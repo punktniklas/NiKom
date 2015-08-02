@@ -1,0 +1,5 @@
+*.uaem
+*.o
+Debug
+NoDebug
+nikom_pragmas.h

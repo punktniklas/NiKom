@@ -1,0 +1,75 @@
+OBJS    = LibInit.o UserLibInit.o Matrix.o Rexx.o Lock.o ReadFidoText.o Echo.o \
+          NodeTypes.o Conf.o Version.o Terminal.o ServerComm.o Hash.o UserInfo.o \
+          Misc.o PrgCat.o Texter.o Crypt.o FCrypt.o
+SCFLAGS = STREQ STRINGMERGE NOSTKCHK LIBCODE UNSIGNEDCHAR
+DEBUG   = DEBUG=LINE
+
+all :  nikom_pragmas.h nikom.library
+
+.c.o :
+	sc $(SCFLAGS) $(DEBUG) $*
+
+setup :
+	makedir Debug
+	makedir NoDebug
+
+clean :
+   delete *.o nikom_pragmas.h
+   delete Debug/* NoDebug/*
+
+nikom_pragmas.h : nikom.fd
+		fd2pragma	nikom.fd nikom_pragmas.tmp
+		convpragma nikom_pragmas.tmp nikom_pragmas.h
+		copy nikom_pragmas.h /Include
+		delete nikom_pragmas.tmp
+
+nikom.library : $(OBJS) nikom.fd
+	nikversion 5 "slink TO Debug/nikom.library NOICONS FROM lib:libent.o $(OBJS) LIBPREFIX _LIB LIBFD nikom.fd LIB lib:sc.lib lib:amiga.lib BATCH NOALVS SMALLCODE SMALLDATA"
+	slink Debug/nikom.library TO NoDebug/nikom.library NODEBUG NOICONS
+
+LibInit.o      : LibInit.c      nikom.fd
+
+UserLibInit.o  : UserLibInit.c  nikom.fd CharTabs.h
+
+Matrix.o       : Matrix.c       nikom.fd /Include/NiKomLib.h /Include/NiKomStr.h
+
+Rexx.o         : Rexx.c         nikom.fd /Include/NiKomLib.h /Include/NiKomStr.h
+
+Lock.o         : Lock.c         nikom.fd /Include/NiKomLib.h /Include/NiKomStr.h
+
+ReadFidoText.o : ReadFidoText.c nikom.fd /Include/NiKomLib.h /Include/NiKomStr.h
+
+Echo.o         : Echo.c         nikom.fd /Include/NiKomLib.h /Include/NiKomStr.h
+
+NodeTypes.o    : NodeTypes.c    nikom.fd /Include/NiKomLib.h /Include/NiKomStr.h
+
+Conf.o         : Conf.c         nikom.fd /Include/NiKomLib.h /Include/NiKomStr.h
+
+Version.o      : Version.c LibInit.o UserLibInit.o Matrix.o Rexx.o Lock.o ReadFidoText.o Echo.o NodeTypes.o Conf.o Terminal.o ServerComm.o Hash.o UserInfo.o Misc.o PrgCat.o Texter.o Crypt.o FCrypt.o /nikversion
+	nikversion 2 "sc $(SCFLAGS) $(DEBUG) Version.c"
+
+Terminal.o     : Terminal.c     nikom.fd /Include/NiKomLib.h /Include/NiKomStr.h
+
+ServerComm.o   : ServerComm.c   nikom.fd /Include/NiKomLib.h /Include/NiKomStr.h
+
+Hash.o         : Hash.c         nikom.fd /Include/NiKomLib.h /Include/NiKomStr.h
+
+UserInfo.o     : UserInfo.c		nikom.fd /Include/NiKomLib.h /Include/NiKomStr.h
+   sc $(SCFLAGS) $(DEBUG) COMMENTNEST $*
+
+Misc.o         : Misc.c			nikom.fd /Include/NiKomLib.h /Include/NiKomStr.h
+	sc $(SCFLAGS) $(DEBUG) COMMENTNEST $*
+
+UserGroups.o      : UserGroups.c		nikom.fd /Include/NiKomLib.h /Include/NiKomStr.h
+
+PrgCat.o : PrgCat.c	nikom.fd /Include/NiKomLib.h /Include/NiKomStr.h
+	sc $(SCFLAGS) $(DEBUG) COMMENTNEST $*
+
+Texter.o : Texter.c	nikom.fd /Include/NiKomLib.h /Include/NiKomStr.h
+	sc $(SCFLAGS) $(DEBUG) COMMENTNEST $*
+
+Crypt.o : Crypt.c	nikom.fd /Include/NiKomLib.h /Include/NiKomStr.h
+	sc $(SCFLAGS) $(DEBUG) COMMENTNEST $*
+
+FCrypt.o : FCrypt.c Des.h
+	sc $(SCFLAGS) $(DEBUG) COMMENTNEST $*
