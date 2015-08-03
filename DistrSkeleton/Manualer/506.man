@@ -1,0 +1,13 @@
+
+
+Exekvera Profile
+----------------
+
+Synopsis: Exekvera Profile
+
+Beskrivning:
+Kör din personliga profile.
+Profilen är en sorts script-fil som man kan fylla med vanliga NiKom-kommandon.
+Denna scriptfil körs sedan automatiskt när man loggar in.
+
+Se Även: Ändra Profile, Visa Profile

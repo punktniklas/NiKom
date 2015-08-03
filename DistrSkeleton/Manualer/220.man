@@ -1,0 +1,11 @@
+
+
+Var
+---
+
+Synopsis: Var
+
+Beskrivning:
+Visar vilket möte man befinner sig i och hur många olästa texter man har där.
+
+Se Även: Lista Nyheter, Lista Möten

@@ -1,0 +1,11 @@
+
+
+Download, Ladda ner
+-------------------
+
+Synopsis: Download <filnamn> [<filnamn> [<filnamn> [..]]]
+
+Beskrivning:
+Laddar ner de angivna filerna ur den filarean man befinner sig i.
+
+Se Även: Upload, Lista Filer, Lista Areor, Sök, Visa Filinfo

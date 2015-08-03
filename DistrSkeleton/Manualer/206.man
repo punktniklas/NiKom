@@ -1,0 +1,11 @@
+
+
+Igen
+----
+
+Synopsis: Igen
+
+Beskrivning:
+Visar den senast lästa texten en gång till.
+
+Se Även: Läs

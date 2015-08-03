@@ -1,0 +1,13 @@
+
+
+Nästa Text
+----------
+
+Synopsis: Nästa Text
+
+Beskrivning:
+Detta kommando bryter den kommentars-kedja man är inne i och tar fram
+'(Läsa) Nästa Text'-prompten. Kommentarerna man inte läste är dock
+fortfarande markerade som olästa.
+
+Se Även: Hoppa Över, Endast

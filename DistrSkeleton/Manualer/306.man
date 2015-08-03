@@ -1,0 +1,9 @@
+
+
+Tiden
+-----
+
+Synopsis: Tiden
+
+Beskrivning:
+Visar vad klockan är och dagens datum samt hur lång systemtid man har kvar.

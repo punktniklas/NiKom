@@ -1,0 +1,186 @@
+Grupper
+=======
+
+En grupp är ett sätt att enkelt sammanföra ett antal användare som ska
+få tillgång till samma saker. Tex kan en användarförenings BBS ha en
+medlemsgrupp som gör att de som är med i gruppen får tillgång till vissa
+meddelandeareor.  För att skapa en grupp ger man kommandot 'Skapa Grupp'.
+Då får man först av allt upp en fråga om vad gruppen ska heta.
+
+Efter detta kommer en fråga om vid vilken status användare automatiskt ska
+bli medlem i gruppen. Anger man -1 så blir ingen automatiskt medlem utan
+måste göras medlem för hand. Om man anger 0 så kommer alla användare att
+bli medlemmar i gruppen.
+
+Man kan även göra en grupp hemlig, då kan bara de som är medlemmar i
+gruppen se att den existerar.
+
+Man kan när som helst ändra de olika uppgifterna i en grupp med kommandot
+'Ändra Grupp'. Man kan även radera en grupp med kommandot 'Radera Grupp'.
+
+För att se vilka grupper som finns så ger man kommandot 'Lista Grupper'. De
+grupper som det står en stjärna framför är man inte medlem i.
+
+Vill man se vilka personer som är medlem i en grupp så använder man en
+flagga till kommandot 'Lista Medlemmar' (som normalt visar medlemmarna i
+ett möte). Man skriver 'Lista Medlemmar -g <gruppnamn>'. Man kan även se
+vilka grupper en person är medlem i genom att använda kommandot status.
+
+Vill man göra en person medlem i en grupp som inte styrs av status eller
+i en grupp som användaren egentligen inte har tillräcklig status för att
+vara med i så ger man kommandot 'Addera Gruppmedlem'. Kommandot för att
+göra det motsatta (dvs göra så att en användare inte är medlem i gruppen
+längre) heter 'Subtrahera Gruppmedlem'.
+
+Observera! Om en användare har blivit medlem i en grupp pga av att han haft
+tillräcklig status men senare får sänkt status så utesluts han INTE, jag
+repeterar INTE, ur gruppen. Detta måste ske för hand.
+
+                             Flaggorna
+                             =========
+
+I NiKom finns det ett antal flaggor som antingen kan vara avslagna eller
+påslagna. Kommandot 'Lista Flaggor' ger en lista över de som finns samt
+talar om om de är på eller avslagna. Man ändrar flaggor med kommandona 'Slå
+På' och 'Slå Av'.
+
+Skyddad Status
+--------------
+Om denna flagga är påslagen så kan bara de som har tillräcklig status
+(definieras i Status.cfg) se adress och telefonuppgifter på en användare.
+
+Streckrad under ärendet
+-----------------------
+Om denna flagga är påslagen så kommer det att skrivas ut en rad med streck
+under ärendet till varje text. Tex:
+Ärende: Hejsan hoppsan
+----------------------
+
+ISO 8 bitars tecken
+-------------------
+Om denna flagga är avslagen så kommer NiKom att översätta in och utgående
+tecken så att de svenska tecknen representeras av s.k. måsvingar. Många
+använder 7 bitars teckenuppsättningar och där är de svenska tecknen
+representerade som följer:
+
+Normala Amiga-tecken (ISO)    7-bitars svenska tecken
+          }                              å
+          {                              ä
+          |                              ö
+          ]                              Å
+          [                              Ä
+          \                              Ö
+
+Ingen autohjälp
+----------------
+Om denna flagga är påslagen så kommer inte den automatiska hjälptexten fram
+när man skrivit två felaktiga kommandon i rad.
+
+Fullskärmseditor
+----------------
+Om denna flagga är påslagen så används NiKoms fullskärmseditor istället för
+radeditorn. (Se kapitlet om editorer)
+
+Automatisk Fillista
+------------------
+Om denna flagga är påslagen så kommer det automatiskt upp en lista över nya
+filer vid lista nyheter.
+
+Mellanslag som paustangent
+--------------------------
+Om denna flagga är påslagen så kan mellanslag användas för att pausa
+utskriften precis som Ctrl-S.
+
+Lapp vid brev
+-------------
+Om denna flagga är påslagen så kommer en användares lapp att synas före
+brevheadern varje gång som någon skriver ett brev till honom. Är användbart
+för att tex tala om att man är bortrest och inte kan svara på brev på ett
+tag.
+
+ANSI-sekvenser skickas
+----------------------
+Om denna flagga är avslagen så skickas det aldrig några ANSI-sekvenser på
+kommandoraden och liknande ställen. För att kunna editera kommandoraden så
+krävs det att denna flagga är påslagen.
+
+
+Användare
+=========
+
+Skulle man vilja få information om en viss användare så kan man använda
+kommandot 'Status'. Detta använder man även för att få information om sig
+själv. Tex hur många inloggningar man har gjort, hur många texter man har
+skrivit osv.
+Om man vill ändra tex sina adressuppgifter så finns kommandot
+'Ändra Användare'. Den person som har tillräcklig status (anges i
+Status.cfg) kan även ändra andra användare än sig själv, ändra antal
+ inloggningar, statusnivå etc.
+Om man vill veta vilka användare som finns så kan man använda kommandot
+'Lista Användare'.
+
+Lista Senaste
+=============
+Med kommandot 'Lista Senaste' kan man se vilka som varit inloggade den
+senaste tiden och vad de har gjort för något.
+
+Info
+====
+I de flesta baser finns det olika informationstexter upplagda. Dessa kan
+man få fram med kommandot 'Info'
+
+Pratstund med sysop
+===================
+Om man skulle vilja prata direkt med sysop så ska man använda kommandot
+'Ropa'. Då påkallas sysops uppmärksamhet och om han är tillgänglig (och
+vill prata) så svarar han genom att trycka på Return i fönstret.
+
+Tiden
+=====
+Kommandot 'Tiden' används för att få reda på vad klockan är, vilket datum
+det är samt hur lång systemtid man har kvar.
+
+Olika noder
+===========
+Om basen har olika noder så kan man ta reda på vilka som är inloggade på de
+olika noderna med kommandot 'Vilka'. Då får man också reda på på ett
+ungefär vad de gör.
+Skulle man sedan vilja säga något till någon som är inloggad samtidigt så
+finns kommandot 'Säg' att tillgå.
+
+System Info
+===========
+Med kommandot 'SysInfo' så kan man få reda på en del om systemet. Bla
+vilket det högsta användarnumret är, högsta mötesnumret osv.
+
+Manualer
+========
+Om man under inloggningen skulle vilja få reda på lite mer om hur ett
+kommando fungerar så rekommenderas kommandot 'Manual'.
+
+Profiles
+========
+Alla användare kan skapa en egen kommando-fil som körs automatiskt när man
+loggar in. I denna fil kan man ha vanliga NiKom-kommandon. Vanligast är att
+ha 'Lista Nyheter' och 'Vilka' här. För att editera sin profile ger man
+kommandot 'Ändra Profile'. Vill man sedan titta på den finns kommandot
+'Visa Profile'. Vill man testköra sin profile kan man använda kommandot
+'Exekvera Profile'.
+
+Lappar
+======
+Alla användare kan skapa en egen lapp. Denna lapp syns sist av allt när man
+tar status på en person. I denna kan man tex tala om att man är bortrest
+ett tag. För att editera sin lapp ger man kommandot 'Ändra Lapp'. Vill man
+ta bort sin lapp finns kommandot 'Radera Lapp'.
+
+Alias
+=====
+Man kan definiera sina egna alias för olika kommandon. Det gör att om man
+hellre vill skriva 'Nisse' istället för 'Status' så definierar man ett
+alias som heter 'Nisse' men betyder 'Status'.
+Ett alias kan bara vara enordigt men kan betyda flera ord. Ett alias har
+högre prioritet än vanliga kommandona så gör man ett alias som heter
+'Status' så kan man inte använda kommandot 'Status' förrän man tar bort det
+aliaset.
+Kommandot man använder heter just 'Alias'.

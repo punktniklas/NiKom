@@ -1,0 +1,10 @@
+
+
+Sysinfo
+-------
+
+Synopsis: Sysinfo
+
+Beskrivning:
+Ger information om en del i systemet. Bla hur många användare, möten, texter
+osv det finns. Visar även CLI-kommandona 'info' och 'avail'.

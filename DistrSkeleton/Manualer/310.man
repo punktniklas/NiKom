@@ -1,0 +1,12 @@
+
+
+Vilka
+-----
+
+Synopsis: Vilka
+
+Beskrivning:
+Visar vilka som är inloggade på de olika noderna samt om dessa skriver en
+text, läser en text, chattar eller inte gör något speciellt.
+
+Se Även: Status

@@ -1,0 +1,35 @@
+/* Kommandot System
+$VER: System 1.0 (20.4.92)
+N=SYSTEM
+O=1
+#=523
+*/
+
+parse arg nod pers .
+
+options results
+
+do forever
+	'sendstring' '0d0a'x'DOS> '
+	'getstring 128'
+	inmat=result
+	if rc>0 then exit 5
+	parse var inmat nikcommand resten
+	if inmat = "" then exit
+	if abbrev('upload',nikcommand) then do
+		'recbinfile' resten
+		iterate
+	end
+	if abbrev('download',nikcommand) then do
+		'sendbinfile' resten
+		iterate
+	end
+	if left(nikcommand,1) = '"' then do
+		tofunc = 'retur=' resten
+		interpret tofunc
+		'sendstring' '0d0a0a'x || retur '0d0a'x
+		iterate
+	end
+	'runfifo' inmat
+
+end

@@ -1,0 +1,12 @@
+
+
+Nu ska du ställa in vilka söknycklar som filen ska ha. För att få fram en
+lista på alla säknycklar, skriv '?'. Sedan räcker det att skriva början av
+ett nyckelnamn och trycka return så fyller NiKom i resten. För att se vilka
+nycklar man har satt så skriver man '!' och trycker Return. Om man ångrar
+sig och inte vill ha en nyckel som man satt så skriver man bara det
+nyckelnamnet igen. Försök att sätta så många passande nycklar som möjligt.
+Tex om det följer med källkod i C så sätt nycklarna 'Källkod' och 'C'.
+Detta gör att det blir lättare att hitta filer sedan.
+
+När du är klar trycker du Return på en tom rad.

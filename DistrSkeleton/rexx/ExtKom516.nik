@@ -1,0 +1,30 @@
+/* Kommandot Skapa Privatarea
+$VER: Skapa Privatarea 1.0 (20.4.92)
+N=SKAPA PRIVATAREA
+O=2
+#=516
+A=.
+*/
+
+parse arg nod pers namn
+
+namn=strip(namn)
+
+if namn = "" then do
+	'sendstring' '0d0a0a'x'Skriv: Skapa Privatarea <användare>' '0d0a'x
+	exit
+end
+
+area = NiKParse(namn,'n')
+
+if area = -1 then do
+	'sendstring' '0d0a0a'x'Finns ingen sådan användare!' '0d0a'x
+	exit
+end
+
+if Exists('nikom:Privat/'||area) then do
+	'sendstring' '0d0a0a'x UserInfo(area,'n') 'har redan en privat filarea!' '0d0a'x
+	exit
+end
+
+address command 'makedir nikom:Privat/'||area

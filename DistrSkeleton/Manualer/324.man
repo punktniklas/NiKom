@@ -1,0 +1,20 @@
+
+
+Alias
+-----
+Synopsis: Alias [<alias> [<betydelse>]]
+
+Beskrivning:
+Definierar ett alias som kan användas istället för den längre betydelsen.
+Tex:
+   alias ny lista användare -s0
+Detta gör så att varje gång man skriver 'ny' så kommer istället 'lista
+användare -s0' att utföras. Ett alias kan bara vara ett ord men dess
+betydelse kan vara flera.
+Om man bara skriver alias utan argument så visas en lista över definierade
+alias.
+Man kan omdefiniera ett alias genom att (om vi fortsätter på det förra
+exemplet) bara skriva:
+   alias ny lista möten
+Vill man sedan ta bort aliaset helt skriver man rätt och slätt:
+   alias ny

@@ -1,0 +1,12 @@
+
+
+Upload, Ladda Upp
+-----------------
+
+Synopsis: Upload
+
+Beskrivning:
+Laddar upp en fil till basen. Man behöver inte befinna sig i rätt area när
+man ska ladda upp utan det kan anges separat.
+
+Se Även: Lista Filer, Lista Areor, Sök, Visa Filinfo, Download

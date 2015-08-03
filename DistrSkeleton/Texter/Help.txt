@@ -1,0 +1,66 @@
+
+
+NiKom är ett KOM-system som när man väl lärt sig det är klart mycket
+smidigare att använda än meny-baserade system typ Paragon.
+
+Alla diskussioner sker i något som kallas för möten. Det finns flera olika
+möten för olika intressen. För att få upp en lista på alla möten så ger man
+kommandot 'Lista Möten'. En del (eller kanske alla) möten står det en
+stjärna framför. Med detta menas att man inte är medlem i dessa möten. Man
+kan bara läsa och skriva texter i möten som man är medlem i. De flesta
+möten är öppna för alla att vara med i. En del får dock bara vissa utvalda
+personer vara med i, sådana möten står det (slutet) efter. För att bli
+medlem i ett möte så ger man kommandot 'Medlem <mötesnamn>'. Alla mötesnamn
+går att förkorta. Så att istället för att skriva 'Fritt Forum' så räcker
+det alldeles säkert med 'Fr Fo'.
+Om man skulle vilja gå ur ett möte som man finner ointressant så använder
+man kommandot 'Utträd <mötesnamn>'.
+
+När man har blivit medlem i ett möte som man har olästa texter i så ändras
+prompten till '(Gå till) nästa möte'. Med det menas att NiKom föreslår att
+man ska gå till nästa möte som man har olästa texter i. Om man bara trycker
+Return så kommer detta att ske. Då ändras prompten '(Läsa) nästa text'.
+Trycker man bara Return nu så kommer man att läsa nästa text. Om den texten
+har några kommentarer så står detta direkt efter texten i vilka texter det
+finns och vem som har skrivit dem. Då kommer prompten ännu en gång att
+ändras, nu till '(Läsa) nästa kommentar'. Man får alltså läsa kommentarer
+direkt efter texten som de var kommentarer till så man inte tappar tråden.
+
+På detta sätt kan man alltså genom att bara trycka Return läsa alla olästa
+texter man har. Om man nu skulle vilja kommentera en text så ger man
+kommandot 'Kommentera'. Kommentera kommenterar ALLTID den senast lästa
+texten. Vill man kommentera en annan text så anger man det som parameter.
+tex 'kommentera 45'. Skulle man vilja ge en personlig kommentar till en
+text som bara den som skrivit texten kan läsa (texten hamnar alltså i
+brevlådan) så ger man kommandot 'personlig'.
+När man gjort detta så kommer man ut i texteditorn. Där skriver man vad man
+vill ha skrivet. När man är klar med det ser man till att man befinner sig
+först på en rad, där trycker man på Ctrl-Z. Det finns ett antal kommandon
+i editorn också. Alla dessa börjar med ett utropstecken och måste skrivas
+först på en rad. För att få upp en lista på vilka kommandon som finns,
+skriv '!?' (naturligtvis först på en rad)
+
+Om man vill skriva en helt ny text så måste man först befinna sig i rätt
+möte. (Rätt möte är alltså det möte som man vill skriva texten i) Detta gör
+man med kommandot 'gå <mötesnamn>'. Om man vill veta vilket möte man
+befinner sig i just nu så ger man kommandot 'var'.
+När man gjort detta så ger man kommandot 'skriv' ('inlägg' går lika bra om
+man skulle föredra det). Då får man första skriva ett ärende som ska tala om
+vad diskussionen handlar om. Sedan kommer man ut i texteditorn som vanligt.
+
+Om man har väldigt många olästa texter i ett möte som man inte har någon
+lust att läsa så kan man ge kommandot 'endast <antal texter>'. Man får då
+så många olästa texter i det mötet man befinner sig i. Om man anger fler
+texter än det finns i mötet så får man alla texter i olästa.
+
+Andra bra kommandon
+-------------------
+Lista Kommandon  -  Listar alla kommandon
+Ropa             -  Ropar på sysop
+Hoppa över       -  Hoppar över alla kommentarer till en text
+Brev <användare> -  Skickar ett brev till den personen
+Sluta            -  Visar utloggningstexten och lägger sedan på. Använd
+                    detta istället för att bara lägga på själv.
+Info             -  Ger information om olika saker
+
+För att pausa utskriften, tryck på mellanslag.

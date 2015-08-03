@@ -1,0 +1,29 @@
+
+
+I fullskärmseditorn kan man gå runt med piltangenterna precis som man kan
+i alla vanliga editorer. Det finns även ett par andra saker man kan göra
+genom att trycka Ctrl och någon tangent.
+
+Ctrl-Z - Sparar texten. Kan tryckas ner varsomhelst i editorn.
+
+Ctrl-C - Kastar bort texten utan att spara den.
+
+Ctrl-K - Raderar till slutet av en rad, ala Emacs. Det raderade stoppas
+         i en yankbuffert.
+
+Ctrl-X - Raderar raden markören står på och flyttar upp underliggande
+         rader.
+
+Ctrl-Y - Tar fram det som ligger i yankbufferten, om det får plats på raden.
+
+Ctrl-A - Hoppar till början av raden.
+
+Ctrl-E - Hoppar till slutet av raden.
+
+Ctrl-Q - Utför ett längre kommando. Följande kommandon finns:
+         Flytta <mötesnamn> - flyttar texten till ett annat möte.
+         Dump - stänger av ekot av tecken så att man lättare kan ladda upp
+                textfiler.
+         Ärende - Ändrar ärendet på texten.
+
+Ctrl-R - För att citera den kommenterade texten.

@@ -1,0 +1,23 @@
+/* Detta program körs varje gång någon loggar in */
+parse arg nod person .
+
+signal ON ERROR
+
+LF= '0a0d'x
+LLF= '0a0a0d'x
+
+filnamn='ram:NiKom/Mark'||nod
+if ~open('fil',filnamn,'W') then 'sendstring' '0d0a0a'x'Kunde inte rensa markerade-texter-filen' '0d0a'x
+
+profile='NiKom:Users/'||person%100||'/'||person||'/Profile'
+
+if ~open('prfil',profile) then exit
+
+do until eof('prfil')
+	foo=readln('prfil')
+	if NiKParse(foo,'k')=506 then do
+		'sendstring' '0d0a0a'x || 'Du kan inte ha 'Exekvera Profile' i din profile.' '0a0d'x
+		iterate
+	end
+	'nikcommand' foo
+end

@@ -1,0 +1,13 @@
+
+
+Lista Privatfiler
+-----------------
+
+Synopsis: Lista Privatfiler
+
+Beskrivning:
+Listar filerna i den privata filarean, förutsatt att en sådan finns.
+För att få en privat filarea måste man be sysop om en. Filerna i denna area
+ska raderas av ägeren till arean när de inte behövs längre.
+
+Se Även: Privat Upload, Privat Download, Radera Privatfil

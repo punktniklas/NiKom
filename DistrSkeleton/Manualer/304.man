@@ -1,0 +1,11 @@
+
+
+Slå På
+------
+
+Synopsis: Slå På <flagga>
+
+Beskrivning:
+Slår på den angivna flaggan och talar samtidigt om hur den stod innan.
+
+Se Även: Slå Av, Lista Flaggor

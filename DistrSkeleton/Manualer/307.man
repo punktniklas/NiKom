@@ -1,0 +1,17 @@
+
+
+Ropa
+----
+
+Synopsis: Ropa
+
+Beskrivning:
+Ropar på sysop för en liten pratstund. Blinkar skärmen 10 ggr på BBS-
+datorns skärm med ca 1 sekunds mellanrum. Om sysop inte har svarat efter
+10 sekunder återgår man till KOM-systemet.
+Samtalet med sysop avslutas med Ctrl-Z.
+
+Om man under samtalet trycker Ctrl-C kommer man ut i ett specialläge. (Det
+står "Tar bort filtret") I detta läge så skickas alla tecken precis som de
+är. Inga konverteringar för radbrytning eller dyl görs. Ursprungligen var
+detta tänkt för att kunna spela upp ANSI-animeringar.

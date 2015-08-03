@@ -1,0 +1,6 @@
+/* Program för att radera en användare */
+
+parse arg nod pers radera .
+
+dirnamn = 'NiKom:Users/' || radera%100 || '/' || radera 'ALL'
+address command 'delete >nil:' dirnamn

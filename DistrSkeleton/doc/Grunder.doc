@@ -1,0 +1,205 @@
+                           Systemet NiKom
+                           ==============
+
+Det är fyra körbara filer som hanterar systemet. Dessa är
+
+  NiKServer
+  NiKomCon
+  Prenode
+  GetRelLine
+
+
+NiKServer
+----------
+SYNTAX: NikServer
+
+Detta är den s.k. servern för hela systemet. Detta program håller i allt
+gemensamt minne och delar ut rättigheter att öppna NiKoms systemfiler.
+
+När NiKServer startas läser den in alla filer som behövs. Bla
+konfigurationsfilerna. Detta kan ta en liten stund. Servern behöver dock
+aldrig stängas av (såvida man inte ska göra något annat och har ont om
+minne) så man behöver bara starta den när datorn startas upp.
+
+Endast en Server kan finnas samtidigt och Servern måste vara igång för att
+köra NiKomCon eller Prenode.
+
+I Servern ligger funktionsdelen av NiKoms Arexx-interface. Det räcker
+alltså med att Servern är igång för att använda dessa.
+Programmet avslutas med att man klickar på det lilla fönster som den öppnar.
+
+Det är tillrådligt att låta anropet ske i bakgrunden genom 'run NikServer'.
+
+
+NiKomCon
+--------
+SYNTAX: NiKomCon
+
+Om du vill logga in lokalt är det detta program som ska användas.
+Bakgrundsanrop rekommenderas.
+
+
+Prenode
+--------
+SYNTAX: Prenode [konfigurationsfil] [-Getty [-Bxxxx]]
+
+Detta program används för att starta en nod som tar emot inloggningar
+via modemet. Vid uppstart kommer den att läsa in filen SerNode.cfg eller
+en annan fil som detta har angivits som argument. Modemet initieras sedan
+och Prenode kommer att vänta på att någon ska ringa.
+
+För att ha flera noder med olika modem så skapar man alltså flera
+SerNode.cfg och anger på kommandoraden vilken konfigurationsfil varje nod
+ska använda.
+
+Om -Getty anges om argument så förväntar sig Prenode att någon redan har
+ringt och att modemet redan är uppkopplat. Den kommer då direkt att visa
+inloggningstexten. När personen sedan loggar ut så avslutas Prenode
+istället för att vänta på att någon ska ringa. Detta kan användas tex för
+att starta Prenode från TrapDoor eller Getty.
+När man anger -Getty kan man även ange -Bxxxx som då talar om vilken
+hastighet som ska användas mellan dator och modem.
+
+
+GetRelLine
+----------
+SYNTAX: GetRelLine <nodnr>
+
+Får den angivna noden (som lämpligen bör vara en Prenode-nod) att stänga
+sitt device så att man exempelvis kan ringa ut själv. För att öppna devicet
+igen kör man GetRelLine igen.
+
+Detta program är mest tänkt för de som tex pollar UseNet eller FidoNet mitt
+i natten. Innan man kör programmet bör man med ett ARexx-program kolla att
+ingen är inloggad, då GetRelLine inte tar hänsyn till detta.
+
+
+
+                             Starta systemet
+                             ===============
+
+OBS!! Innan något program startas, se till att stacken är tillräckligt
+hög. NiKom kräver minst ca 30000 i stack. Har man gott om minne kan man
+gärna klämma till med 50000.
+Stacken ställer man in med CLI-kommandot 'Stack'. Ex:
+
+1> stack 50000
+1> run NiKServer
+ <bla bla bla>
+1> run Prenode
+
+
+Först startar man alltså servern med "run NiKServer". När denna är klar och
+har läst in alla sina filer så startar man en eller flera noder. Varje nod
+öppnar sitt eget fönster på serverns skärm. Här kan man se allt som händer
+precis som det ser ut "på andra sidan". Man kan även skriva i ett fönster
+som Prenode öppnat. Programmet gör ingen skillnad på om inmatningen kommer
+från modemet eller från tangentbordet.
+
+Om det är första gången NiKom startas så bör man logga in lokalt (med
+NiKomCon) först och göra iordning systemet innan man låter folk ringa.
+Logga in som sysop med lösen sysop (InitNiKom skapade ju en sådan
+användare).
+Förmodligen vill du inte heta sysop utan ge kommandot 'Ändra Användare' och
+fyll i dina uppgifter. Tänk också ut ett bra lösenord. Om någon med onda
+avsikter skulle komma på detta lösenord så kan det i värsta fall leda till
+att hela basen måste startas om.
+
+Alla fönster på NiKom-skärmen kan man stänga genom att klicka längst upp
+till vänster. Observera dock att om man stänger en nod på detta sätt och
+någon är inloggad så sparas inte användarens aktuella data på disken, och
+nästa gång användaren loggar in kommer han att få läsa om de texter han
+läste den här gången. För att alla uppgifter ska sparas måste användaren
+logga ut med kommandona 'sluta' eller 'logout'.
+
+Detta kan dock vara praktiskt om man själv som sysop vill logga in bara för
+att kolla någon sak. Om man stänger fönstret kommer det inte heller synas i
+listan över de senast inloggade att man var inne.
+
+
+
+
+                  Grundläggande användning av NiKom
+                  =================================
+
+NiKom är ett s.k. KOM-system. Det finns inga menyer någonstans utan allting
+styrs genom att ge kommandon. Alla kommandon kan utföras närsomhelst.
+
+Kommandona består antingen av ett eller två ord. Kommandona kan också ta
+ett eller flera argument. Med detta menas att man skriver något efter
+kommandot för att styra det. Tex så när man ska ladda ner en fil så måste
+man tala om vilken fil man vill ladda ner. Då skriver man det som argument
+till kommandot 'Download'. Dvs: 'Download MinFil.lzh'
+
+Alla kommandon kan också förkortas ner till sin minsta unika del. Man kan
+alltså skriva bara några bokstäver så länge detta inte passar in på något
+annat kommando. Istället för 'Lista Möten' räcker det med 'Li Mö'. Även
+'L Mö' skulle gå alldeles utmärkt. Däremot passar 'L M' in på både 'Lista
+Möten' och 'Lista Medlemmar'. Om man skulle skriva något som passar in på
+flera kommandon så kommer det upp en lista på de kommandon man kunde ha
+menat. Det är alltså ingen farligt att experimentera hur långt man kan
+förkorta ett kommando.
+
+Vill man få upp en lista på alla tillgängliga kommandon så kan man ge
+kommandot 'Lista Kommandon'
+
+Det är inte bara kommandon som kan förkortas, utan även användarnamn,
+mötesnamn, gruppnamn, filnamn etc. Dvs, nästan allt kan förkortas. För
+användare går det även bra att skriva användarnumret om man vill det.
+
+Inloggning
+----------
+När modemen har kopplat upp så kommer det fram en text, inloggningstexten.
+Efter denna så kommer det fram en prompt: 'Namn:'. Om man redan har ett
+konto på basen så skriver man sitt användarnamn eller nummer. (Kom ihåg att
+namnen går att förkorta). Om NiKom känner igen namnet så ska man skriva
+sitt lösenord. Tänk på att det är skillnad på små och stora bokstäver.
+När man skrivit rätt lösenord så kommer du in i systemet och kan börja ge
+kommandon.
+
+Om man inte har ett konto så skriver du vanligtvis 'ny' som namn för att
+fylla i en ansökan om ett konto. Vad man ska skriva för att registrera sig
+som ny användare kan man ändra på i System.cfg. Vad man än ska skriva bör
+detta talas om i inloggningstexten.
+
+TIPS! Om man vill kolla alla nya användare innan de får tillgång till basen
+      kan man använda en speciell statusnivå för just nya användare. Denna
+      statusnivå ger man sedan en maximal tid på -1, dvs ingen tid alls. (0
+      går inte att använda eftersom detta betyder att man har obegränsat
+      med tid.) Sedan kan man med lista alla nya användare med hjälp av
+      lista användare. Om alla nya användare har status 0 tex så skriver
+      man 'lista användare -s0' för att få upp en lista på alla med status
+      0. Ännu ett tips är att definiera ett alias, tex 'ny' för det.
+
+
+Utloggning
+----------
+När man vill logga ut ur basen så ska man ge kommandot 'Sluta' eller
+'Logout'. Man ska INTE bara lägga på modemet, även om NiKom i de flesta fall
+klarar av att upptäcka det.
+
+
+Börja Om
+--------
+Med kommandot Börja Om kan man när man ringer till basen påbörja en ny
+inloggning utan att behöva ringa upp igen. Detta kommando bör vara
+begränsar så att endast sysop kan använda det.
+
+Kontroll av utmatning
+---------------------
+Man kan för det mesta avbryta utskriften av tex en text genom att trycka
+Ctrl-C. Om basen använder ett höghastigehtsmodem kan det hända att det
+dröjer lite innan utmatningen verkligen avbryts. Detta beror på att modemet
+har en egen buffer. NiKom har slutat skicka något till modemet men modemet
+håller på en liten stund till.
+
+Man kan få en automatisk paus efter ett visst antal raders utskrift, man
+måste då trycka på return för att utmatningen ska fortsätta. Det normala är
+att man har detta inställt på 25 rader. Man kan ändra det med kommandot
+'Ändra Användare'.
+Om man inte vill ha någon paus alls sätter man värdet till 0.
+
+Man kan alltid pausa utskriften genom att trycka på Ctrl-S. Om man har
+flaggan "Mellanslag som paustangent" påslagen kan man även pausa med
+mellanslag. För att fortsätta utskriften trycker man sedan på valfri
+tangent.

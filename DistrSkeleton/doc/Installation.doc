@@ -1,0 +1,359 @@
+@database installation
+
+@node main
+Tilldelning
+--------------
+Börja med att tilldela det logiska namnet "NiKom:" till katalogen som
+bildar roten för systemet.
+
+           assign NiKom: <enhet:katalog>
+
+tex        assign NiKom: dh0:NiKomBBS
+
+I denna katalog bör sedan det uppackade NiKom-arkivet ligga med bibehållen
+katalogstruktur.
+
+Katalogkontroll
+---------------
+I NiKom: förväntar sig systemet att följande underkataloger finns. En del
+ska redan finnas och en del måste skapas.
+
+
+DatoCfg   - Innehåller NiKoms datafiler (.dat) samt de olika
+            konfigurationsfilerna (.cfg).
+
+Lappar    - Innehåller s.k. möteslappar. Det är en liten info-text om mötet
+            som man får upp med kommandot 'Mötesstatus' samt när man blir
+            medlem i ett möte.
+            Filerna här heter <mötesnr>.motlapp. (Tex 2.motlapp)
+
+Moten     - Innehåller alla texter och huvuden för alla möten.
+
+Rexx      - Innehåller alla de Arexx-program som kan startas från NiKom.
+            Filerna heter ExtKom<kommandonr>.nik, tex ExtKom501.nik
+
+Texter    - Innehåller diverse textfiler. Textfiler som ska åberopas med
+            kommandot "info" måste sluta på .txt
+
+Manualer  - Innehåller manualtexter som åberopas med kommandot "man".
+            Filerna heter <nr>.man där <nr> är kommando-numret.
+            Kommando-numret definieras i filen Kommandon.cfg.
+
+Privat    - Innehåller privata filareor. De användare som har en privat
+            filarea har en katalog här med användarnumret som namn.
+
+Users     - Innehåller all användardata.
+
+
+Kontrollera att dessa kataloger finns. Om inte, skapa dem.
+
+Övriga filer och kataloger
+--------------------------
+Det krävs att det finns en katalog i Ram: som heter NiKom. Se
+till att detta skapas varje gång datorn startas.
+
+För överföringar med ZModem krävs det att xprzmodem.library ligger i libs:.
+Med i arkivet hittar du xprzmodem.library version 2.52.
+
+I ExtKom10.nik används ett DOS-kommando som heter Move för att flytta filer
+från temporärkatalogen till den katalog i filarean där det ska ligga.
+Move är inte en del av Amigans standardkommandon. Ett Move-kommando följer
+med detta arkiv.
+
+För att kunna köra externa program via Fifo (se ARexx-kommandot 'runfifo')
+så krävs det att Fifo är installerat i systemet. Mer om detta står i
+manualen till Fifo som följer med det här arkivet.
+
+Skräddarsy systemet
+-------------------
+Nu kan man börja skräddarsy systemet.
+
+Först av allt bör man bestämma sig för vilka statusnivåer man vill använda
+sig av. Möjliga statusnivåer är från 0 till 100. Den högsta (100) är tänkt
+för sysop. Man behöver inte använda alla statusnivåer utan man definierar
+bara så många som man vill använda.
+Ha gärna lite utrymme mellan nivåerna så det senare finns möjlighet att
+klämma in statusnivåer emellan.
+
+Ett tips är att reservera nivå 0 för helt nya användare vars namn och
+adressuppgifter inte har kollats. När dessa sedan valideras så höjs deras
+status.
+Man bör också ha en statusnivå (tex 10) för avstängda användare som har
+misskött sig av någon anledning. dessa bör då bara få tillgång till
+brevlådan.
+
+
+
+                   Filerna i katalogen DatoCfg
+                   ===========================
+
+Sedan är det dags att börja fylla i de olika konfigurationsfilerna. De
+konfigurationsfiler som följer med går i stort sett att använda utan
+någon modifikation. Förmodligen vill du dock inte ha det riktigt så som
+det är som standard. Ta dig därför tid att ändra i dessa filer.
+
+Alla filer kan ändras senare, men det är bra att gå igenom de noga en gång
+innan basen startas upp.
+
+System.cfg
+----------
+I system.cfg definierar man olika saker om systemet i stort, bla de olika
+status-nivåerna.
+Denna fil är ganska självförklarande och det bör inte vara några större
+problem att fylla i den.
+
+
+Status.cfg
+----------
+Här definieras olika statusnivåer som krävs för att utföra vissa saker i
+systemet. Tex för att skriva i skrivskyddade möten eller ändra andra
+användares uppgifter.
+Detta kan användas för att ge en cosysop rättigheter att göra vissa saker
+som normalt bara sysop kan göra.
+
+
+Kommandon.cfg
+-------------
+När de olika statusnivåerna är definierade skall man definiera lägsta
+statusnivå för alla kommandon. Dvs vilken minimistatus ett kommando
+är förknippat med för att användas av olika användare.
+Tänk efter noga innan definieringen fastslås.
+Definieringarna anges i filen "Kommandon.cfg".
+
+Ett kommando definieras som följer:
+Först av allt kommer en rad som börjar på stort N och efter det ett
+likamed-tecken. Därefter kommer namnet på kommandot. Tex:
+N=LISTA ANVÄNDARE
+
+Därefter följer några andra fält:
+#=Kommandots nummer. Arexx-program har nummer 500 eller större. Detta
+  nummer använder NiKom för att identifiera kommandot.
+O=Antal ord i kommandot, 1 eller 2.
+S=Minimistatus för att utföra kommandot.
+A=Vilken typ av argument kommandot tar. Ett '#'-tecken anger ett numeriskt
+  värde. Något annat anger att kommandot tar vad som helst i argument och
+  utelämnar man A:et så tar kommandot inget argument.
+L=Minsta antalet inloggningar man måste ha gjort för att utföra kommandot.
+D=Minsta antal dagar man måste ha varit registrerad för att utföra
+  kommandot.
+X=Ett eventuellt lösenord för att utföra kommandot.
+V=Om detta är satt till 'N' så betyder det att det bara kommer vara synligt
+  för de som har rätt att utföra kommandot.
+
+Den sista flaggan kan kanske behöva en lite närmare förklaring så vi tar
+ett exempel:
+
+Nisse har ett sysop-kommando som heter 'Slasktratt', som det krävs
+status 100 för att få utföra. Om V-flaggan inte är satt till N så hade
+alla fått upp:
+  FLERTYDIGT KOMMANDO
+  SLUTA
+  SLASKTRATT
+om de skrivit 'sl'. (Personligen skriver jag 'sl' för att logga ut).
+Sätts nu V=N så kan alla vanliga användare skriva 'sl' för att logga ut.
+Nisse får dock fortfarande upp båda kommandona, han kan ju utföra båda.
+
+
+Av fälten är N,#,O och S obligatoriska. Ett kommando kan tex definieras så
+här:
+N=DOWNLOAD
+#=404
+O=1
+S=3
+A=.
+L=10
+
+
+Nycklar.cfg
+-----------
+Filerna i filarean i systemet är förknippade med nycklar. En fil kan ha
+flera nycklar. Sätt upp vad för nycklar som skall finnas.
+Detta görs i filen "nycklar.cfg". När man sedan har definierat detta och
+startat basen så ska man inte ändra på ordningen på dem. Vill man lägga
+till flera nycklar måste dessa läggas till på slutet.
+
+
+SerNode.cfg
+-----------
+I denna fil ska man bla ange modemets olika kommandon och vilken serieport
+system ska använda sig av (vanligen serial.device).
+Den medföljande definieringen är gjord för de flesta vanliga 2400-modem.
+Detta görs i filen "SerNode.cfg". Alla fält består av ett namn, ett
+likamed-tecken och sist själva definitionen. Namnet måste vara i stora
+bokstäver och det får inte förekomma något mellanslag på någon sida om
+likamedtecknet.
+
+******OBS!!!*******
+Innan du börjar klia dig själv i huvudet över hur modemet ska konfigureras,
+ta och läs manualen till ditt modem och lär känna hur det fungerar.
+
+INITSTRING=   Den sträng som skickas till modemet vid uppstart och efter
+              varje inloggning. Det finns några kommandon som måste finnas
+              med här:
+              E0  - gör så att modemet inte ekar tillbaka de kommandon som
+                    ges till det.
+              Q0  - gör så att modemet svarar på de kommandon som ges (med
+                    OK).
+              S0  - om autosvar ska användas (se ANSWERSTRING) så ska S0
+                    sättas till ett värde större än 0 (dvs, det antal
+                    ringsignaler som ska gå fram innan modemet svara). Tex
+                    S0=1. Annars ska det sättas till 0, S0=0. I vanliga fall
+                    bör inte modemets autosvar användas och S0 ska alltså
+                    sättas till 0.
+              &C1 - Detta gör att modemet bara signalerar DCD (Data Carrier
+                    Detect) när det är uppkopplat mot ett annat modem.
+              &D2 - Gör så att modemet lägger på när DTR (Data Terminal
+                    Ready) släpps.
+
+ANSWERSTRING= Den sträng som får modemet att svara. Om denna sträng börjar
+              med '-' (ett streck) så används modemets autosvar och alla
+              RING som modemet skickar ignoreras.
+
+HANGUPSTRING= Den sträng som får modemet att lägga på. Om denna strängs
+              börjar med '-' (ett streck) så lägger NiKom på genom att
+              släppa DTR-signalen, annars används '+++' och HANGUPSTRING.
+
+HIGHBAUDRATE= Den hastighet som ska användas för att initialisera modemet.
+              Detta bör vara den högsta hastigheten modemet klarar av för
+              modem utan komprimering och felkorrigering. För andra modem
+              se avsnittet nedan om "Höghastighetsmodem".
+
+FIXED=        YES eller NO. Vid YES så hålls alltid HIGHBAUDRATE mellan
+              dator och modem. Ska endast användas med modem som klarar
+              fast hastighet, se avsnittet nedan om "Höghastighetsmodem".
+
+DEVICE=       Vilket device som ska användas. Är serial.device för den
+              vanliga serieporten. För Supra2400zi (internmodem) så används
+              modem0.device.
+
+UNIT=         Vilken unit som ska användas. Vanligtvis 0.
+
+ZINIT=        vilken initstring som ska skickas till xprzmodem.library.
+              Måste sluta på P och inga mellanslag efter det. I övrigt
+              hänvisas till dokumentationen för xprzmodem.library.
+
+HANGUPDELAY=  Det antal dosticks (50 = 1s) som det dröjer mellan det att
+              utloggningstexten visats till det att modemet lägger på.
+              Används vid modem med intern buffer (Supra 2400zi,
+              höghastighetsmodem mm) så att inte modemet lägger på innan
+              hela texten verkligen har skickats ut över telefonlinjen.
+
+SCREEN=       Anger vilken Public Screen som fönstret ska öppnas på. Om
+              endast ett streck, '-', används så öppnas det på default
+              Public Screen. För mer info om hur Public Screens fungerar,
+              se manualen för datorn.
+
+YPOS=         Vilken y-koordinat fönstret ska öppnas på.
+XPOS=         Vilken x-koordinat fönstret ska öppnas på.
+YSIZE=        Hur högt fönstret ska vara i antal pixels.
+XSIZE=        Hur brett fönstret ska vara i antal pixels.
+NODEID=       Vilken id-sträng noden ska ha. Detta för att via NodeInfo()
+              kunna hitta en specifik nod oavsett vilket nodnummer den har
+              fått.
+
+Höghastighetsmodem
+------------------
+Hur NiKom ska konfigureras med ett höghastighetsmodem beror mycket på
+vilket modem det är. Allt information som inte ges här bör stå i manualen
+till modemet.
+
+När det gäller höghastighetsmodem (v32,v32",HST etc), komprimerande (v42",
+MNP-5) och felkorrigerande (v42, MNP 1-4) modem så måste man skilja på två
+olika hastigheter. Den hastighet som används mellan modemen och den som
+används mellan datorn och modemet. Den förstnämnda är egentligen helt
+ointressant för NiKom, det är hastigheten mellan dator och modem som är
+intressant.
+Denna brukar man hålla på en fast hastighet. För 2400-modem med v42/v42" så
+brukar den vara 9600 och för v32/v32"-modem 19200, 38400 eller 57600. För
+att uppnå detta på NiKoms sida så sätter man helt enkelt FIXED till YES och
+HIGHBAUDRATE till den hastighet man ska köra. Nu gäller det även att få
+modemet att göra på samma sätt.
+
+Vilken hastighet som ska användas bestäms sedan genom att datorn skickar ett
+AT-kommando i den hastigheten. I NiKoms fall HIGHBAUDRATE. När man använder
+låst hastighet mellan dator och modem så ignorerar NiKom vad det står för
+siffra efter CONNECT-meddelandet.
+
+Nu gäller det dessutom att slå på handskakningen. NiKom använder RTS/CTS
+handskakning och du måste ställa in modemet på att använda samma sak.
+
+
+ConNode.cfg
+-----------
+
+Även de lokala noderna har en konfigurationsfil. Denna består av de sex
+sista fälten i SerNode.cfg. Dvs: SCREEN, YPOS, XPOS, YSIZE, XSIZE, NODEID.
+
+
+
+                       Filerna i katalogen Texter
+                       ==========================
+
+I katalogen Texter finns ett antal textfiler som man kan ändra i som man
+vill.
+
+2fel.txt            - Denna text visas när användaren har skrivit ett
+                      felaktigt kommando två gånger i rad.
+
+Bulletin.txt        - Denna text visas när man har angett korrekt namn
+                      och lösenord vid inloggningen om den har uppdaterats
+                      sedan förra inloggningen.
+
+EditorHelp.txt      - Denna text visas när man skriver '!?' först på en
+                      rad i radeditorn.
+
+Help.txt            - Denna text visas när man ger kommandot '?' eller
+                      'Hjälp'.
+
+Info.txt            - Denna text visas när man ger kommandot 'Info' utan
+                      argument.
+
+Inlogg.txt          - Denna text visas vid inloggningen innan frågorna om
+                      namn och lösen.
+
+ListaKommandon.txt  - Denna text visas när man ger kommandot 'Lista
+                      Kommandon'.
+
+NyAnv.txt           - Denna text visas när någon ska registrera sig som
+                      ny användare.
+
+Nyckelhjälp.txt     - Denna text visas efter en upload när det är dags
+                      att definiera söknycklar.
+
+TidenSlut.txt       - Denna text visas när tiden tar slut för en användare.
+
+Utlogg.txt          - Denna text visas när man loggar ut, innan modemet
+                      kopplar ned.
+
+
+
+                       Konfigurering av ARexx-program
+                       ==============================
+
+Två ARexx-program kan man enkelt ändra lite i för att skräddarsy systemet.
+Detta är dock inget man behöver göra. NiKom bör fungera bra även om man
+låter de vara som de är.
+
+Rexx/ExtKom5.nik   Detta program sköter om packningen av de filer som
+                   kommandot Offdown skapar. Här kan du ställa in vad din
+                   BBS heter så att filen tex heter NissesBBS0.lzh istället
+                   för Offdown0.lzh. Du kan även ställa in vilket
+                   arkivprogram som ska användas.
+
+Rexx/ExtKom509.nik Detta program visar innehållet i arkiv som ligger i
+                   filarean. Här kan du ställa in vilka arkivformat
+                   du vill basen ska klara av och vilka program som ska
+                   användas för att lista dem.
+
+
+
+                       Initiering av systemet
+                       ======================
+
+När man har skapat alla nödvändiga kataloger och konfigurerat systemet som
+man vill ha det så är det dags att köra programmet InitNiKom. Detta program
+skapar en användare som har användarnumret 0 och som heter Sysop. Lösenord
+är 'sysop' (med små bokstäver). Skulle man någon gång vilja starta om hela
+systemet på nytt så kan man ta bort alla filer i katalogen Moten och sedan
+köra InitNiKom igen.
+@endnode

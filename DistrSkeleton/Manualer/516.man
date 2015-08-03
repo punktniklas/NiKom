@@ -1,0 +1,12 @@
+
+
+Skapa Privatarea
+----------------
+
+Synopsis: Skapa Privatarea <användare>
+
+Beskrivning:
+Skapar en privat filarea åt den angivna användaren, såvida han inte redan
+har en.
+
+Se Även: Lista Privatfiler, Privat Upload, Privat Download

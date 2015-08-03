@@ -1,0 +1,11 @@
+
+
+Radera Grupp
+------------
+
+Synopsis: Radera Grupp <grupp>
+
+Beskrivning:
+Raderar den angivna användargruppen.
+
+Se Även: Skapa Grupp, Ändra Grupp, Lista Medlemmar

@@ -1,0 +1,13 @@
+
+
+Kommentera
+----------
+
+Synopsis: Kommentera [<textnummer<]
+
+Beskrivning:
+Påbörjar en kommentar till den senast lästa texten. Om man ger ett textnummer
+som argument kommenteras denna text istället.
+
+Se Även: Radera Text
+

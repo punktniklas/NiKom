@@ -1,0 +1,11 @@
+
+
+Validera Fil
+------------
+
+Synopsis: Validera File <filnamn>
+
+Beskrivning:
+Validerar en nyligen uppladdad fil och gör den tillgänglig för användarna.
+
+Se Även: Ändra Fil

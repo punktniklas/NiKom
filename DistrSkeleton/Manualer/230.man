@@ -1,0 +1,11 @@
+
+
+Dumpa Brev
+----------
+
+Synopsis: Dumpa Brev <brevnummer>
+
+Beskrivning:
+Gör en vanlig textfil av ett brev.
+
+Se Även: Dumpa Text

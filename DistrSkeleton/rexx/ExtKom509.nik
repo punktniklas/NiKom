@@ -1,0 +1,72 @@
+/*
+$VER: Lista_Innehåll 1.0 (27.4.92)
+
+N=LISTA INNEHÅLL
+O=2
+#=2505
+A=.
+*/
+parse arg nod pers argument .
+
+if argument = "" then do
+	'sendstring' '0d0a0a'x'Skriv: Lista Innehåll: <arkivnamn>' '0d0a'x
+	exit
+	end
+
+options results
+'whicharea'
+area=result
+if area=-1 then do
+	'sendstring' '0d0d0a'x'Du befinner dig inte i någon area!' '0d0a'x
+	exit
+end
+
+fil1=FileInfo(argument,'n',area)
+if fil1=-1 then do
+	'sendstring' '0d0a0a'x'Finns inte någon sådan fil.' '0d0a'x
+	exit
+end
+i=FileInfo(fil1,'i',area)
+fil=AreaInfo(area,'d'||i)||fil1
+
+if upper(right(fil1,4))='.LZH' then do
+	call korcom('lha -N v '||fil)
+end
+if upper(right(fil1,4))='.LHA' then do
+	call korcom('lha -N v '||fil)
+end
+if upper(right(fil1,4))='.LZX' then do
+	call korcom('lzx v '||fil)
+end
+if upper(right(fil1,4))='.ZIP' then do
+	call korcom('unzip -v '||fil)
+end
+
+exit
+
+korcom: procedure
+parse arg str
+address command str ' >t:LiIn.tmp'
+sendstring '0d0a0a'x
+sendtextfile 't:LiIn.tmp'
+address command 'delete t:LiIn.tmp >nil:'
+return
+
+visalzh: procedure
+arg filnamn,nodnr
+say 'lharc -N >t:Liin'||nodnr 'v' filnamn
+call korcom 'lharc -N >t:Liin'||nodnr 'v' filnamn
+exist=1
+return
+
+visazoo: procedure
+arg filnamn,nodnr
+call korcom 'zoo >t:Liin'||nodnr '-v' filnamn
+exits=1
+return
+
+visaarc: procedure
+arg filnamn,nodnr
+call korcom 'pkax >t:Liin'||nodnr '-v' filnamn
+exits=1
+return

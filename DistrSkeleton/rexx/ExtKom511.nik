@@ -1,0 +1,25 @@
+/* Program för att ladda upp till en privat filarea */
+
+parse arg nod pers argument
+
+options results
+
+if argument = "" then do
+	'sendstring' '0d0a0a'x'Skriv: Privat Upload <användare>' '0d0a'x
+	exit
+end
+
+argument=strip(argument)
+
+anvnr=NiKParse(argument,'n')
+if anvnr=-1 then do
+	'sendstring' '0d0a0a'x'Finns ingen sådan användare!' '0d0a'x
+	exit
+end
+
+if ~exists('NiKom:Privat/'||anvnr) then do
+	'sendstring' '0d0a0a'x UserInfo(anvnr,'n') 'har ingen privat filarea!' '0d0a'x
+	exit
+end
+'recbinfile NiKom:Privat/'||anvnr||'/'
+

@@ -1,0 +1,12 @@
+
+
+Dumpa Text
+----------
+
+Synopsis: Dumpa Text <textnummer>
+
+Beskrivning:
+Gör en vanlig textfil av en text. Fungerar bara med texter i lokala
+möten. För Fido-möten finns separata program som sköter detta.
+
+Se Även: Dumpa Brev

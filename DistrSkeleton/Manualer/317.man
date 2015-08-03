@@ -1,0 +1,11 @@
+
+
+Offdown
+-------
+
+Synopsis: Offdown
+
+Samlar ihop alla olästa texter man har till en fil, packar den och skickar
+den sedan med ZModem. Detta gör att man kan läsa texterna i lugn och ro
+hemma utan att vara uppkopplad mot BBS:en. Enklast är att använda någon av
+Offline-läsare som finns att tillgå.

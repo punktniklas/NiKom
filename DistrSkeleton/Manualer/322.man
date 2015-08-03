@@ -1,0 +1,11 @@
+
+
+Subtrahera Gruppmedlem
+----------------------
+
+Synopsis: Subtrahera Gruppmedlem [<användare>]
+
+Beskrivning:
+Gör en angiven användare till icke medlem i en angiven användargrupp.
+
+Se Även: Lista Grupper, Lista Användare, Status

@@ -1,0 +1,12 @@
+/* Program för att visa profilen */
+
+parse arg nod person argument .
+
+'sendstring' '0d0a0a'x
+if argument='' then do
+	'sendtextfile' 'NiKom:Users/'||person%100||'/'||person||'/profile'
+end
+else do
+	'sendtextfile' 'NiKom:Users/'||argument%100||'/'||argument||'/profile'
+end
+

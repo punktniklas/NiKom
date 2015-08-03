@@ -1,0 +1,16 @@
+/* Detta program visar markerade texter */
+parse arg nod person
+
+filnamn='ram:NiKom/Mark'||nod
+
+if ~open('fil',filnamn,'R') then do
+	'sendstring' '0d0a0a'x'Kunde inte öppna' filnamn
+	exit 5
+end
+do until eof('fil')
+	foo=readln('fil')
+	parse var foo typ nr
+	if typ='B' then 'showletter' nr
+	else if typ='T' then 'showtext' nr
+end
+

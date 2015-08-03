@@ -1,0 +1,13 @@
+
+
+Personlig
+---------
+
+Synopsis: Personlig [<textnummer>]
+
+Beskrivning:
+Påbörjar en personlig kommentar till den senast lästa texten. Texten kommer
+att hamna i Brevlådan hos den personen som skrev den kommenterade texten.
+Om man anger ett textnummer som argument så kommenteras den texten.
+
+Se Även: Brev

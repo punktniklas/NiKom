@@ -1,0 +1,12 @@
+
+
+Filstatus
+---------
+
+Synopsis: Filstatus <filnamn>
+
+Beskrivning:
+Ger mer utförlig information om en viss fil. Här kan bla se vilka söknycklar
+som är satta för filen och en eventuell längre beskrivning av filen.
+
+Se Även: Sök, Lista Filer

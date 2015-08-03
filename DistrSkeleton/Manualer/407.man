@@ -1,0 +1,12 @@
+
+
+Ändra Area
+----------
+
+Sysnopsis: Ändra Area <area>
+
+Beskrivning:
+Ger möjlighet att ändra en area vad gäller namn, mötestillhörighet och
+grupptillhörighet.
+
+Se Även: Lista Areor

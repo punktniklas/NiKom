@@ -1,0 +1,10 @@
+
+
+Lista Brev
+----------
+
+Synsopsis: Lista Brev [<användare>]
+
+Beskrivning:
+Listar alla brev i ens brevlåda. Anges ett användarnamn som argument så visas
+de brev som man själv skrivit till den angivna användaren.

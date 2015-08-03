@@ -1,0 +1,38 @@
+/* Sysinfo-kommandot
+   Lite förändringar 9/10 1991 av Tomas Kärki
+*/
+
+/* parse arg nod person flag1 flag2 . */
+
+sendstring '0d0a'x
+if exists('NiKom:texter/SysInfo.txt') then do
+	'sendtextfile NiKom:texter/SysInfo.txt'
+end
+
+'sendstring' '0d0a'x
+
+'sendstring Högsta användarnummer:' Sysinfo('a') '0d0a'x
+'sendstring Högsta mötesnummer:   ' Sysinfo('m') '0d0a'x
+'sendstring Antal kommandon:      ' Sysinfo('k') '0d0a'x
+'sendstring Lägsta textnummer     ' Sysinfo('l') '0d0a'x
+'sendstring Högsta textnummer:    ' Sysinfo('h') '0d0a'x
+'sendstring Högsta areanummer:    ' SysInfo('o')
+
+totalt = 0
+do i=1 to Sysinfo('t')
+	tmp = Sysinfo('b'||i)
+	parse var tmp bps antal
+	totalt = totalt + antal
+end
+
+sendstring '0d0a0a'x
+sendstring 'Bps           Antal        Procent' '0d0a'x
+do i=1 to Sysinfo('t')
+	tmp = Sysinfo('b'||i)
+	parse var tmp bps antal
+	sendstring left(bps,14)||left(antal,16)||left(((antal*1000)/totalt) % 10,10)
+	sendstring '0d0a'x
+end
+
+sendstring '0d0a'x
+sendstring 'Totalt '||totalt||' samtal till denna BBS!' '0d0a'x

@@ -1,0 +1,14 @@
+
+
+Endast
+------
+
+Synopsis: Endast <antal texter>
+
+Beskrivning:
+Ger det angivna antalet texter olästa i det mötet man befinner sig i.
+Kan användas både för att minska och öka antalet olästa texter i ett möte.
+Om man anger fler texter än vad det finns i mötet så får man alla texter
+olästa.
+
+Se Även: Hoppa Över

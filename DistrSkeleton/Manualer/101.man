@@ -1,0 +1,32 @@
+
+
+Lista Möten
+-----------
+
+Synopsis: Lista Möten
+
+Beskrivning:
+Listar alla möten som användaren har rätt att se. Framför mötesnamnet
+i listan står antingen en siffra som talar om hur många olästa texter
+användaren har i det mötet eller en stjärna vilket betyder att användaren
+inte är medlem i det mötet.
+
+Efter mötesnamnet kan det stå viss information inom parentes:
+
+Slutet       - Bara vissa utvalda användare får vara med i mötet
+
+Hemligt      - Bara de som får vara med i mötet får se att mötet finns.
+               (Om du ser detta betyder det alltså att du kan gå med i
+               mötet)
+
+Skrivskyddat - Endast sysop får skriva nya texter i mötet. (Kommentarer
+               får dock vem som helst skriva)
+
+Kom.skyddat  - Endast sysop får kommentera i möte. Att skriva nya texter
+               får dock vem som helst göra.
+
+Auto         - Alla användare är automagiskt medlemmar i mötet. Man kan
+               inte utträda ur mötet.
+
+
+Se även: Medlem, Utträd, Gå

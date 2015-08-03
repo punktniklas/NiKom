@@ -1,0 +1,16 @@
+
+
+Följande kommandon finns att tillgå i editorn:
+
+!radera <radnr>      Raderar den angivna raden
+!infoga <radnr>      Infogar en rad före den angivna raden
+!läs el. !hela       Visar hela texten
+!bort el. !kasta     Avslutar utan att spara texten
+!spara               Sparar texten
+!flytta <möte>       Flyttar texten till angivet möte
+!ändra <radnr>       Ändrar på den angivna raden. Ta fram tecken för tecken
+                     med Ctrl-F. Ta fram resten av raden med Ctrl-R.
+!dump                Gör så att ingenting ekas tillbaka. Lämpligt vid
+                     uppladdande av textfiler. Sätt på ekot igen med Ctrl-C.
+!ärende <nytt ärende> Ändrar ärendet på texten.
+

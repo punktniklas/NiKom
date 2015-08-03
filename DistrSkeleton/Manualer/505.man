@@ -1,0 +1,11 @@
+
+
+Visa Profile
+------------
+
+Synopsis: Visa Profile
+
+Beskrivning:
+Visar ens personliga profile.
+
+Se Även: Ändra Profile, Exekvera Profile

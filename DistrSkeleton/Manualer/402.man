@@ -1,0 +1,11 @@
+
+
+Visa Filinfo
+------------
+
+Sysnopsis: Visa Filinfo
+
+Beskrivning:
+Visar vilken filarea användaren befinner sig i just nu.
+
+Se Även: Byt Area, Lista Areor, Lista Filer

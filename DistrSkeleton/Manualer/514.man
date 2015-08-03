@@ -1,0 +1,17 @@
+
+
+Radera Privatfil
+----------------
+
+Synopsis: Radera Privatfil [-a] [filnamn] [filnamn] [...]
+
+Beskrivning:
+Raderar filer från den privata filarean, förtsatt att en sådan finns. För att
+få en privat filarea måste man be sysop om en. Denna area förväntas
+innehavaren själv hålla rent i. Observera att man måste skriva hela filnamnet,
+man kan inte förkorta som i vanliga filarean.
+
+Om man anger -a som argument så kommer alla filer i den privata arean
+att raderas.
+
+Se Även: Privat Upload, Privat Download, Lista Privatfiler

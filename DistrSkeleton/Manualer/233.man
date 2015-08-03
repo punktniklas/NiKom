@@ -1,0 +1,13 @@
+
+
+Hoppa Ärende
+------------
+
+Synopsis: Hoppa Ärende [<ärende>]
+
+Beskrivning:
+Hoppar över alla olästa texter i det mötet man befinner sig i som matchar det
+ärendet man har angivit. Om man inte har angivit något ärende så används
+ärendet på den senast lästa texten.
+
+Se Även: Hoppa Över, Endast

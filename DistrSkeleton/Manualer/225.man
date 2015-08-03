@@ -1,0 +1,14 @@
+
+
+Rensa Texter
+------------
+
+Synopsis: Rensa Texter <antal texter>
+
+Beskrivning:
+Rensar ut det angivna antalet texter från systemet och gör plats för nya.
+Antalet texter man rensar måste vara jämt delbart med 512. Medan rensningen
+sker är all kommunikation med NiKServer blockerad. Basen "hänger sig" alltså
+under tiden. När rensningen är klar kommer allt igång igen.
+
+Se Även: Rensa Brev

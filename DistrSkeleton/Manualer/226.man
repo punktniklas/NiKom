@@ -1,0 +1,12 @@
+
+
+Rensa Brev
+----------
+
+Synopsis: Rensa Brev <antal brev>
+
+Beskrivning:
+Rensar ut angivet antal brev från ens egen brevlåda. För att få reda på hur
+många brev ens brevlåda innehåller kan man använda 'Lista Brev'.
+
+Se Även: Lista Brev

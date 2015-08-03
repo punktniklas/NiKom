@@ -1,0 +1,17 @@
+
+
+Lista Medlemmar
+---------------
+
+Synopsis: Lista Medlemmar [-g <gruppnamn>]
+
+Beskrivning:
+Listar alla medlemmar alt de som inte är medlemmar i det mötet man befinner
+sig i för tillfället.
+Om man anger optionen '-g' så listar man medlemmarna i den angivna gruppen
+istället.
+
+Observera att detta kommando (utfört på möten) tar en stund eftersom
+informationen inte ligger i minnet utan måste hämtas från hårddisken.
+
+Se Även: Var, Lista Möten, Lista Grupper

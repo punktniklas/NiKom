@@ -1,0 +1,13 @@
+
+
+Flytta Text
+-----------
+
+Synopsis: Flytta Text <textnummer> <möte>
+
+Beskrivning:
+Flyttar den angivna texten till det angivna mötet. Alla kommentarslänkar
+behålls dock men vidare kommentarer till texten kommer att hamna i det nya
+mötet. Det går inte att flytta texter till/från Fido-möten.
+
+Se Även: Skriv, Radera Text, Lista Möten

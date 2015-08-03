@@ -1,0 +1,20 @@
+
+
+System
+------
+
+Synopsis: System
+
+Beskrivning:
+Gör så att man kan utföra vanliga DOS-kommandon genom NiKom. En speciell
+prompt ("DOS>") kommer upp och man kan ge kommandondon precis som i CLI.
+Alla kommandon körs genom Fifo, som alltså måste vara installerat för att
+det hela ska fungera.
+
+Det finns även två inbyggda kommandon, upload och download. Upload tar som
+argument ett directory där filen ska hamna (tex "upload NiKom:DatoCfg/").
+Download tar som argument den filen som man vill ladda ner.
+
+Man kommer ur System-kommandot genom att bara trycka Return vid prompten.
+
+OBS! Detta kommando bör för säkerhets skull vara lösenordsbelagt!

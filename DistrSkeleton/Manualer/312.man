@@ -1,0 +1,10 @@
+
+
+ReadConfig
+----------
+
+Synopsis: ReadConfig
+
+Beskrivning:
+Läser in System.cfg, Kommandon.cfg, Status.cfg, Nycklar.cfg och
+NodeTypes.cfg igen.

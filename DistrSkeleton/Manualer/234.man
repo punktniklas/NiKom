@@ -1,0 +1,11 @@
+
+
+Flytta Gren
+-----------
+
+Synopsis: Flytta Gren <rottext> <möte>
+
+Beskrivning:
+Flyttar den angivna texten och alla kommenterer till den (samt kommentarerna
+till kommentarerna) till det angivna mötet. Det går inte att flytta texter
+till/från ett Fido-möte.

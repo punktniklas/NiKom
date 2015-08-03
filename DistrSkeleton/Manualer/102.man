@@ -1,0 +1,26 @@
+
+
+Lista Användare
+---------------
+
+Synopsis: Lista Användare [-b] [-s(x|-x|x-|x-y)] [<pattern>]
+
+Beskrivning:
+Listar alla eller del av de användare som finns registrerade.
+Ger man flaggan '-b' kommer listan baklänges.
+
+Flaggan -s kan användas på fyra olika sätt:
+   -s3    - listar alla användare med status 3
+   -s-3   - listar alla användare med status upp till 3
+   -s3-   - listar alla användare med status 3 eller högre
+   -s3-5  - listar alla användare med status mellan 3 och 5
+
+En pattern gör att bara användare som passar in listas. Ex:
+   k      - listar alla användare som börjar på k.
+   * k    - listar alla användare vars efternamn börjar på k.
+
+Alla options kan kombineras, en eventuell pattern måste dock stå sist.
+Ex:
+   li an -s-5 ni    - listar alla användare med status 5 eller lägre och
+                      som börjar på ni
+   li an -b -s5     - Listar alla användare med status 5, baklänges.

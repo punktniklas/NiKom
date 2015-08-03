@@ -1,0 +1,1471 @@
+@database Kommandon
+
+@node Main
+                             Kommandon i NiKom
+                            ===================
+
+En alfabetisk lista över alla förekommande kommandon i NiKom
+
+
+?
+¯
+Synopsis: ?
+
+Nummer: 302
+
+Beskrivning:
+Visar en hjälptext.
+
+Likadan som Hjälp
+
+Se Även: Lista Kommandon
+
+
+Addera Gruppmedlem
+¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+Synopsis: Addera Gruppmedlem [<användare>]
+
+Nummer: 321
+
+Beskrivning:
+Gör en angiven användare till medlem i en angiven användargrupp.
+
+Se Även: Subtrahera Gruppmedlem, Lista Grupper
+
+
+Addera Rättigheter
+¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+Synopsis: Addera Rättigheter <användare>
+
+Nummer: 215
+
+Beskrivning:
+Ger den angivna användaren rättigheter i det möte man befinner sig i. Kan
+endast utföras av den personen som skapade mötet, MAD eller av sysop.
+
+Se Även: Subtrahera Rättigheter, Lista Rättigheter
+
+
+Alias
+-----
+Synopsis: Alias [<alias> [<betydelse>]]
+
+Nummer: 324
+
+Beskrivning:
+Definierar ett alias som kan användas istället för den längre betydelsen.
+Tex:
+   alias ny lista användare -s0
+Detta gör så att varje gång man skriver 'ny' så kommer istället 'lista
+användare -s0' att utföras. Ett alias kan bara vara ett ord men dess
+betydelse kan vara flera.
+Om man bara skriver alias utan argument så visas en lista över definierade
+alias.
+Man kan omdefiniera ett alias genom att (om vi fortsätter på det förra
+exemplet) bara skriva:
+   alias ny lista möten
+Vill man sedan ta bort aliaset helt skriver man rätt och slätt:
+   alias ny
+
+
+Areor
+¯¯¯¯¯
+Synopsis: Areor
+
+Nummer: 111
+
+Beskrivning:
+Listar alla de filareor som är tillgängliga för användaren. Är ofta bara en
+enda area.
+
+Likadan som Lista Areor.
+
+Se Även: Lista Filer, Download, Upload, Sök
+
+
+Brev
+¯¯¯¯
+Synopsis: Brev <användare>
+
+Nummer: 205
+
+Beskrivning:
+Påbörjar ett personligt brev till den angivna användaren.
+
+Se Även: Personlig
+
+
+Byt Area
+¯¯¯¯¯¯¯¯
+Synopsis: Byt Area <areanamn>
+
+Nummer: 401
+
+Beskrivning:
+Förflyttar användaren till en annan filarea.
+
+Se Även: Lista Areor, Visa Filinfo, Lista Filer
+
+
+Börja Om
+--------
+
+Synopsis: Börja Om
+
+Nummer: 325
+
+Beskrivning:
+Loggar ut användaren men istället för att lägga på så visas
+inloggningstexten och man kan logga in på nytt. Detta kommando kan
+visserligen användas lokalt men fyller bara en funktion när man ringer till
+basen.
+
+
+Download, Ladda ner
+-------------------
+
+Synopsis: Download <filnamn> [<filnamn> [<filnamn> [..]]]
+
+Nummer: 404
+
+Beskrivning:
+Laddar ner de angivna filerna ur den filarean man befinner sig i med det
+protokoll som är inställt.
+
+Se Även: Upload, Lista Filer, Lista Areor, Sök, Visa Filinfo
+
+
+Dumpa Text
+¯¯¯¯¯¯¯¯¯¯
+Synopsis: Dumpa Text <textnummer>
+
+Nummer: 229
+
+Beskrivning:
+Gör en vanlig textfil av en text.
+
+
+
+Endast
+¯¯¯¯¯¯
+Synopsis: Endast <antal texter>
+
+Nummer: 213
+
+Beskrivning:
+Ger det angivna antalet texter olästa i det mötet man befinner sig i.
+Kan användas både för att minska och öka antalet olästa texter i ett möte.
+Om man anger fler texter än vad det finns i mötet så får man alla texter
+olästa.
+
+Se Även: Hoppa Över
+
+
+Exekvera Profile
+¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+Synopsis: Exekvera Profile
+
+Nummer: 506
+
+Beskrivning:
+Kör din personliga profile.
+Profilen är en sorts script-fil som man kan fylla med vanliga NiKom-kommandon.
+Denna scriptfil körs sedan automatiskt när man loggar in.
+
+Se Även: Ändra Profile, Visa Profile
+
+
+
+
+Filer
+-----
+
+Synopsis: Lista Filer [-] [<nyckel>]
+
+Nummer: 113
+
+Beskrivning:
+Listar de filer som finns i den arean man befinner sig i just nu. Filerna
+listas i omvänd tidsordning dvs de nya filerna visas först.
+
+Anges ett streck (-) så visas bara de filer som inte är validerade. (Är
+man vanlig användare visas inga filer alls eftersom de inte kan se icke
+validerade filer.)
+
+Anges en nyckel listas bara filer som har den nyckeln satt.
+
+Se Även: Lista Areor, Visa Filinfo, Byt Area, Sök, Upload, Download
+
+
+
+Filstatus
+¯¯¯¯¯¯¯¯¯
+Synopsis: Filstatus <filnamn>
+
+Nummer: 414
+
+Beskrivning:
+Ger mer utförlig information om en viss fil. Här kan man bla se vilka
+söknycklar som är satta för filen och en eventuell längre beskrivning av
+filen.
+
+Se Även: Sök, Lista Filer
+
+
+
+
+Flytta Gren
+-----------
+
+Synopsis: Flytta Gren <rottext> <möte>
+
+Nummer: 234
+
+Beskrivning:
+Flyttar den angivna texten och alla kommentarer till den (samt
+kommentarerna till kommentarerna) till det angivna mötet.
+
+
+
+
+Flytta Text
+¯¯¯¯¯¯¯¯¯¯¯
+Synopsis: Flytta Text <textnummer> <möte>
+
+Nummer: 231
+
+Beskrivning:
+Flyttar den angivna texten till det angivna mötet. Alla kommentarslänkar
+behålls dock men vidare kommentarer till texten kommer att hamna i det nya
+mötet.
+
+Se Även: Skriv, Radera Text, Lista Möten
+
+
+Gå
+¯¯
+Synopsis: Gå [<mötesnamn>]
+
+Nummer: 201
+
+Beskrivning:
+Går till det angivna mötet. Om inget argument angivits så placeras man i
+Brevlådan.
+
+Se Även: Lista Möten, Var
+
+
+Hjälp
+¯¯¯¯¯
+Synopsis: Hjälp
+
+Nummer: 302
+
+Beskrivning:
+Visar en hjälptext.
+
+Likadan som '?'
+
+Se Även: Lista Kommandon
+
+
+Hoppa Ärende
+------------
+
+Synopsis: Hoppa Ärende [<ärende>]
+
+Nummer: 233
+
+Beskrivning:
+Hoppar över alla olästa texter i det mötet man befinner sig i som matchar
+det ärendet man har angivit. Om man inte har angivit något ärende så används
+ärendet på den senast lästa texten.
+
+Se Även: Hoppa Över, Endast
+
+
+Hoppa Över
+¯¯¯¯¯¯¯¯¯¯
+Synopsis: Hoppa Över
+
+Nummer: 214
+
+Beskrivning:
+Hoppar över de texter som är kommentarer till den senast lästa frampromptade
+texten och markerar de som lästa.
+
+Se Även: Endast
+
+
+Igen
+¯¯¯¯
+Synopsis: Igen
+
+Nummer: 206
+
+Beskrivning:
+Visar den senast lästa texten en gång till.
+
+Se Även: Läs
+
+
+Info
+¯¯¯¯
+Synopsis: Info [<filnamn>]
+
+Nummer: 311
+
+Beskrivning:
+Ger information om olika saker. För att se vad man kan få information om,
+ge kommandot utan argument.
+
+
+Inlägg
+¯¯¯¯¯¯
+Synopsis: Inlägg
+
+Nummer: 202
+
+Beskrivning:
+Påbörjar skrivandet av en text i det mötet man befinner sig i.
+
+Likadan som Skriv.
+
+Se Även: Lista Möten, Radera Text
+
+
+Kommentera
+¯¯¯¯¯¯¯¯¯¯
+Synopsis: Kommentera [<textnummer>]
+
+Nummer: 203
+
+Beskrivning:
+Påbörjar en kommentar till den senast lästa texten. Om man ger ett textnummer
+som argument kommenteras denna text istället.
+
+Se Även: Radera Text
+
+
+Ladda Ner
+¯¯¯¯¯¯¯¯¯
+Synopsis: Ladda Ner <filnamn> [<filnamn> [<filnamn> [..]]]
+
+Nummer: 404
+
+Beskrivning:
+Laddar ner de angivna filerna ur den filarean man befinner sig i med det
+protokoll som är inställt.
+
+Likadan som Download
+
+Se Även: Upload, Lista Filer, Lista Areor, Sök, Visa Filinfo
+
+
+Ladda Upp
+¯¯¯¯¯¯¯¯¯
+Synopsis: Ladda Upp [<filnamn>]
+
+Nummer: 403
+
+Beskrivning:
+Laddar upp en fil till basen med det protokoll som är inställt. Man behöver
+inte befinna sig i rätt area när man ska ladda upp utan det kan anges
+separat. Om protokollet man använder även för över filnamnet på filen
+behöver man inte skriva ett filnamn som argument. (Zmodem tex för över
+filnamn).
+
+Likadan som Upload
+
+Se Även: Lista Filer, Lista Areor, Sök, Visa Filinfo, Download
+
+
+Lista Användare
+¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+Synopsis: Lista Användare [-b] [-s(x|-x|x-|x-y)] [<pattern>]
+
+Nummer: 102
+
+Beskrivning:
+Listar alla eller del av de användare som finns registrerade.
+
+Ger man flaggan '-b' kommer listan baklänges.
+
+Flaggan -s kan användas på fyra olika sätt:
+   -s3    - listar alla användare med status 3
+   -s-3   - listar alla användare med status upp till 3
+   -s3-   - listar alla användare med status 3 eller högre
+   -s3-5  - listar alla användare med status mellan 3 och 5
+
+En pattern gör att bara användare som passar in listas. Ex:
+   k      - listar alla användare som börjar på k.
+   * k    - listar alla användare vars efternamn börjar på k.
+
+Alla options kan kombineras, en eventuell pattern måste dock stå sist.
+Ex:
+   li an -s-5 ni    - listar alla användare med status 5 eller lägre och
+                      som börjar på ni
+   li an -b -s6     - Listar alla användare med status 6, baklänges.
+
+
+
+Lista Areor
+¯¯¯¯¯¯¯¯¯¯¯
+Synopsis: Lista Areor
+
+Nummer: 111
+
+Beskrivning:
+Listar alla de filareor som är tillgängliga för användaren. Är ofta bara en
+enda area.
+
+Likadan som Areor.
+
+Se Även: Lista Filer, Download, Upload, Sök
+
+
+Lista Brev
+----------
+
+Synopsis: Lista Brev [<användare>]
+
+Nummer: 116
+
+Beskrivning:
+Listar alla brev i ens brevlåda. Anges ett användarnamn som argument så
+visas de brev som man själv skrivit till den angivna användaren.
+
+
+
+Lista Flaggor
+¯¯¯¯¯¯¯¯¯¯¯¯¯
+Synopsis: Lista Flaggor
+
+Nummer: 109
+
+Beskrivning:
+Ger en lista över de personliga flaggor som finns samt om de är avslagna
+eller påslagna.
+
+Se Även: Slå På, Slå Av
+
+
+Lista Filer
+-----------
+
+Synopsis: Lista Filer [-] [<nyckel>]
+
+Nummer: 113
+
+Beskrivning:
+Listar de filer som finns i den arean man befinner sig i just nu. Filerna
+listas i omvänd tidsordning dvs de nya filerna visas först.
+
+Anges ett streck (-) så visas bara de filer som inte är validerade. (Är
+man vanlig användare visas inga filer alls eftersom de inte kan se icke
+validerade filer.)
+
+Anges en nyckel listas bara filer som har den nyckeln satt.
+
+Se Även: Lista Areor, Visa Filinfo, Byt Area, Sök, Upload, Download
+
+
+
+Lista Grupper
+¯¯¯¯¯¯¯¯¯¯¯¯¯
+Synopsis: Lista Grupper
+
+Nummer: 114
+
+Beskrivning:
+Listar de användargrupper som finns i basen. En stjärna framför ett namn
+betyder att du inte är medlem i den gruppen.
+
+Se Även: Lista Medlemmar, Status
+
+
+
+Lista Innehåll
+--------------
+
+Synopsis: Lista Innehåll <arkiv>
+
+Nummer: 509
+
+Beskrivning:
+Listar de olika filerna i en packad fil som ligger i filarean.
+
+Se Även: Lista Filer, Sök
+
+
+
+Lista Kommandon
+¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+Synopsis: Lista Kommandon
+
+Nummer: 104
+
+Beskrivning:
+Ger en lista på alla kommandon som finns att tillgå i NiKom.
+
+
+Lista Medlemmar
+¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+Synopsis: Lista Medlemmar [-g <gruppnamn>]
+
+Nummer: 103
+
+Beskrivning:
+Listar alla medlemmar alternativt de som inte är medlemmar i det mötet man
+befinner sig i för tillfället.
+Om man anger optionen '-g' så listar man medlemmarna i den angivna gruppen
+istället.
+
+Se Även: Var, Lista Möten, Lista Grupper
+
+
+Lista Möten
+¯¯¯¯¯¯¯¯¯¯¯
+Synopsis: Lista Möten
+
+Nummer: 101
+
+Beskrivning:
+Listar alla möten som användaren har rätt att se. Framför mötesnamnet
+i listan står antingen en siffra som talar om hur många olästa texter
+användaren har i det mötet eller en stjärna vilket betyder att användaren
+inte är medlem i det mötet.
+
+Se även: Medlem, Utträd, Gå
+
+
+Lista Nycklar
+¯¯¯¯¯¯¯¯¯¯¯¯¯
+Synopsis: Lista Nycklar
+
+Nummer: 112
+
+Beskrivning:
+Listar alla söknycklar som finns. Söknycklar används för att hitta filer av
+ett visst slag.
+
+Se Även: Sök, Lista Filer
+
+
+
+Lista Nyheter
+-------------
+
+Synopsis: Lista Nyheter
+
+Nummer: 107
+
+Beskrivning:
+Visar de möten som användaren har olästa texter, hur många det är i varje
+möte samt det totala antalet olästa texter. Om flaggan 'Nya Filer vid Lista
+Nyheter' är satt så visas även de nya filer som tillkommit.
+
+Se Även: Lista Möten, Endast
+
+
+
+Lista Privatfiler
+¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+Synopsis: Lista Privatfiler
+
+Nummer: 513
+
+Beskrivning:
+Listar filerna i den privata filarean, förutsatt att en sådan finns.
+För att få en privat filarea måste man be sysop om en. Filerna i denna area
+ska raderas av ägaren till arean när de inte behövs längre.
+
+Se Även: Privat Upload, Privat Download, Radera Privatfil, Skapa Privatarea
+
+
+Lista Rättigheter
+¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+Synopsis: Lista Rättigheter
+
+Nummer: 105
+
+Beskrivning:
+Ger en lista på alla som har rättighet alt inte har rättighet att bli medlem
+i det mötet användaren befinner sig just nu.
+
+Se Även: Var, Lista Möten, Lista Medlemmar
+
+
+
+
+Lista Senaste
+-------------
+
+Synopsis: Lista Senaste [-<antal>] [<användare>]
+
+Nummer: 106
+
+Beskrivning:
+Ger en lista på de senaste inloggningarna. Vem som var inloggad, vilken
+tid han loggade ut, hur länge han var inloggad, hur många texter han läste
+samt hur många texter han skrev.
+Om man anger ett antal skrivs bara så många rader ut, lämpligt för tex
+profilen.
+Skriver man en användare som argument så får man bara upp hans inloggningar.
+
+
+
+
+Lista Ärende
+¯¯¯¯¯¯¯¯¯¯¯¯
+Synopsis: Lista Ärende [-f] [-t] [<textnummer>]
+
+Nummer: 108
+
+Beskrivning:
+Listar alla texter i det mötet man befinner sig i för tillfället. Texterna
+listas från den nyaste till den äldsta och följande information finns:
+Vem som skrev texten, vilket nummer den har, vilken text den är en kommentar
+till (eller ett '-' om det inte är någon kommentar), när den skrevs och vad
+texten har för ärende.
+Flaggan '-f' gör så att texterna listas framlänges istället för baklänges.
+Flaggan '-t' gör så att bara texter som inte är en kommentar till någon text
+visas.
+Om man anger ett nummer så börjar listan från och med det numret.
+
+Se Även: Läs, Lista Möten
+
+
+Logout
+¯¯¯¯¯¯
+Synopsis: Logout
+
+Nummer: 301
+
+Beskrivning:
+Visar utloggningstexten, lägger sedan på modemet och sparar användaren i
+användarfilen. BBS:en ställer sig sedan att vänta på en ny inloggning.
+
+Likadan som Sluta
+
+
+Läsa
+¯¯¯¯
+Synopsis: [Läsa] <textnummer>
+
+Nummer: 212
+
+Beskrivning:
+Visar den angivna texten. Observera att man inte behöver skriva 'Läsa' utan
+det räcker med bara textnumret.
+
+Se Även: Lista Ärende
+
+
+Manual
+¯¯¯¯¯¯
+Synopsis: Manual <kommando>
+
+Nummer: 507
+
+Beskrivning:
+Kommandot du kör just nu. Ger en liten beskrivning över det angivna
+kommandot.
+
+
+Markera Text
+¯¯¯¯¯¯¯¯¯¯¯¯
+Synopsis: Markera Text [<textnummer>]
+
+Nummer: 502
+
+Beskrivning:
+Markerar den senast lästa texten för senare läsning. Om man anger ett
+textnumret så markeras den texten.
+
+Se Även: Visa Markerade
+
+
+Medlem
+¯¯¯¯¯¯
+Synopsis: Medlem <möte> | -a
+
+Nummer: 208
+
+Beskrivning:
+Gör användaren till medlem i det angivna mötet om han har rättighet att
+bli det.
+Med flaggan '-a' blir man medlem i alla möten man har rättighet att bli
+medlem i.
+
+Se Även: Utträd, Lista Möten
+
+
+Mötesstatus
+¯¯¯¯¯¯¯¯¯¯¯
+Synopsis: Mötesstatus [<möte>]
+
+Nummer: 232
+
+Beskrivning:
+Ger information om det angivna mötet. Sist kan det även vara en liten text
+om vad som diskuteras i mötet.
+Om inget möte anges så ges information om det mötet man befinner sig i.
+
+Se Även: Lista Möten
+
+
+Nya Filer
+---------
+
+Synopsis: Nya Filer [-]
+
+Nummer: 416
+
+Beskrivning:
+Listar de filer som har laddats upp sedan användaren var inloggad senast.
+Denna lista kan man även få upp i kommandot 'Lista Nyheter' om man slår
+på flaggan 'Automatisk Fillista'.
+
+Anges ett streck (-) som argument så visas endast ovaliderade filer. För en
+vanlig användare syns då inga filer alls eftersom de inte har rätt att se
+icke validerade filer.
+
+Se Även: Lista Filer, Lista Flaggor, Slå På, Slå Av
+
+
+
+Nästa Kommentar
+¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+Synopsis: Nästa Kommentar
+
+Nummer: 211
+
+Beskrivning:
+Visar den nästa kommentaren om man är inne i en kommentarskedja. Detta
+kommando har man ingen större nytta av använda själv utan promptas oftast
+fram.
+
+
+Nästa Möte
+----------
+
+Synopsis: Nästa Möte
+
+Nummer: 221
+
+Beskrivning:
+Gör så att man går till nästa möte med olästa texter i möteslistan. Den
+kommentarskedja man läser bryts.
+
+Se Även: Gå, Endast
+
+
+
+Nästa Text
+¯¯¯¯¯¯¯¯¯¯
+Synopsis: Nästa Text
+
+Nummer: 210
+
+Beskrivning:
+Detta kommando bryter den kommentars-kedja man är inne i och tar fram
+'(Läsa) Nästa Text'-prompten. Kommentarerna man inte läste är dock
+fortfarande markerade som olästa.
+
+Se Även: Hoppa Över, Endast
+
+
+Offdown
+-------
+
+Synopsis: Offdown
+
+Nummer: 317
+
+Samlar ihop alla olästa texter man har till en fil, packar den och skickar
+den sedan med Zmodem. Detta gör att man kan läsa texterna i lugn och ro
+hemma utan att vara uppkopplad mot BBS:en. Enklast är att använda någon av
+Offline-läsare som finns att tillgå.
+
+
+
+Personlig
+¯¯¯¯¯¯¯¯¯
+Synopsis: Personlig [<textnummer>]
+
+Nummer: 204
+
+Beskrivning:
+Påbörjar en personlig kommentar till den senast lästa texten. Texten kommer
+att hamna i Brevlådan hos den personen som skrev den kommenterade texten.
+Om man anger ett textnummer som argument så kommenteras den texten.
+
+Se Även: Brev
+
+
+Privat Download
+¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+Synopsis: Privat Download <filnamn>
+
+Nummer: 512
+
+Beskrivning:
+Laddar ner en fil från den privata filarean, förutsatt att en sådan finns.
+För att få en privat filarea måste man be sysop om en. Observera att hela
+filnamnet måste anges, man kan inte förkorta som i vanliga filarean.
+
+Se Även: Privat Upload, Lista Privatfiler, Radera Privatfil, Skapa Privatarea
+
+
+Privat Upload
+¯¯¯¯¯¯¯¯¯¯¯¯¯
+Synopsis: Privat Upload <användare>
+
+Nummer: 511
+
+Beskrivning:
+Laddar upp en fil till den angivna användarens privata filarea, förutsatt
+att användaren har någon privat filarea. Denna fil är sedan endast åtkombar
+av mottagaren.
+
+Se Även: Privat Download, Lista Privatfiler, Skapa Privatarea
+
+
+Radera Användare
+¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+Synopsis: Radera Användare <användare>
+
+Nummer: 309
+
+Beskrivning:
+Raderar den angivna användaren.
+
+
+Radera Area
+¯¯¯¯¯¯¯¯¯¯¯
+Synopsis: Radera Area <area>
+
+Nummer: 406
+
+Beskrivning:
+Raderar den angivna arean.
+
+Se Även: Lista Areor
+
+
+Radera Grupp
+------------
+
+Synopsis: Radera Grupp <grupp>
+
+Nummer: 320
+
+Beskrivning:
+Raderar den angivna användargruppen.
+
+Se Även: Skapa Grupp, Ändra Grupp, Lista Medlemmar
+
+
+Radera Fil
+¯¯¯¯¯¯¯¯¯¯
+Synopsis: Radera Fil <filnamn>
+
+Nummer: 409
+
+Beskrivning:
+Raderar den angivna filen från filarean och diskrediterar användaren för
+filen. Man kan bara radera filer som man själv har laddat upp såvida man
+inte är sysop, då får man också en fråga om användaren ska diskrediteras
+för filen.
+
+Se Även: Lista Filer, Sök
+
+
+Radera Lapp
+¯¯¯¯¯¯¯¯¯¯¯
+Synopsis: Radera Lapp
+
+Nummer: 316
+
+Beskrivning:
+Raderar den personliga lapp som visas sist varje gång man tar status på
+en person.
+
+Se Även: Ändra Lapp
+
+
+Radera Möte
+¯¯¯¯¯¯¯¯¯¯¯
+Synopsis: Radera Möte <möte>
+
+Nummer: 219
+
+Beskrivning:
+Raderar det angivna mötet. Kan bara utföras av den som har skapat mötet
+eller sysop.
+
+Se Även: Skapa Möte
+
+
+Radera Privatfil
+¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+Synopsis: Radera Privatfil <filnamn>
+
+Nummer: 514
+
+Beskrivning:
+Raderar en fil ur den privata filarean, förutsatt att en sådan finns. För
+att få en privat filarea måste man be sysop om en. Denna area förväntas
+innehavaren själv hålla rent i. Observera att man måste skriva hela
+filnamnet, man kan inte förkorta som i vanliga filarean.
+
+Se Även: Privat Upload, Privat Download, Lista Privatfiler
+
+
+Radera Text
+¯¯¯¯¯¯¯¯¯¯¯
+Synopsis: Radera Text <textnummer>
+
+Nummer: 217
+
+Beskrivning:
+Raderar den angivna texten. Kan bara utföras av den som har skrivit texten
+eller sysop.
+
+Se Även: Radera Brev, Skriv
+
+
+ReadConfig
+¯¯¯¯¯¯¯¯¯¯
+Synopsis: ReadConfig
+
+Nummer: 312
+
+Beskrivning:
+Talar om för NiKServer att den ska läsa in System.cfg, Status.cfg,
+Kommandon.cfg och Nycklar.cfg igen. Måste utföras för att en ändring i
+någon av dessa filer ska gå någon effekt.
+
+
+Rensa Brev
+----------
+
+Synopsis: Rensa Brev <antal brev>
+
+Nummer: 226
+
+Beskrivning:
+Rensar ut angivet antal brev från ens egen brevlåda. För att få reda på hur
+många brev ens brevlåda innehåller kan man använda 'Lista Brev'.
+
+Se Även: Lista Brev
+
+
+
+Rensa Texter
+------------
+
+Synopsis: Rensa Texter <antal texter>
+
+Nummer: 225
+
+Beskrivning:
+Rensar ut det angivna antalet texter från systemet och gör plats för nya.
+
+Se Även: Rensa Brev
+
+
+
+Ropa
+¯¯¯¯
+Synopsis: Ropa
+
+Nummer: 307
+
+Beskrivning:
+Ropar på sysop för en liten pratstund. Blinkar skärmen 10 ggr på BBS-
+datorns skärm med ca 1 sekunds mellanrum. Om sysop inte har svarat efter
+10 sekunder återgår man till KOM-systemet.
+Samtalet med sysop avslutas med Ctrl-Z.
+
+
+Skapa Area
+¯¯¯¯¯¯¯¯¯¯
+Synopsis: Skapa Area [<areanamn<]
+
+Nummer: 405
+
+Beskrivning:
+Skapar en filarea med det angivna namnet.
+
+Se Även: Lista Areor
+
+
+Skapa Fil
+¯¯¯¯¯¯¯¯¯
+Synopsis: Skapa Fil [<filnamn>]
+
+Nummer: 408
+
+Beskrivning:
+Lägger upp en fil som redan ligger fysiskt på hårddisken (disketten) som
+fil i en filarea.
+
+Se Även: Lista Filer, Sök
+
+
+Skapa Grupp
+¯¯¯¯¯¯¯¯¯¯¯
+Synopsis: Skapa Grupp [<gruppnamn>]
+
+Nummer: 318
+
+Beskrivning:
+Skapar en ny användargrupp. Kommandot frågar efter namn (om detta inte
+angivits på kommandoraden), om gruppen ska vara hemlig samt vid vilken
+status man automatiskt blir medlem i gruppen.
+
+Se Även: Lista Grupper
+
+
+Skapa Möte
+----------
+
+Synopsis: Skapa Möte
+
+Nummer: 218
+
+Beskrivning:
+Skapar ett nytt möte. Kommandot frågar efter namn på mötet, hur många
+texter som ska vara det maximala i mötet (bör ligga runt 200-300), vilket
+sorteringsvärde mötet ska ha, om det ska vara öppet eller slutet, om det
+ska vara skrivskyddat, om det ska vara kommentars-skyddat, om det ska vara
+hemligt, om användare ska vara automatiskt medlemmar, om mötet ska vara
+skrivstyrt eller om det ska styras från ARexx.
+
+Se Även: Radera Möte, Lista Möten
+
+
+
+Skapa Privatarea
+¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+Synopsis: Skapa Privatarea <användare>
+
+Nummer: 516
+
+Beskrivning:
+Skapar en privat filarea åt den angivna användaren, såvida han inte redan
+har en.
+
+Se Även: Lista Privatfiler, Privat Upload, Privat Download
+
+
+Skriv
+¯¯¯¯¯
+Synopsis: Skriv
+
+Nummer: 202
+
+Beskrivning:
+Påbörjar skrivandet av en text i det mötet man befinner sig i.
+
+Likadan som Inlägg.
+
+Se Även: Lista Möten, Radera Text
+
+
+Sluta
+¯¯¯¯¯
+Synopsis: Sluta
+
+Nummer: 301
+
+Beskrivning:
+Visar utloggningstexten, lägger sedan på modemet och sparar användaren i
+användarfilen. BBS:en ställer sig sedan att vänta på en ny inloggning.
+
+Likadant som Logout
+
+
+Slå Av
+¯¯¯¯¯¯
+Synopsis: Slå Av <flagga>
+
+Nummer: 304
+
+Beskrivning:
+Slår av den angivna flaggan samt talar om hur den stod innan.
+
+Se Även: Slå På, Lista Flaggor
+
+
+Slå På
+¯¯¯¯¯¯
+Synopsis: Slå På <flagga>
+
+Nummer: 305
+
+Beskrivning:
+Slår på den angivna flaggan och talar samtidigt om hur den stod innan.
+
+Se Även: Slå Av, Lista Flaggor
+
+
+Status
+¯¯¯¯¯¯
+Synopsis: Status [<användare>]
+
+Nummer: 308
+
+Beskrivning:
+Visar den angivna användarens status eller den egna statusen om man inte
+anger någon användare. Den informationen man får är Namn, adress,
+telenummer, antal lästa/skrivna texter etc. Om användaren har flaggan
+'Skyddad status' på visas inte adress och telefonnummer.
+
+Se Även: Ändra Användare
+
+
+Subtrahera Gruppmedlem
+¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+Synopsis: Subtrahera Gruppmedlem [<användare>]
+
+Nummer: 322
+
+Beskrivning:
+Gör en angiven användare till icke medlem i en angiven användargrupp.
+
+Se Även: Lista Grupper, Lista Användare, Status
+
+
+Subtrahera Rättigheter
+¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+Synopsis: Subtrahera Rättigheter <användare>
+
+Nummer: 216
+
+Beskrivning:
+Tar bort rättigheterna för den angivna användaren att vara med i det möte
+man befinner sig i samt gör honom till icke medlem. Kan bara utföras av den
+person som har skapat mötet eller av sysop.
+
+Se Även: Addera Rättigheter
+
+
+Sysinfo
+¯¯¯¯¯¯¯
+Synopsis: Sysinfo
+
+Nummer: 508
+
+Beskrivning:
+Ger information om en del i systemet. Bla hur många användare, möten, texter
+osv det finns. Visar även CLI-kommandona 'info' och 'avail'.
+
+
+System
+------
+
+Synopsis: System
+
+Nummer: 523
+
+Beskrivning:
+Gör så att man kan utföra vanliga DOS-kommandon genom NiKom. En speciell
+prompt ("DOS>") kommer upp och man kan ge kommandon precis som i CLI.
+Alla kommandon som ges (utom upload/download, se nedan) körs genom Fifo.
+Fifo måste alltså vara aktivt för att man ska kunna använda System.
+
+Det finns även två inbyggda kommandon, upload och download. Upload tar som
+argument en katalog där filen ska hamna (tex "upload NiKom:DatoCfg/").
+Download tar som argument den filen som man vill ladda ner.
+
+Man kommer ur System-kommandot genom att bara trycka Return vid prompten.
+
+OBS! Detta kommando bör för säkerhets skull vara lösenordsbelagt!
+
+
+Säg
+¯¯¯
+Synopsis: Säg <användare>[, <meddelande>]
+
+Nummer: 314
+
+Beskrivning:
+Skickar ett litet meddelande till en person som är inloggad på en annan nod.
+En förutsättning är naturligtvis att den användare man angivit är inloggad
+
+Se Även: Vilka
+
+
+Sök
+¯¯¯
+Synopsis: Sök [<söksträng>]
+
+Nummer: 413
+
+Beskrivning:
+Söker efter filer i filarean. Om man inte anger något argument så kommer
+NiKom att fråga efter en söksträng. Om man anger en söksträng så gäller det
+att den ska finnas någonstans inuti filnamnet eller beskrivningen för att
+filen ska komma upp.
+Om man söker på nycklar så gäller att ALLA nycklar man söker på måste finnas
+i en fil för att den ska komma upp.
+Om man söker på uppladdare så syns bara filer som den angivna personen har
+laddat upp.
+Om man söker på storlek så syns bara de filer som passar det man skrivit
+upp. Dvs om man skriver '>50000' så kommer bara filer som är större än
+50000 bytes upp.
+
+Om man söker på flera saker samtidigt så måste samtliga saker träffa in
+för att en fil ska komma upp. Ju exaktare man söker desto färre filer
+kommer upp. Om man inte vill ange tex någon söksträng så trycker man bara
+return när frågan om söksträng kommer. Man behöver inte heller ange några
+nycklar, man kan trycka return direkt om man vill.
+Om man inte anger något att söka på så kommer alla filer att passa in, dvs
+listan blir precis likadan som om man hade tagit 'lista filer'.
+
+Se Även: Lista Filer
+
+
+Tiden
+¯¯¯¯¯
+Synopsis: Tiden
+
+Nummer: 306
+
+Beskrivning:
+Visar vad klockan är och dagens datum samt hur lång systemtid man har kvar.
+
+
+Type
+¯¯¯¯
+Synopsis: Type <filnamn>
+
+Nummer: 415
+
+Beskrivning:
+Visar en textfil i filarean på skärmen.
+
+Se Även: Download, Lista Filer, Sök
+
+
+Upload
+¯¯¯¯¯¯
+Synopsis: Upload [<filnamn>]
+
+Nummer: 403
+
+Beskrivning:
+Laddar upp en fil till basen med det protokoll som är inställt. Man behöver
+inte befinna sig i rätt area när man ska ladda upp utan det kan anges
+separat. Om protokollet man använder även för över filnamnet på filen
+behöver man inte skriva ett filnamn som argument. (Zmodem tex för över
+filnamn).
+
+Likadan som Ladda Upp
+
+Se Även: Lista Filer, Lista Areor, Sök, Visa Filinfo, Download
+
+
+Utträd
+¯¯¯¯¯¯
+Synopsis: Utträd <möte>
+
+Nummer: 209
+
+Beskrivning:
+Gör så att användaren inte längre är medlem i det angivna mötet.
+
+Se Även: Medlem
+
+
+
+Validera Fil
+------------
+
+Synopsis: Validera Fil <filnamn>
+
+Nummer: 417
+
+Beskrivning:
+Validerar en nyligen uppladdad fil och gör den tillgänglig för användarna.
+
+Se Även: Ändra Fil
+
+
+
+Var
+¯¯¯
+Synopsis: Var
+
+Nummer: 220
+
+Beskrivning:
+Visar vilket möte man befinner sig i och hur många olästa texter man har
+där.
+
+Se Även: Lista Nyheter, Lista Möten
+
+
+Version
+¯¯¯¯¯¯¯
+Synopsis: Version
+
+Nummer: 323
+
+Beskrivning:
+Visar vilken version av NiKom som används och på vem kopian är
+registrerad.
+
+
+Vilka
+¯¯¯¯¯
+Synopsis: Vilka
+
+Nummer: 310
+
+Beskrivning:
+Visar vilka som är inloggade på de olika noderna samt om dessa skriver en
+text, läser en text, chattar eller inte gör något speciellt.
+
+Se Även: Status
+
+
+Visa Filinfo
+¯¯¯¯¯¯¯¯¯¯¯¯
+Synopsis: Visa Filinfo
+
+Nummer: 402
+
+Beskrivning:
+Visar vilken filarea användaren befinner sig i just nu samt vilket protokoll
+som är inställt för tillfället.
+
+Se Även: Byt Area, Lista Areor, Lista Filer
+
+
+Visa Markerade
+¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+Synopsis: Visa Markerade
+
+Nummer: 503
+
+Beskrivning:
+Visar de texter som man tidigare har markerat under samma inloggning.
+
+Se Även: Markera Text
+
+
+Visa Profile
+¯¯¯¯¯¯¯¯¯¯¯¯
+Synopsis: Visa Profile
+
+Nummer: 505
+
+Beskrivning:
+Visar ens personliga profile.
+
+Se Även: Ändra Profile, Exekvera Profile
+
+
+Återse Kommenterade
+¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+Synopsis: Återse Kommenterade
+
+Nummer: 207
+
+Beskrivning:
+Visar den text som den senast lästa texten är kommentar till.
+
+Se Även: Läs
+
+
+Ändra Användare
+¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+Synopsis: Ändra Användare [<användare>]
+
+Nummer: 303
+
+Beskrivning:
+Ger möjlighet att ändra de personliga uppgifterna såsom namn,adress och
+lösenord. Endast sysop kan ändra andra användare än sig själv.
+
+
+Ändra Area
+¯¯¯¯¯¯¯¯¯¯
+Synopsis: Ändra Area <area>
+
+Nummer: 407
+
+Beskrivning:
+Ger möjlighet att ändra en area vad gäller namn, mötestillhörighet och
+grupptillhörighet.
+
+Se Även: Lista Areor
+
+
+Ändra Grupp
+-----------
+
+Synopsis: Ändra Grupp <grupp>
+
+Nummer: 319
+
+Beskrivning:
+Ändrar uppgifterna om den angivna användargruppen.
+
+Se även: Skapa Grupp, Radera Grupp, Lista Medlemmar
+
+
+Ändra Fil
+¯¯¯¯¯¯¯¯¯
+Synopsis: Ändra Fil <filnamn>
+
+Nummer: 410
+
+Beskrivning:
+Ändrar på infon om en fil i filarean. Man kan bara ändra på filer man själv
+har laddat upp såvida man inte är sysop.
+
+Se Även: Radera Fil, Lista Filer, Sök
+
+
+Ändra Lapp
+¯¯¯¯¯¯¯¯¯¯
+Synopsis: Ändra Lapp
+
+Nummer: 315
+
+Beskrivning:
+Editerar användarens personliga lapp som visas sist när man tar status på
+en användare.
+
+Se Även: Radera Lapp
+
+
+Ändra Möte
+¯¯¯¯¯¯¯¯¯¯
+Synopsis: Ändra Möte <möte>
+
+Nummer: 223
+
+Beskrivning:
+Ändrar på det angivna mötet. Man kan ändra alla uppgifter som man fyllde i
+när man skapade det. Kan bara utföras av den som skapat mötet eller sysop.
+
+Se Även: Radera Möte, Skapa Möte
+
+
+Ändra Profile
+¯¯¯¯¯¯¯¯¯¯¯¯¯
+Synopsis: Ändra Profile
+
+Nummer: 504
+
+Beskrivning:
+Ändrar ens personliga profile. Profilen tas in i editorn för editering.
+
+Se Även: Visa Profile, Exekvera Profile
+@endnode

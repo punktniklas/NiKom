@@ -1,0 +1,99 @@
+/* Kommandot Flytta fil
+$VER: Flytta Fil 2.0 (12.04.97)
+N=FLYTTA FIL
+O=2
+#=525
+A=.
+*/
+
+parse arg nod pers fil toarea
+
+options results
+
+toarea = strip(toarea,b)
+
+'whicharea'
+area = RESULT
+
+if area = -1 then do
+    'sendstring' '0d0a0a'x||'Du befinner dig inte i någon area!'||'0d0a'x
+    exit
+end
+
+if fil = '' then do
+    'sendstring' '0d0a0a'x||'Ange fil att flytta: '
+    'getstring 40'
+    fil = RESULT
+    if rc>0 then exit 5
+    'sendstring' '0d0a0a'x
+end
+
+filnamn = FileInfo(fil,'n',area)
+flaggor = FileInfo(fil,'f',area)
+langbesk = FileInfo(fil,'l',area)
+
+if filnamn='-1' then do
+    'sendstring' '0d0a0a'x||'Filen finns inte!'||'0d0a0a'x
+    exit
+end
+
+sendstring '0d0a0a'x
+sendstring 'Filnamn:' filnamn
+
+if toarea = '' then do
+	do forever
+	    'sendstring' '0d0a'x||'Area att flytta filen till (? för lista) '
+    	'getstring 40'
+	    toarea = RESULT
+    	if rc>0 then exit 5
+	    if toarea = '' then do
+    		sendstring '0d0a'x
+    		exit
+	    end
+    	'sendstring' '0d0a'x
+	    if toarea='?' then do
+    	    do i=0 to SysInfo('o')
+        		if i = area then iterate
+	            a = AreaInfo(i,'n')
+    	        if a='-1' | a='-2' then iterate
+        	    if AreaInfo(a,'m')='-1' | AreaRight(pers,i) then do
+	                'sendstring' a||'0d0a'x
+    	        end
+        	end
+	        iterate
+    	end
+	    leave
+	end
+end
+
+nyarea=NikParse(toarea,'a')
+if nyarea < 0 then do
+    'sendstring' '0d0a'x||'Arean finns inte!'||'0d0a'x
+    exit
+end
+
+if nyarea = area then do
+	sendstring '0d0a'x||'Du kan inte flytta filen till samma area!'||'0d0a'x
+	exit
+end
+
+fromdir = AreaInfo(area,'d'||FileInfo(filnamn,'i',area))
+
+do i=0 to 15
+    todir   = AreaInfo(nyarea,'d'i)
+    if todir ~= '' then leave
+end
+
+address command 'move >nil: '||fromdir||filnamn||' '||todir
+if bittst(d2c(flaggor),0) = 1 then do
+	address command 'move >nil: '||langbesk||' '||todir||'longdesc'
+	say 'move '||langbesk||' '||todir||'longdesc'
+end
+
+e = MoveFile(filnamn,area,nyarea)
+if e < 0 then do
+    'sendstring' '0d0a'x||'MoveFile() felkod 'e '0d0a'x
+    exit
+end
+
+'sendstring' '0d0a'x||'Filen flyttad till area '||areainfo(nyarea,'n')||'.'||'0d0a'x

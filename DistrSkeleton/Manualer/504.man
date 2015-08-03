@@ -1,0 +1,11 @@
+
+
+Ändra Profile
+-------------
+
+Synopsis: Ändra Profile
+
+Beskrivning:
+Ändrar ens personliga profile. Profilen tas in i editorn för editering.
+
+Se Även: Visa Profile, Exekvera Profile

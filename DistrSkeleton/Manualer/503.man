@@ -1,0 +1,11 @@
+
+
+Visa Markerade
+--------------
+
+Synopsis: Visa Markerade
+
+Beskrivning:
+Visar de texter som man tidigare har markerat under samma inloggning.
+
+Se Även: Markera Text

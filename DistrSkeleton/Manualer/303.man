@@ -1,0 +1,10 @@
+
+
+Ändra Användare
+---------------
+
+Synopsis: Ändra Användare [<användare>]
+
+Beskrivning:
+Ger möjlighet att ändra de personliga uppgifterna såsom namn,adress och
+lösenord. Endast sysop kan ändra andra användare än sig själv.

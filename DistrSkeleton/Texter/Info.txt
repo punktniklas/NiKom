@@ -1,0 +1,22 @@
+
+
+Följande info-filer finns:
+
+Tips             - En del tips över finesser som gör livet lättare
+Fullskärmseditor - Text om fullskärmseditorn.
+Changes          - Ändringar i olika versioner av NiKom
+----------------------------------------------------------------------------
+                Följande texter kommer fram när
+2fel            -  man har skrivit två fel i rad
+Help            -  man ger kommandot 'HJÄLP' eller '?'
+ListaKommandon  -  man ger kommandot 'LISTA KOMMANDON'
+TidenSlut       -  tiden tar slut
+EditorHelp      -  man ger kommandot '!?' i editorn
+Inlogg          -  man loggar in
+Bulletin        -  man har angivit korrekt namn och lösen
+NyAnv           -  man registrerar sig som ny användare
+Utlogg          -  man loggar ut
+Info            -  man ger kommandot 'INFO' utan argument
+----------------------------------------------------------------------------
+
+Skriv 'info <filnamn>', filnamnet kan förkortas

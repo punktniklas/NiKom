@@ -1,0 +1,14 @@
+
+
+RGamla Texter
+-------------
+
+Synopsis: RGamla Texter
+
+Beskrivning:
+Går igenom alla möten och rensar ut texter som har ramlat utanför maxgränsen
+eller är för gamla.
+
+Se Även: RGamla Brev, Rensa Texter
+
+(Inte implementerat än)

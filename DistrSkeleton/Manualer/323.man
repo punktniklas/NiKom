@@ -1,0 +1,10 @@
+
+
+Version
+-------
+
+Synopsis: Version
+
+Beskrivning:
+Visar vilken version av NiKom som används samt på vem programmet är
+registrerat.

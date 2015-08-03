@@ -1,0 +1,10 @@
+
+
+Info
+----
+
+Synopsis: Info [<filnamn>]
+
+Beskrivning:
+Ger information om olika saker. För att se vad man kan få information om,
+ge kommandot utan argument.

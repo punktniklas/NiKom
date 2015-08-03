@@ -1,0 +1,12 @@
+
+
+Gå
+--
+
+Synopsis: Gå [<mötesnamn>]
+
+Beskrivning:
+Går till det angivna mötet. Om inget argument angivits så placeras man i
+Brevlådan.
+
+Se Även: Lista Möten, Var

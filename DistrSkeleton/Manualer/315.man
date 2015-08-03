@@ -1,0 +1,12 @@
+
+
+Ändra Lapp
+----------
+
+Synopsis: Ändra Lapp
+
+Beskrivning:
+Editerar användarens personliga lapp som visas sist när man tar status på
+en användare.
+
+Se Även: Radera Lapp

@@ -1,0 +1,14 @@
+
+
+Lista Senaste
+-------------
+
+Synopsis: Lista Senaste [-<antal>] [<användare>]
+
+Beskrivning:
+Ger en lista på de 128 senaste inloggningarna. Vem som var inloggad, vilken
+tid han loggade ut, hur länge han var inloggad, hur många texter han läste
+samt hur många texter han skrev.
+Om man anger ett antal skrivs bara så måmnga rader ut, lämpligt för tex
+profilen.
+Skriver man en användare som argument så får man bara upp hans inloggningar.

@@ -1,0 +1,242 @@
+                    FidoNet och FidoNet-kompatibla nät
+                    ==================================
+
+OBS! Denna dokumentation beskriver inte hur FidoNet fungerar i allmänhet
+utan bara den NiKom-specifika delen. För en allmän beskrivning hänvisas
+till dokumentation för annan FidoNet-programvara såsom tex TrapDoor,
+TrapToos eller Spot.
+
+Att sätta upp en FidoNet nod är inte det allra enklaste man kan sig för.
+Jag vill därför rekomendera starkt att du först sätter upp det hela privat
+och kör ett tag för att komma igång med hur det fungerar. Sedan när du
+börjar bli varm i kläderna kan du stoppa in det hela i din BBS.
+
+
+Begrepp
+-------
+Överallt där det står FidoNet ska man egentligen läsa "FidoNet-kompatibla
+nät". Fido och FidoNet behandlas här som standarder för nätverk, inte
+nätverket själv. Det finns inget som säger att det just är FidoNet man
+måste koppla upp sig mot. Det kan lika gärna vara tex AmigaNet.(Eller
+båda).
+
+Programvara
+-----------
+
+För att få en fungerande Fido-nod måste man ha lite annan programvara
+förutom NiKom. Man behöver en mailer och en tosser.
+
+I Mailer-väg duger i stort sett vad som helst, bara den fungerar. TrapDoor
+är dock den bästa och den som rekomenderas.
+
+Vad gäller Tosser så måste den hålla sig till FTS-1-standarden. Tex
+Spot lägger upp meddelandedatabasen på ett helt eget sätt, något som inte
+fungerar med NiKom. TrapToss är ett bra fungerande program. Foozle kan fås
+att fungera om man ställer in den att arbeta med FTS-1-texter.
+
+
+NiKomFido.cfg
+-------------
+Fido-biten har en helt egen konfigurationsfil, NiKomFido.cfg. Först där ska
+man ange vilka domäner (eller nät) man är med i. En rad kan se ut som:
+
+DOMAIN 1 FidoNet 2:201/420.0 1: 2: 3: 4: 5: 6:
+
+Först på raden står nyckelordet DOMAIN. Efter det kommer en siffra som man
+väljer själv. Den måste dock vara större än noll och två domäner får inte
+ha sammma värde. Detta är till för att NiKom internt ska kunna hålla reda
+på domänerna. Om man tar bort en domän bör man inte återanvända dess värde.
+
+Sedan kommer namnet på domänen. Detta har tekniskt sett egentligen ingen
+betydelse vad det står här, inte för NiKoms del iaf. Namnet används för att
+läggas på efter adresser, som tex 2:201/420.0@FidoNet. Detta bör dock
+sättas till något vettigt. Det kan hända att andra system förlitar sig på
+vad som står här.
+
+Efter detta kommer den adress som ska användas för utgående texter i
+domänen. NiKom kommer inte att märka om man anger något annat än sitt
+nodnummer här. Detta är dock i övrigt ingen god ide.
+
+Sist kommer ett godtyckligt antal siffror med kolon efter sig. Detta anger
+vilka zon-nummer som används i nätet. Detta används främst för att avgöra
+vilken adress som ska användas i brevlådan. NiKom kommer även att vägra att
+skicka nätbrev till zoner som inte finns medtagna här.
+
+Efter detta kan man ange ett antal rader med ALIAS. Detta för att man ska
+kunna skicka brev till namn som inte finns som användarnamn i basen. Först
+anges vilket användarnummer breven ska skickas till och sedan kommer själva
+aliaset. Ex:
+ALIAS 0 Sysop
+ALIAS 10 Support
+
+Nyckelordet BOUNCE är inte implementerat ännu, låt det vara.
+
+MATRIXDIR anger i vilken katalog som filerna för brevlådan ligger.
+
+MAILGROUP anger vilka användargrupper som ska få möjlighet att skicka
+nätbrev. Man kan ange godtyckligt antal rader med grupper.
+
+MAILSTATUS anger vilken status som krävs för att få skicka nätbrev om man
+inte är med i någon av användargrupperna.
+
+FIDOLOGFILE anger till vilken fil logginfo ska skrivas. Änsålänge loggas
+bara import av brev.
+
+DEAFAULTORIGIN anger vilken origin som ska vara standard när man skapar nya
+möten. Observera att om man ändrar detta så ändras inte origin i redan
+skapade möten.
+
+CRASHSTATUS anger vilken status som krävs för att få crasha nätbrev.
+
+
+LastMatrix
+----------
+
+I DatoCfg finns en liten fil som heter LastMatrix. Denna talar om
+(namnet till trots :-) vilket nummer som är nästa nätbrev att importera.
+Detta är alltså högsta nätbrev + 1.
+
+
+Fido-möten
+----------
+
+När man skapar ett möte får man en fråga om det ska vara ett lokalt möte
+eller ett Fido-möte. För lokala möten hänvisas till Möten.doc. För
+Fido-möten får man först fylla i uppgifter som för lokala möten (återigen
+se Möten.doc). Efter det kommer lite Fido-specifika saker.
+
+Katalog: Här ska det anges i vilken katalog som tossern har texterna, dvs
+alla .msg-filer. När ett möte skapas utgår NiKom från att det finns en fil
+med namn 1.msg, där det s.k. HWM (High Water Mark) ligger.
+
+Tag-namn: Här anges vilket Tag-namn mötet har. Tex R20_AMIGA.
+
+Origin: Här anges vilken Origin-rad som ska läggas sist i alla texter som
+skrivs i detta möte. Brukar ofta vara information om vilken BBS texten
+kommer från.
+
+Teckenset: Här anges vilken teckenuppsättning som utgående texter ska
+konverteras till. Ofta står det i ett mötes regler vilka
+teckenuppsättningar som är tillåtna. I Amiga-möten ska ofta ISO Latin
+användas (samma som Amigan själv använder). I andra möten är det ofta IBM
+CodePage (PC8) som gäller. De flesta möten brukar acceptera SIS-7. Denna
+bör dock bara användas när ingen 8-bitars teckenuppsättning är möjlig.
+
+Alla utgående texter märks med en s.k. CHRS-kludge som talar om vilken
+teckenuppsättning som används. När inkommande texter ska visas måste de
+konverteras till ISO Latin. Om en CHRS-klude finns så konverteras texten
+enligt denna. Om CHRS-kludge saknas så konverteras å, ä, ö, Å, Ä, Ö, æ, ø,
+Æ och Ø i PC8. Andra tecken lämnas orörda. Detta gör att de flesta texter
+blir bra oavsett om de är skrivna med PC8 eller ISO Latin. Undantag finns
+dock.
+
+Nät: Här anges vilket av de nät som finns i NiKomFido.cfg som mötet
+tillhör.
+
+
+Användandet av möten är i stort sett som med vanliga möten. Man kan läsa,
+skriva och kommentera i dem. Det finns dock ingen kommentarslänkning. Detta
+gör att 'Återse kommenterade' inte fungerar och att bara 'Nästa Text'
+kommer att komma upp i prompten.
+När man kommenterar en text så förväntas man citera väl välda delar av det
+man kommenterar så att sammanhanget framgår. Citera kan man göra i
+fullskärmseditorn genom att trycka Ctrl-R eller i radeditorn genom att ge
+kommandot '!citera'.
+Se även avsnittet om citering.
+
+
+Brevlådan
+---------
+
+I brevlådan, till skillnad från mötena, så importeras alla texter och läggs
+i användarnas respektive användarkatalog.
+För att skicka ett brev så skriver man "brev <användarnamn>@<nodnummer>".
+Tex:
+  brev Nisse Persson@2:201/420
+
+Kommentera brev gör man som vanligt med 'Kommentera'. Även 'Personlig'
+fungerar som vanligt. När man kommentarer ett brev kan man inte citera i
+editorn utan detta måste ske för hand. (Lämpligen med ett program som Snap
+eller PowerSnap). Se även avsnittet om citering.
+
+För att skicka ett brev som CrashMail så ger man i fullskärmseditorn först
+Ctrl-Q och sedan kommandot 'Crash'. I radeditorn ges kommandot '!crash'.
+Allt NiKom egentligen gör då är att sätta en viss bit i texten som talar om
+att det är ett crashmail. Tossern kommer då (förmodligen) att lägga texten
+i Mail:Outbound som <nodnummer>.CUT. Sedan är det upp till sysop (eller
+sysops automagiska script) att ringa upp den aktuella basen och skicka över
+brevet.
+
+
+Citering
+--------
+
+Eftersom Fido saknar ett riktigt system för kommentarslänkning så brukar
+man i allmänhet citera det man kommenterar. Här gäller regeln att man ska
+klippa bort så mycket som möjligt av citatet. Ingen blir glad åt när någon
+citerar en 20-30 rader för att sedan själv skriva 'Nej' under.
+
+Det finns vissa tekniska aspekter på det hela också. Fido arbetar inte med
+radbaserade texter utan allt byggs på stycken. Detta gör att varje system
+själv kan "flöda om" texten till den bredd som passar. Detta ger dock
+vissa problem. Normalt brukar man sätta skribentens initialer framför det
+han har skrivit. Om någon citerar det jag skrivit skulle det bli:
+
+ NL> Bla  bla bla och skogen är grön om sommaren men inte om vintern
+ NL> för då är den vit.
+
+Om varje system fick flöda om detta som de ville skulle "NL>" i många fall
+hamna mitt i raderna. Därför lägger man alltid ett mellanslag först på
+raden. De flesta system (så även NiKom) tolkar nämligen det som ett nytt
+stycke. Varje citatrad blir alltså ett eget stycke. När man citerar själv
+ska man alltså alltid se till att börja varje rad med ett mellanslag.
+(Detta trick kan även användas i andra fall, tex om man har en tabell som
+inte bör flödas om)
+
+
+Underhåll
+---------
+
+När mailern har pollat och fått in ny post så packar tossern upp det hela
+och lägger det på rätt ställe. Detta är dock inget som NiKom kan veta om.
+Därför måste programmet "UpdateFido" köras efter varje imort av nya texter.
+UpdateFido kollar upp för varje möte om det kommit några nya texter och gör
+dessa tillgängliga i basen. Den kollar även om det kommit några nya brev
+och importerar i så fall dessa till rätt användare.
+I tex TrapToss kan man ange hur många texter man vill ha i ett möte. När
+den importerar ny post så plockar den bort motsvarande mängd från slutet.
+Detta kollar även UpdateFido upp så att allt blir rätt.
+
+Om man vill kan man ha ett separat program som rensar bort gamla texter
+från slutet. Bara UpdateFido körs efteråt. Viktigt är dock att det från den
+lägsta till högsta texten är en obruten serie. Den får inte finnas luckor
+där det saknas texter.
+
+Skulle man av någon anledning vilja scanna om ett möte helt och hållet så
+finns programmet ReScanConf. Detta tar ett mötesnummer som argument och
+scannar om det mötet. Vill man scanna om samtliga möten så finns
+ReScanAllConf.
+
+Fido-standarden har den nackdelen av den inte gillar textnummer högre än ca
+32000. För att lösa detta så kan man numrera om ett möte med hjälp av
+programmet RenumberConf. Detta gör att filernas namn numreras om. Inuti
+basen behålls dock samma nummer som förut så att NiKom kan hålla reda på
+vilka användare som har vilka texter olästa. Detta gör att samma text har
+olika nummer i filnamnet och i basen.
+Om ett möte ska numreras om _måste_ RenumberConf användas. Inget annat
+program får numrera om mötet. Då kommer NiKom helt tappa kollen över vilken
+text som är vad.
+
+
+Flaggor
+-------
+
+Det finns även två flaggor som har med läsandet av Fido-texter att göra. Om
+flaggan 'Visa FidoNet kludge-rader' är påslagen så kommer alla kludgerader,
+SEEN-BY och PATH att visas. Är den avslagen syns inte dessa rader.
+
+Flaggan 'Töm skärmen innan en Fido-text' gör att skärmen töms innan en
+Fido-text visas. Detta snabbar ofta upp utskriften väsentligt på de ofta
+ganska långa texterna. I Fido-möten där man inte läser i kommentarsordning
+har man dessutom ganska litet intresse av att samtidigt kunna se föregående
+text på skärmen.

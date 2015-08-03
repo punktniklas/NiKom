@@ -1,0 +1,12 @@
+
+
+Lista Grupper
+-------------
+
+Sysnopsis: Lista Grupper
+
+Beskrivning:
+Listar de användargrupper som finns i basen. En stjärna framför ett namn
+betyder att du inte är medlem i den gruppen.
+
+Se Även: Lista Medlemmar, Status

@@ -1,0 +1,8 @@
+
+
+WriteInfo
+
+Synopsis: WriteInfo
+
+Beskrivning:
+Sparar serverns interna systeminfofil.

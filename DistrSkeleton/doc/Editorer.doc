@@ -1,0 +1,80 @@
+                                 Editorerna
+                                 ==========
+
+I NiKom finns det två olika editorer: Radeditorn och fullskärmseditorn.
+Vilken man vill använda styr man genom flaggan 'Fullskärmseditor' (se
+avsnittet om flaggor i Övrigt.doc)
+
+Fullskärmseditorn kräver att användarens terminalprogram klarar av (och är
+inställt på) ANSI-emulering.
+
+Radeditorn
+----------
+Först på raden står det alltid vilken rad man håller på att skriva och när
+man har skrivit så raden är full så byter den automatiskt rad och ser till
+så att ordet man håller på att skriva flyttas ner. Man kan sudda ut de
+tecken man har skrivit och även sudda sig tillbaka till raden innan.
+Man kan även ge editorkommandon. Dessa börjar alltid med ett utropstecken
+och ska skrivas först på en rad.
+
+Skulle man vilja ändra på en rad man skrivit lite längre upp så använder
+man kommandot '!ändra'. Då kommer den radens nummer fram och man kan börja
+ändra. För att ta fram tecken för tecken av den gamla raden så trycker man
+Ctrl-F. Vill man ta fram resten av den gamla raden trycker man Ctrl-R. Man
+avslutar ändringen genom att trycka return.
+
+Vill man infoga en rad någonstans så kan man använda kommandot '!infoga'.
+Då får man möjlighet att skriva raden och avslutar med Return.
+Man kan även radera en rad med kommandot '!radera'.
+
+Om man ska ladda upp en redan skriven text genom terminalprogrammet så kan
+man hindra att någonting syns (vilket snabbar upp det hela). Man ger då
+kommandot '!dump'. När man sedan är klar skriver man (i blindo) '!stop'.
+Tryck gärna på return innan så att du är säker på att det hamnar först på
+en rad.
+
+För att se hela texten som den kommer att bli så ge kommandot '!läs' eller
+'!hela'.
+
+Om det är en text i ett möte man skriver så finns det två kommandon man kan
+använda:
+'!flytta' - flyttar texten till ett annat möte
+'!ärende' - ändrar ärendet på texten
+
+När man har skrivit klart texten så ger man kommandot '!spara' för att
+spara texten. Det går även bra att trycka på Ctrl-Z.
+Vill man inte spara texten så finns kommandona '!bort' och '!kasta'.
+
+Om det är ett brev som skrivs så finns det ytterligare ett kommando,
+'!addera'. Detta adderar en mottagare till brevet.
+
+
+Fullskärmseditorn
+-----------------
+
+Fullskärmseditorn är lite mer som vanliga editorer. Man kan flytta runt
+markören med piltangenterna och ändra bäst man vill. Om man vill radera
+allt från markören till slutet av raden så använder man Ctrl-K. Skulle man
+redan stå i slutet av raden så flyttas raden under upp, förutsatt att den
+får plats där. Det man raderar med Ctrl-K kan man sedan klippa in med hjälp
+av Ctrl-Y.
+
+Vill man ta bort en rad helt så trycker man Ctrl-X. De rader som finns
+under kommer då att flyttas upp ett steg. Står man på sista raden så rensas
+den bara på text och markören hamnar i början av raden.
+
+Det finns kommandon i fullskärmseditorn också. Dessa får man fram genom att
+först trycka på Ctrl-Q och sedan skriva kommandot. Dessa är:
+  dump   - tar emot en text utan att eka tillbaka några tecken. Kommandot
+           avbryts med Ctrl-C.
+  flytta - flyttar texten till ett annat möte
+  ärende - ändrar ärendet på texten.
+  addera - adderar en mottagare till ett brev.
+
+Dessa kommandon fungerar likadant som deras motsvarigheter i radeditorn.
+
+För att spara texten så trycker man Ctrl-Z och för att kasta bort texten så
+trycker man Ctrl-C.
+
+Ingen av dessa Ctrl-tangent kombinationer måste utföras på början av en rad
+utan man kan använda dem var som helst i texten.

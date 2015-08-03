@@ -1,0 +1,25 @@
+
+
+Hmm, du har problem verkar det som. För att göra saker i denna BBS så ger
+man kommandon. Dessa kommandon kan bestå antingen av ett eller två ord. För
+att få upp en lista på alla kommandon så ger man kommandot
+'LISTA KOMMANDON'
+
+Alla kommandon går att förkorta till sin närmaste unika del. Så stället för
+att skriva 'LISTA KOMMANDON' så hade det gått alldeles utmärkt med 'LI KO'.
+Om det man skriver passar in på flera kommadon så kommer en lista upp på de
+kommandon man kunde ha menat.
+
+Även alla användarnamn, mötesnamn och flaggnamn går att förkorta. Så
+istället för att skriva 'Tomas Kärki' går det bra med 'to kä' eller
+Numret som du ser efter alla användarna(Jag har tex (#)0)
+
+I prompten står de alltid ett kommando. Med detta menas att om man bara
+trycker på <RETURN> utan att skriva något så kommer detta kommando att
+utföras.
+
+Vill du ha ytterligare hjälp så kan du ge kommandot 'HJÄLP' eller '?' (båda
+två gör samma sak)
+
+skriv 'ropa' för att ropa på sysop.
+Om du inte vill få fram den här texten, skriv 'slå på Ingen'

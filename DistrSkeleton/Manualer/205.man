@@ -1,0 +1,23 @@
+
+
+Brev
+----
+
+Synopsis: Brev <användare>
+
+Beskrivning:
+Påbörjar ett brev till den angivna användaren.
+
+Om namnet innehåller ett '@' betraktas det som ett nätbrev. Formatet är då
+
+  <namn>@<zon>:<nät>/<nod>.<point>
+
+Point-numret kan utelämnas, det antas då vara noll. Exempel:
+
+  brev Nisse Persson@2:201/420
+  brev Jultomten@1:234/567.8
+
+Alla svenska tecken i namn görs om till "sprattgok". Dvs, ä och å blir a
+och ö blir o.
+
+Se Även: Personlig

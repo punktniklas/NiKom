@@ -1,0 +1,13 @@
+
+
+Subtrahera Rättigheter
+----------------------
+
+Synopsis: Subtrahera Rättigheter <användare>
+
+Beskrivning:
+Tar bort rättigheterna för den angivna användaren att vara med i det möte
+man befinner sig i samt gör honom till icke medlem. Kan bara utföras av den
+person som har skapat mötet, MAD eller av sysop.
+
+Se Även: Addera Rättigheter

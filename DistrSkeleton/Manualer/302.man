@@ -1,0 +1,12 @@
+
+
+Hjälp, ?
+--------
+
+Synopsis: Hjälp
+Synopsis: ?
+
+Beskrivning:
+Visar en hjälptext.
+
+Se Även: Lista Kommandon

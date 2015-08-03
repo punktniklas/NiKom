@@ -1,0 +1,11 @@
+
+
+Sluta, Logout
+-------------
+
+Synopsis: Sluta
+Synopsis: Logout
+
+Beskrivning:
+Visar utloggningstexten, lägger sedan på modemet och sparar användaren i
+användarfilen. BBS:en ställer sig sedan att vänta på en ny inloggning.

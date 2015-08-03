@@ -1,0 +1,12 @@
+
+
+Nästa Möte
+----------
+
+Synopsis: Nästa Möte
+
+Beskrivning:
+Gör så att man går till nästa möte med olästa texter i möteslistan. Den
+kommentarskedja man läser bryts.
+
+Se Även: Gå, Endast

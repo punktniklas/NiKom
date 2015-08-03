@@ -1,0 +1,386 @@
+/* Sortera Möten */
+
+options results
+
+ESC = d2c(27)
+
+CLS = ESC||'[2J'||ESC||'[H'
+
+parse arg nod person argument
+
+antalmoten = SysInfo('m')
+
+sendstring '0d0a0a'x
+sendstring 'Läser in information om mötena i minnet...'
+
+do i=0 to antalmoten
+		motesnamn.i = MeetInfo(i, 'n')
+		motessortering.i = MeetInfo(i, 'p')
+end
+
+j = 0
+do i=0 to antalmoten
+	if MeetInfo(j, 'n') ~= -1 then do
+		motesnummer.j = j
+		j = j + 1
+	end
+end
+rader = UserInfo(person, 'q')
+antalmoten = j - 1
+
+visarader = rader
+aktivt = 0
+context = 0
+sendstring '0d0a'x
+sendstring 'Sorterar mötena...'
+call SorteraMoten
+call VisaMoten
+
+do forever
+	call Gotoxy(1,visarader+3)
+	sendstring 'val: '
+	tecken = upper(gettkn())
+	select
+		when tecken = 'Q' then do
+			call Gotoxy(1,visarader+2)
+			exit
+		end
+
+		when tecken = '8' then do	/* Upp ett steg */
+			call cursorup
+		end
+
+		when tecken = '2' then do	/* Ner ett steg */
+			call cursordown
+		end
+
+		when tecken = '9' then do   /* Upp en sida */
+			call cursorpageup
+		end
+
+		when tecken = '3' then do   /* Ner en sida */
+			call cursorpagedown
+		end
+
+		when tecken = '7' then do	
+			if context ~= 0 then do
+				context = 0
+				aktivt = 0
+				call VisaMoten
+			end
+		end
+
+		when tecken = '1' then do
+			if aktivt < antalmoten then do
+				curr = antalmoten%(visarader+1)
+				context = curr*(visarader+1)
+				aktivt = antalmoten
+				call VisaMoten
+			end
+		end
+
+		when tecken = 'X' then do
+			sendstring CLS
+			sendstring 'Startsorteringsvärde: '
+			getstring '10'
+			start = result
+			sendstring '0d0a'x
+			sendstring 'Sorteringsvärdeshopp: '
+			getstring '10'
+			hopp = result
+
+			do i=0 to antalmoten
+				nummer = motesnummer.i
+				motessortering.nummer = start
+				start = start + hopp
+			end
+			call VisaMoten
+		end
+
+		when tecken = 'A' then do	/* Flytta möte ett steg upp */
+			if aktivt > 0 then do
+				call Flyttamote(aktivt, aktivt-1,1)
+			end
+		end
+
+		when tecken = 'Z' then do	/* Flytta möte ett steg ner */
+			if aktivt < context+(visarader+1) & aktivt < antalmoten then do
+				call Flyttamote(aktivt, aktivt+1,1)
+			end
+		end
+		
+		when tecken = 'S' then do
+			sendstring 'Sorterar möten...'
+			call Sorteramoten
+			call VisaMoten
+		end
+
+		when tecken = 'V' then do
+			sendstring CLS
+			sendstring 'Sorteringsvärde för detta möte: '
+			getstring '10'
+			motessortering.aktivt = result
+			call MarkeraAktivt(aktivt)
+		end
+
+		when tecken = 'W' then do
+			if UserInfo(person, 'r') > 99 then do
+				sendstring 'Sparar...'
+				do i=0 to antalmoten
+					nummer = motesnummer.i
+					if nummer ~= -1 then do
+						call chgmeet(nummer, 'p', motessortering.nummer)
+					end
+				end
+			end
+			exit
+		end
+
+		when tecken = 'J' then do
+			if aktivt > 0 then do
+				do tmp=aktivt to 1 by -1
+					call Flyttamote(aktivt, aktivt-1,0)
+				end
+			end
+			call VisaMoten
+		end
+		
+		when tecken = 'M' then do
+			if aktivt < antalmoten then do
+				do tmp=aktivt to antalmoten - 1
+					call Flyttamote(aktivt, aktivt+1,0)
+				end
+			end
+			call VisaMoten
+		end
+
+		when tecken = 'H' then do
+			taktivt = aktivt
+			if aktivt > 0 then do
+				do tmp=aktivt to 1 by -1
+					call Flyttamote(aktivt, aktivt-1,0)
+				end
+			end
+			aktivt = taktivt
+			call visamoten
+		end
+		
+		when tecken = 'N' then do
+			taktivt = aktivt
+			if aktivt < antalmoten then do
+				do tmp=aktivt to antalmoten - 1
+					call Flyttamote(aktivt, aktivt+1,0)
+				end
+			end
+			aktivt = taktivt
+			call visamoten
+		end
+
+		otherwise do
+			if tecken = d2c(155) | tecken = d2c(27) then do /* ESCAPE tecken */
+				tecken = upper(gettkn())
+				if tecken = d2c(91) then do
+					tecken = upper(gettkn())
+				end
+				select
+					when tecken = 'A' then do /* Cursor up */
+						call cursorup
+					end
+					
+					when tecken = 'B' then do /* cursor down */
+						call cursordown
+					end
+					when tecken = 'C' then do
+						call cursorpagedown
+					end
+					when tecken = 'D' then do
+						call cursorpageup
+					end
+					otherwise do
+						sendstring
+					end
+				end
+			end
+		end
+	end
+end
+
+exit
+
+sorteramoten:
+/*
+flagga=0
+do mm1=1 to antalmoten until flagga
+        flagga=1
+        do mm2=antalmoten to mm1 by -1
+                mmtemp=mm2-1
+                mn1 = motesnummer.mm1
+                mn2 = motesnummer.mmtemp
+                if motessortering.mn1 > motessortering.mn2 then do
+                        flagga=0
+                        call SwapData(mmtemp,mm1)
+				end
+		end
+end
+*/
+
+do mm1=0 to antalmoten
+        do mm2=mm1 to antalmoten-1
+                mn1 = motesnummer.mm1
+                mn2 = motesnummer.mm2
+                if motessortering.mn1 > motessortering.mn2 then do
+					call SwapData(mm2,mm1)
+				end
+		end
+end
+return
+
+gettkn: procedure
+'getchar'
+return result
+
+MarkeraAktivt:
+parse arg motesnr,synligt
+
+if synligt then do
+	call Gotoxy(1,motesnr+1-context)
+	tempnr = motesnummer.motesnr
+	sendstring '-> '||motesnamn.tempnr||' ('||motessortering.tempnr||')'||copies(' ', 46-length(motesnamn.tempnr))
+end
+aktivt = motesnr
+return
+
+MarkeraInAktivt:
+parse arg motesnr,synligt
+
+if synligt then do
+	call Gotoxy(1,motesnr+1-context)
+	do i=1 to 3
+		sendchar '/ '
+	end
+	tempnr = motesnummer.motesnr
+	sendstring motesnamn.tempnr||' ('||motessortering.tempnr||')'||copies(' ', 46-length(motesnamn.tempnr))
+end
+return
+
+gotoxy: procedure expose ESC
+parse arg x,y
+sendstring ESC||'['||y||';'||x||'H'
+return
+
+Bytmote:
+parse arg franmote,tillmote
+
+Call MarkeraInAktivt(franmote,1)
+
+Call MarkeraAktivt(tillmote,1)
+return
+
+Flyttamote:
+parse arg franmote,tillmote,synligt
+
+call SwapData(franmote,tillmote)
+
+if context%(visarader+1) = tillmote%(visarader+1) then do
+	Call MarkeraInAktivt(franmote,synligt)
+	Call MarkeraAktivt(tillmote,synligt)
+end
+else do
+	context = (tillmote%(visarader+1))*(visarader+1)
+	aktivt = tillmote
+	if synligt then do
+		call VisaMoten
+	end
+end
+return
+
+SwapData:
+parse arg i,j
+temp = motesnummer.i
+motesnummer.i = motesnummer.j
+motesnummer.j = temp
+return
+
+/*
+temp = motesnamn.i
+motesnamn.i = motesnamn.j
+motesnamn.j = temp
+
+temp = motessortering.i
+motessortering.i = motessortering.j
+motessortering.j = temp
+*/
+
+VisaMoten:
+sendstring CLS
+if context+visarader > antalmoten then do
+	antal = antalmoten
+end
+else do
+	antal = context+visarader
+end
+do junk=context to antal
+	if junk ~= aktivt then do
+		call MarkeraInAktivt(junk,1)
+	end
+	else do
+		call MarkeraAktivt(junk,1)
+	end
+end
+return
+/*
+do junk=context to antal
+	nummer = motesnummer.junk
+	if nummer ~= aktivt then do
+		call MarkeraInAktivt(nummer,1)
+	end
+	else do
+		call MarkeraAktivt(nummer,1)
+	end
+end
+*/
+cursorup:
+if aktivt > context then do
+	call BytMote(aktivt, aktivt-1)
+end
+else do
+	if context > 0 then do
+		context = context - (visarader + 1)
+		aktivt = aktivt - 1
+		call VisaMoten
+	end
+end
+return
+
+cursordown:
+if aktivt < context+visarader & aktivt < antalmoten then do
+	call BytMote(aktivt, aktivt+1)
+end
+else do
+	if aktivt+1 ~= antalmoten then do
+		if context < antalmoten then do
+			context = context + (visarader + 1)
+			aktivt = aktivt + 1
+			call VisaMoten
+		end
+	end
+end
+return
+
+cursorpageup:
+curr = context%(visarader+1)
+if curr > 0 then do
+	context = ((curr-1)*(visarader+1))
+	aktivt = context
+	call VisaMoten
+end
+return
+
+cursorpagedown:
+curr = context%(visarader+1)
+if curr < antalmoten%(visarader+1) then do
+	context = ((curr+1)*(visarader+1))
+	aktivt = context
+	call VisaMoten
+end
+return

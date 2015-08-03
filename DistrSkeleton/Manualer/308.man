@@ -1,0 +1,15 @@
+
+
+Status
+------
+
+Synopsis: Status [<användare>]
+
+Beskrivning:
+Visar den angivna användarens status eller den egna statusen om man inte
+anger någon användare. Den informationen man får är Namn, adress, telenummer,
+antal lästa/skrivna texter etc. Om användaren har flaggan 'Skyddad status' på
+visas inte adress och telefonnummer. Sist av allt visas användarens lapp, om
+en sådan finns.
+
+Se Även: Ändra Användare

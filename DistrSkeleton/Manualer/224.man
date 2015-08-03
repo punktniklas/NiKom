@@ -1,0 +1,12 @@
+
+
+Radera Brev
+-----------
+
+Synopsis: Radera Brev <brevnr>
+
+Beskrivning:
+Raderar det angivna brevet. Kan bara utföras av avsändaren eller mottagaren
+till brevet eller sysop.
+
+Se Även: Radera Text

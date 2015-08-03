@@ -1,0 +1,12 @@
+
+
+Radera Text
+-----------
+
+Synopsis: Radera Text <textnummer>
+
+Beskrivning:
+Raderar den angivna texten. Kan bara utföras av den som har skrivit texten,
+MAD och sysop.
+
+Se Även: Radera Brev, Skriv

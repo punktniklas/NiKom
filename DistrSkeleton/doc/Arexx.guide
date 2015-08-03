@@ -1,0 +1,1485 @@
+@database ARexx.guide
+@rem Konverterad till .guide-format av Daniel Hutmacher och Tomas Kärki.
+@node Main "Innehållsförteckning:"
+
+   Denna dokumentation är Copyright ©1991 - 1996 Niklas Lindholm.
+   Omskriven till AmigaGuide (hypertext)-format av Daniel Hutmacher.
+   Numera skriven av Tomas Kärki 1996-1998.
+
+                  @{"     Om ARexx-interfacet     " link About}
+
+          @{"    Nummerserier    " link Nummer} @{" Interna kommandon  " link Interna}
+          @{"      Argument      " link Argument} @{"     Carrier...     " link Carrier}
+          @{"    Information     " link Information} @{"      Manualer      " link Manual}
+
+                  @{"        Referens-del         " link Referens}
+
+             @{"    !  Nyheter i NiKom v1.60beta1  !    " link News160beta1}
+             @{"    !  Nyheter i NiKom v1.60beta2  !    " link News160beta2}
+
+            För fixar efter v1.60beta2 se @{"NiKom.guide" link "NiKom.guide/Main"}
+@endnode
+@node News160beta2 "Nyheter i NiKom v1.60beta2!"
+
+Buggfixar:
+
+- ARexx-funktionen @{"SysSettings()" link "ARexx.guide/SysSettings"} hette av misstag SystemInfo detta är nu fixat.
+  Kommandot heter numera alltså korrekt SysSettings och du måste ändra
+  i alla ARexx-scripts som använder SystemInfo.
+
+- ARexx-funktionen @{"TextInfo()" link "ARexx.guide/TextInfo"} returnerar nu -3 om en text är raderad.
+
+- SysInfo fungerade inte riktigt som den skulle, vilket kunde ge flera entries med
+  samma hastighet om man körde prenoden hela tiden, dvs inte via TrapDoor eller dylikt program.
+  Detta är numera fixat!
+
+Nya saker:
+
+- ARexx-program som körs vid prompterna behöver inte längre ha något speciellt
+  nummer.
+
+- Har förbättrat dokumentationen för några ARexx-funktioner litegranna.
+
+@endnode
+@node News160beta1 "Nyheter i NiKom v1.60beta1!"
+
+Nya funktioner i NiKom v1.60beta1 som släpptes 960729:
+
+@{"StatusInfo" link StatusInfo}  - Ger info om olika statusnivåer.
+@{"SysSettings" link SysSettings} - Ta fram info om settings för logfiler etc.
+@{"Arearight" link Arearight}   - Kollar om en viss användare har rättigheter till en area.
+
+Ändrade funktioner:
+
+@{"SysInfo" link SysInfo}     - Räknar nu CONNECT-hastigheter för BBSen.
+@{"sendbinfile" link SendBinFile} - Uppdaterad med bättre stöd för Batch download
+@{"recbinfile" link RecBinFile}  - Uppdaterad med stöd för Batch upload
+@{"NodeInfo" link NodeInfo}   - Många nya subjekt tillagda.
+@{"FileInfo" link FileInfo}	  - Du kan nu få tag på filnamnet på den långa beskrivningen.
+@{"ChgFile" link ChgFile}   - Nu med möjlighet att ändra den långa beskrivningen.
+@{"GetString" link GetString}   - Nu kan man även ha en defaultsträng om man vill ha det!
+
+@endnode
+@node About "Om ARexxinterfacet..."
+
+NiKoms ARexxinterface består av två delar. Kommandointerfacet och Function
+Hosten. Kommandona i kommandointerfacet kan bara anropas i ett Arexx program
+som har startats från NiKom som ett rexx-macro. De kommandona innesluts
+alltid av två "'". Tex:
+'@{"sendstring" link SendString} Hejsan på dejsan'
+
+Functionhosten kan användas närsomhelst som NiKServer är igång. Funktioner
+har alltid parenteser efter sig. Tex: @{"UserInfo" link UserInfo}(1,'n')
+
+
+ARexx-program kan startas från NiKom på två olika sätt. Antingen vid ett
+visst tillfälle, som anges i System.cfg eller som ett definierat kommando i
+Kommandon.cfg. Alla ARexx-program som startas från NiKom måste ligga i
+katalogen NiKom:Rexx och heta "ExtKom<nr>.nik", där <nr> är numret på
+programmet.
+
+I System.cfg så anger man ett nummer när ett ARexx-program ska utföras vid
+ett bestämt tillfälle. Det är detta nummer som ARexx-programmet ska ha.
+
+I Kommandon.cfg så betraktas alla kommandon som har nummer högre än eller
+lika med 500 som ARexx-program, och det är även det numret som programmet
+som ska köras ska ha.
+
+@endnode
+@node Nummer "Nummer-serier..."
+
+Följande konvention finns när det gäller vilket nummer ett ARexx-program
+ska få:
+   500-999    De ARexx-program som följer med NiKom som standard och som
+              kan ses som en del NiKom. Gör inga ARexx-program med dessa
+              nummer på eget bevåg.
+
+   1000-1999  Program som sysoparna på de enskilda BBS:erna kan använda för
+              egna små program. Program med dessa nummer är dock inte
+              tänkta att spridas i någon organiserad form. Med organiserad
+              form menas att det räknas versionsnummer och att det följer
+              med dokumentation och sådant. (Ni förstår nog vad jag menar)
+
+   2000-2499  Extra tillbehörsprogram gjorda av Niklas Lindholm
+   2500-2999  Extra tillbehörsprogram gjorda av Tomas Kärki
+   3000-3499  Extra tillbehörsprogram gjorda av Erik Lundevall
+   3500-3999  Extra tillbehörsprogram gjorda av Nils-Arne Dahlberg
+   4000-4499  Extra tillbehörsprogram gjorda av Christian Almgren
+   4500-4999  Extra tillbehörsprogram gjorda av Thomas Svenson
+   5000-5499  Extra tillbehörsprogram gjorda av Christian Carlsson
+   5500-5999  Extra tillbehörsprogram gjorda av Magnus Lindkvist
+   6000-6499  Extra tillbehörsprogram gjorda av Mats Kling
+   6500-6999  Extra tillbehörsprogram gjorda av Fredrik Nylander
+   7000-7499  Extra tillbehörsprogram gjorda av Mikael Tienssu
+   7500-7999  Extra tillbehörsprogram gjorda av Jakob Hussfelt
+   8000-8499  Extra tillbehörsprogram gjorda av Jens Roos
+   8500-8999  Extra tillbehörsprogram gjorda av Johan Känngård
+   9000-9499  Extra tillbehörsprogram gjorda av Bo Liljegren
+   9500-9999  Extra tillbehörsprogram gjorda av Algot Runebjörk
+   10500-10999  Extra tillbehörsprogram gjorda av Olof Lindholm
+   11000-11499  Extra tillbehörsprogram gjorda av Fredrik Lindfeldt
+   11500-11999  Extra tillbehörsprogram gjorda av Bo Oskarsson
+   12000-12499  Extra tillbehörsprogram gjorda av Tomas Krantz
+   12500-12999  Extra tillbehörsprogram gjorda av Torbjörn Malmer
+   13000-13499  Extra tillbehörsprogram gjorda av Rickard Olsson
+   13500-13999  Extra tillbehörsprogram gjorda av Mats Kling (2)
+   14000-14499  Extra tillbehörsprogram gjorda av Jonas Minnbergh
+   14500-14999  Extra tillbehörsprogram gjorda av Johan Östlund
+   15000-15499  Extra tillbehörsprogram gjorda av Patrik Lindqvist
+   15500-15999  Extra tillbehörsprogram gjorda av Marcus Orreving
+   16000-16499  Extra tillbehörsprogram gjorda av Robin Calvin
+   16500-16999  Extra tillbehörsprogram gjorda av Daniel Hutmacher
+   17000-17499  Extra tillbehörsprogram gjorda av Henrik Öqvist
+   17500-17999  Extra tillbehörsprogram gjorda av Mikael Welander
+   18000-18499  Extra tillbehörsprogram gjorda av Niklas Sjögren
+   18500-18999  Extra tillbehörsprogram gjorda av Mattias Appelqvist
+   19000-19499  Extra tillbehörsprogram gjorda av <har tappat bort namnet>
+   19500-19999  Extra tillbehörsprogram gjorda av Patrik Hagberg
+   20500-20999  Extra tillbehörsprogram gjorda av Fabian Norlin
+   21000-21499  Extra tillbehörsprogram gjorda av Carl Holmgren
+   21500-21999  Extra tillbehörsprogram gjorda av Peter Kerschbaumer
+   22000-22499  Extra tillbehörsprogram gjorda av Leif Stockdale
+   22500-22999  Extra tillbehörsprogram gjorda av Erik Zalitis
+   23000-23499  Extra tillbehörsprogram gjorda av Martin Tillenius
+   23500-23999  Extra tillbehörsprogram gjorda av Joakim Möller
+   24000-24499  Extra tillbehörsprogram gjorda av Robert Styrfält
+   24500-24999  Extra tillbehörsprogram gjorda av Tobias Dahlen
+   25000-25499  Extra tillbehörsprogram gjorda av Max Epstein
+   25500-25999  Extra tillbehörsprogram gjorda av Robert Anderson
+   26000-26499  Extra tillbehörsprogram gjorda av Ola Nyström
+   26500-26999  Extra tillbehörsprogram gjorda av Sonat Böler
+   27000-27499  Extra tillbehörsprogram gjorda av Jonas Tehler
+   27500-27999  Extra tillbehörsprogram gjorda av David Granlund
+   28000-28499  Extra tillbehörsprogram gjorda av Tommy Höglund
+   28500-28999  Extra tillbehörsprogram gjorda av Erik Hansson
+   29000-29499  Extra tillbehörsprogram gjorda av Martin Sahlén
+   29500-29999  Extra tillbehörsprogram gjorda av Kalle Kiviaho
+   30000-30499  Extra tillbehörsprogram gjorda av Hans Forsström
+   30500-30999  Extra tillbehörsprogram gjorda av Anna Lindberg
+   31000-31499  Extra tillbehörsprogram gjorda av Michael Holm
+   31500-31999  Extra tillbehörsprogram gjorda av Magnus Eklund
+   32000-32499  Extra tillbehörsprogram gjorda av Johan Björk
+   32500-32999  Extra tillbehörsprogram gjorda av Jesper Svennevid
+   33000-33499  Extra tillbehörsprogram gjorda av Björn Poppe
+   33500-33999  Extra tillbehörsprogram gjorda av Claes Karlebrink
+   34000-34499  Extra tillbehörsprogram gjorda av Jonas Kjellin
+   34500-34999  Extra tillbehörsprogram gjorda av Carl Drougge
+   35000-35499  Extra tillbehörsprogram gjorda av Gustaf Carleson
+   35500-35999  Extra tillbehörsprogram gjorda av Peter Gunnarsson
+   36000-36499  Extra tillbehörsprogram gjorda av Olle Johansson
+   36500-36999  Extra tillbehörsprogram gjorda av Anders Bengtsson
+   37000-37499  Extra tillbehörsprogram gjorda av Niklas Jonsson
+   37500-37999  Extra tillbehörsprogram gjorda av Ulf Lundgren
+   38000-38499  Extra tillbehörsprogram gjorda av Zany Dezigns ARexx Crew
+   38500-38999  Extra tillbehörsprogram gjorda av mAStERbOYs
+   39000-39499	Extra tillbehörsprogram gjorda av Mikael Haraldsson
+   39500-39999	Extra tillbehörsprogram gjorda av Ulf Slotte
+
+   Om du själv har ett eller flera program som du skulle vilja dela med dig
+   av (och inte är uppräknad ovan naturligtvis) så kan du höra av dig till
+   mig (Niklas Lindholm) och få en nummerserie reserverad för dig.
+
+@endnode
+@node Interna "Interna kommandon..."
+
+Det finns några ARexx-program som används internt av systemet för att
+utföra vissa saker. Dessa är:
+
+ExtKom5.nik   Används för att packa ihop den fil som kommandot OffDown har
+              genererat och sedan skicka den med ZModem. Till sist raderas
+              både den packade och den opackade filen.
+              Detta program kräver i grundutförande kommandot LhA, men kan
+              lätt modifieras till att använda tex LZ eller LHArc istället.
+
+
+ExtKom10.nik  Används för att flytta en fil som just har laddats upp till
+              sin slutgiltiga katalog. Detta kräver i grundutförandet
+              kommandot Move som är en del av ARP. Om man inte har Move kan
+              man ändra ExtKom10.nik till att använda Copy och Delete
+              istället.
+              Det rekomenderas dock att Move används eftersom denna bara
+              byter namn på filen om katalogen som filen ska flyttas till
+              finns på samma volym som temporärkatalogen.
+
+ExtKom15.nik  Anropas när an användare ska raderas för att ta bort hans
+              användarlåda.
+
+@endnode
+@node Argument "Argument..."
+
+Alla program som startas av NiKom får även några argument medskickade.
+Dessa är i ordning:
+
+Vilken nod som startade programmet
+Vilken användare som är inloggad på den noden
+Vad användaren skrev som argument på kommandoraden (om det nu startades som
+   ett kommando).
+
+Detta kan läggas i olika variabler på följande sätt:
+
+parse arg nod pers argument
+
+@endnode
+@node Carrier "Carrier..."
+
+När man skriver ett BBS-program måste man ständigt vara medveten att en
+användare kan släppa eller tappa carriern i precis vilket ögonblick som
+helst. När detta sker måste man snabbt gå tillbaka till läget att vänta på
+att någon ny användare ska ringa.
+Alla kommandon i NiKoms ARexx-interface som på något sätt väntar på respons
+på användaren returnerar värdet 100 i variablen RC när carriern släpps. Ett
+ARexx-program måste vara beredd på detta och avsluta så fort som möjligt
+när det inträffar.
+
+@endnode
+@node Information "Information i början av programmen..."
+
+Alla program som sprids bör ha information i kommentaren i början av
+programmet som indikerar hur det ska definieras i Kommandon.cfg. Denna
+information ser ut precis som i Kommandon.cfg och de fält som ska vara med
+är: N, O, # och A.
+Skulle man behöva använda strängen N=,O=,#= eller A= först på en rad av
+någon anledning så måste man stoppa in tex ett mellanslag före.
+
+Om det förs versionsnummer på programmet bör också detta finnas med i
+headern enligt standarden i AmigaOS 2.0.
+Enligt denna standard ska versionsnumret skrivas såhär:
+$VER: TuffRexx 1.1 (20.4.92)
+Man kan då få fram versionsnumret med vanliga DOS-kommandot Version.
+
+Ett exempel:
+------------------------------------------------
+/* Ett ARexx-program
+$VER: TuffRexx 1.1 (20.4.92)
+
+N=TUFF REXX
+O=2
+#=600
+A=.
+*/
+
+parse arg nod pers argument .
+...
+------------------------------------------------
+
+@endnode
+@node Manual "Manual..."
+
+Alla ARexx-program till NiKom som släpps till allmänheten bör (förutom
+vanlig dokumentation) även ha en manualfil som man kan få fram med
+kommandot Manual. Dessa filer ska se ut på ungefär samma sätt som de
+manualfiler som följer med NiKom som standard. Synopsis-fältet kan behöva
+lite mer beskrivning.
+
+Allt som man byter ut mot ett annat värde eller annan sträng ska vara
+inneslutet i <>, tex <mötesnamn>. Alla argument som man inte nödvändigtvis
+behöver ange ska vara inneslutna i klamrar ([]), tex [<textnummer>]. Olika
+val som man ska plocka ett av ska vara separerade med '|'. Eventuellt kan
+man innesluta hela satsen med val mellan måsvingar ({}) för att förtydliga.
+(Tex { -a | -b | -c } )
+
+@endnode
+@node Referens
+
+Texter:
+@{"CreateText()       " link CreateText} @{"TextInfo()         " link TextInfo} @{"NextUnread         " link NextUnread}
+@{"lasttext           " link LastText} @{"sendtextfile       " link SendTextFile} @{"sendrawfile        " link sendrawfile}
+@{"DelOldTexts()      " link DelOldTexts}
+
+Brev:
+@{"CreateLetter()     " link CreateLetter}
+@{"showletter         " link ShowLetter}
+
+Filer:
+@{"AreaInfo()         " link AreaInfo} @{"NextFile()         " link NextFile} @{"FileInfo()         " link FileInfo}
+@{"CreateFile()       " link CreateFile} @{"ChgFile()          " link ChgFile} @{"DeleteFile()       " link DeleteFile}
+@{"sendbinfile        " link SendBinFile} @{"whicharea          " link WhichArea} @{"Recbinfile         " link RecBinFile}
+@{"GetDir()           " link GetDir} @{"NextPatternFile()  " link NextPatternFile}
+
+Möten:
+@{"MeetMember()       " link MeetMember} @{"ChgMeetRight()     " link ChgMeetRight} @{"MeetRight()        " link MeetRight}
+@{"MeetInfo()         " link MeetInfo} @{"whichmeet          " link WhichMeet} @{"entermeet          " link EnterMeet}
+@{"ChgMeet()          " link ChgMeet}
+
+Användare:
+@{"ChgUser()          " link ChgUser} @{"UserInfo()         " link UserInfo}
+
+Tid:
+@{"gettime            " link GetTime} @{"extratime          " link ExtraTime}
+
+Noder:
+@{"NodeInfo()         " link NodeInfo} @{"setnodeaction      " link setnodeaction}
+
+System:
+@{"NiKParse()         " link NiKParse} @{"niknrcommand       " link NikNrCommand} @{"nikcommand         " link NikCommand}
+
+Övrigt:
+@{"SysInfo()          " link SysInfo} @{"CommandInfo()      " link CommandInfo} @{"lastlogin          " link LastLogin}
+@{"setlinecount       " link SetLineCount} @{"runfifo            " link RunFIFO} @{"readconfig         " link ReadConfig}
+@{"logout             " link Logout} @{"yesno              " link YesNo} @{"edit               " link Edit}
+@{"changelatestinfo   " link changelatestinfo} @{"SendNodeMess()     " link SendNodeMess}
+
+Tecken:
+@{"sendchar           " link SendChar} @{"chkbuffer          " link ChkBuffer} @{"getchar            " link GetChar}
+
+Nycklar:
+@{"KeyInfo()          " link KeyInfo}
+@endnode
+
+@node Arearight "Referens : Arearight()"
+Arearight(användarnummer, areanummer)
+
+Ger följande returvärden:
+
+ 0      Användaren har inga rättigheter i den aktuella arean.
+ 1      Användaren har rättigheter i den aktuella arean.
+-1      Användaren finns inte.
+-2      Arean är raderad.
+-3      Arean finns inte.
+@endnode
+
+@node StatusInfo "Referens : StatusInfo()"
+
+StatusInfo(status,subject)
+Ger information om en viss status
+
+Följande subject kan användas:
+
+i - Hur länge användaren får vara inaktiv innan han blir utloggad. (används ej ännu)
+r - Vilken ULDL ratio användaren har.
+t - Hur lång tid användaren får vara inloggad per inloggning i sekunder.
+
+@endnode
+@node SysSettings "Referens : SysSettings()"
+
+SysSettings(subject)
+
+Där följande subject kan användas:
+
+b - Namnet på brevlådan
+d - Såhär många bytes krävs för att kunna ladda upp i ULTMP biblioteket.
+f - Default flaggor för nya användare. Här är de möjliga värdena:
+	Skyddad status:                        1
+	Streckrad under ärendet:               2
+	ISO 8-bitars tecken:                   4
+	Ingen automatisk hjälptext:            8
+	Fullskärmseditor:                     16
+	Automatisk fillista:                  32
+	Mellanslag som paus:                  64
+	Lapp vid brev:                       128
+	ANSI-sekvenser skickas:              256
+	Visa FidoNet Kludge-rader            512
+	Töm skärmen innan en Fido-text      1024
+	Färger                              4096
+
+m - Vad som loggas till NiKoms loggfil. Här är de möjliga värdena:
+	1     - CONNECT xxxx  (nod y)
+	2     - xxx #yy loggar in på nod z
+	4     - xxx #yy angivet som namn, fel lösen
+	8     - xxx #yy loggar ut från nod z
+	16    - xxx #yy släpper carriern
+	32    - Tar emot filen zzzz från xxx #yy
+	64    - Skickar filen zzzz till xxx #yy
+	128   - xxx #yy laddar upp filen zzzz
+	256   - xxx #yy ladder ner filen zzzz
+	512   - xxx #yy skriver en text i mötet zzzz
+	1024  - xxx #yy skickar ett brev till zzz #qq
+	2048  - RING på nod x, men ingen CONNECT
+
+l - Maximalt antal inloggningsförsök man får.
+r - Default antal rader för nya användare
+p - Default xpr protokoll (ignorera denna options för tillfället)
+s - Default status nya användare får.
+n - Nya användares inloggningsnamn
+u - Upload temporärbibliotek
+o - Namnet på NiKoms loggfil
+
+@endnode
+@node SendString "Referens : sendstring"
+
+sendstring <sträng>
+
+Skriver ut den angivna strängen.
+För att få en nya rad så måste man skicka både CR och LF. Detta kan skrivas
+'0a0d'x. Vill man ha flera radframmatningar räcker det att fylla på med LF.
+Tex '0a0a0d'x.
+Sendstring returnerar ett boolskt värde. 1 betyder att utskriften avbröts
+med Ctrl-C. 0 betyder att utskriften inte avbröts.
+Ex:
+'sendstring Hej' variabel 'eventuellt mera sträng' '0a0d'x
+
+@endnode
+@node GetString "Referens : getstring"
+
+getstring <antal tecken> [NOECHO] [STARECHO] [default sträng]
+
+Hämtar in en sträng från användaren. Strängen hamnar i variabeln 'result'.
+Observera att vid nästa anrop så kommer result att raderas så den sparas
+undan i en annan variabel. NOECHO gör så att inget syns när man skriver.
+Tex för lösenord.
+
+Om man anger en default sträng så kommer den att vara ifylt som default.
+
+OBS! Det går inte kombinera NOECHO eller STARECHO och en default sträng
+samtidigt.
+
+Ex:
+'getstring 50'
+'getstring 10 NOECHO'
+'getstring 20 tomas'
+
+@endnode
+
+@node SendTextFile "Referens : sendtextfile"
+
+sendtextfile <filnamn>
+
+Visar den angivna textfilen.
+Ex:
+'sendtextfile ram:Hejhopp.txt'
+
+@endnode
+@node ShowText "Referens : showtext"
+
+showtext <textnummer> <mötesnummer>
+
+Visar den angivna texten (såvida den finns, inte är raderad, användaren har
+rätt att se den osv). Om inget mötesnummer anges så antas det att texten
+är en i orginaltypen av möte. (Den enda typ som finns i 1.47)
+Ex:
+'showtext 4564 12'
+'showtext 3546'
+
+@endnode
+@node ShowLetter "Referens : showletter"
+
+showletter <anv.nr> <brevnummer>
+
+Samma som showtext fast med brev istället. Användarnumret anger i vilken
+användares brevlåda som brevet finns.
+
+@endnode
+@node LastText "Referens : lasttext"
+
+lasttext
+
+Ger vilken text som är den senast lästa. I result får man en ströng i
+formatet "B <anv.nr> <text.nr>" eller "T <text.nr> <mötes.nr>" beroende på om
+det är ett brev eller en text som är den senast lästa.
+Ex:
+'lasttext'
+
+@endnode
+@node NikCommand "Referens : nikcommand"
+
+nikcommand <kommando>
+
+Utför det angivna kommandot precis som om det var skrivet vid prompten, dvs
+kommandona kan förkortas precis som vanligt.
+
+                      OBSERVERA
+
+En del kommandon fungerar på ett speciellt sätt internt i NiKom. Detta
+gör att man måste köra de allra sist i ett ARexx-program.
+
+De aktuella kommandona är:
+Gå, Nästa Text, Nästa Kommentar, Nästa Möte, Sluta, Logout,
+Offdown, Börja Om
+
+Ex:
+'nikcommand ra te 4335'
+
+@endnode
+@node NikNrCommand "Referens : niknrcommand"
+
+niknrcommand <kommandonummer>
+
+Utför det angivna kommandot, kommandot behöver inte finnas med i
+Kommandon.cfg. Se Kommandon.doc för information om vilka nummer olika
+kommandon har.
+Se även under *OBSERVERA* på @{"nikcommand" link NikCommand}.
+
+@endnode
+@node Edit "Referens : Edit"
+
+edit <filnamn>
+
+Tar in den angivna texten i editorn och sparar den när det är
+klartediterat. Om filen inte finns så editeras den som ny fil och sparas
+sedan.
+Ex:
+'edit ram:hejhopp'
+
+@endnode
+@node GetChar "Referens : getchar"
+
+getchar
+
+Läser in ett tecken antingen från NiKoms interna buffer eller, om den är
+tom, väntar på ett tecken.
+Returnerar det tecknet.
+Ex:
+'getchar'
+say result    --> q
+
+@endnode
+@node ChkBuffer "Referens : chkbuffer"
+
+chkbuffer
+
+Kolar hur många tecken som finns i NiKoms interna buffer och returnerar
+antalet.
+Ex:
+'chkbuffer'
+say result    --> 3
+
+@endnode
+@node YesNo "Referens : yesno"
+
+yesno <ja-tecken> <nej-tecken> <default>
+
+Ger en ja-nej-prompt. (Tex: (j/N) ) Första argumentet är det "positiva"
+tecknet och det andra det "negativa". Sista argumentet skall antingen vara
+1 eller 2. Det talar om vilket av de två valen som gälla om man bara trycker
+return, och visas följdaktligen med stor bokstav.
+Returnerar 1 om det positiva valet valdes, annars 0.
+Ex:
+'yesno ö s 1'      --> (Ö/s)
+
+@endnode
+@node WhichMeet "Referens : whichmeet"
+
+whichmeet
+
+Returnerar vilket möte användaren befinner sig i just nu. -1 betyder
+brevlådan.
+Ex:
+'whichmeet'
+say result      --> 13
+
+@endnode
+@node WhichArea "Referens : whicharea"
+
+whicharea
+
+Returnerar vilken area användaren befinner sig i. -1 betyder att användaren
+inte befinner sig i någon area.
+Ex:
+'whicharea'
+say result      --> 0
+
+@endnode
+@node SendBinFile "Referens : sendbinfile"
+
+sendbinfile <filnamn>
+
+Skickar den angivna filen med Zmodem. Returnerar 1 om överföringen lyckades
+och 0 om den misslyckades för varje fil separerat med mellanslag.
+Ex:
+'sendbinfile ram:Foo.lzh'
+
+@endnode
+@node RecBinFile "Referens : recbinfile"
+
+recbinfile <katalog>
+
+Tar emot en fil med ZModem till den angivna katalogen. Namnet på filerna
+som togs emot returneras (separerade med mellanslag) eller 0 om
+överföringen misslyckades.
+Ex:
+'recbinfile dh0:Filer/'
+say result      --> FooBar.lzh BarFoo.lha
+
+@endnode
+@node Logout "Referens : logout"
+
+logout
+
+Sätter en flagga så att nästa gång en kommandoprompt ska komma upp så
+loggas användaren ut istället.
+
+Ex:
+'logout'
+
+@endnode
+@node RunFIFO "Referens : runfifo"
+
+runfifo <programnamn>
+
+Detta kommando kör igång ett vanligt Shell-program som använder standard
+in och utmatning (dvs vanligtvis bara använder Shell-fönstret) genom
+NiKom. Det finns redan nu ett gäng online-spel som kan köras på detta
+vis.
+Kravet för att de ska fungera med NiKom är de slutar när de får en
+SIGBREAKF_CTRL_C (dvs, de går att avsluta med Ctrl-C). Helst ska de känna
+av en EOF också och avsluta då.
+För att kunna köra ett program på detta sätt krävs att Fifo av Matt
+Dillon är installerat. Fifo följer med detta arkiv.
+
+@endnode
+@node EnterMeet "Referens : entermeet"
+
+entermeet <mötesnr>
+
+Detta kommando gör att användaren hoppar till det angivna mötet, om det
+finns. Finns huvudsakligen för att kunna hoppa till ARexx-styrda möten,
+men fungerar med alla möten.
+OBS!! Pga av NiKoms interna uppläggning så måste detta kommando köras
+som SISTA NiKom-kommando i ARexx-programmet. Inget kommer att hända
+förrän programmet har avslutat.
+
+@endnode
+@node SetLineCount "Referens : setlinecount"
+
+setlinecount ON | OFF
+
+Argumentet OFF stänger av de <RETURN> som kommer upp efter ett visst
+antal rader. ON sätter på de igen.
+När ARexx-programmet avslutas sätts detta på igen automagiskt.
+
+@endnode
+@node ExtraTime "Referens : extratime"
+
+extratime <seconds>|GET
+
+Ställer in hur mycket extratid som användaren ska få i sekunder. Om man
+vill minska användarens tid kan man ange ett negativt värde.
+Istället för ett numeriskt värde man man ange nyckelordet GET. Den sedan
+tidigare inställda extratiden kommer då att returneras.
+
+@endnode
+@node GetTime "Referens : gettime"
+
+gettime
+
+Returnerar hur mycket tid användaren har kvar i sekunder, inklusive
+eventuell extratid. Värdet 0 betyder att användaren har obegränsat med
+tid.
+OBS! Med lite otur kan man råka anropa gettime just när en vanlig
+användare har 0 sekunder kvar. Nästa sekund kommer dock ett negativt
+värde returneras.
+
+@endnode
+@node SendChar "Referens : sendchar"
+
+sendchar /<tecken>
+
+Skriver ut det angivna tecknet. Observera snedstrecket som måste finnas
+precis innan tecknet som ska skrivas ut (det får inte finnas några
+mellanslag emellan). Sendchar klarar, till skillnad mot sendstring, av
+att skriva ut ett ensamt mellanslag.
+Ex:
+'sendchar /a'
+'sendchar /' || tkn
+
+@endnode
+@node UserInfo "Referens : UserInfo()"
+
+UserInfo(användarnummer,subject)
+Ger information om den angivna användaren.
+
+Subject kan vara något av följande:
+a - annan info
+b - vilken tid första inloggningen var
+c - land
+d - downloads
+e - senast inloggad
+f - telefonnummer
+g - gata
+h - antal nerladdade byte
+j - antal uppladdade byte
+i - antal inloggningar
+k - protokoll inställt
+l - antal lästa texter
+m - prompten
+n - namn
+o - flaggor. Första flaggan är 1, andra 2, tredje 4 osv
+p - postadress
+q - antal rader
+r - status
+s - skrivna texter
+t - total tid inloggad i sekunder
+u - antal uploads
+x - lösenord
+y - Vilka grupper användaren är med i. Resulatet ges på formen
+    <höga bits>,<låga bits>. Eegentligen är det hela ett 32-bitars värde.
+    Detta gick dock inte att överföra direkt till ARexx. Därför är det
+    uppdelat i två värden mellan 0 och 65535.
+z - Användarens "brevpekare". Dvs, vilket brev som är nästa olästa brev.
+
+Felvärden:
+1 - Inte tillräckligt med argument till funktionen.
+3 - Fel vid läsandet av användaren.
+
+Returvärden:
+-1 - Användaren finns inte.
+Annars den begärda strängen. Alla tider anges i formatet: ÅÅMMDD HH:MM
+
+Ex:
+say UserInfo(0,'n') ==> Niklas Lindholm
+
+@endnode
+@node ChgMeet "Referens : ChgMeet()"
+
+ChgMeet(mötesnummer,subject,ändra_till)
+
+Samma subjekt kan användas som för @{"MeetInfo" link "ARexx.guide/MeetInfo"}
+förutom två stycken som för tillfället inte kan användas.
+
+Felvärden:
+1 - Inte tillräckligt med argument.
+
+Returvärden:
+-1 - Mötet finns inte
+-2 - Finns inget sådant subjekt
+
+@endnode
+@node MeetInfo "Referens : MeetInfo()"
+
+MeetInfo(mötesnummer,subject)
+
+Följande subjects finns:
+a - skapat av användarnummer
+m - maximalt antal texter
+n - namn på mötet
+s - status 1=Slutet 2=Skrivskyddat 4=Kommentarsskyddat 8=Hemligt
+t - skapat tid
+
+Felvärden:
+1 - Inte tillräckligt med argument.
+
+Returvärden:
+-1 - Mötet finns inte
+
+Ex:
+say MeetInfo(0,'n') ==> Felrapporter och klagomål
+
+@endnode
+@node NikParse "Referens : NiKParse()"
+
+NiKParse(sträng,subject)
+Parsar den angivna strängen.
+
+Subject kan vara:
+k - kommando
+m - möte
+n - användarnamn
+a - area
+y - nyckel
+
+Felvärden:
+1 - Inte tillräckligt med argument.
+
+Returvärden:
+-1 - Hittar ej något som passar
+-2 - Flertydigt kommando
+-3 - Inget skrivet i sträng
+Annars ett nummer (användarnummer, mötesnummer, kommandonummer etc)
+
+Ex:
+say NiKParse('ni li','n') ==> 0
+variabel='li mö'
+say NiKParse(variabel,'k') ==> 101
+
+@endnode
+@node LastLogin "Referens : LastLogin()"
+
+LastLogin(nummer,subject)
+Ger information om de senast inloggade. Nummer kan vara mellan 0 och 127. 0
+är den allra senaste, 1 den näst senaste osv.
+
+Följande subjects finns:
+a - användarnummer
+d - antal downloads
+g - utloggningstid
+l - lästa
+s - skrivna
+t - tid inloggad i minuter
+u - uploads
+
+Felvärden:
+1 - Inte tillräcklitg med argument.
+
+Returvärden:
+-1 - Numret större än 127 eller mindre än 0.
+-2 - Finns ingen inloggad på den positionen (det har inte varit så många
+     inloggningar)
+-3 - Användaren på den positionen är raderad.
+Annars den begärda informationen.
+
+Ex:
+say LastLogin(2,'l') ==> 24
+
+@endnode
+@node SysInfo "Referens : SysInfo()"
+
+SysInfo(subject)
+
+Följande subjects finns:
+a - högsta användarnummer
+n - antal nycklar
+h - högsta textnummer
+k - antal kommandon
+l - lägsta textnummer
+m - högsta mötesnummer
+o - högsta areanummer
+bx - Returnerar en sträng med bps och antalet som ringt med denna
+	 bps för nummer bps connect nummer x separerat med ett mellanslag.
+t - Totalt antal olika bps connects som BBSen haft. (används tillsammans
+	med bx för att få fram olika connect hastigheter till BBSen, och hur
+	många av varje.)
+
+Felvärden:
+1 - Inte tillräckligt med argument.
+
+Returvärden:
+Den begärda informationen.
+
+Ex:
+say SysInfo('h') ==> 6648
+say SysInfo('b5') ==> 14400 144
+
+@endnode
+@node CommandInfo "Referens : CommandInfo()"
+
+CommandInfo(kommandonr,subject)
+
+Följande subject finns:
+a - argument (0=inget, 1=numeriskt, 2=annat)
+d - Antal dagar man ska ha varit registrerad för att använda komamndot.
+l - Antal inloggningar man måste ha gjort för att använda kommandot.
+n - Namnet
+o - Antal ord, 1 eller 2.
+s - Status man måste ha för att använda kommandot.
+x - Lösenord som behövs för att använda komamndot.
+
+Felvärde:
+1 - Inte tillräckligt med argument.
+
+Returvärden:
+-1 - Finns inget kommando med det numret.
+Annars den begärda informationen.
+
+Ex:
+say CommandInfo(102,'n') --> LISTA ANVÄNDARE
+
+@endnode
+@node AreaInfo "Referens : AreInfo()"
+
+AreaInfo(areanr,subject)
+
+Följande subjects finns:
+a - Vem som skapat arean.
+dx - Ger katalog x (Ex: 'd3').
+m - Vilket möte arean är kopplat till, -1 om inget.
+n - Namnet på arean
+t - När arean skapades.
+
+Felvärden:
+1 - Inte tillräckligt med argument.
+
+Returvärden:
+-1 - Arean är raderad.
+-2 - Felaktigt areanummer.
+
+Ex:
+say AreaInfo(1,'d1') --> NiKom:Program/TuffArea/
+
+@endnode
+@node FileInfo "Referens : FileInfo()"
+
+FileInfo(pattern,subject,areanr)
+Pattern är antingen filnamnet eller något som matchar filnamnet. Areanr
+är arean där filen ligger.
+
+Följande subjects finns:
+b - Beskrivningen på filen.
+d - Antal downloads.
+e - Senaste download.
+f - Flaggorna på filen.
+    1 = Lång beskrivning
+    2 = Inte validerad
+    4 = Fri download
+i - Numret på katalogen filen ligger i
+n - Namnet på filen.
+r - Status som behövs för att ladda ner filen.
+s - Filens storlek.
+t - Tid då filen laddades upp.
+u - Vem som laddade upp filen.
+l - Hela pathen plus filnamn till den långa beskrivningen.
+
+Felvärden:
+1 - Inte tillräckligt med argument.
+
+Returvärden:
+-1 - Finns ingen sådan fil.
+-2 - Finns ingen sådan area.
+-3 - Filen har ingen lång beskrivning.
+
+Ex:
+say FileInfo(a,'n',0) --> Add21k.lzh
+
+@endnode
+@node ChgUser "Referens : ChgUser()"
+
+ChgUser(användarnummer,ändra_till,subject)
+
+Alla subjects är samma som för @{"UserInfo()" link UserInfo}
+
+Felvärden:
+1 - Inte tillräckligt med argument.
+3 - Fel vid läsandet eller skrivandet av användaren.
+
+Returvärden:
+0  - Allt ok.
+-1 - Finns ingen sådan användare.
+
+Ex:
+say ChgUser(3,3,'r') --> 0
+
+@endnode
+@node CreateFile "Referens : CreateFile()"
+
+CreateFile(filnamn,areanr,uppladdare,beskrivning,status[,nyckel[,nyckel[,..]]])
+
+Maximalt 10 nycklar kan anges (pga av att Arexx "bara" klarar 15 argument)
+Om VALIDERAFILER i System.cfg är satt till JA så kommer filen att markeras
+som icke validerad.
+
+Felvärden:
+1 - Inte tillräckligt med argument.
+2 - Kunde inte allokera minne till filen.
+3 - Kunde inte få ett Lock för filen.
+4 - Kunde inte allokera minne för en FileInfo-struktur.
+5 - Kunde inte göra Examine()
+6 - Kunde inte öppna .nikfile-filen.
+7 - Kunde inte skriva till .nikfile-filen.
+
+Returvärden:
+0  - Allt ok.
+-1 - Felaktigt areanummer.
+-2 - Finns redan en fil med det namnet.
+-3 - Filen finns inte i areans katalog.
+-4 - Upladdaren finns inte.
+-5 - Filnamnet får inte innehålla tecknen #, ?, *, /, :, (, ), [, ]
+     eller mellanslag.
+-6 - Filnamnet får inte vara längre än 25 tecken.
+
+Ex:
+say CreateFile('Nisse.lzh',1,43,'Oerhört användbar fil!',1,'DOS',Disk') --> 0
+call CreateFile('Pelle.lzh',0,23,'Nya versionen',2)
+
+@endnode
+@node ReadConfig "Referens : ReadConfig()"
+
+ReadConfig()
+
+Läser in NiKoms konfigurationsfiler. Samma sak som kommandot ReadConfig.
+
+@endnode
+@node NodeInfo "Referens : NodeInfo()"
+
+NodeInfo(nodnr,subject)
+
+Ger information om de olika noderna. Följande subjects finns:
+
+a - Eventuellt argument till vad användaren gör.
+d - Returnerar nodens id-sträng som den är angiven i Node.cfg
+g - Vad användaren gör i stort.
+       1 - Användaren har inga olästa texter, dvs har Se tiden-prompten.
+       2 - Användaren skriver en text. I vilket möte fås med subject 'm'.
+       3 - Användaren laddar upp en fil. Till vilken area fås med subject
+           'm'. Filnamn fås med subject 'a'.
+       4 - Användaren laddar ner en fil. Från vilken area fås med subject
+           'm'. Filnamn fås med subject 'a'.
+       5 - Användaren är i ett möte med olästa texter. Vilket möte fås med
+           subject 'm'.
+       6 - Användaren gör något annat än ovanstående. Vad kan fås med
+           subject 'a'.
+i - Vem som är inloggad, -1 om ingen, -2 om noden är uppringd.
+m - Möte som användaren befinner sig i.
+p - Antal sekunder sedan användaren fick fram en prompt.
+s - Vilken hastighet användaren hade vid connect. Observera att detta kan
+    ändras under inloggningen utan att NiKom kan få reda på detta.
+    Speciellt V.FC har en tendens att gå upp/ner ganska kraftigt i
+    hastighet.
+t - Vad det är för nodtyp. 1=CON:, 2=SER:
+u - Flaggar om användaren har olästa meddelanden, 1=Har olästa, 0=Har inga olästa.
+
+Felvärden:
+1 - Inte tillräckligt med argument
+
+Returvärden:
+-1 - Finns ingen nod igång med det numret.
+
+@endnode
+@node DeleteFile "Referens : DeleteFile()"
+
+DeleteFile(filnamn,areanr)
+
+Raderar den angivna filen både från fillistan och fysiskt från disken.
+
+Felvärden:
+1 - Inte tillräckligt med argument
+
+Returvärden:
+0  - Allt OK
+-1 - Finns ingen sådan area
+-2 - Finns ingen sådan fil
+-3 - Kunde inte radera .nikfile-filen
+-4 - Kunde inte radera filen fysiskt.
+-5 - Kunde inte radera den långa beskrivningen.
+
+@endnode
+@node NextFile "Referens : NextFile"
+
+NextFile(filnamn,area)
+
+Ger nästa filnamn efter det angivna namnet i fillistan. Första filnamnet
+får man med @{"FileInfo('*','n',areanr)" link FileInfo}.
+
+Felvärden:
+1 - Inte tillräckligt med argument
+
+Returvärden:
+-1 - Finns ingen sådan area
+-2 - Finns ingen sådan fil
+-3 - Sista filen i listan
+
+@endnode
+@node CreateText "Referens : CreateText()"
+
+CreateText(kommenterad text,mötesnr,anvnr,ärende,textfil)
+
+Skapar en text från den angivna textfilen. Om det inte är en kommentar så
+anger man '' i första fältet. Om det är en kommentar kan man ange '' i
+mötes och ärendefältet för att behålla värdet från den kommenterade texten.
+
+
+Felvärden:
+1 - Inte tillräckligt med argument.
+
+Returvärden:
+Positivt värde - Den skapade textens nummer
+-1 - Inget möte angivet (och ingen kommentar)
+-2 - Inget ärende angivet (och ingen kommentar)
+-3 - Finns ingen sådan användare
+-4 - Finns inget sådant möte
+-5 - Texten som ska kommenteras finns inte
+-6 - Textfilen går inte att öppna
+-7 - Fel vid inläsandet av texten som ska kommenteras
+
+@endnode
+@node TextInfo "Referens : TextInfo()"
+
+TextInfo(nummer,subject)
+
+Ger information om den angivna texten.
+
+Subject kan vara:
+ax - Vem som skrev kommentar x (ett tal mellan 0 och 15)
+f  - Vem som skrivit texten
+ix - Textnummer på kommentar x (ett tal mellan 0 och 15)
+k  - Vilken text texten är en kommentar till
+m  - Vilket möte texten är i.
+p  - Vilken användare som är kommenterad
+r  - Ärendet
+t  - När texten skrevs
+
+Felvärden:
+1 - Inte tillräckligt med argument
+
+Returvärden:
+-1 - Fältet innehåller inget värde. Tex, texten är ingen kommentar vid k.
+-2 - Texten finns inte
+-3 - Texten är raderad
+
+@endnode
+@node NextUnread "Referens : NextUnread()"
+
+NextUnread(textnr,mötesnr,anvnr)
+
+Ger nästa olästa text från textnr räknat i det angivna mötet för den
+angivna användaren. Ett startvärde man få ut med @{"SysInfo()" link SysInfo}.
+
+Felvärden:
+1 - Inte tillräckligt med argument
+
+Returvärden:
+-1 - Texten finns inte
+-2 - Mötet finns inte
+-3 - Användaren finns inte
+-4 - Fel vid inläsandet av användaren
+-5 - Inga fler olästa texter i mötet.
+
+@endnode
+@node CreateLetter "Referens : CreateLetter()"
+
+CreateLetter(frånanvnr,ärende,textfil,mottagare[,mottagare[,mottagare[,..]]])
+
+Skapar ett brev från den angivna textfilen i den angivna användarens
+brevlåda. Pga begränsningar i ARexx kan man "bara" ange som mest 12
+mottagare.
+
+Felvärden:
+1 - Inte tillräckligt med argument
+
+Returvärden:
+-1 - Avsändaren finns inte
+-2 - Textfilen går inte att öppna
+-3 - Någon av mottagarna finns inte
+-4 - Kunde inte öka .nextletter med 1
+-5 - Kunde inte öppna brevfilen
+-6 - Fel vid skrivaned av brevet
+-7 - Kunde inte få ett lock för det sparade brevet
+-8 - Kunde inte göra en länk till det sparade brevet
+
+@endnode
+@node MeetRight "Referens : MeetRight()"
+
+MeetRight(anvnr,mötesnr)
+
+Kollar om användaren har rättigheter i det angivna mötet och returnerar i
+så fall 1. Om inte returneras 0.
+
+Felvärden:
+1 - Inte tillräckligt med argument
+
+Returvärden:
+-1 - Användaren finns inte
+-2 - Fel vid läsandet av användaren
+-3 - Mötet finns inte
+
+@endnode
+@node MeetMember "Referens : MeetMember()"
+
+MeetMember(anvnr,mötesnr)
+
+Kollar om användaren är medlem i det angivna mötet och returnerar i
+så fall 1. Om inte returneras 0.
+
+Felvärden:
+1 - Inte tillräckligt med argument
+
+Returvärden:
+-1 - Användaren finns inte
+-2 - Fel vid läsandet av användaren
+-3 - Mötet finns inte
+
+@endnode
+@node ChgMeetRight "Referens : ChgMeetRight"
+
+ChgMeetRight(anvnr,mötesnr,+|-)
+
+Antingen adderar (+) eller subtraherar (-) den angivna användaren från
+det angivna mötet. Om allt gick ok returneras 0.
+Ex:
+ChgMeetRight(3,4,'+') /* Adderar användare 3 till möte 4 */
+
+Felvärden:
+1 - Inte tillräckligt med argument
+
+Returvärden:
+-1 - Varken '-' eller '+' angivet som tredje argument.
+-2 - Användaren finns inte.
+-3 - Fel vid läsandet av användaren.
+-4 - Mötet finns inte.
+-5 - Fel vid skrivandet av användaren.
+
+@endnode
+
+@node ChgFile "Referens : ChgFile()"
+
+ChgFile(filnamn,ändra till,subject,areanr)
+
+Ändrar uppgifter om den angivna filen. Alla subjects är samma som för
+@{"FileInfo()" link FileInfo}. Om valideringsflaggan (värde 2) ändras från
+att vara satt till att inte vara satt så kommer filen att betecknas som
+nyuppladdad och synas med kommandot 'Nya Filer'.
+Om man ändrar filens katalog så kommer inte filen att flyttas, detta får
+man ombesörja själv. Om man ändrar filens namn kommer detta dock att
+ändras.
+
+Om du använder subjekt L för att ändra den, sätt in filnamnet med den nya
+långa beskrivningen i Ändra till fältet, vill du ha bort den långa
+beskrivningen så är det bara att ange en tom sträng där istället.
+
+Med subjekt 'T' kan du ändra uppladdningstiden. 'ändra till' måste
+då vara en sträng i ett av följande format:
+1)     [yy]yymmdd
+2)     [yy]yymmdd hh:mm
+3)     hh:mm
+
+1 ändrar endast datum, bevarar tiden. årtal kan antingen anges med
+  två eller fyra siffror (exvis 96 eller 1996)
+2 ändrar datum och tid. årtal enligt ovan
+3 ändrar endast tid, datum bevaras.
+
+Observera att det är viktigt att strängen ser ut exakt på detta vis,
+annars kommer ändringen inte att fungera.
+
+Om du ändrar uppladdningstiden kommer fillistan i den arean vara osorterad
+tills du startar om servern.
+
+Felvärden:
+1 - Inte tillräckligt med argument
+
+Returvärden:
+0   - Allt ok.
+-1  - Felaktigt areanummer
+-2  - Filen finns inte
+-3  - Kunde inte döpa om filen
+-4  - Kunde inte döpa om .nikfile-filen.
+-5  - Användaren (uppladdaren) finns inte.
+-6  - Kunde inte öppna .nikfile-filen
+-7  - Kunde inte söka i .nikfile-filen
+-8  - Kunde inte skriva till .nikfile-filen.
+-9  - Kunde inte hitta filen med nya långa beskrivningen.
+-10 - Kunde inte skriva den nya långa beskrivningen.
+
+@endnode
+@node setnodeaction "Referens: setnodeaction"
+setnodeaction <sträng>
+
+Sätter den sträng som ska synas i vilka-kommandot för den här noden. Denna
+sträng kommer att synas tills den ändras till något annat. Systemet brukar
+tex ändra detta när en prompt kommer fram.
+@endnode
+@node sendrawfile ""Referens: sendrawfile"
+-------------------------------------------------------------------------
+sendrawfile <filnamn>
+
+Skickar en fil precis som den är. Inga radbrytningar, pauser eller
+liknande läggs till.
+Observera att om denna ska användas till att skriva ut texter så
+måste det för varje radbrytning finnas en LF och en CR. (En ASCII 10 ($0a)
+och en ASCII 13 ($0d)). Annars kommer det att se ut något i den här stilen:
+Hej
+    på dig
+           hur mår du.
+@endnode
+@node changelatestinfo "Referens: changelatestinfo"
+-------------------------------------------------------------------------
+changelatestinfo <fält> <värde>
+
+Ändrar den data som vid utlogg kommer att hamna i Lista Senaste. De olika
+fälten är: WRITE, READ, UPLOAD och DOWNLOAD. Värdet är ett helttal som
+kommer att adderas till det värde som redan finns. Som resultat får man
+vad det nya värdet är. För att minska värdet kan man ange ett negativt
+tal. Om man bara vill ha reda på vad värdet står på just nu kan man ange
+n0ll.
+Om ett felaktigt fältnamn anges returneras -1.
+Ex:
+changelatestinfo WRITE 1     - Ökar antalet skrivna texter med 1.
+changelatestinfo READ  0     - Returnerar hur många texter som lästs.
+changelatestinfo UPLOAD -1   - Minskar antal uploads med ett.
+@endnode
+@node KeyInfo "Referens: KeyInfo"
+KeyInfo(nummer,subject)
+
+Ger information om en nyckel. Enda subject är 'n' som ger namnet på
+nyckeln.
+
+Felvärden:
+1 - Inte tillräckligt med argument
+
+Returvärden:
+-1 - Finns ingen nyckel med det numret.
+@endnode
+@node GetDir "Referens: GetDir"
+GetDir(subject, areanummer, [nyckel1, [nyckel, ...]])
+
+Ger namnet på den katalog som en fil lämpligen bör hamna i i den angivna
+arean utgående från de nycklar som givits. Detta är precis vad NiKom
+gör när någon har laddat upp en fil och satt nycklarna.
+
+Enda subject är 'd'. (Fråga inte mig varför det ska vara ett överhuvud
+taget, det är Christian som gjort funktionen. :-)
+
+Felvärden:
+1 - Inte tillräckligt med argument.
+@endnode
+@node DelOldTexts "Referens: DelOldTexts"
+DelOldTexst(antal)
+
+Rensar ut gamla texter i systemet. Är samma sak som att köra komamndot
+'Rensa Texter'. Antalet texter måste vara jämt delbart med 512.
+
+Felvärden:
+1 - Inget argument givet.
+
+Returvärden:
+0  - Allt ok.
+-1 - Antalet texter får inte vara under 0.
+-2 - Finns inte så många texter.
+-3 - Antalet texter är inte jämt delbart med 512.
+@endnode
+@node SendNodeMess "Referens: SendNodeMess"
+SendNodeMess(nodnr, avsändare, meddelande)
+
+Skickar ett säg-meddelande till den angivna noden. Anges -1 så skickas
+meddelandet till samtliga noder. Avsändare ska vara ett användarnummer
+eller -1, som tolkas som ett systemmeddelande.
+
+Felvärden:
+1 - Fel antal argument givna
+
+Returvärden:
+1  - Meddelandet skickat, mottagaren hade inga olästa meddelanden
+0  - Meddelandet skickat, mottagaren hade olästa meddelanden
+-1 - Skickandet misslyckades
+-2 - Felaktigt nodnummer.
+-3 - Felaktig avsändare
+@endnode
+@node MoveFile "Referens: MoveFile()"
+MoveFile(filnamn,area,ny area)
+
+Flyttar filinformationen (inte den fysiska filen) från area
+till nyarea. Du måste själv flytta filen fysiskt _innan_ du
+anropar denna funktion.
+Ex:
+    fromdir = AreaInfo(area,'d',FileInfo(fil,'i',area))
+    todir   = AreaInfo(nyarea,'d1')
+    address command 'move 'fromdir||fil todir
+    say MoveFile(fil,area,nyarea)
+
+Felvärden:
+1 - Inte tillräckligt med argument
+
+Returvärden:
+0   - Allt ok.
+-1  - Gamla arean finns inte
+-2  - Filen finns inte
+-3  - Nya arean finns inte
+-4  - Filen finns inte fysiskt i nya arean
+-5  - Fel vid skrivning av datafiler
+@endnode
+
+@node AddProgramData "Referens: AddProgramData()"
+AddProgramData(användare, kategori, typ, data)
+
+Addera eller ändra värdet på en typ i en viss kategori
+för användaren som specificerades.
+
+Dethär är ett smidigt sätt för externa program att lagra data
+utan att behöva skapa en egen fil att lagra den i och det är
+ganska lätt hanterat och snabbt.
+
+Exempel:
+
+retur = AddProgramData(0, "DCredit", "UploadBytes", "98845")
+varde = GetProgramData(0, "DCredit", "UploadBytes")
+if(c2d(varde) ~= 0) say varde
+
+--> 98845
+
+Returvärden:
+ 0	- Allt ok.
+-1	- Kunde inte hitta användaren.
+-2	- Kunde inte allokera minne.
+@endnode
+
+@node GetProgramData "Referens: GetProgramData()"
+GetProgramData(användare, kategori, typ)
+
+Hämtar värdet för den angivna kategorin och typen för
+användaren som specificerades.
+
+Dethär är ett smidigt sätt för externa program att lagra data
+utan att behöva skapa en egen fil att lagra den i och det är
+ganska lätt hanterat och snabbt.
+
+Exempel:
+
+retur = AddProgramData(0, "DCredit", "UploadBytes", "98845")
+varde = GetProgramData(0, "DCredit", "UploadBytes")
+if varde ~= '' say varde
+
+--> 98845
+
+Returvärden:
+En tom sträng ('') - Kunde inte hitta kategorin eller typen...
+Annars får man värdet på typen i den aktuella kategorin!
+@endnode
+
+@node MarkTextRead "Referens: MarkTextRead()"
+MarkTextRead(användare, textnummer)
+
+Markerar den angivna texten (textnummer) som läst för den
+angivna användaren.
+
+Returvärden:
+
+ 0	- Allt OK
+-1	- Användaren finns inte.
+-2	- Texten finns inte.
+-3	- Texten är redan läst.
+-4	- Kunde inte läsa in användaren. (slut på minne?)
+-5	- Texten är raderad.
+
+@endnode
+
+@node MarkTextUnRead "Referens: MarkTextUnRead()"
+MarkTextUnRead(användare, textnummer)
+
+Markerar den angivna texten (textnummer) som läst för den
+angivna användaren.
+
+Returvärden:
+
+ 0	- Allt OK
+-1	- Användaren finns inte.
+-2	- Texten finns inte.
+-3	- Texten är redan läst.
+-4	- Kunde inte läsa in användaren (slut på minne?)
+-5	- Texten är raderad.
+
+@endnode
+
+@node NextPatternFile "Referens: NextPatternFile()"
+NextPatternFile(startfilnamn, area, pattern)
+
+Letar upp nästa fil som motsvarar Amiga-DOS pattern i fillistan
+i den aktuella arean.
+
+Exempel:
+
+I en area med två filer den första heter testfil och den andra testfil2:
+
+say NextPatternFile(testfil, 0, '*test*')
+
+--> testfil2
+
+Returnvärden:
+
+0	- Allt OK
+-1	- Kunde inte hitta arean
+-2	- Kunde inte hitta filen
+-3	- Kunde inte hitta någon mer fil som motsvarade pattern
+@endnode
+
+@node GetNumber "Referens: GetNumber"
+GetNumber <minvärde> <maxvärde> <standardvärde>
+GetNumber <minvärde> <maxvärde>
+GetNumber <standardvärde>
+
+Låter användaren mata in ett nummer mellan min och max värdet. (om de inte
+angetts så finns det ingen begränsning)
+Standardvärdet är det värdet som anges som default.
+
+Returvärde:
+<värde>				Värdet som användaren matade in.
+Min-värdet - 1		Användaren avbröt inmatningen.
+
+@endnode
+
+@node CheckUserPassword "Referens: CheckUserPassword()"
+CheckUserPassword(användarnummer, lösenord)
+
+Kolla lösenord är samma som användarnummers lösenord.
+
+Returvärden:
+1	- Lösenordet stämmer.
+0	- Fel lösenord.
+
+@endnode

@@ -1,0 +1,17 @@
+
+
+Nya Filer
+---------
+
+Synsopsis: Nya Filer [-]
+
+Beskrivning:
+Listar de filer som har laddats upp sedan användaren var inloggad senast.
+Denna lista kan man även få upp i kommandot 'Lista Nyheter' om man slår
+på flaggan 'Automatisk Fillista'.
+
+Anges ett streck (-) som argument så visas endast ovaliderade filer. För en
+vanlig användare syns då inga filer alls eftersom de inte har rätt att se
+icke validerade filer.
+
+Se Även: Lista Filer, Lista Flaggor, Slå På, Slå Av

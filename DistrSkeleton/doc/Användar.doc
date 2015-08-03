@@ -1,0 +1,566 @@
+                  Grundläggande användning av NiKom
+                  =================================
+
+NiKom är ett sk KOM-system. Det finns inga menyer någonstans utan allting
+styrs genom att ge kommandon. Alla kommandon kan utföras närsomhelst.
+
+Kommandona består antingen av ett eller två ord. Kommandona kan också ta
+ett eller flera argument. Med detta menas att man skriver något efter
+kommandot för att styra det. Tex så när man ska ladda ner en fil så måste
+man tala om vilken fil man vill ladda ner. Då skriver man det som argument
+till kommandot 'Download'. Dvs: 'Download MinFil.lzh'
+
+Alla kommandon kan också förkortas ner till sin minsta unika del. Man kan
+alltså skriva bara några bokstäver så länge detta inte passar in på något
+annat kommando. Istället för 'Lista Möten' räcker det med 'Li Mö'. Även
+'L Mö' skulle gå alldeles utmärkt. Däremot passar 'L M' in på både 'Lista
+Möten' och 'Lista Medlemmar'. Om man skulle skriva något som passar in på
+flera kommandon så kommer det upp en lista på de kommandon man kunde ha
+menat. Det är alltså inget farligt att experimentera hur långt man kan
+förkorta ett kommando.
+
+Vill man få upp en lista på alla tillgängliga kommandon så kan man ge
+kommandot 'Lista Kommandon'
+
+Det är inte bara kommandon som kan förkortas, utan även användarnamn,
+mötesnamn, gruppnamn, filnamn etc. Dvs, nästan allt kan förkortas. I
+stället för användarnamn går det även bra att skriva användarnumret om
+man vill det.
+
+Inloggning
+----------
+När modemen har kopplat upp så kommer det fram en text, inloggningstexten.
+Efter denna så kommer det fram en prompt: 'Namn:'. Om man redan har ett
+konto på basen så skriver man sitt användarnamn eller -nummer. (Kom ihåg att
+namnen går att förkorta). Om NiKom känner igen namnet så ska man skriva
+sitt lösenord. Tänk på att det är skillnad på små och stora bokstäver.
+När du skrivit rätt lösenord så kommer du in i systemet och kan börja ge
+kommandon.
+
+Om man inte har ett konto så skriver du vanligtvis 'ny' som namn för att
+fylla i en ansökan om ett konto. Vad man ska skriva för att registrera sig
+som ny användare brukar stå i inloggningstexten.
+
+
+Utloggning
+----------
+När man vill logga ut ur basen så ska man ge kommandot 'Sluta' eller
+'Logout'. Man ska INTE bara lägga på modemet, även om NiKom i de flesta fall
+klarar av att upptäcka det.
+
+
+Kontroll av utmatning
+---------------------
+Man kan för det mesta avbryta utskriften av tex en text genom att trycka
+Ctrl-C. Om basen använder ett höghastigehtsmodem kan det hända att det
+dröjer lite innan utmatningen verkligen avbryts. Detta beror på att modemet
+har en egen buffer. NiKom har slutat skicka något till modemet men modemet
+håller på en liten stund till.
+
+Man kan få en automatisk paus efter ett visst antal raders utskrift, man
+måste då trycka på return för att utmatningen ska fortsätta. Det normala är
+att man har detta inställt på 25 rader. Man kan ändra det med kommandot
+'Ändra Användare'.
+Om man inte vill ha någon paus alls sätter man värdet till 0 (noll).
+
+Man kan alltid pausa utskriften genom att trycka på Ctrl-S. Om man har
+flaggan "Mellanslag som paustangent" påslagen kan man även pausa med
+mellanslag. För att fortsätta utskriften trycker man sedan på valfri
+tangent.
+
+
+                               Mötessystemet
+                               =============
+
+Alla diskussioner sker i något som kallas för möten. Det finns olika möten
+för olika intresseområden och typer av diskussioner.
+
+Användande
+----------
+För att se vilka möten som finns så ge kommandot 'Lista Möten'. Om det står
+en stjärna framför namnet så betyder det att man inte är medlem i mötet.
+Annars står det en siffra som indikerar hur många olästa texter som finns i
+mötet. Här kan man även se om mötet är skrivskyddat, slutet osv.
+
+För att kunna använda ett möte och läsa/skriva texter där så måste man vara
+medlem i mötet. Detta gör man med kommandot 'Medlem'. Sedan gäller det att
+man befinner sig i rätt möte. Detta göra man med kommandot 'Gå'. Vill man
+se vilket möte man befinner sig i så ger man kommandot 'Var'. Då får man
+även reda på hur många olästa texter man har i mötet. Om man vill ändra
+antalet olästa texter så använder man kommandot 'Endast'.
+Skulle man sedan inte vilja vara medlem i ett möte längre så använder man
+kommandot 'Utträd'.
+
+Läsande av texter
+-----------------
+Om det finns något möte som man har olästa texter i (och man inte befinner
+sig i det mötet) så kommer det stå '(Gå till) nästa möte' i prompten (det
+som indikerar att man ska skriva något). Om man nu trycker Return så kommer
+det som står i prompten att hända, dvs man kommer att gå till nästa möte
+som man har olästa texter i. Det kommer att komma upp några rader i stil med:
+
+Du befinner dig nu i Fritt Forum
+Du har 10 olästa texter.
+
+Nu ändras även prompten till '(Läsa) nästa text'. Om man bara trycker
+Return igen så kommer nu nästa olästa text att visas.
+
+En text består av två delar, texthuvudet och själva texten. I texthuvudet
+finns en hel del information att hämta. Det kan se ut så här:
+
+--------------------------------------------------------------------------
+Text 1873  Möte: Fritt Forum    910815 18:17
+Skriven av Nisse Persson #35
+Kommentar till text 1840 av Pelle Andersson #6
+Ärende: Bussar
+
+Nej, jag tycker att det är alldeles för dyrt att åka buss i stan. Inte
+konstigt att folk väljer bilen istället.
+
+(Slut på text 1873 av Nisse Persson #35)
+  (Kommentar i text 1880 av Pelle Andersson #6)
+--------------------------------------------------------------------------
+Först så står det vilket nummer texten har. Numren är globala för alla
+möten. Sedan står det i vilket möte texten finns, i det här fallet Fritt
+Forum. På nästa rad står det vem som har skrivit texten och på raden efter
+det vilken text som texten är en kommentar till. Om texten inte är en
+kommentar utan en ny text så finns inte denna rad med.
+Sist så står det vad texten har för ärende. Denna rad är till för att
+beskriva kort vad diskussionen handlar om.
+Sedan kommer själva texten och sist en rad som indikerar att texten är slut.
+Allra sist står det en rad som talar om att det finns en kommentar till
+denna text.
+
+Prompten ändras nu ännu en gång till '(Läsa) nästa kommentar'. Trycker du
+nu return så får du läsa kommentaren på en gång (så att man inte tappar
+tråden). När alla kommentarer till texten (och kommentarer till
+kommentarerna och...) är läst så går prompten tillbaka till att vara
+'(Läsa) nästa text' om det finns flera olästa texter i mötet. Annars så
+blir prompten '(Gå till) nästa möte' igen om det finns flera möten med
+olästa texter i. På detta sätt kan man genom att bara trycka på return läsa
+alla olästa texter i alla möten. Om det inte finns några olästa texter
+längre så blir prompten '(Se) tiden'. Då får man bara fram vad klockan är
+och hur lång tid man har på sig innan man blir utloggad.
+
+Om man får upp en text som har kommentarer som man inte vill läsa så kan man använda kommandot 'Hoppa Över' för att hoppa över dessa. Vill man hoppa över alla texter som har samma ärende som den senast lästa texten så kan man ge kommandot 'Hoppa Ärende'.
+
+Om man har en hel del olästa texter i ett möte som man inte vill läsa just
+nu utan spara till senare så kan man ge kommandot 'Nästa Möte' för att få
+upp '(Gå till) nästa möte' prompten. Man kan även gå till ett annat möte
+när som helst med kommandot 'Gå'.
+
+Om man precis har läst en text och vill läsa den igen så kan man använda
+kommandot 'Igen'. Skulle man vilja se den text som den senast läste texten
+är en kommentar till så använder man kommandot 'Återse Kommentar'.
+Skulle man vilja läsa en specifik text som man vet textnumret på så kan man
+använda kommandot 'Läsa'. Man kan även skriva bara numret på texten direkt
+så tolkas det som att man vill läsa den texten.
+
+Vet man inte riktigt vad en text har för nummer så kan man använda kommandot
+'Lista Ärende'. Då får man upp en lista över alla texter i mötet, vem som
+har skrivit dem, vad de har för nummer, till vilken text texten är en
+kommentar, när texten skrevs och vad den har för ärende.
+
+
+Skrivande av texter
+-------------------
+Om man vill kommentera en text som man precis har läst så ger man kommandot
+'kommentera'. Det kommer då upp ett texthuvud och sedan kommer man in i
+editorn där man ska skriva sin text. (En beskrivning av editorerna finns
+i kapitlet Editorer.) När man sedan har sparat sin text så kommer det
+fram vilket textnummer den fick och sedan kan man fortsätta med läsandet.
+Man kan även kommentera en text som man läste för en liten stund sedan. Då
+skriver man textnumret som ett argument till kommentera.
+
+Skulle man vilja skriva en helt ny text så använder man kommandot 'Skriv'
+eller 'Inlägg'. Innan man gör det ska man dock se till att man befinner sig
+i rätt möte. Förfarandet är detsamma som för att kommentera en text förutom
+att man även ska välja ett ärende till texten. Detta bör på några få ord
+tala om vad hela texten (och en eventuell diskussion) handlar om.
+
+Skulle man ångra sig när man har skrivit en text så kan man radera den. Då
+använder man kommandot 'Radera Text'. Man kan endast radera texter man har
+skrivit själv.
+
+Man kan även flytta en text till ett annat möte, tex om man tycker att en
+diskussion har bytt ämne såpass mycket att den passar bättre i ett annat
+möte. Man använder då kommandot 'Flytta Text'.
+
+Man kan även göra en personlig kommentar till en text som hamnar i
+brevlådan. Man använder då kommandot 'Personlig'.
+
+
+Övrigt
+------
+Man kan markera texter för att läsa dem senare. Man använder då kommandot
+'Markera Text'. Sedan när man vill läsa de markerade texterna så ger man
+kommandot 'Visa Markerade'.
+
+Om man vill få upp en lista på vilka möten man har olästa texter i och hur
+många de är så kan man använda kommandot 'Lista Nyheter'. Då får man även
+reda på hur många nya filer det har kommit i olika areor.
+
+Med kommandot 'Mötesstatus' kan man få upp information om ett möte, vem
+som skapat det, när det skapades, vem som är MAD osv. Varje möte kan även
+ha en lapp som då syns efter den andra informationen. Här kan det tex stå
+vad det är tänkt att man ska diskutera i mötet.
+
+
+                                Brevlådan
+                                =========
+
+Förutom att diskutera saker allmänt så kan man också skriva privata brev i
+Brevlådan.
+
+Varje användare har en egen brevlåda med en egen numrering av breven. Alla
+brevfiler finns i varje användares katalog och försvinner när användaren
+raderas.
+
+För att skriva ett brev kan man antingen använda kommandot 'Brev' eller om
+man vill skicka en personlig kommentar på en text, 'Personlig'. Många
+kommandon som används i mötessystemet fungerar även i brevlådan, tex
+'Kommentera', 'Igen' och 'Återse Kommenterade'. Det finns dock vissa
+skillnader från vanliga möten.
+Ett brev som är ivägskickat går inte att radera, det gäller hålla
+fingrarna i styr när man skriver. 'Lista Ärende' fungerar inte. Istället
+används kommandot 'Lista Brev'. Om man använder 'Lista Brev' utan
+argument så kommer alla brev som är skrivna till en själv upp. Vill man se
+de brev man själv har skrivit så anger man vilken användares brevlåda man
+vill kika i. Tex 'Lista Brev ni pe'.
+
+När man sedan vill läsa brev så är principen densamme. Skriver man bara
+ett brevnummer så läser man ett brev i sin egen brevlåda. Anger man en
+användare efteråt så läser man ett brev (som man själv måste ha skrivit)
+i någon annans brevlåda . Tex 'Läsa 123 ni pe'.
+
+Inget brev försvinner automatiskt från systemet utan användarna måste
+själva rensa i sina brevlådor med jämna mellanrum. Detta görs med
+kommandot 'Rensa Brev'
+
+Flera mottagare
+---------------
+Ett brev kan ha flera mottagare för att på så sätt föra små mini-debatter
+i brevlådan. När ett brev kommenteras som har flera mottagare så skickas
+kommentaren iväg till alla tidigare mottagare utom en själv. (Det skickas
+naturligtvis även till den som skrev brevet)
+
+För att addera en mottagare till ett brev så ger man kommandot 'addera' i
+editorn. (Se nedan)
+
+
+
+                                 Editorerna
+                                 ==========
+
+I NiKom finns det två olika editorer: Radeditorn och fullskärmseditorn.
+Vilken man vill använda styr man genom flaggan 'Fullskärmseditor' (se
+längre ned i denna text)
+
+Fullskärmseditorn kräver att användarens terminalprogram klarar av (och är
+inställt på) ANSI-emulering.
+
+Radeditorn
+----------
+Först på raden står det alltid vilken rad man håller på att skriva och när
+man har skrivit så att raden är full så byter den automatiskt rad och ser
+till så att ordet man håller på att skriva flyttas ner. Man kan sudda ut
+de tecken man har skrivit och även sudda sig tillbaka till raden innan.
+Man kan även ge editorkommandon. Dessa börjar alltid med ett utropstecken
+och ska skrivas först på en rad.
+
+Skulle man vilja ändra på en rad man skrivit lite längre upp så använder
+man kommandot '!ändra'. Då kommer den radens nummer fram och man kan börja
+ändra. För att ta fram tecken för tecken av den gamla raden så trycker man
+Ctrl-F. Vill man ta fram resten av den gamla raden trycker man Ctrl-R. Man
+avslutar ändringen genom att trycka return.
+
+Vill man infoga en rad någonstans så kan man använda kommandot '!infoga'.
+Då får man möjlighet att skriva raden och avslutar med Return.
+Man kan även radera en rad med kommandot '!radera'.
+
+Om man ska ladda upp en redan skriven text genom terminalprogrammet så kan
+man hindra att någonting syns (vilket snabbar upp det hela). Man ger då
+kommandot '!dump'. När man sedan är klar trycker man på Ctrl-C.
+
+För att se hela texten som den kommer att bli så ge kommandot '!läs' eller
+'!hela'.
+
+Om det är en text i ett möte man skriver så finns det två kommandon man kan
+använda:
+'!flytta' - flyttar texten till ett annat möte
+'!ärende' - ändrar ärendet på texten
+
+När man har skrivit klart texten så ger man kommandot '!spara' för att
+spara texten. Det går även bra att trycka på Ctrl-Z.
+Vill man inte spara texten så finns kommandona '!bort' och '!kasta'.
+
+
+Fullskärmseditorn
+-----------------
+
+Fullskärmseditorn är lite mer som vanliga editorer. Man kan flytta runt
+markören med piltangenterna och ändra bäst man vill. Om man vill radera
+allt från markören till slutet av raden så använder man Ctrl-K. Skulle man
+redan stå i slutet av raden så flyttas raden under upp, förutsatt att den
+får plats där. Det man raderar med Ctrl-K kan man sedan klippa in med hjälp
+av Ctrl-Y.
+
+Vill man ta bort en rad helt så trycker man Ctrl-X. De rader som finns
+under kommer då att flyttas upp ett steg. Står man på sista raden så rensas
+den bara på text och markören hamnar i början av raden.
+
+Det finns tre stycken kommandon i fullskärmseditorn. Dessa får man fram
+genom att först trycka på Ctrl-Q och sedan skriva kommandot. Dessa är:
+dump - tar emot en text utan att eka tillbaka några tecken, avslutas med
+       Ctrl-C.
+flytta - flyttar texten till ett annat möte
+ärende - ändrar ärendet på texten.
+
+Dessa kommandon fungerar likadant som deras motsvarigheter i radeditorn.
+
+För att spara texten så trycker man Ctrl-Z och för att kasta bort texten så
+trycker man Ctrl-C.
+
+Ingen av dessa Ctrl-tangent-kombinationer behöver utföras på början av en
+rad utan man kan använda dem var som helst i texten.
+
+
+
+                                Filareorna
+                                ==========
+
+Genom filareorna kan användare skicka program till basen och hämta program
+från den. Idén med filareorna i NiKom är att det i princip bara ska finnas
+en enda area. Om det kommer att finnas program till flera olika datorer så
+kan det vara bra att ha flera areor. För att bringa någon ordning bland
+filerna så används istället något som kallas för nycklar. På en fil kan man
+sedan sätta en eller flera nycklar.
+
+
+För att se vilka areor som finns så ger man kommandot 'Lista Areor', eller
+bara 'Areor'. För att sedan hoppa till en area så ger man kommandot
+'Byt Area'. Om man vill se vilken area man befinner sig i så kan man ge
+kommandot 'Visa Filinfo'.
+
+För att få upp en lista på de filer som finns i den arean man befinner sig
+i så ger man kommandot 'Lista Filer'. Man får då upp en lista där det står
+vad filerna heter, hur stora de är, när de laddades upp, vem uppladdaren
+är, hur många som har laddat ner filen, och på en egen rad en kort
+beskrivning av filen.
+Man kan även ge en nyckel som argument till 'Lista Filer'. Då listas bara
+filer som har den nyckeln satt.
+
+En fil kan ha en längre beskrivning än den korta enradare som syns i en
+vanlig fillista. Om en fil har en längre beskrivning så visas '**>'
+framför den korta beskrivningen. Denna beskrivning kan man få fram med
+kommandot 'Filstatus', då även en del annan information om filen kommer
+upp.
+
+Om man är håller på att leta efter ett speciellt program men inte vill
+titta igenom en lång lista av filer så kan man använda kommandot 'Sök'.
+
+För att ladda ner en fil från basen så ger man kommandot 'Download' eller
+'Ladda Ner'. För att ladda upp en fil till basen så är det 'Upload' eller
+'Ladda Upp' som gäller.
+
+Filer man själv har laddat upp kan man ändra uppgifter om, och även radera.
+Då använder man kommandona 'Ändra Fil' och 'Radera Fil'.
+
+Man kan även få upp en lista över de filer som kommit sedan man var
+inloggad förra gången med kommandot 'Nya Filer'.
+
+Man kan även kika på de nycklar som finns med kommandot 'Lista Nycklar'.
+
+Privata Filareor
+----------------
+Det finns även möjlighet att ha privata filareor. Till en privat filarea
+kan vem som helst ladda upp en fil men bara den som äger filarean kan ladda
+ner filer. För att få en privat filarea måste man be sysopen att han skapar
+en.
+
+För att se vad det finns för filer i den privata filarean så använd
+kommandot 'Lista Privatfiler'.
+
+För överföring av filer finns kommandona 'Privat Download' och
+'Privat Upload'.
+Det är meningen att användarna själva ska hålla rent i sina privata
+filareor och radera filer de har laddat ner. Detta görs med kommandot
+'Radera Privatfil'.
+
+I den privata filarean, till skillnad från resten av systemet, så måste
+man ange hela filnamn. Det går alltså inte att förkorta filnamnen.
+
+Det finns ingen automatisk funktion för att rensa bort gamla filer i de
+privata filareorna utan det är tänkt att varje användare själv ska hålla
+rent i sin privata filarea.
+
+
+
+                                  Övrigt
+                                  ======
+
+Grupper
+=======
+
+En grupp är ett sätt att enkelt sammanföra ett ett antal användare som ska
+få tillgång till samma saker. Tex kan en användarförenings BBS ha en
+medlemsgrupp som gör att de som är med i gruppen får tillgång till vissa
+meddelandeareor.
+
+För att se vilka grupper som finns så ger man kommandot 'Lista Grupper'. De
+grupper som det står en stjärna framför är man inte medlem i.
+
+Vill man se vilka personer som är medlem i en grupp så använder man en
+flagga till kommandot 'Lista Medlemmar' (som normalt visar medlemmarna i
+ett möte). Man skriver 'Lista Medlemmar -g <gruppnamn>'. Man kan även se
+vilka grupper en person är medlem i genom att använda kommandot 'Status'.
+
+
+Flaggorna
+=========
+
+I NiKom finns det ett antal flaggor som antingen kan vara avslagna eller
+påslagna. Kommandot 'Lista Flaggor' ger en lista över de som finns samt
+talar om om de är på eller avslagna. Man ändrar flaggor med kommandona
+'Slå På' och 'Slå Av'.
+
+Skyddad Status
+--------------
+Om denna flagga är påslagen så kan bara de som har tillräcklig status
+se adress och telefonuppgifter på en användare.
+
+Streckrad under ärendet
+-----------------------
+Om denna flagga är påslagen så kommer det att skrivas ut en rad med streck
+under ärendet till varje text. Tex:
+Ärende: Hejsan hoppsan
+----------------------
+
+ISO 8 bitars tecken
+-------------------
+Om denna flagga är avslagen så kommer NiKom att översätta in och utgående
+tecken så att de svenska tecknen representeras av s.k. måsvingar. Många
+använder 7 bitars teckenuppsättningar och där är de svenska tecknen
+representerade som följer:
+
+Normala Amiga-tecken (ISO 8559-1)    7-bitars svenska tecken (SF7, SIS-7)
+          }                                    å
+          {                                    ä
+          |                                    ö
+          ]                                    Å
+          [                                    Ä
+          \                                    Ö
+
+Ingen autohjälp
+----------------
+Om denna flagga är påslagen så kommer inte den automatiska hjälptexten fram
+när man skrivit två felaktiga kommandon i rad.
+
+Fullskärmseditor
+----------------
+Om denna flagga är påslagen så används NiKoms fullskärmseditor istället för
+radeditorn. (Se kapitlet om editorer)
+
+Automatisk Fillista
+------------------
+Om denna flagga är påslagen så kommer det automatiskt upp en lista över nya
+filer vid lista nyheter.
+
+Mellanslag som paustangent
+--------------------------
+Om denna flagga är påslagen så kan mellanslag användas för att pausa
+utskriften precis som Ctrl-S.
+
+Lapp vid brev
+-------------
+Om denna flagga är påslagen så kommer en användares lapp att synas före
+brevheadern varje gång som någon skriver ett brev till honom. Är användbart
+för att tex tala om att man är bortrest och inte kan svara på brev på ett
+tag.
+
+ANSI-sekvenser skickas
+----------------------
+Om denna flagga är avslagen så skickas det aldrig några ANSI-sekvenser på
+kommandoraden och liknande ställen. För att kunna editera kommandoraden så
+krävs det att denna flagga är påslagen.
+
+
+Användare
+=========
+
+Skulle man vilja få information om en viss användare så kan man använda
+kommandot 'Status'. Detta använder man även för att få information om sig
+själv. Tex hur många inloggningar man har gjort, hur många texter man har
+skrivit osv.
+Om man vill ändra tex sina adressuppgifter så finns kommandot
+'Ändra Användare'. Den person som har tillräcklig status (anges i
+Status.cfg) kan även ändra andra användare än sig själv, ändra antal
+inloggningar, statusnivå etc.
+Om man vill veta vilka användare som finns så kan man använda kommandot
+'Lista Användare'.
+
+Lista Senaste
+=============
+Med kommandot 'Lista Senaste' kan man se vilka som varit inloggade den
+senaste tiden och vad de har gjort för något.
+
+Info
+====
+I de flesta baser finns det olika informationstexter upplagda. Dessa kan
+man få fram med kommandot 'Info'
+
+Pratstund med sysop
+===================
+Om man skulle vilja prata direkt med sysop så ska man använda kommandot
+'Ropa'. Då påkallas sysops uppmärksamhet och om han är tillgänglig (och
+vill prata) så svarar han.
+
+Tiden
+=====
+Kommandot 'Tiden' används för att få reda på vad klockan är, vilket datum
+det är samt hur lång systemtid man har kvar.
+
+Olika noder
+===========
+Om basen har olika noder så kan man ta reda på vilka som är inloggade på de
+olika noderna med kommandot 'Vilka'. Då får man också reda på på ett
+ungefär vad de gör.
+Skulle man sedan vilja säga något till någon som är inloggad samtidigt så
+finns kommandot 'Säg' att tillgå.
+
+System Info
+===========
+Med kommandot 'SysInfo' så kan man få reda på en del om systemet. Bla
+vilket det högsta användarnumret är, högsta mötesnumret osv.
+
+Manualer
+========
+Om man under inloggningen skulle vilja få reda på lite mer om hur ett
+kommando fungerar så rekommenderas kommandot 'Manual'.
+
+Profiles
+========
+Alla användare kan skapa en egen kommando-fil som körs automatiskt när man
+loggar in. I denna fil kan man ha vanliga NiKom-kommandon. Vanligast är att
+ha 'Lista Nyheter' och 'Vilka' här. För att editera sin profile ger man
+kommandot 'Ändra Profile'. Vill man sedan titta på den finns kommandot
+'Visa Profile'. Vill man testköra sin profile kan man använda kommandot
+'Exekvera Profile'.
+
+Lappar
+======
+Alla användare kan skapa en egen lapp. Denna lapp syns sist av allt när man
+tar status på en person. I denna kan man tex tala om att man är bortrest
+ett tag. För att editera sin lapp ger man kommandot 'Ändra Lapp'. Vill man
+ta bort sin lapp finns kommandot 'Radera Lapp'.
+
+Alias
+=====
+Man kan definiera sina egna alias för olika kommandon. Det gör att om man
+hellre vill skriva 'Nisse' istället för 'Status' så definierar man ett
+alias som heter 'Nisse' men betyder 'Status'.
+Ett alias kan bara vara enordigt men kan betyda flera ord. Ett alias har
+högre prioritet än vanliga kommandona så gör man ett alias som heter
+'Status' så kan man inte använda kommandot 'Status' förrän man tar bort det
+aliaset.
+Kommandot man använder heter just 'Alias'.

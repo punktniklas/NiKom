@@ -1,0 +1,11 @@
+
+
+Skapa Area
+----------
+
+Synsopsis: Skapa Area [<areanamn<]
+
+Beskrivning:
+Skapar en filarea med det angivna nanmet.
+
+Se Även: Lista Areor

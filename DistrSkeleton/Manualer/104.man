@@ -1,0 +1,12 @@
+
+
+Lista Kommandon
+---------------
+
+Synopsis: Lista Kommandon
+
+Beskrivning:
+Ger en lista på alla kommandon som finns att tillgå. Denna text sköts
+av sysop. Det är därför inte säkert att alla kommandon i listan finns
+på den aktuella BBS:en, eller tvärtom att alla kommandon i BBS:en finns
+med på listan.

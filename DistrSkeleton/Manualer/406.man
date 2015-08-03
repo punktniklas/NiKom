@@ -1,0 +1,11 @@
+
+
+Radera Area
+-----------
+
+Synopsis: Radera Area <area>
+
+Beskrivning:
+Raderar den angivna arean.
+
+Se Även: Lista Areor

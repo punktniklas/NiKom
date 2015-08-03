@@ -1,0 +1,13 @@
+
+
+Privat Download
+---------------
+
+Synopsis: Privat Download <filnamn>
+
+Beskrivning:
+Laddar ner en fil från den privata filarean, försutsatt att en sådan finns.
+För att få en privat filarea måste man be sysop om en. Observera att hela
+filnamnet måste anges, man kan inte förkorta som i vanliga filarean.
+
+Se Även: Privat Upload, Lista Privatfiler, Radera Privatfil

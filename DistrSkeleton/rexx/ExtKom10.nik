@@ -1,0 +1,48 @@
+/* Program för att flytta filer rätt */
+
+parse arg nod pers from to .
+
+len=Word(statef(from),2)
+
+reklam=0
+
+if ~exists('NiKom:DatoCfg/SRatio.cfg') then do
+ sendstring 'Hittar inte konfigurationen!!'||'0a0a0d'x
+ exit
+end
+call open(fil,'NiKom:DatoCfg/SRatio.cfg','READ')
+do until eof(fil)
+ New=upper(readln(fil))
+ Dtl=strip(Word(New,1))
+ NSt=strip(Word(New,2))
+ If dtl='REKLAM:' & nst='JA' then reklam=1
+ IF dtl='LOG:' then do
+  log=1
+  logfil=nst
+ end
+end
+call close(fil)
+
+if reklam=1 then do
+ sis=upper(right(from,4))
+ address command 'Execute S:SRatioReklam "'from'" 'sis
+end
+
+ address command 'copy "'from'" 'to' NOREQ QUIET'
+
+ DivPos=max(lastpos(':', From),lastpos('/', From))+1
+ Dest=to||substr(From, DivPos)
+
+ if exists(dest) then do
+  address command 'delete "'from'" QUIET'
+ end
+ else do
+  sendstring '0a0a0d'x
+  sendstring '*** Något blev fel vid flyttningen av filen!!!'||'0a0d'x
+  sendstring '*** Kontakta sysop!!'||'0a0a0d'x
+ end
+
+if log=1 then address command 'echo >>'logfil' "'date()' 'time()': 'pers' skickade upp 'from'!"'
+call open(fil,'T:FILSTORLEK'nod,'W')
+call writeln(fil,len)
+call close(fil)

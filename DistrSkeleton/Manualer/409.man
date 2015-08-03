@@ -1,0 +1,14 @@
+
+
+Radera Fil
+----------
+
+Synopsis: Radera Fil <filnamn>
+
+Beskrivning:
+Raderar den angivna filen från filarean och diskrediterar användaren för
+filen. Man kan bara radera filer som man själv har laddat upp såvida man
+inte är sysop, då får man också en fråga om användaren ska diskrediteras
+för filen.
+
+Se Även: Lista Filer, Sök

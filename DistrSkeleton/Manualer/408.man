@@ -1,0 +1,12 @@
+
+
+Skapa Fil
+---------
+
+Synopsis: Skapa Fil [<filnamn>]
+
+Beskrivning:
+Lägger upp en fil som redan ligger fysiskt på hårddisken (disketten) som
+fil i en filarea.
+
+Se Även: Lista Filer, Sök

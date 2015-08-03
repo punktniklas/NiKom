@@ -1,0 +1,29 @@
+
+
+Sök
+---
+
+Synsopsis: Sök [<söksträng>]
+
+Beskrivning:
+Söker efter filer i filarean. Om man inte anger något argument så kommer
+NiKom att fråga efter en söksträng. Om man anger en söksträng så gäller det
+att den ska finnas någonstans innuti filnamnet eller beskrivningen för att
+filen ska komma upp.
+Om man söker på nycklar så gäller att ALLA nycklar mam söker på måste finnas
+i en fil för att den ska komma upp.
+Om man söker på uppladdare så syns bara filer som den angivna personen har
+laddat upp.
+Om man söker på storlek så syns bara de filer som passar det man skrivit
+upp. Dvs om man skriver '>50000' så kommer bara filer som är större än
+50000 bytes upp.
+
+Om man söker på flera saker samtidigt så måste samtliga saker träffa in
+för att en fil ska komma upp. Ju exaktare man söker desto färre filer
+kommer upp. Om man inte vill ange tex någon söksträng så trycker man bara
+return när frågan om söksträng kommer. Man behöver inte heller ange några
+nycklar, man kan skriva '/' direkt om man vill.
+Om man inte anger något att söka på så kommer alla filer att passa in, dvs
+listan blir precis likadan som om man hade tagit 'lista filer'.
+
+Se Även: Lista Filer

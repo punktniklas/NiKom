@@ -1,0 +1,11 @@
+
+
+Återse Kommentar
+----------------
+
+Synopsis: Åtese Kommentar
+
+Beskrivning:
+Visar den text som den senast lästa texten är kommentar till.
+
+Se Även: Läs

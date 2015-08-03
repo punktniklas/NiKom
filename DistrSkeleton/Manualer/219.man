@@ -1,0 +1,12 @@
+
+
+Radera Möte
+-----------
+
+Synopsis: Radera Möte <möte>
+
+Beskrivning:
+Raderar det angivna mötet. Kan bara utföras av den som har skapat mötet
+eller sysop.
+
+Se Även: Skapa Möte

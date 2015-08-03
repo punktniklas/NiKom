@@ -1,0 +1,13 @@
+
+
+Privat Upload
+-------------
+
+Synopsis: Privat Upload <användare>
+
+Beskrivning:
+Laddar upp en fil till den angivna användarens privata filarea, förutsatt
+att användaren har någon privat filarea. Denna fil kan sedan endast kommas
+åt av mottagaren.
+
+Se Även: Privat Download, Lista Privatfiler

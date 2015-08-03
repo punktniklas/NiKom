@@ -1,0 +1,27 @@
+/* Kommandot Exekvera Profile
+$VER: Exekvera Profile 1.0 (20.4.92)
+N=EXEKVERA PROFILE
+O=2
+#=506
+*/
+
+parse arg nod person .
+
+profile='NiKom:Users/'||person%100||'/'||person||'/Profile'
+
+Namn=UserInfo(person,'n')
+
+if ~open('fil',profile) then do
+	'sendstring' '0d0a0a'x'Du har ingen profile!' '0d0a'x
+	exit
+end
+do until eof('fil')
+   foo=readln('fil')
+   legal=NikParse(foo,'k')
+   if legal ~= 506 then do
+      'nikcommand' foo
+     end
+   else do
+      say namn' har Execute Profile i sin profile!'
+   end
+end

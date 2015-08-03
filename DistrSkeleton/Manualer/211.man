@@ -1,0 +1,11 @@
+
+
+Nästa Kommentar
+---------------
+
+Synopsis: Nästa Kommentar
+
+Beskrivning:
+Visar den nästa kommentaren om man är inne i en kommentarskedja. Detta
+kommando har man ingen större nytta av använda själv utan promptas oftast
+fram.

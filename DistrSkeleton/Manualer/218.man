@@ -1,0 +1,19 @@
+
+
+Skapa Möte
+----------
+
+Synopsis: Skapa Möte
+
+Beskrivning:
+Skapar ett nytt möte. Kommandot frågar efter namn på mötet, vilket
+sorteringsvärde mötet ska ha, om det ska vara öppet eller slutet, om det
+ska vara skrivskyddat, om det ska vara kommentars- skyddat, om det ska vara
+hemligt, om användare ska vara automatiskt medlemmar, om mötet ska vara
+skrivstyrt eller om det ska styras från ARexx.
+
+För Fido-möten frågas det även om tag-namn, katalog för .msg-filerna,
+origin-rad och vilken teckenuppsättning som ska användas för utgående
+texter.
+
+Se Även: Radera Möte, Lista Möten

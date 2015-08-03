@@ -1,0 +1,12 @@
+
+
+Hoppa Över
+----------
+
+Synopsis: Hoppa Över
+
+Beskrivning:
+Hoppar över de texter som är kommentarer till den senast lästa frampromptade
+texten och markerar de som lästa.
+
+Se Även: Endast

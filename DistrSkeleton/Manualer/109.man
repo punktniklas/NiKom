@@ -1,0 +1,12 @@
+
+
+Lista Flaggor
+-------------
+
+Synopsis: Lista Flaggor
+
+Beskrivning:
+Ger en lista över de personliga flaggor som finns samt om de är avslagna
+eller påslagna.
+
+Se Även: Slå På, Slå Av

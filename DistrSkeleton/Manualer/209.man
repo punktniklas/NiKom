@@ -1,0 +1,11 @@
+
+
+Utträd
+------
+
+Synopsis: Utrräd <möte>
+
+Beskrivning:
+Gör så att användaren inte längre är medlem i det angivna mötet.
+
+Se Även: Medlem

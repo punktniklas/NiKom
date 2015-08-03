@@ -1,0 +1,27 @@
+/* Program som markerar texter */
+parse arg nod person argument
+
+options results
+
+filnamn='ram:NiKom/Mark'||nod
+'sendstring' argument
+if argument='' then do
+	'lasttext'
+	savestr=result
+	if savestr='RESULT' then do
+		'sendstring' '0d0a0a'x'Du har inte läst någon text ännu!' '0d0a'x
+		exit 0
+	end
+end
+else if ~datatype(argument,'n') then do
+	'sendstring' '0d0a0a'x'Skriv: Markera Text <textnummer>' '0d0a'x
+	'sendstring eller bara: Markera Text för att markera den senast lästa texten' '0d0a'x
+	exit 0
+end
+else savestr='T '||argument
+if ~open('fil',filnamn,'A') then do
+	'sendstring' '0d0a0a'x'Kunde inte öppna' filnamn '0d0a'x
+	exit 5
+end
+call writeln('fil',savestr)
+

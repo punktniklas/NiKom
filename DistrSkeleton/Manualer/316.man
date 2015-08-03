@@ -1,0 +1,12 @@
+
+
+Radera Lapp
+-----------
+
+Synopsis: Radera Lapp
+
+Beskrivning:
+Raderar den personliga lapp som visas sist varje gång man tar status på
+en person.
+
+Se Även: Ändra Lapp

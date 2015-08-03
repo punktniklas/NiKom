@@ -1,0 +1,11 @@
+
+
+Slå Av
+------
+
+Synopsis: Slå Av <flagga>
+
+Beskrivning:
+Slår av den angivna flaggan samt talar om hur den stod innan.
+
+Se Även: Slå På, Lista Flaggor

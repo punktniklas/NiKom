@@ -1,0 +1,136 @@
+Genom filareorna kan användare skicka program till basen och hämta program
+från den. Idén med filareorna i NiKom är att det i princip bara ska finnas
+en enda area. Om det kommer att finnas program till flera olika datorer så
+kan det vara bra att ha flera areor. För att bringa någon ordning bland
+filerna så används istället något som kallas för nycklar. (Dessa definieras
+i Nycklar.cfg). På en fil kan man sedan sätta en eller flera nycklar.
+
+
+Att skapa filareor
+------------------
+
+För att skapa en area så används kommandot Skapa Area. Då ska man först
+fylla i ett namn på arean. Sedan ska man bestämma om arean ska vara kopplad
+till något möte. Om den är det så får bara de som har tillgång till det
+mötet tillgång till arean. Sedan kan man även ange vilka grupper som ska ha
+tillgång till arean. Om inga grupper anges så har alla grupper tillgång
+till den. Om man anger både ett möte och en eller flera grupper så gäller
+det att man _både_ ska ha tillgång till mötet och vara med i någon av
+grupperna för att få tillgång till arean.
+
+Man kan även ange om användarna ska få ladda upp och/eller ned ned från
+arean. De enda som kan ladda upp till en area dit uploads inte tillåts
+är de som har status LADDAUPP (enligt Status.cfg) eller högre. Samma sak
+gäller för downloads.
+
+Sist av allt ska man välja de kataloger som filerna i filarean ska läggas
+i. Man kan ange maximalt 16 kataloger till en area. Till varje katalog
+anger man även en nyckelkombination. När en fil sedan laddas upp så kommer
+den att hamna i den katalog som har flest överensstämmande nycklar med
+filen. Om flera kataloger har lika många så hamnar filen i den sista. Om
+ingen nyckel stämmer överens någonstans så hamnar alltså filen allra sist.
+Om filen inte skulle få plats i aktuell katalog så väljs en annat ut.
+
+Precis som med grupper och möten så finns det två kommandon som heter 'Ändra
+Area' och 'Radera Area'.
+
+
+Att lista filerna
+-----------------
+
+För att se vilka areor som finns så ger man kommandot 'Lista Areor', eller
+bara 'Areor'. För att sedan hoppa till en area så ger man kommandot 'Byt
+Area'. Om man vill se vilken area man befinner sig i så kan man ge
+kommandot 'Visa Filinfo'.
+
+För att få upp en lista på de filer som finns i den arean man befinner sig
+i så ger man kommandot 'Lista Filer'. Man får då upp en lista där det står
+vad filerna heter, hur stora de är, när de laddades upp, vem uppladdaren
+är, hur många som har laddat ner filen, och på en egen rad en kort
+beskrivning av filen.
+Man kan även ge en nyckel som argument till 'Lista Filer'. Då listas bara
+filer som har den nyckeln satt.
+
+En fil kan ha en längre beskrivning än den korta enradare som syns i en
+vanlig fillista. Om en fil har en längre beskrivning så finns det ett '**>'
+framför den korta beskrivningen. Denna beskrivning kan man få fram med
+kommandot 'Filstatus', då även en del annan information om filen kommer
+upp.
+
+Om man är håller på att leta efter ett speciellt program men inte vill
+titta igenom en lång lista av filer så kan man använda kommandot 'Sök'.
+
+
+Upp och nedladdning av filer
+----------------------------
+
+För att ladda ner en fil från basen så ger man kommandot 'Download' eller
+'Ladda Ner'. För att ladda upp en fil till basen så är det 'Upload' eller
+'Ladda Upp' som gäller.
+
+Filer man själv har laddat upp kan man ändra uppgifter om, och även radera.
+Då använder man kommandona 'Ändra Fil' och 'Radera Fil'.
+
+Man kan även få upp en lista över de filer som kommit sedan man var
+inloggad förra gången med kommandot 'Nya Filer'.
+
+Om sysopen skulle vilja ladda upp en fil lokalt så finns det ett kommando
+som heter 'Skapa Fil'. Se bara till att filen finns i areans katalog
+först.
+Man kan även kika på de nycklar som finns med kommandot 'Lista Nycklar'.
+
+
+Validering av filer
+-------------------
+
+Om VALIDERAFILER i System.cfg är satt till JA så kommer alla filer som
+laddas upp att vara markerade som icke validerade. Detta innebär att bara
+den som har status FILER (enligt Status.cfg) eller högre kan se och använda
+filerna. För att en fil ska lämnas ut till allmänheten så måste den
+valideras. Detta sker med kommandot Validera Fil. (Även Ändra Fil kan
+användas)
+Vitsen med detta är att inte tex piratkopior ska kunna ligga i filarean
+utan att man har hunnit radera dem. Ett sådant här skydd kan bli nödvändigt
+med kommande lagstiftning.
+
+
+Filer med fri download
+----------------------
+
+Enstaka filer kan markeras med fri download. När en sådan fil laddas ned
+så påverkas inte användarens räknare av downloads, ration påverkas inte
+heller.
+
+
+
+Privata Filareor
+----------------
+Det finns även möjlighet att ha privata filareor. Till en privat filarea kan
+vem som helst ladda upp en fil men bara den som äger filarean kan ladda ner
+filer. För att skapa en sådan så ska man helt enkelt göra en katalog som
+heter användarens användarnummer i katalogen 'NiKom:Privat'. Tex om Nisse
+Persson #74 ska ha en privat filarea så ska katalogen NiKom:Privat/74
+skapas.
+
+För att se vad det finns för filer i den privata filarean så använd
+kommandot 'Lista Privatfiler'. Observera! Detta kommando kräver att
+programmet 'ls' finns i C:. Arexx-programmet som sköter detta kan lätt
+modifieras att tex använda 'list' istället.
+ARexx-programmet heter ExtKom513.nik och man ändrar lättast genom att ändra
+raden:
+   address command 'ls >t:Priv'||nod '-l NiKom:Privat/'||pers
+till:
+   address command 'list >t:Priv'||nod 'NiKom:Privat/'||pers
+
+För överföring av filer finns kommandona 'Privat Download' och
+'Privat Upload'.
+Det är meningen att användarna själva ska hålla rent i sina privata
+filareor och radera filer de har laddat ner. Detta görs med kommandot
+'Radera Privatfil'.
+
+I den privata filarean, till skillnad från resten av systemet, så måste
+man ange hela filnamn. Det går alltså inte att förkorta filnamnen.
+
+Det finns ingen automatisk funktion för att rensa bort gamla filer i de
+privata filareorna utan det är tänkt att varje användare själv ska hålla
+rent i sin privata filarea.

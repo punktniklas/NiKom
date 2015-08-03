@@ -1,0 +1,268 @@
+Skapande och underhåll
+----------------------
+Ett möte är det som alla diskussioner sker i. Lämpligt är att ha olika
+möten för olika intresseområden så att användarna själva kan välja vilka
+diskussioner de vill delta i och vilka de helst vill slippa.
+
+För att skapa ett möte så ger man kommandot 'Skapa Möte'. Då kommer man att
+få frågor om hur mötet ska vara. Först så kommer en fråga om vad mötet ska
+heta. Sedan kommer en om hur många texter som ska vara maximalt i mötet.
+Detta bör inte sättas till mer än några hundra. Sedan kommer ett antal
+frågor om mötets typ.
+
+Skrivskyddat:      Då kan bara de som har tillräcklig status (anges i
+                   Status.cfg) skriva texter i mötet. Alla kan dock
+                   kommentera texter.
+
+Kommentarsskyddat: Då kan bara de som har tillräcklig status kommentera
+                   texter. Alla kan dock skriva nya texter.
+
+Slutet:            Då har bara folk som explicit har fått tillstånd
+                   tillgång till mötet. Rättigheter kan man få antingen
+                   genom att vara med i en grupp (se avsnittet om
+                   användargrupper i Övrigt.doc) som har tillgång till mötet
+                   eller genom kommandot 'Addera Rättigheter'.
+
+Hemligt:           Detta kan anges tillsammans med slutet för att bara de
+                   som har tillgång till mötet ska kunna se att det
+                   existerar.
+
+Automatisk medlem: Om denna flagga sätts så blir alla användare medlemmar
+                   automatiskt i mötet. Kan vara bra för tex möten som
+                   Meddelanden från Sysop. Det går heller inte att utträda
+                   ur mötet.
+
+Skrivstyrt:        Detta gör att alla användare kan gå med i mötet och läsa
+                   i det. Dock kan bara de som har rättigheter i mötet
+                   (antingen personliga rättigheter eller genom grupper)
+                   skriva i det.
+
+ARexx-styrt:       Ett möte som är ARexx-styrt kan vanliga användare varken
+                   gå till eller komma till automatiskt (genom att ha olästa
+                   texter). Det kommer heller inte upp i Lista Möten eller
+                   på något annat sätt. Det enda sättet att komma till ett
+                   ARexx-styrt möte är genom ARexx-kommandot 'entermeet'.
+                   Vitsen med detta kan tex vara att varje gång en användare
+                   vill komma till mötet så körs ett litet ARexx-program
+                   som kollar om användaren får det. En användare kan tex ha
+                   rätt att komma till mötet när han/hon har betalt för
+                   support eller så.
+
+Om man har angett mötet som slutet eller skrivstyrt så kommer det nu en
+fråga om vilka grupper som ska ha tillgång till mötet.
+
+Om man vill kan man även ange en MAD (Mötesadministratör) för mötet. Denna
+person har då rätt att addera/subtrahera rättigheter, radera och flytta
+texter i det aktuella mötet.
+
+Varje möte ges ett sorteringsvärde som kan vara mellan 0 och ca 2 miljarder.
+Detta gör att man kan sortera mötena i precis den ordning man vill. När man
+sorterar sina möten första gången kan det vara bra att tänka efter lite och
+göra stora luckor i värdena för att kunna peta in nya möten mitt i lite
+senare. Möten med låga värden sorteras före möten med höga värden.
+Ett nytt möte som skapas sorteras in på rätt ställe direkt. När man ändrar
+ett möte så krävs det dock att NiKServer startas om för att mötet ska hamna
+på rätt ställe.
+
+Man kan när som helst ändra uppgifterna om ett möte genom att ge kommandot
+'Ändra Möte'. Man kan även radera möten med kommandot 'Radera Möte'.
+
+För att ge en person tillgång till ett slutet möte så använder man
+kommandot 'Addera Rättigheter'. Motsatsen heter 'Subtrahera Rättigheter'.
+När man subtraherar rättigheter för en person görs han även till icke medlem
+i mötet.
+
+För att se vilka personer som har personliga rättigheter i ett möte så ger
+man kommandot 'Lista Rättigheter'.
+
+Användande
+----------
+För att se vilka möten som finns så ge kommandot 'Lista Möten'. Om det står
+en stjärna framför namnet så betyder det att man inte är medlem i mötet.
+Annars står det en siffra som indikerar hur många olästa texter som finns i
+mötet. Här kan man även se om mötet är skrivskyddat, slutet osv.
+
+För att kunna använda ett möte och läsa/skriva texter där så måste man vara
+medlem i mötet. Detta gör man med kommandot 'Medlem'. Sedan gäller det att
+man befinner sig i rätt möte. Detta göra man med kommandot 'Gå'. Vill man
+se vilket möte man befinner sig i så ger man kommandot 'Var'. Då får man
+även reda på hur många olästa texter man har i mötet. Om man vill ändra
+antalet olästa texter så använder man kommandot 'Endast'.
+Skulle man sedan inte vilja vara medlem i ett möte längre så använder man
+kommandot 'Utträd'.
+
+Läsande av texter
+-----------------
+Om det finns något möte som man har olästa texter i (och man inte befinner
+sig i det mötet) så kommer det stå i prompten (det som indikerar att man
+ska skriva något) '(Gå till) nästa möte'. Om man nu trycker Return så
+kommer det som står i prompten att hända, dvs man kommer att gå till nästa
+möte som man har olästa texter i. Det kommer att komma upp några rader i
+stil med:
+Du befinner dig nu i Fritt Forum
+Du har 10 olästa texter.
+Nu ändras även prompten till '(Läsa) nästa text'. Om man bara trycker
+Return igen så kommer nu nästa olästa text att visas.
+
+En text består av två delar, texthuvudet och själva texten. I texthuvudet
+finns en hel del information att hämta. Det kan se ut så här:
+
+--------------------------------------------------------------------------
+Text 1873  Möte: Fritt Forum    910815 18:17
+Skriven av Nisse Persson #35
+Kommentar till text 1840 av Pelle Andersson #6
+Ärende: Bussar
+
+Nej, jag tycker att det är alldeles för dyrt att åka buss i stan. Inte
+konstigt att folk väljer bilen istället.
+
+(Slut på text 1873 av Nisse Persson #35)
+  (Kommentar i text 1880 av Pelle Andersson #6)
+--------------------------------------------------------------------------
+Först så står det vilket nummer texten har. Numren är globala för alla
+möten. Sedan står det i vilket möte texten finns, i det här fallet Fritt
+Forum. På nästa rad står det vem som har skrivit texten och på raden efter
+det vilken text som texten är en kommentar till. Om texten inte är en
+kommentar utan en ny text så finns inte denna rad med.
+Sist så står det vad texten har för ärende. Denna rad är till för att
+beskriva kort vad diskussionen handlar om.
+Sedan kommer själva texten och sist en rad som indikerar att texten är slut.
+Allra sist står det en rad som talar om att det finns en kommentar till
+denna text.
+
+Prompten ändras nu ännu en gång till '(Läsa) nästa kommentar'. Trycker du
+nu return så får du läsa kommentaren på en gång (så att man inte tappar
+tråden). När alla kommentarer till texten (och kommentarer till
+kommentarerna och...) är lästa så går prompten tillbaka till att vara
+'(Läsa) nästa text' om det finns flera olästa texter i mötet. Annars så
+blir prompten '(Gå till) nästa möte' igen om det finns flera möten med
+olästa texter i. På detta sätt kan man genom att bara trycka på return läsa
+alla olästa texter i alla möten. Om det inte finns några olästa texter
+längre så blir prompten '(Se) tiden'. Då får man bara fram vad klockan är
+och hur lång tid man har på sig innan man blir utloggad.
+
+Om man får upp en text med som har kommentarer som man inte vill läsa så
+kan man använda kommandot 'Hoppa Över' för att hoppa över dessa. Vill man
+hoppa över alla texter som har samma ärende som den senast lästa texten så
+kan man ge kommandot 'Hoppa Ärende'.
+
+Om man har en hel del olästa texter i ett möte som man inte vill läsa just
+nu utan spara till senare så kan man ge kommandot 'Nästa Möte' för att få
+upp '(Gå till) nästa möte' prompten. Man kan även gå till ett annat möte
+när som helst med kommandot 'Gå'.
+
+Om man precis har läst en text och vill läsa den igen så kan man använda
+kommandot 'Igen'. Skulle man vilja se den text som den senast läste texten
+är en kommentar till så använder man kommandot 'Återse Kommentar'.
+Skulle man vilja läsa en specifik text som man vet textnumret på så kan man
+använda kommandot 'Läsa'. Man kan även skriva bara numret på texten direkt
+så tolkas det som att man vill läsa den texten.
+
+Vet man inte riktigt vad en text har för nummer så kan man använda kommandot
+'Lista Ärende'. Då får man upp en lista över alla texter i mötet, vem som
+har skrivit dem, vad de har för nummer, till vilken text texten är en
+kommentar, när texten skrevs och vad den har för ärende.
+
+
+Skrivande av texter
+-------------------
+Om man vill kommentera en text som man precis har läst så ger man kommandot
+'kommentera'. Det kommer då upp ett texthuvud och sedan kommer man in i
+editorn där man ska skriva sin text. (En beskrivning av editorerna finns
+i filen Editorer.doc.) När man sedan har sparat sin text så
+kommer det fram vilket textnummer den fick och sedan kan man fortsätta med
+läsandet.
+Man kan även kommentera en text som man läste för en liten stund sedan. Då
+skriver man textnumret som ett argument till kommentera.
+
+Skulle man vilja skriva en helt ny text så använder man kommandona 'Skriv'
+eller 'Inlägg'. Innan man gör det ska man dock se till att man befinner sig
+i rätt möte. Förfarandet är detsamma som för att kommentera en text förutom
+att man även ska välja ett ärende till texten. Detta bör på några få ord
+tala om vad hela texten (och en eventuell diskussion) handlar om.
+
+Skulle man ångra sig när man har skrivit en text så kan man radera den. Då
+använder man kommandot 'Radera Text'. Man kan endast radera texter man har
+skrivit själv, såvida man inte har tillräcklig status för att radera andras
+texter (anges i Status.cfg).
+
+Man kan flytta en text till ett annat möte, tex om man tycker att en
+diskussion har bytt ämne såpass mycket att den passar bättre i ett annat
+möte. Man använder då kommandot 'Flytta Text'.
+Skulle man vilja flytta en hel kommentarsgren (en text med alla dess
+kommentarer) så finns kommandot 'Flytta Gren'.
+
+Man kan även göra en personlig kommentar till en text som hamnar i
+brevlådan. Man använder då kommandot 'Personlig'.
+
+
+Raderande av gamla texter
+-------------------------
+Det maximala antalet texter i alla möten är 8192 samtidigt. Vid 'lista
+möten' ser man aktuella siffror på högsta och lägsta text. För att rensa ut
+gamla texter ger man kommandot 'Rensa Texter <antal texter>'. Då kommer de
+<antal texter> lägsta texterna att raderas. Observera att man bara kan
+rensa texter i block om 512 stycken.
+
+Övrigt
+------
+Man kan markera texter för att läsa dem senare. Man använder då kommandot
+'Markera Text'. Sedan när man vill läsa de markerade texterna så ger man
+kommandot 'Visa Markerade'.
+
+Om man vill få upp en lista på vilka möten man har olästa texter i och hur
+många de är så kan man använda kommandot 'Lista Nyheter'. Då får man även
+reda på hur många nya filer det har kommit i olika areor.
+
+Med kommandot 'Mötesstatus' kan man få upp information om ett möte, vem
+som skapat det, när det skapades, vem som är MAD osv. Varje möte kan även
+ha en lapp som då syns efter den andra informationen. Här kan det tex stå
+vad det är tänkt att man ska diskutera i mötet.
+En möteslapp är en fil i katalogen NiKom:Lappar/. Namnet har formen
+<mötesnummer>.motlapp. Tex om mötet Fritt Forum har nummer 3 så ska mötets
+lapp heta NiKom:Lappar/3.motlapp.
+Vilket nummer ett möte har kan man ta reda på med ARexx-funktionen
+NiKParse() (se ARexx.doc).
+
+
+
+                                Brevlådan
+                                =========
+
+Förutom att diskutera saker allmänt så kan man också skriva privata brev i
+Brevlådan.
+
+Varje användare har en egen brevlåda med en egen numrering av breven. Alla
+brevfiler finns i varje användares katalog och försvinner när användaren
+raderas.
+
+För att skriva ett brev kan man antingen använda kommandot 'Brev' eller om
+man vill skicka en personlig kommentar på en text, 'Personlig'. Många
+kommandon som används i mötessystemet fungerar även i brevlådan, tex
+'Kommentera', 'Igen' och 'Återse Kommenterade'. Det finns dock vissa
+skillnader från vanliga möten.
+Ett brev som är ivägskickat går inte att radera, det gäller hålla
+fingrarna i styr när man skriver. 'Lista Ärende' fungerar inte. Istället
+används kommandot 'Lista Brev'. Om man använder 'Lista Brev' utan
+argument så kommer alla brev som är skrivna till en själv upp. Vill man se
+de brev man själv har skrivit så anger man vilken användares brevlåda man
+vill kika i. Tex 'Lista Brev ni pe'.
+
+När man sedan vill läsa brev så är principen densamme. Skriver man bara
+ett brevnummer så läser man ett brev i sin egen brevlåda. Anger man en
+användare efteråt så läser man ett brev i någon annans brevlåda (som man
+själv måste ha skrivit). Tex 'Läsa 123 ni pe'.
+
+Inget brev försvinner automatiskt från systemet utan användarna måste
+själva rensa i sina brevlådor med jämna mellanrum. Detta görs med
+kommandot 'Rensa Brev'
+
+Flera mottagare
+---------------
+Ett brev kan ha flera mottagare för att på så sätt föra små mini-debatter
+i brevlådan. När ett brev kommenteras som har flera mottagare så skickas
+kommentaren iväg till alla tidigare mottagare utom en själv. (Det skickas
+naturligtvis även till den som skrev brevet)
+
+För att addera en mottagare till ett brev så ger man kommandot 'addera' i
+editorn. (Se Editor.doc)

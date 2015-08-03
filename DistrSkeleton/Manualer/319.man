@@ -1,0 +1,11 @@
+
+
+Ändra Grupp
+-----------
+
+Synsopsis: Ändra Grupp <grupp>
+
+Beskrivning:
+Ändrar uppgifterna om den angvina användargruppen.
+
+Se även: Skapa Grupp, Radera Grupp, Lista Medlemmar

@@ -1,0 +1,22 @@
+/* Program för att editera profilen */
+
+parse arg nod person argument .
+
+if argument~='' then do
+        if person=0 then do
+                person=NiKParse(argument,'n')
+                if person<0 then do
+                	'sendstring' '0d0a0a'x||'Finns ingen sån användare.' '0d0a'x
+                end
+        end
+end
+
+signal on ERROR
+profile='NiKom:Users/'||person%100||'/'||person||'/profile'
+
+'edit' profile
+exit
+
+ERROR:
+exit rc
+

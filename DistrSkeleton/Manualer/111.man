@@ -1,0 +1,11 @@
+
+
+Lista Areor, Areor
+------------------
+
+Sysnopsis: Lista Areor
+
+Beskrivning:
+Listar alla de filareor som är tillgängliga för användaren.
+
+Se Även: Lista Filer, Download, Upload, Sök, Byt Area

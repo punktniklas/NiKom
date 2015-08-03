@@ -1,0 +1,12 @@
+
+
+Säg
+---
+
+Synopsis: Säg <användare>
+
+Beskrivning:
+Skickar ett litet meddelande till en person som är inloggad på en annan nod.
+En förutsättning är naturligtvis att den användare man angivit är inloggad
+
+Se Även: Vilka

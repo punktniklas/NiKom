@@ -1,0 +1,93 @@
+I katalogen RexxTools ligger ett antal ARexx-program. Dessa är ingen direkt
+del av NiKom och krävs inte för dess fungerande. De kan dock vara trevliga
+att använda ibland. Alla programmen körs igång från en Shell. Tex
+
+ 1> rx sta sysop
+
+De programmen som finns är:
+
+countusers.rexx
+---------------
+Räknar helt enkelt igenom hur många användare det finns i basen.
+
+
+fil.rexx
+--------
+Syntax: fil <filnamn>
+
+Är praktiskt att använda tillsammans med exempelvis Snap. Man kanske vet en
+fil som ligger i filarean och som man skulle vilja titta närmare på. Men
+arean den ligger i har flera kataloger kopplade till sig och det står ju
+inget i fillistan om vilken katalog en fil ligger i.
+Det här programmet skriver ut filnamnet, beskrivningen och den fullständiga
+sökvägen (färdig att snappas).
+
+OBS! Detta program hittar endast filer i area nummer 0, vilket förvisso är
+lätt att ändra.
+
+
+filer.rexx
+----------
+Syntax: filer <area>
+
+Ger helt enkelt en vanlig fillista över den angivna arean.
+
+
+FindMissMan.rexx
+----------------
+Syntax: FindMissMan
+
+Ett praktiskt program om man har gjort en massa egna kommandon till basen
+men inte riktigt har kolla på vilka man har skrivit en manual-fil. Detta
+program går igenom Kommandon.cfg och skriver ut de kommandon som finns där
+men saknar manualfil.
+
+
+InstallExtKom.rexx
+------------------
+Syntax: InstallExtKom.rexx <filnamn>
+
+Ett program som gör att man enkelt kan installera ett ARexx-program som
+någon annan har gjort i Kommandon.cfg. Argumentet är den fil som är själva
+ARexx-programmet, denna fil ska helst inte redan ligga i NiKom:Rexx. Detta
+program kollar upp namn, nummer och antal ord från headern i filen och
+frågar sedan om sådana saker som status, antal dagar osv.
+När detta är gjort kopieras filen till NiKom:Rexx och får rätt namn (filen
+behöver alltså inte heta ExtKomxxxx.nik från början). Om det finns en
+manualfil i den katalog man befinner sig så kopieras den till
+NiKom:Manualer.
+Det nya kommandot skrivs in sist i Kommandon.cfg och till sist kan man låta
+NiKServer läsa in konfigurationsfilerna om man vill.
+
+
+lise.rexx
+---------
+Syntax: lise [<antal>]
+
+Listar de <antal> senaste inloggningarna, vem som var inloggad, hur många
+texter som skrevs och hur många filer som laddades upp. Om man inte anger
+något antal så används 10.
+
+
+nfil.rexx
+---------
+Syntax: nfil <filnamn>
+
+Ett program som enbart är tänkt att användas med backticks (som bara finns
+under AmigaOS 2.0, se Using the System Software för mer information).
+Programmet skriver bara ut den fullständiga pathen till filen. Ett exempel:
+
+ 1> lha x `rx nfil bootx`
+
+Detta skulle packa upp filen som passar in på 'bootx' och ligger i area
+nummer 0.
+
+OBS! Detta program hittar bara filer som ligger i area 0, något som
+förvisso är lätt att ändra.
+
+
+sta.rexx
+--------
+Syntax: sta <användare>
+
+Ger helt enkelt statusen på den angivna användaren.

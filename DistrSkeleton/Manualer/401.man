@@ -1,0 +1,11 @@
+
+
+Byt Area
+--------
+
+Synopsis: Byt Area <areanamn>
+
+Beskrivning:
+Förflyttar användaren till en annan filarea.
+
+Se Även: Lista Areor, Visa Filinfo, Lista Filer

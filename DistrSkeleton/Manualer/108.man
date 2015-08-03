@@ -1,0 +1,19 @@
+
+
+Lista Ärende
+------------
+
+Synopsis: Lista Ärende [-f] [-t] [<textnummer>]
+
+Beskrivning:
+Listar alla texter i det mötet man befinner sig i för tillfället. Texterna
+listas från den nyaste till den äldsta och följande information finns:
+Vem som skrev texten, vilket nummer den har, vilken text den är en kommentar
+till (eller ett '-' om det inte är någon kommentar), när den skrevs och vad
+texten har för ärende.
+Flaggan '-f' gör så att texterna listas framlänges istället för baklänges.
+Flaggan '-t' gör så att bara texter som inte är en kommentar till någon text
+visas.
+Om man anger ett nummer så börjar listan från och med det nummret.
+
+Sä Även: Läs, Lista Möten

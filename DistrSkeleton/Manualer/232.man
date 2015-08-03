@@ -1,0 +1,12 @@
+
+
+Mötesstatus
+-----------
+
+Synopsis: Mötesstatus <möte>
+
+Beskrivning:
+Ger information omm det angivna mötet. Om en möteslapp finns för mötet
+visas den sist.
+
+Se Även: Lista Möten

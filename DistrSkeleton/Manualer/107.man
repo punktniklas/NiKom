@@ -1,0 +1,15 @@
+
+
+Lista Nyheter
+-------------
+
+Synopsis: Lista Nyheter
+
+Beskrivning:
+Visar de möten som användaren har olästa texter, hur många det är i varje
+möte samt det totala antalet olästa texter. Efter mötena följer de filareor
+som det kommit nya filer i. Om flaggan 'Nya Filer vid Lista Nyheter' är
+satt så visas istället en lista över filerna istället för att bara tala om
+hur många det är.
+
+Se Även: Lista Möten, Endast, Nya Filer

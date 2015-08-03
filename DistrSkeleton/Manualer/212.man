@@ -1,0 +1,17 @@
+
+
+Läsa
+----
+
+Synopsis: [Läsa] <textnummer>
+
+Beskrivning:
+Visar den angivna texten. Observera att man inte behöver skriva 'Läsa' utan
+det räcker med bara textnummret.
+
+För texter i de lokala mötena så räcker det att vara i något lokalt möte
+(inte nödvändigtvis det texten finns i) när man ger kommandot. För Fido-
+möten måste man dock vara i rätt möte. Samma sak gäller brevlådan; för att
+läsa ett brev måste man befinna sig i brevlådan.
+
+Se Även: Lista Ärende

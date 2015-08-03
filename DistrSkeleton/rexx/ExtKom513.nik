@@ -1,0 +1,16 @@
+/* Program för att lista privata filer */
+
+parse arg nod pers .
+
+if ~exists('NiKom:Privat/'||pers) then do
+	'sendstring' '0d0a0a'x'Du har ingen privat filarea!' '0d0a'x
+	exit
+end
+
+address command 'list >t:Priv'||nod||' NiKom:Privat/'||pers||' nohead'
+
+'sendstring' '0d0a0a'x
+'sendtextfile t:Priv'||nod
+'sendstring' '0d0a'x
+
+address command 'delete t:Priv'||nod||' QUIET'

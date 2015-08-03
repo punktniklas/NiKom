@@ -1,0 +1,11 @@
+
+
+Type
+----
+
+Synopsis: Type <filnamn>
+
+Beskrivning:
+Visar en textfil i filarean på skärmen.
+
+Se Även: Download, Lista Filer, Sök

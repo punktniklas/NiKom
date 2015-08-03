@@ -1,0 +1,12 @@
+
+
+Ändra Möte
+----------
+
+Synopsis: Ändra Möte <möte>
+
+Beskrivning:
+Ändrar på det angivna mötet. Man kan ändra alla uppgifter som man fyllde i
+när man skapade det. Kan bara utföras av den som skapat mötet eller sysop.
+
+Se Även: Radera Möte, Skapa Möte

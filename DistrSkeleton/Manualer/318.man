@@ -1,0 +1,13 @@
+
+
+Skapa Grupp
+-----------
+
+Synopsis: Skapa Grupp [<gruppnamn>]
+
+Beskrivning:
+Skapar en ny användargrupp. Kommandot frågar efter namn (om detta inte
+angivits på kommandoraden), om gruppen ska vara hemlig samt vid vilken
+status man automatiskt blir medlem i gruppen.
+
+Se Även: Lista Grupper

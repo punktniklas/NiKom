@@ -1,0 +1,13 @@
+
+
+Flytta Fil
+----------
+
+Synopsis: Flytta Fil <fil> [area]
+
+Beskrivning:
+Flyttar en fil från en area till en annan. Flyttar även den fysiska
+filen. Detta kommando bör endast vara tillgängligt för Sysop/Cosysop.
+
+Om man anger area så kommer den att flytta filen till arean, annars
+frågar den vilken area du vill flytta filen till.

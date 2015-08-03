@@ -1,0 +1,11 @@
+
+
+Addera Gruppmedlem
+------------------
+
+Synopsis: Addera Gruppmedlem [<användare>]
+
+Beskrivning:
+Gör en angiven användare till medlem i en angiven användargrupp.
+
+Se Även: Lista Grupper

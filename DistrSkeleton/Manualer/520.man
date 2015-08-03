@@ -1,0 +1,36 @@
+
+
+Sortera Möten
+------------
+
+Synopsis: Sortera Möten
+
+Beskrivning:
+Sortera upp möten som du vill. (för sysop endast)
+
+Dessa olika knappar kan användas i programmet:
+
+Pil upp för att flytta markören ett steg upp
+Pil ner för att flytta markören ett steg ner
+
+'q' för att avsluta UTAN att spara
+'w' för att avsluta och SPARA inställningarna.
+'a' för att flytta mötet upp ett steg
+'z' för att flytta mötet ner ett steg
+'j' för att flytta mötet högst upp och flytta markören till det
+'m' för att flytta möte längst ner och flytta markören till det
+'h' för att flytta mötet högst upp men låt markören vara kvar
+'n' för att flytta möte längst ner men låt markören vara kvar
+'s' för att sortera mötena efter sorteringsvärde
+'x' för att ändra sorteringsvärdena på mötena efter
+    ett givet startvärde och sen med vissa steg.
+'v' för att ändra sorteringsvärde på det aktuella mötet
+'8' Flytta markören ett steg upp
+'2' Flytta markören ett steg ner
+'9' Flytta markören till föregående sida
+'3' Flytta markören till nästa sida
+'7' Flytta markören till den första posten
+'1' Flytta markören till den sista posten
+
+Notera att alla ändringar som görs här kommer inte att börja gälla
+förrän nikservern är omstartad.

@@ -1,0 +1,12 @@
+
+
+Börja Om
+--------
+
+Sysnopsis: Börja Om
+
+Beskrivning:
+Loggar ut användaren men istället för att lägga på så visas
+inloggningstexten och man kan logga in på nytt. Detta kommando kan
+viserligen användas lokalt men fyller bara en funktion när man ringer till
+basen.

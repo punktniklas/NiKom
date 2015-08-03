@@ -1,0 +1,18 @@
+
+
+Lista Filer, Filer
+------------------
+
+Synopsis: Lista Filer [-] [<nyckel>]
+
+Beskrivning:
+Listar de filer som finns i den arean man befinner sig i just nu. Filerna
+listas i omvänd tidsordning dvs de nya filerna visas först.
+
+Anges ett streck (-) så visas bara de filer som inte är validerade. (Är
+man vanlig användare visas inga filer alls eftersom de inte kan se icke
+validerade filer.)
+
+Anges en nyckel listas bara filer som har den nyckeln satt.
+
+Se Även: Lista Areor, Visa Filinfo, Byt Area, Sök, Upload, Download

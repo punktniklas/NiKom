@@ -1,0 +1,42 @@
+/* Program för att göra privat download */
+
+options results
+parse arg nod pers fil
+
+filerattskicka = ''
+
+if ~exists('NiKom:Privat/'||pers) then do
+	'sendstring' '0d0a0a'x'Du har ingen privat filarea!' '0d0a'x
+	exit
+end
+
+if fil = "" then do
+	'sendstring' '0d0a0a'x'Skriv: Privat Download <filnamn> ...' '0d0a'x
+	exit
+end
+
+if pos('/',fil) | pos(':',fil) then do
+	'sendstring' "0d0a0a"x"Du kan inte ha '/' i filnamnet!" "0d0a"x
+	exit
+end
+
+do i=1 to words(fil)
+	if ~exists('NiKom:Privat/'||pers||'/'||word(fil,i)) then do
+		'sendstring' '0d0a0a'x'Filen' fil 'finns inte i din filarea!' '0d0a'x
+		exit
+	end
+	else do
+		filerattskicka = filerattskicka||'NiKom:Privat/'||pers||'/'||word(fil,i)||' '
+	end
+end
+
+if filerattskicka='' then do
+	'sendstring' '0d0a0a'x'Fanns inga filer att skicka...' '0d0a'x
+	exit
+end
+
+filerattskicka = left(filerattskicka,length(filerattskicka)-1)
+
+'sendbinfile '||filerattskicka
+
+say rc result

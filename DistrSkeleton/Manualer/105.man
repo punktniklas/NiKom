@@ -1,0 +1,15 @@
+
+
+Lista Rättigheter
+-----------------
+
+Synopsis: Lista Rättigheter
+
+Beskrivning:
+Ger en lista på alla som har rättighet alt inte har rättighet att bli medlem
+i det mötet användaren befinner sig just nu.
+
+Observera att detta kommando tar en stund eftersom informationen inte
+ligger i minnet utan måste hämtas från hårddisken.
+
+Se Även: Var, Lista Möten, Lista Medlemmar

@@ -1,0 +1,14 @@
+
+
+Medlem
+------
+
+Synopsis: Medlem <möte> | -a
+
+Beskrivning:
+Gör användaren till medlem i det angivna mötet om han har rättighet att
+bli det.
+Med flaggan '-a' blir man medlem i alla möten man har rättighet att bli
+medlem i.
+
+Se Även: Utträd, Lista Möten

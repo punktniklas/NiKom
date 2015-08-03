@@ -1,0 +1,12 @@
+
+
+Lista Nycklar
+-------------
+
+Synopsis: Lista Nycklar
+
+Beskrivning:
+Listar alla söknycklar som finns. Söknycklar används för att hitta filer av
+ett visst slag.
+
+Se Även: Sök, Lista Filer

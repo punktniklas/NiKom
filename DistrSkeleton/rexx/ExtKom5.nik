@@ -1,0 +1,27 @@
+/* Program för att packa ihop och skicka en grabfil */
+
+parse arg nod pers .
+
+options results
+
+address command 'lha a t:Kärkigrab'||nod||'.lha t:grab'||nod
+
+nisse=1
+do while nisse=1
+	'sendbinfile t:Kärkigrab'||nod||'.lha'
+	pelle=result
+	if pelle=100 then exit
+	if pelle = 0 then do
+		'sendstring' '0d0a0a'x'Vill du försöka en gång till? (lämpligen Zmodem Resume) '
+		'yesno j n 1'
+		pelle=result
+		if pelle=100 then exit
+		if pelle=0 then nisse=0
+	end
+	else nisse=0
+end
+
+if exists('nikom:privat/'||pers) then do
+	address command 'copy t:Kärkigrab'||nod||'.lha nikom:privat/'||pers
+end
+address command 'delete >nil: t:Kärkigrab'||nod||'.lha t:grab'||nod

@@ -1,0 +1,9 @@
+
+
+Manual
+
+Synopsis: Manual <kommando>
+
+Beskrivning:
+Kommandot du kör just nu. Ger en liten beskrivning över det angivna
+kommandot.

@@ -1,0 +1,44 @@
+/* Program för att radera privat fil */
+
+options results
+
+parse arg nod pers filer
+
+if ~exists('NiKom:Privat/'||pers) then do
+	'sendstring' '0d0a0a'x'Du har ingen privat filarea!' '0d0a'x
+	exit
+end
+
+if filer = "" then do
+	'sendstring' '0d0a0a'x'Skriv: Radera Privatfil <filnamn>' '0d0a'x
+	exit
+end
+
+if filer = "-a" then do
+	sendstring '0d0a0a'x
+	sendstring 'Är du verkligen säker att du vill radera alla filerna? '
+	'yesno j n 2'
+	svar = result
+	if svar then do
+		sendstring 'Ja!' '0d0a'x
+		runfifo 'delete NiKom:Privat/'||pers||'#?'
+	end
+	else do
+		sendstring 'Nej.'
+	end
+	exit
+end
+
+sendstring '0d0a0a'x
+
+do i=1 to words(filer)
+	fil = word(filer,i)
+
+	if ~exists('NiKom:Privat/'||pers||'/'||fil) then do
+		'sendstring' 'Filen' fil 'finns inte i din filarea!' '0d0a'x
+	end
+	else do
+		address command 'delete >nil: NiKom:Privat/'||pers||'/'||fil
+		sendstring 'Raderar filen '||fil '0d0a'x
+	end
+end

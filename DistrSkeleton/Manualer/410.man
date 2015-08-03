@@ -1,0 +1,12 @@
+
+
+Ändra Fil
+---------
+
+Synopsis: Ändra Fil <filnamn>
+
+Beskrivning:
+Ändrar på infon om en fil i filarean. Man kan bara ändra på filer man själv
+har laddat upp såvida man inte är sysop.
+
+Se Även: Radera Fil, Lista Filer, Sök

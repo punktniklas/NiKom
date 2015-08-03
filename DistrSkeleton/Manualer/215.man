@@ -1,0 +1,13 @@
+
+
+Addera Rättigheter
+------------------
+
+Synopsis: Addera Rättigheter <användare>
+
+Beskrivning:
+Ger den angivna användaren rättighet att bli medlem i det möte man befinner
+sig i. Kan endast utföras av den personen som skapade mötet, MAD eller av
+sysop.
+
+Se Även: Subtrahera Rättigheter
