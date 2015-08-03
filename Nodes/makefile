@@ -11,6 +11,11 @@ MENYOBJS    = menyversion.o ServerComm.o Terminal.o MenyFuncs.o NiKFuncs2.o \
               NiKFiles.o MenyBrev.o MenyOrgMeet.o MenyFidoMeet.o _tzset.o \
               Meny1.o sprakstrings.o noansi.o
 
+NIKVERSION      = `/GetNiKomVersion.rexx Version /NiKVersion.txt`
+NIKKOMREVISION  = `/GetNiKomVersion.rexx KOMRevision /NiKVersion.txt`
+NIKMENYREVISION = `/GetNiKomVersion.rexx MenyRevision /NiKVersion.txt`
+
+
 all: NiKomCon NiKomSer MenyCon MenySer
 
 install: all
@@ -111,9 +116,8 @@ NiKTransfer.o: NiKTransfer.c /Include/NiKomStr.h
 NiKConTrans.o: NiKConTrans.c
   sc $(FLAGS) NiKConTrans.c OBJNAME=NiKConTrans.o
 
-NiKVersion.o: NiKVersion.c ServerComm.c Terminal.c NiKFuncs.c NiKFuncs2.c NiKFuncs3.c NiKFuncs4.c NiKFuncs5.c NiKEditor.c NiKRexx.c NiKFiles.c NiKVersion.c Brev.c OrgMeet.c FidoMeet.c /nikversion
-  ;sc $(FLAGS) DEFINE=NIKVERSION="$(NIKVERSION)" DEFINE=NIKREVISION="$(NIKREVISION)" NiKVersion.c
-  nikversion 1 "sc $(FLAGS) NiKVersion.c OBJNAME=NiKVersion.o"
+NiKVersion.o: NiKVersion.c /NiKVersion.txt
+  sc $(FLAGS) DEFINE=NIKVERSION=$(NIKVERSION) DEFINE=NIKREVISION=$(NIKKOMREVISION) NiKVersion.c
 
 NiKOffline.o: NiKOffline.c /Include/NiKomStr.h
   sc $(FLAGS) NiKOffline.c OBJNAME=NiKOffline.o
@@ -153,9 +157,8 @@ Meny1.o: Meny1.c /Include/NiKomStr.h /Include/NiKomLib.h MenyStr.h sprakstrings.
 sprakstrings.o: sprakstrings.c sprakstrings.h
   SC $(FLAGS) sprakstrings.c OBJNAME=sprakstrings.o
 
-menyversion.o: menyversion.c MenyFuncs.c MenyBrev.c MenyOrgMeet.c MenyFidoMeet.c sprakstrings.c noansi.c /nikversion
-  ;sc $(FLAGS) DEFINE=NIKVERSION="1" DEFINE=NIKREVISION="1" MenyVersion.c
-  nikversion 3 "sc $(FLAGS) MenyVersion.c OBJNAME=menyversion.o"
+menyversion.o: menyversion.c /NiKVersion.txt
+  sc $(FLAGS) DEFINE=NIKVERSION=$(NIKVERSION) DEFINE=NIKREVISION=$(NIKMENYREVISION) MenyVersion.c
 
 noansi.o: noansi.c
   SC $(FLAGS) noansi.c OBJNAME=noansi.o

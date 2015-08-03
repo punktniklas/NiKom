@@ -2,6 +2,9 @@ CPU=68020
 FLAGS = NMINC STRMERGE CPU=$(CPU) DEBUG=FULL IDIR=/Include
 OBJS = Ser.o /Nodes/SerialIO.o /Nodes/Terminal.o /Nodes/ServerComm.o Modem.o Rexx.o Stuff.o Version.o
 
+NIKVERSION   = `/GetNiKomVersion.rexx Version /NiKVersion.txt`
+NIKREVISION  = `/GetNiKomVersion.rexx PreNodeRevision /NiKVersion.txt`
+
 all: PreNode
 
 setup:
@@ -28,5 +31,5 @@ Rexx.o: Rexx.c /Include/NiKomstr.h
 Stuff.o: Stuff.c /Include/NiKomstr.h
   sc $(FLAGS) Stuff.c
 
-Version.o: Version.c /Include/NiKomstr.h /nikversion
-  nikversion 0 "sc $(FLAGS) Version.c"
+Version.o: Version.c /NiKVersion.txt
+  sc $(FLAGS) DEFINE=NIKVERSION=$(NIKVERSION) DEFINE=NIKREVISION=$(NIKREVISION) Version.c

@@ -16,7 +16,7 @@ void nikversion(void)
 	int libver, librev;
 	char rel[20];
 	GetNiKomVersion(&libver,&librev,rel);
-	sprintf(outbuffer,"\n\n\rNiKom %s © Tomas Kärki 1996-1998, Niklas Lindholm 1992-1996\r\n",rel);
+	sprintf(outbuffer,"\n\n\rNiKom %s © Tomas Kärki 1996-1998, Niklas Lindholm 1990-1996\r\n",rel);
 	puttekn(outbuffer,-1);
 	sprintf(outbuffer,"KOM-nod v%d.%d\r\n",atoi(NIKVERSION),atoi(NIKREVISION));
 	puttekn(outbuffer,-1);

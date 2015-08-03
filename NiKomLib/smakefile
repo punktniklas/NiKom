@@ -1,8 +1,12 @@
 OBJS    = LibInit.o UserLibInit.o Matrix.o Rexx.o Lock.o ReadFidoText.o Echo.o \
           NodeTypes.o Conf.o Version.o Terminal.o ServerComm.o Hash.o UserInfo.o \
           Misc.o PrgCat.o Texter.o Crypt.o FCrypt.o
-SCFLAGS = STREQ STRINGMERGE NOSTKCHK LIBCODE UNSIGNEDCHAR
+SCFLAGS = STREQ STRINGMERGE NOSTKCHK LIBCODE UNSIGNEDCHAR IDIR=/Include
 DEBUG   = DEBUG=LINE
+
+NIKRELEASE  = `/GetNiKomVersion.rexx Release /NiKVersion.txt`
+NIKVERSION  = `/GetNiKomVersion.rexx Version /NiKVersion.txt`
+NIKREVISION = `/GetNiKomVersion.rexx LibraryRevision /NiKVersion.txt`
 
 all :  nikom_pragmas.h nikom.library
 
@@ -24,7 +28,14 @@ nikom_pragmas.h : nikom.fd
 		delete nikom_pragmas.tmp
 
 nikom.library : $(OBJS) nikom.fd
-	nikversion 5 "slink TO Debug/nikom.library NOICONS FROM lib:libent.o $(OBJS) LIBPREFIX _LIB LIBFD nikom.fd LIB lib:sc.lib lib:amiga.lib BATCH NOALVS SMALLCODE SMALLDATA"
+   slink TO Debug/nikom.library NOICONS \
+         FROM lib:libent.o $(OBJS) \
+         LIBPREFIX _LIB LIBFD nikom.fd \
+         LIB lib:sc.lib lib:amiga.lib \
+         BATCH NOALVS SMALLCODE SMALLDATA \
+         LIBVERSION $(NIKVERSION) \
+         LIBREVISION $(NIKREVISION) \
+         LIBID "nikom.library $(NIKVERSION).$(NIKREVISION)"
 	slink Debug/nikom.library TO NoDebug/nikom.library NODEBUG NOICONS
 
 LibInit.o      : LibInit.c      nikom.fd
@@ -45,8 +56,11 @@ NodeTypes.o    : NodeTypes.c    nikom.fd /Include/NiKomLib.h /Include/NiKomStr.h
 
 Conf.o         : Conf.c         nikom.fd /Include/NiKomLib.h /Include/NiKomStr.h
 
-Version.o      : Version.c LibInit.o UserLibInit.o Matrix.o Rexx.o Lock.o ReadFidoText.o Echo.o NodeTypes.o Conf.o Terminal.o ServerComm.o Hash.o UserInfo.o Misc.o PrgCat.o Texter.o Crypt.o FCrypt.o /nikversion
-	nikversion 2 "sc $(SCFLAGS) $(DEBUG) Version.c"
+Version.o      : Version.c /NiKVersion.txt
+   sc $(SCFLAGS) DEFINE=NIKRELEASE=$(NIKRELEASE) \
+               DEFINE=NIKLIBVERSION=$(NIKVERSION) \
+               DEFINE=NIKLIBREVISION=$(NIKREVISION) \
+               Version.c
 
 Terminal.o     : Terminal.c     nikom.fd /Include/NiKomLib.h /Include/NiKomStr.h
 

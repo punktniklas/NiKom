@@ -3,7 +3,7 @@
 
 extern struct System *Servermem;
 
-/* char dosversion[]="\0$VER: NiKServer " NIKSERVERVERSION "." NIKSERVERREVISION " " __AMIGADATE__; */
+char dosversion[]="\0$VER: NiKServer " NIKSERVERVERSION "." NIKSERVERREVISION " " __AMIGADATE__;
 
 void GetServerversion(void)
 {

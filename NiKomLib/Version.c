@@ -2,8 +2,8 @@
 #include <dos/dos.h>
 #include <string.h>
 #include <stdlib.h>
-#include "/Include/NiKomStr.h"
-#include "/Include/NiKomLib.h"
+#include "NiKomStr.h"
+#include "NiKomLib.h"
 #include "NiKomBase.h"
 #include "funcs.h"
 

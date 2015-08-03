@@ -2,6 +2,9 @@ CPU   = 68020
 FLAGS = NMINC STRMERGE CPU=$(CPU) DEBUG=FULL IDIR=/Include
 OBJS  = NiKServer.o NiKHost.o NiKHost2.o NiKHost3.o NiKSerVersion.o NodeComm.o
 
+NIKVERSION  = `/GetNiKomVersion.rexx Version /NiKVersion.txt`
+NIKREVISION = `/GetNiKomVersion.rexx ServerRevision /NiKVersion.txt`
+
 all: NiKServer
 
 setup:
@@ -32,8 +35,8 @@ NiKHost2.o: NiKHost2.c /Include/NiKomStr.h
 NiKHost3.o: NiKHost3.c /Include/NiKomStr.h
   sc $(FLAGS) NiKHost3.c
 
-NiKSerVersion.o: NiKSerVersion.c NiKServer.o NiKHost.o NiKHost2.o NiKHost3.o NodeComm.o /nikversion
-  nikversion 4 "sc $(FLAGS) NiKSerVersion.c"
+NiKSerVersion.o: NiKSerVersion.c NiKServer.o NiKHost.o NiKHost2.o NiKHost3.o NodeComm.o /NiKVersion.txt
+  sc $(FLAGS) DEFINE=NIKSERVERVERSION=$(NIKVERSION) DEFINE=NIKSERVERREVISION=$(NIKREVISION) NiKSerVersion.c
 
 NodeComm.o: NodeComm.c /Include/NiKomStr.h
   sc $(FLAGS) NodeComm.c

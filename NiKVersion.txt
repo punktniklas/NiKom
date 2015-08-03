@@ -1,0 +1,7 @@
+Release: v1.61beta2
+Version: 20
+ServerRevision: 50
+LibraryRevision: 50
+KOMRevision: 50
+MenyRevision: 50
+PreNodeRevision: 50
