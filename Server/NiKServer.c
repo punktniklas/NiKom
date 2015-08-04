@@ -373,10 +373,6 @@ void getconfig(void) {
 		if(buffer[0]=='J' || buffer[0]=='j') Servermem->cfg.cfgflags |= NICFG_CRYPTEDPASSWORDS;
 		else Servermem->cfg.cfgflags &= ~NICFG_CRYPTEDPASSWORDS;
 	}
-	if(getcfgfilestring("MAXPRGDATACACHE",fh,buffer)) {
-		Close(fh);
-		return;
-	} else Servermem->cfg.maxprgdatacache=atoi(buffer);
 	Close(fh);
 	printf("System.cfg inläst\n");
 }

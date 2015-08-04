@@ -195,7 +195,7 @@ struct AutoRexxCfg {
 struct Config {
    struct Statuscfg st;
    struct AutoRexxCfg ar;
-   long defaultflags, diskfree, logmask, cfgflags, maxprgdatacache;
+   long defaultflags, diskfree, logmask, cfgflags;
    short maxtid[101],logintries;
    char uldlratio[101],inaktiv[101],defaultrader,
       defaultprotokoll,defaultstatus,brevnamn[41],ny[21],ultmp[100],
