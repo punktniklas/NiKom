@@ -9,20 +9,6 @@
 #include <exec/semaphores.h>
 #endif /* EXEC_SEMAPHORES_H */
 
-/*
-#ifndef FIFOLIB_PRAGMAS_H
-#include <pragmas/fifolib_pragmas.h>
-#define FIFOLIB_PRAGMAS_H
-#endif
-
-#ifndef PPC_SYSBASEFIX
-	#define PPC_SYSBASEFIX
-	#ifdef _PPC
-	extern struct ExecBase *SysBase;
-	#endif
-#endif
-*/
-
 #include <time.h>
 
 /* Från nod till server */
@@ -245,12 +231,6 @@ struct Kommando {
    		vilkainfo[50],logstr[50],menu[50];
 };
 
-/* struct SysInfo {
-   long hightext,lowtext,inloggningar,skrivna,lasta,uloads,dloads,
-      radbytes,lowbrev,highbrev,radbytesbrev,users;
-   short nycklar,kommandon,moten,areor;
-}; */
-
 struct SysInfo {
    long hightext,lowtext,inloggningar,skrivna,lasta,uloads,dloads,
       radbytes,lowbrev,highbrev,radbytesbrev,users;
@@ -263,19 +243,6 @@ struct UserGroup {
    char namn[41],flaggor,autostatus,nummer;
    int groupadmin;
 };
-
-/* För senare användning
-struct SayString {
-   struct MinList say_list;
-   long fromuser;
-   struct SayString *NextSay;
-};
-
-struct SayRad {
-   struct MinNode say_node;
-   char string[81];
-};
-*/
 
 struct SayString {
    int fromuser;
@@ -355,16 +322,6 @@ struct NodeType {
 	int nummer;
 	char path[50],desc[80];
 };
-
-/* Kanske ska tas över av ProgramData istället???? Fast då måste
-   ProgramDatan bli _STABIL_ först!!! TK: 981122
-
-struct UserCache {
-	struct User Usercached;
-	time_t LatestUsedUserCache;
-	int usernumber;
-};
-*/
 
 struct ProgramDataCache
 {
