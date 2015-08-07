@@ -9,3 +9,5 @@ I don't know what the activity on this will be going forward and if there are ot
 3. The "swenglishness" of the code should be reduced over time. The code should as far as possible be in English and not in Swedish.
 
 I have used a clone of the hard drive contents of my old Amiga 3000 now running in FS-UAE to compile NiKom. It's running AmigaOS 3.1 and the C compiler is SAS/C 6.56. There may be assumptions in the build files that only applies to my environment. This will need to be fixed as discovered and needed.
+
+NiKom is published as open source under the MIT License. See LICENSE.txt.
