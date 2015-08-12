@@ -1,0 +1,28 @@
+del NiKomBinDistr.lha
+
+cd NiKomLib
+smake clean
+smake
+cd /
+
+cd InitNiKom
+smake clean
+smake
+cd /
+
+cd PreNode
+smake clean
+smake
+cd /
+
+cd Server
+smake clean
+smake
+cd /
+
+cd Nodes
+smake clean
+smake
+cd /
+
+lha a NiKomBinDistr.lha NiKomLib/NoDebug/* InitNiKom/InitNiKom PreNode/NoDebug/68020/* Server/NoDebug/68020/* Nodes/NoDebug/68020/*
