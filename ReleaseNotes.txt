@@ -1,0 +1,599 @@
+---------------------------------------------------------------------------
+                         NiKom v1.61, 2015-08-xx
+---------------------------------------------------------------------------
+
+- Datum på tvåtusentalet skrivs nu ut korrekt.
+
+Finns det någon lista över övriga förändringar??
+
+---------------------------------------------------------------------------
+                         NiKom v1.60, 1998-10-05 (?)
+---------------------------------------------------------------------------
+
+Uppdelat på alla alfor, betor och pre-releases.
+
+v1.60 final
+- Installationsprogrammet lägger upp sakerna korrekt i s:user-startup numera.
+- Manualen uppdaterad med bla. ny info om vad man gör efter att
+  installationen av NiKom är klar.
+- Profiles kommandona som följde med var gamla och fungerade därmed inte
+  som de skulle. De använde NiKom:Profiles/<anvnummer>.profile istället
+  för NiKom:Users/<anvnummer>%100/anvnummer/profile som det ska vara.
+  Detta är numera ordnat.
+
+v1.60prerel3
+- Några program för NiKoms FidoNet support adderade till bin katalogen.
+- NiKom klarade inte väldigt långa rader i text-filer förut, numera
+  klarar den av radera som är upptill 1023 tecken långa vilket bör
+  räcka långt.
+- Gå-kommandot är förbättrat och säger inte längre att man inte är
+  medlem i ett möte man försöker gå till utan frågar istället om man
+  vill bli medlem i mötet i fråga.
+
+v1.60prerel2
+- Ganska mycket förbättrat installationsprogram.
+
+v1.60prerel1
+- Nytt ARexx-kommando CheckUserPassword().
+- Nytt ARexx-kommando Getnumber().
+- Nytt ARexx-program för att sortera möten, dvs. på ett mycket enklare
+  sätt ordna upp mötena i den ordning som du, sysop vill ha dem!
+- TextInfo() returnerar nu -3 om en text är raderad.
+- Kryptering av användarnas lösenord, valfritt för sysop.
+  Ny option för detta i NiKom:Datocfg/System.cfg. (CRYPTEDPASSWORDS=JA)
+  Kör CryptPasswords från biblioteket för att kryptera alla användares
+  lösenord! (kör inte detta om du inte vill använda krypterade lösenord)
+  Installationsprogrammet hjälper dig med detta!
+- Nytt kommando SPARA!
+  Det är internt och har nummer = 328.
+  Sparar alla inställningar för användaren som är inloggad! (dvs vilka
+  texter som var lästa)
+- Programdata förbättrat, data fältet nu utökat till 80 tecken istället
+  för 40 som det var förut. Har även implementerat så att den inte försöker
+  använda längre strängar än vad som är tillåtet. (>40 tecken
+  orsakade förut en krasch)
+- Det finns en ny flagga som gör att varje användare kan välja
+  om de vill ha stjärnor när de skriver in lösenord eller ej.
+- Det finns en ny option till Getstring",
+  STARECHO. Det man skriver in ekas med en stjärna.
+- Defaultorigin är nu implementerat när man skapar nya Fidonet möten!
+- Nytt ARexx kommando! ChgMeet
+- Nytt ARexx kommandot! NextPatternFile
+- NiKom skickar inte längre två radbyten innan en fidotext om
+  flaggan om rensar skärmen innan man läser texter är påslagen.
+- NiKom räknar nu antalet rader bättre. (kunde ibland visa antal rader
+  innan <RETURN> prompten dök upp.
+- Programmet skickar nu CTRL-C till program som körs via FIFO om carriern
+  tappas. (osäker om detta verkligen fungerar dock)
+- Arexx-funktionen SendNodesMess() är fixad för höga nodnummer.. (över 15)
+
+v1.60beta4 (970430) 
+- ARexx-kommandot Edit" skickar numera en radmatning innan man börjat
+  editera mot tre förut. Tänk på att ni måste ändra detta i program
+  som använder edit!
+- Två nya ARexx-kommandon Marktextread() och Marktextunread()
+- Varje grupp har nu en grupp administratör. Dvs en användare som
+  får lägga till användare till gruppen och ta bort användare
+  som är med i gruppen.
+  Det finns även en ny option i NiKom:Datocfg/status.cfg som anger
+  vilken status det behövs för att man ska få göra detta.
+  Detta kräver också att man minskar statusen som krävs för att köra
+  de olika grupp kommandona i NiKom:Datocfg/kommandon.cfg
+- Flytta fil kommandot är vesäntligt förbättrat.
+  Flyttar numera även långa beskrivningen, kollar så att man inte
+  försöker flytta till samma area och arean man befinner sig i syns
+  inte i area-listan som visas om man trycker ? på area frågan.
+  Kollar även så att användaren har nog med status för att flytta filen
+  dvs. att han är sysop eller uppladdare av filen.
+- Editorn tar nu in 78 tecken per rad istället för 76 som förut.
+- Sök kommandot klarar numera av att söka globalt i alla areor om man
+  vill det.
+- Status kommandot kunde visa fel antal olästa texter på en användare
+  som inte är inloggad om det rensats texter sen han var inloggad.
+  Detta är numera fixat!
+
+v1.60beta3 (970309)
+- Arearight funktionen returnerade att man hade rättigheter till en
+  area även om arean var raderad.
+- Det gick inte att lägga/ta bort långa beskrivningar med ChgFile()
+  det ska nu gå bra att göra detta.
+- Man kan nu se i vilka hur länge en nod har varit inaktiv när ingen är
+  inloggad eller hur länge en nod varit uppringd men ingen loggat in
+  på den ännu.
+  ARexx-funktionen NodeInfo() hanterar även detta.
+- ARexx funktionen NextUnread() läser nu från
+  minnet om en användare är inloggad och inte alltid från disk.
+  (Dvs den går nu alltid efter det korrekta antal olästa texter och inte
+  som förut att man alltid får antalet olästa som man hade när man
+  senast loggade ut)
+- ARexx-funktionen edit ska inte tappa det 76:e tecknet när det läser in
+  en textfil.
+- ARexx-funktionen DeleteFile()
+  raderar nu även den långa beskrivningen om en fil har en lång beskrivning.
+- Man kan nu gå upp till föregående rad med backspace även om det är
+  ett tecken på sista kolumnen i raden ovanför!
+- Om man skrev en lång rad utan mellanslag så tappades det 76:e tecknet
+  bort.
+- KeyInfo() avslutade alltid nyckelnamnet med carrier
+  return ("\n", ASCII-värde 13) vilket den inte gör längre!
+- När man skapar en area så skapas numera biblioteken man angett för arean,
+  detta gäller även när man ändrar en area. Dessutom så skapas också
+  ett longdesc bibliotek under areans bibliotek. Detta bör lösa problem
+  med långa beskrivningar när man skapar nya areor och inte själv skapar
+  biblioteket och longdesc biblioteket.
+- Man kan nu ställa in hur länge en användare får vara inaktiv innan han
+  blir utloggad för varje nod.
+  Lägg in följande rad i sernode.cfg: (default är som förut 5 minuter om
+  den inte finns)
+  INACTIVETIME=tid (tid är tiden i minuter som man får vara inaktiv innan
+  man blir utloggad)
+- Man kan nu skriva in ca 1000 tecken vid prompten. Kommandohistorien är
+  också anpassad för detta!
+- Man kan nu använda wildcards när man ska gå med eller gå ur möten!
+- Man kan nu använda wildcards med kommandot lista möten också.
+- Man kan nu ange -a som argument till utträd kommandot för att gå ur
+  alla möten.
+- Man kan nu använda CTRL-A för att gå till början av raden och CTRL-E
+  för att gå till slutet av raden i getstring, detta gick bara i editorn
+  förut.
+- Två nya ARexx-kommandon. AddProgramData() och GetProgramData().
+- Har snabbat upp parsning av kommandon litegranna. Märks VÄLDIGT mycket
+  på vissa datorer! (iaf på Fabbes A4000!)
+  CA 20ggr snabbare på Fabians dator!
+
+v1.60beta2 (960915)
+- ARexx-funktionen SysSettings() hette av misstag SystemInfo detta är nu fixat.
+  Kommandot heter numera alltså korrekt SysSettings och du måste ändra
+  i alla ARexx-scripts som använder SystemInfo.
+- ARexx-funktionen TextInfo() returnerar nu -3 om en text är raderad.
+- SysInfo fungerade inte riktigt som den skulle, vilket kunde ge flera entries med
+  samma hastighet om man körde prenoden hela tiden, dvs inte via TrapDoor eller
+  dylikt program. Detta är numera fixat!
+- Kommandohistory buffern rensas numera efter att man har loggat ut från
+  CON-noden. (SER-noden fungerade redan förut)
+- Försökte man lägga upp saker i en nyskapad area så kom inte filen upp i arean.
+  Det kunde även orsaka en hängning om man hade otur.
+- ARexx-program som körs vid prompterna behöver inte längre ha något speciellt
+  nummer.
+- Har förbättrat dokumentationen för några ARexx-funktioner litegranna.
+- Det följer nu med ett flytta fil kommando som fungerar med det nya
+  filsystemet.
+- Det finns nu ny funktion tillagd i ARexx-interfacet för att flytta filer
+  mellan areor MoveFile().
+- Kommandot ChgFile() i ARexx interfacet klarar numera
+  även av att ändra uppladdningstid på en fil.
+
+v1.60beta1, släppt 960729 
+- Areaparsningen fungerade inte riktigt bra. Försökte man byta till en
+  area som matchade flera areor och man inte hade tillgång till den
+  första så fick man ett meddelande "arean finns inte" även om man
+  hade rättigheter till en eller flera areor som passade in men låg
+  längre ner i listan.
+- Det finns nu stöd för Batch upload. (uppladdning av flera filer efter
+  varandra.)
+- Inga fler .nikfile utan använder istället datafiler, dvs mycket snabbare
+  inläsning av filerna vid uppstart av NiKom!
+  Inläsning av filer på Kärkis BBS uppsnabbat från 10-15min --> 13 sek!
+- Man kan inte ange negativa argument till Rensa Brev.
+- Det syns numera idle-tid + olästa meddelanden i Vilka -v.
+- Mötesinfo ger mer info vid Fido-möten. Tex katalog för .msg-filer.
+- Man kan använda Shift-Pilvänster resp Shift-pilhöger för att flytta
+  sig till början av raden rsp slutet av raden på de flesta ställena i NiKom.
+- Man kan nu se antal upladdade Bytes/KB och nerladdade Bytes/KB i status
+  kommandot. Dock ej implementerat i NiKom internt så man måste köra
+  något ratio paket som stödjer detta för att det ska användas på ett
+  vettigt sätt.
+- NiKom ska inte krascha när man kör ARexx-program vid prompterna längre!
+  Detta hände mycket sällan men när det väl hände så var det inte så kul.
+  OBS! För att ARexx-program som körs vid prompterna ska fungera korrekt
+  så måste de ha ett nummer under 500.
+- ARexx-funktionen Sendrawfile finns numera även i Prenoden.
+
+1.60megaalfa6, släppt 951107 
+- Nodernas fönster kan vara ner till 10 pixlar i y-led.
+- Även Prenode och NiKomCon har den feta kanten på fönstret underst.
+- Prenoden ska inte längre krascha om man stänger den när serieporten är
+  stängd.
+- Nu skrivs det ut "^C\n\r" när man trycker Ctrl-C i en textutmatning.
+- Koll inlagd så att man inte kan försöka radera 0 eller ett negativt
+  antal brev.
+- När NiKomCon startas sätts dess ConnectBPS-värde i Servern till -1.
+- När man skulle skapa en area så nollades inte minnet först. Det görs nu.
+- Arexx-kommandot Edit returnerade de binära värden 0 och 1 istället för
+  ASCII-tecknena '0' och '1' som den borde. Detta är åtgärdat.
+- Det första kommandot i kommandolistan ska inte längre få en extra
+  linefeed i slutet.
+- Bugg som gjorde så att ramlib kraschade när den skulle ladda in
+  nikom.library när man har systemet librarybaser väldigt högt upp i
+  minnet fixad.
+
+1.60megaalfa5, släppt 950630 
+
+- En bugg fixad där man alltid kunde kommentera i skrivstyrda möten om
+  man använde "kommentera" utan argument.
+- Variablerna som lagrar automagiska Arexx-program ökade från short till
+  long så att man kan ha värden högre än 32767.
+- Rutinen som strippar ANSI-koder buggfixad av Christian Almgren.
+- Antalet texter som kan hanteras utökat från 8192 till 32768.
+
+1.60megaalfa4, släppt 950xxx 
+- NiKom klagar på fler tecken i filnamn nu. Nämligen *, #, ?, :. /, (, ),
+  [, ] och mellanslag.
+- CreateFile() kan returnera två nya värden. -5 när filnamnet innehåller
+  ogiltiga tecken och -6 när det är för långt.
+- Man kan nu sätta citationstecken runt ett filnamn för att få NiKom att
+  skippa parsningen och bara jämföra filnamnen exakt.
+- Man ska nu kunna skriva "säg <anvnamn>,<meddelande>".
+- PreNoden ska klara av att man släpper carriern när man ska välja
+  teckenset.
+- Det ska gå att crasha personliga kommentarer till Fido-texter.
+- Info-kommando ska nu klara av svenska bokstäver ordentligt.
+- Man ska kunna skriva texter i Fido-möten som ännu saknar HWM.
+  Det förutsätts dock då att lägsta textnummer är nummer 2. (Om
+  ingen text finns får den nya texten nummer 2.)
+- Ett nytt litet program, SetNodeState, ersätter GetRelLine. Syntaxen är:
+   SetNodeState <nodnr> [SERCLOSED] [NOANSWER] [LOGOUT]
+  Nodnummer kan vara -1 för att påverka samtliga noder.
+  SERCLOSED gör att devicet stängs när ingen användare är inloggad.
+  NOANSWER  gör att PreNoden inte reagerar på RING eller CONNECT.
+  LOGOUT    gör att användaren på noden loggas ut bums. (Oavsett var i
+            systemet han befinner sig.
+  Observera att om en option inte anges så kommer dess negering att
+  användas. Dvs om man först gör SERCLOSED och sedan NOANSWER så kommer
+  devicet öppnas igen.
+- Det ska inte längre gå att kommentera i skrivstyrda möten man inte har
+  rättigheter i.
+- En ny ARexx-funktion, SendNodeMessage(), för att skicka säg-meddelanden
+  till noder.
+
+1.60megaalfa3 
+- Buggen som fick alla flertydiga kommandon att skrivas på samma rad fixad.
+- Har tagit bort lite kod från initialiseringen av modemen. Den fungerar
+  nu ungefär som förut.
+- När man parsar ett möte med en tom sträng blir det inte längre första
+  mötet i listan.
+
+1.60megaalfa2 
+- Fifon fungerar igen
+- Nytt fält i Kommandon.cfg. G=<gruppnamn> gör att bara den gruppen kan
+  utföra kommandot. Man kan ha godtyckligt antal G-rader per kommando.
+- Carriersläpp ska upptäckas bättre vid download.
+- NiKParse() ska parsa möten på samma sätt som noderna nu.
+- Nya användare ska få välja nodtyp.
+- Nya användare får ställa in rätt teckenset direkt.
+- Lite flashig info tillagt i Prenoden. :-)
+- Man kan ange ett argument mellan 1 och 4 till Byt Teckenset för att
+  ange vilket man vill ha.
+
+1.60megaalfa 
+- NiKom ska inte krascha längre om man ger ett jättelångt argument till Sök.
+- Servern ska inte hänga sig med "Stack overflow" om RexxMast inte är igång.
+- Nytt kommando (#327), Byt TeckenSet för att välja mellan ISO Latin,
+  PC8, Mac eller SF7.
+
+
+---------------------------------------------------------------------------
+                          NiKom v1.51, 1995-01-15 (?)
+---------------------------------------------------------------------------
+
+- NiKServer ska inte längre krascha om nikom.library inte går att öppna.
+
+- Man ska nu kunna skapa Grupper igen. En skojig liten bugg gjorde att
+  man bara kunde skapa grupper som redan fanns. Det ska dessutom gå att
+  skapa grupper även om en grupp med det högsta möjliga numret finns.
+  (Förutsatt att det finns luckor längre ned i numreringen..)
+
+- Den extra raden med ett namn när man skickade säg som blev längre än
+  en rad är borta.
+
+- Förhoppningsvis ska det inte komma några <RETURN> nu när folk håller
+  på att logga ut.
+
+- Börja Om fungerar igen.
+
+- Man kan få en hel massa mer information med MeetInfo().
+
+- Man kan få ut vilka grupper en användare är med i med UserInfo().
+
+- Man kan få ut vilka grupper en area och ett möte är kopplade till.
+  (Med AreaInfo() resp MeetInfo())
+
+- Om man skriver 'Medlem -a' så ska man inte få en massa olästa texter
+  i de Fido-möten man är med i.
+
+- ANSI-färger strippades inte i NiKomCon om färg-flaggan var avslagen,
+  det ska det göras nu.
+
+- Ett nytt fält i System.cfg, LOCALCOLOURS, styr om det ska vara några
+  färger i NiKomSer-fönstrena. Denna fungerar helt oberoende av hur
+  användarna har ställt färg-flaggan.
+
+- Skrivstyrda möten ska fungera ordentligt nu.
+
+- Ny versionsnumrering på de olika komponenterna i NiKom. Det finns nu tre
+  nummer att hålla reda. Realese-nummer kommer fortsätta på den gamla
+  numreringen. Den är 1.51 för den här versionen.
+  Versionsnummer är ett heltal som är detsamma för alla komponenter i samma
+  release. Man kunde inte ha så höga nummer som 151 så det fick bli (helt
+  slumpmässigt :-) V17 för 1.51.
+  Revisionsnummer är även detta ett heltal som är individuellt för varje
+  komponent. I skrivande stund är tex nikom.library 17.3.
+
+- När inloggningstexten så sätts nu flaggorna till de värden som är
+  inställda i System.cfg. (Som nya användare får) Vid namnprompten
+  ändras ISO-flaggan så att både ISO och SF7 accepteras. Övriga
+  flaggor lämnas intakta.
+
+- Datumformatet ska vara mer korrekt för Fido-texter.
+
+
+---------------------------------------------------------------------------
+                          NiKom v1.50, 1994-12-29 (?)
+---------------------------------------------------------------------------
+- FidoNet med allt vad det innebär.
+
+- Man kan ställa in i System.cfg hur många försök att logga in en
+  användare ska få göra innan man slängs ut. (Förut var det hårdkodat
+  3)
+
+- Vilka-kommandot är förbättrat. Om man bara kör 'Vilka' så får man upp
+  Nodnummer, Nodid (som anges i Node.cfg) och namn. Ger man argumentet
+  '-v' får man även reda på vilken hastighet användaren är inloggad
+  på och vad han gör. I Kommandon.cfg anger man för varje kommando
+  med fälttet 'W=' vad det ska stå i Vilka när kommandot körs.
+  De som startar NiKomSer via TrapDoor måste även ange flaggan
+  -C<connecthastighet> för att infon ska komma med i Vilka.
+
+- Ett nytt ARexx-kommando 'setnodeaction' för att få en godtycklig
+  sträng att visas i Vilka-kommandot.
+
+- Ett antal nya fält i Kommandon.cfg
+  F - Vad som ska hamna i loggfilen när komamndot utförs. Om F är satt
+      till 'spelar Hack'n Slash' så kommer loggfilen att se ut såhär:
+      940509 22:36 - Niklas Lindholm (sysop) #0 spelar Hack'n Slash
+
+  ( - Ett nummer på ett ARexx-program som ska köras innan kommandot
+      utförs.
+
+  ) - Ett nummer på ett ARexx-program som ska köras efter kommandot
+      utförs.
+
+- ARexx-funktionerna KeyInfo() och GetDir().
+
+- Stöd för olika nodtyper. I den nya filen DatoCfg/NodeTypes.cfg anger
+  man vilka nodtyper som finns tillgängliga.
+
+- NiKomSer kan inte längre startas från Shell. Istället använder man
+  ett nytt program, PreNode. Denna tar emot namn och lösenord och
+  startar den nodtyp som användaren önskar. Registrering av nya användare
+  sker även i PreNoden. PreNode har ett bantat ARexx-interface. Följande
+  kommandon finns kvar: sendstring, getstring, sendtextfile, getchar,
+  chkbuffer, yesno, setlinecount och sendchar. (Alla funktioner ligger
+  i Servern och är naturligtvis tillgängliga).
+  NiKomCon fungerar precis som det gjort tidigare.
+
+- Man kan inte längre skapa flera grupper med samma namn.
+
+- Antal rader för en ny användare initialiseras innan NyAnv.txt skrivs
+  ut istället för efter.
+
+- Fullskärmseditorn accepterar även LF (ASCII 10, $0a) som radbrytning
+  och inte bara CR (ASCII 13, $0d).
+
+- Mötesstatus visar nu mötets nummer istället för max texter, som aldrig
+  har använts.
+
+- En ny ARexx-funktion, DelOldTexts(antal) som rensar ut <antal> texter
+  från systemet.
+
+- ARexx-kommandot 'SendRawFile' som skickar en fil helt omodifierat. Inga
+  pauser för antal rader och dyl görs.
+
+- I MeetInfo() kan man ange 'M' för att få reda på vem som är MAD i mötet.
+
+- Sök skriver ut "Inga filer hittade" om inga filer hittades.
+
+- En ny flagga för att kunna slippa automatiska meddelanden om att folk
+  loggar in och ut.
+
+- En ny flagga för (ANSI)färger.
+
+- Om man försöker ändra till en för lång beskrivning med ChgFile() så
+  trunkeras strängen.
+
+- NodeInfo() är utbyggt för att kunna ge information om vad användarna
+  gör på de olika noderna.
+
+- UserInfo() har fått ett nytt subject, 'z', för att få reda på hur många
+  olästa brev en användare har. Siffran man får är numret på senaste lästa
+  brev + 1. Om brevet med detta nummer finns så är detta alltså oläst.
+
+- Lista Nyheter kan nu avbrytas med Ctrl-C.
+
+- Ett nytt ARexx-kommando, changelatestinfo, för att ändra i det som kommer
+  att hamna i 'Lista Senaste'.
+
+
+---------------------------------------------------------------------------
+                        NiKom v1.4711, 1994-03-28 (?)
+---------------------------------------------------------------------------
+
+- Man kan avbryta långa filbeskrivningar med Ctrl-C
+
+- Vem som helst kan inte radera möten längre.
+
+- <RETURN> ska komma upp även när NiKomSer precis har startats.
+
+- NiKom ska inte missa nedladdningar om överföringen avbryts.
+
+- Jag hoppas att NiKom räknar rader bättre vid fillistningar.
+
+- När man står längst till höger på en rad (som är längst ner på skärmen)
+  och trycker pil höger ska Term scrolla ordentligt.
+
+- Mitt experiment med UUCico där man loggade in som "blutti" är borta.
+
+- Kommandohistorian rensas innan namnprompten.
+
+- Cps-värdet syns hela tiden vid filöverföringar.
+
+- ARexx-kommandot RunRawFifo
+
+- Brevpekaren ska uppdateras ordentligt efter Rensa Brev.
+
+- När man ger 'Endast' vi en 'Nästa Kommentar'-prompt så kommer det
+  alltid fram en 'Du befinner dig i..'.
+
+- Förhoppningsvis lite säkrare koll av nyckeln.
+
+- NiKom kommer ihåg var i historiebuffern man befinner sig. Om man vill
+  utföra samma kommando igen är det bara att trycka pil upp. Dessutom
+  kan man alltid rensa kommandoraden med pil ner numera.
+
+- Inaktivitetskollen ska fungera även vid -Getty.
+
+- Det kommer upp en hjälptext vid editorerna om flaggan 'Ingen automagisk
+  hjälptext' är avslagen. (Ja, flaggan är omdöpt)
+
+- ARexx-programmet som kan köras när carriern släpps ska fungera
+  även vid -Getty.
+
+- En liten informativ rad vid 'Lista Medlemmar' och 'Lista Rättigheter'
+  är tillagd.
+
+- NiKom ska inte hänga sig om man raderar mötet man befinner sig i. (Man
+  ska hamna i brevlådan istället.)
+
+- Default-värdet för ny inloggning i NiKomCon är numera Ja.
+
+- ARexx-kommandot Edit returnerar 1 om texten sparades och 0 om den
+  kastades bort.
+
+- Man ska inte längre kunna ladda upp en fil med samma namn som en
+  ovaliderad fil.
+
+- När man gör 'Endast' i brevlådan ska det bara komma upp en 'Du befinner
+  dig i...'.
+
+- Man kan diskreditera användare som är inloggade.
+
+- TAG_DONE tillagt till OpenWindowTags(). (Skäms som en hund över att ha
+  missat det :-). Ska förmodligen förhindra en hel del Enforcerhits.
+
+- Den förvirrande texten 'Inget protokoll inställt' är borta från
+  kommandot 'Visa Filinfo'. (Egentligen saknar kommandot funktion nuförtiden
+  men finns kvar om någon skulle ha vant sig vid att använda det)
+
+- Om man är längst ut på en rad i fullskärmseditorn skickas det inte längre
+  en ANSI-sekvens för att stoppa in ett nytt tecken utan bara själva tecknet.
+  Detta bör avhjälpa en del problem med ASCII-send till fullskärmseditorn.
+
+- Den som har laddat upp en fil kan se och manipulera den även om den inte
+  är validerad.
+
+- Lista Nyheter ska inte ta med ovaliderade filer när den räknar efter hur
+  många nya filer det finns i en area.
+
+- Vid Radera Area kommer frågan upp med ordentlig radmatning.
+
+- Ett nytt subject för AreaInfo(), 'f', för att få reda på dess flaggor.
+
+- Fältet för "Senast inloggad" nollställs för nya användare.
+
+- Byt Area ska klara av att hantera situationen när man inte befinner sig
+  i någon area och anropar kommandot utan argument.
+
+- Man kan nu (äntligen!) addera folk till möten medan de är inloggade.
+
+- CreateText() ska inte längre kunna producera texter med för långa rader.
+  Övriga systemet ska också bättre klara av de texter som har för långa
+  rader.
+
+- Om en användare misslyckas med att ge rätt namn och lösen tre gånger så
+  slängs han ut.
+
+- Lista Medlemmar -g kan avbrytas med Ctrl-C.
+
+
+---------------------------------------------------------------------------
+                         NiKom v1.47, 1994-01-05 (?)
+---------------------------------------------------------------------------
+
+- Man ska inte kunna flytta texter till skyddade möten längre.
+
+- UserInfo() och ChgUser() ska inte blanda ihop värden mellan olika
+  användare längre.
+
+- SysInfo() ska ge rätt värde vad gäller högsta mötesnummer.
+
+- Man kan för varje möte ange ett sorteringsvärde (mellan 0 och ca 2
+  miljarder) och på så sätt sortera om möteslistan.
+
+- Istället för "Error serial" kommer nu en vettigare felbeskrivning.
+
+- ARexx-kommandot 'sendstring' returnerar nu ett boolskt värde.
+  1 = Utskriften blev avbruten (med Ctrl-C)
+  0 = Utskriften blev inte avbruten
+
+- Inget Ctrl-C skickas åt något håll när carriern släpps under en Fifo-
+  session.
+
+- Fönstrena är character-mappade. Dvs, innehållet koms ihåg även när man
+  minskar ner dem. (Tack till Christer Gessler för påvisandet av hur enkelt
+  det är...)
+
+- Kommandoraden rensas när man trycker pil-ned vid sista historieraden.
+
+- Filer som läses in i editorn klipps efter 77 kolumner istället för 79
+  för att undvika skumheter i editorn med icke-overscan.
+
+- En bugg i 'showtext' fixad som gjorde att den vägrade visa texter.
+  Dessutom slänger 'lasttext' ur sig både vilket textnr och vilket möte
+  det handlar om. Markara Text bör fungera nu pga av detta.
+
+- Sorteringsvärdet syns i mötesstatus.
+
+- Två nya kommandon i ARexx-interfacet för att manipulera tiden.
+  'extratime' gör att man kan ändra tiden en användare har på sig denna
+  inloggning.
+  'gettime' används för att få reda på hur mycket tid användaren har kvar.
+
+- Man kan sätta förbud för att ladda upp och/eller ner på en area.
+
+- Filer kan förses med flaggan 'Fri download'. Användarens download räknas
+  då inte upp när filen laddas ned.
+
+- Alla filer som laddas upp eller skapas med CreateFile() markeras som
+  icke validerade (om så anges i System.cfg). Bara de användare som har
+  status FILER (i Status.cfg) kan se och ladda ner ovaliderade filer.
+  Ett nytt kommando 'Validera Fil' sköter om detta. (Även 'Ändra Fil' klarar
+  biffen). Både 'Lista Filer' och 'Nya Filer' kan ges argumentet '-'. Då
+  listas enbart ovaliderade filer.
+
+- ExtKom5.nik har ändrats så att man lättare kan lägga in namnet på sin
+  BBS för att skapa unika offdown-filer.
+
+- ExtKom509.nik (Lista Innehåll) har ändrats för att man enkelt ska kunna
+  lägga till nya arkivformat och ställa in vilka program man vill använda
+  för att lista arkiven.
+
+- En ny ARexx-funktion, ChgMeetRight(), för att ändra rättigheter i möten
+  har tillkommit.
+
+- Ett nytt ARexx-kommando, SendChar, för att skriva ett enda tecken. Detta
+  kommando klarar av att skriva ut ett ensamt mellanslag.
+
+- Ändrade pil-ner i fullskärmseditorn så Term borde klara av att scrolla
+  fram text som ligger nedanför skärmen.
+
+- Ett nytt subject till FileInfo(). 'f' för att kunna se filflaggorna.
+
+- Nu ska de f-n i mig inte gå att kommentera i kommentarsskyddade möten.
+
+- Det markeras i fillistan om en fil är ovaliderad (V) och har fri DL (F).
+
+- En ny ARexx-funktion, ChgFile().
+
+- ExtKom15.nik tar nu även bort privata filareor.
+
+- Byt Area talar om var man är om man inte ger några argument.
