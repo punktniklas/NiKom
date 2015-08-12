@@ -46,7 +46,8 @@ void logevent(char *str) {
 	char logbuf[150];
 	time(&tid);
 	ts=localtime(&tid);
-	sprintf(logbuf,"%2d%02d%02d %02d:%02d - %s\n",ts->tm_year,ts->tm_mon+1,ts->tm_mday,ts->tm_hour,ts->tm_min,str);
+	sprintf(logbuf,"%4d%02d%02d %02d:%02d - %s\n", ts->tm_year + 1900,
+                ts->tm_mon + 1, ts->tm_mday, ts->tm_hour, ts->tm_min,str);
 	if(!(fh=Open(Servermem->cfg.logfile,MODE_OLDFILE))) {
 		if(!(fh=Open(Servermem->cfg.logfile,MODE_NEWFILE))) {
 			printf("Kunde inte öppna logfilen!\n");

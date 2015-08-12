@@ -360,10 +360,14 @@ void status(void) {
 	sprintf(outbuffer,"Antal rader          : %d\r\n",readuserstr.rader);
 	if(puttekn(outbuffer,-1)) return;
 	ts=localtime(&readuserstr.forst_in);
-	sprintf(outbuffer,"Först inloggad       : %2d%02d%02d  %02d:%02d\r\n",ts->tm_year,ts->tm_mon+1,ts->tm_mday,ts->tm_hour,ts->tm_min);
+	sprintf(outbuffer,"Först inloggad       : %4d%02d%02d  %02d:%02d\r\n",
+                ts->tm_year + 1900, ts->tm_mon + 1, ts->tm_mday, ts->tm_hour,
+                ts->tm_min);
 	if(puttekn(outbuffer,-1)) return;
 	ts=localtime(&readuserstr.senast_in);
-	sprintf(outbuffer,"Senast inloggad      : %2d%02d%02d  %02d:%02d\r\n",ts->tm_year,ts->tm_mon+1,ts->tm_mday,ts->tm_hour,ts->tm_min);
+	sprintf(outbuffer,"Senast inloggad      : %4d%02d%02d  %02d:%02d\r\n",
+                ts->tm_year + 1900, ts->tm_mon + 1, ts->tm_mday, ts->tm_hour,
+                ts->tm_min);
 	if(puttekn(outbuffer,-1)) return;
 	sprintf(outbuffer,"Total tid inloggad   : %d:%02d\r\n",readuserstr.tot_tid/3600,(readuserstr.tot_tid%3600)/60);
 	if(puttekn(outbuffer,-1)) return;

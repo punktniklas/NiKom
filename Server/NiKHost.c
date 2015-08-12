@@ -222,7 +222,9 @@ void userinfo(struct RexxMsg *mess) {
 				ts = localtime(&Servermem->inne[nodnr].forst_in);
 			else
 				ts=localtime(&userinfouser.forst_in);
-			sprintf(str,"%02d%02d%02d %02d:%02d",ts->tm_year,ts->tm_mon+1,ts->tm_mday,ts->tm_hour,ts->tm_min);
+			sprintf(str,"%4d%02d%02d %02d:%02d",
+                                ts->tm_year + 1900, ts->tm_mon + 1, ts->tm_mday,
+                                ts->tm_hour, ts->tm_min);
 			break;
 		case 'c' : case 'C' :
 			if(usrloggedin)
@@ -241,7 +243,9 @@ void userinfo(struct RexxMsg *mess) {
 				ts=localtime(&Servermem->inne[nodnr].senast_in);
 			else
 				ts=localtime(&userinfouser.senast_in);
-			sprintf(str,"%02d%02d%02d %02d:%02d",ts->tm_year,ts->tm_mon+1,ts->tm_mday,ts->tm_hour,ts->tm_min);
+			sprintf(str,"%4d%02d%02d %02d:%02d",
+                                ts->tm_year + 1900, ts->tm_mon + 1, ts->tm_mday,
+                                ts->tm_hour, ts->tm_min);
 			break;
 		case 'f' : case 'F' :
 			if(usrloggedin)
@@ -424,7 +428,9 @@ void motesinfo(struct RexxMsg *mess) {
 			break;
 		case 't' : case 'T' :
 			ts=localtime(&motpek->skapat_tid);
-			sprintf(str,"%02d%02d%02d %02d:%02d",ts->tm_year,ts->tm_mon+1,ts->tm_mday,ts->tm_hour,ts->tm_min);
+			sprintf(str,"%4d%02d%02d %02d:%02d",
+                                ts->tm_year + 1900, ts->tm_mon + 1, ts->tm_mday,
+                                ts->tm_hour,ts->tm_min);
 			break;
 		case 'y' : case 'Y' :
 			sprintf(str,"%d",motpek->type);
@@ -509,11 +515,6 @@ void chgmote(struct RexxMsg *mess)
 			ok = 1;
 			motpek->status = atoi(mess->rm_Args[3]);
 			break;
-/*		case 't' : case 'T' :
-*			ok = 1;
-*			ts=localtime(&motpek->skapat_tid);
-*			sprintf(str,"%02d%02d%02d %02d:%02d",ts->tm_year,ts->tm_mon+1,ts->tm_mday,ts->tm_hour,ts->tm_min);
-*			break; */
 		case 'y' : case 'Y' :
 			ok = 1;
 			motpek->type = atoi(mess->rm_Args[3]);
@@ -624,7 +625,9 @@ void senaste(struct RexxMsg *mess) {
 			break;
 		case 'g' : case 'G' :
 			ts=localtime(&Servermem->senaste[nummer].utloggtid);
-			sprintf(str,"%02d%02d%02d %02d:%02d",ts->tm_year,ts->tm_mon+1,ts->tm_mday,ts->tm_hour,ts->tm_min);
+			sprintf(str,"%4d%02d%02d %02d:%02d",
+                                ts->tm_year + 1900, ts->tm_mon + 1, ts->tm_mday,
+                                ts->tm_hour, ts->tm_min);
 			break;
 		case 'l' : case 'L' :
 			sprintf(str,"%d",Servermem->senaste[nummer].read);
@@ -1145,7 +1148,9 @@ void filinfo(struct RexxMsg *mess) {
 			break;
 		case 'e' : case 'E' :
 			ts=localtime(&filpek->senast_dl);
-			sprintf(str,"%02d%02d%02d %02d:%02d",ts->tm_year,ts->tm_mon+1,ts->tm_mday,ts->tm_hour,ts->tm_min);
+			sprintf(str,"%4d%02d%02d %02d:%02d",
+                                ts->tm_year + 1900, ts->tm_mon + 1, ts->tm_mday,
+                                ts->tm_hour, ts->tm_min);
 			break;
 		case 'f' : case 'F' :
 			sprintf(str,"%d",filpek->flaggor);
@@ -1164,7 +1169,9 @@ void filinfo(struct RexxMsg *mess) {
 			break;
 		case 't' : case 'T' :
 			ts=localtime(&filpek->tid);
-			sprintf(str,"%02d%02d%02d %02d:%02d",ts->tm_year,ts->tm_mon+1,ts->tm_mday,ts->tm_hour,ts->tm_min);
+			sprintf(str,"%4d%02d%02d %02d:%02d",
+                                ts->tm_year + 1900, ts->tm_mon + 1, ts->tm_mday,
+                                ts->tm_hour, ts->tm_min);
 			break;
 		case 'u' : case 'U' :
 			sprintf(str,"%d",filpek->uppladdare);
@@ -1236,7 +1243,9 @@ void areainfo(struct RexxMsg *mess) {
 			break;
 		case 't' : case 'T' :
 			ts=localtime(&Servermem->areor[nummer].skapad_tid);
-			sprintf(str,"%02d%02d%02d %02d:%02d",ts->tm_year,ts->tm_mon+1,ts->tm_mday,ts->tm_hour,ts->tm_min);
+			sprintf(str,"%4d%02d%02d %02d:%02d",
+                                ts->tm_year + 1900, ts->tm_mon + 1, ts->tm_mday,
+                                ts->tm_hour, ts->tm_min);
 			break;
 		default :
 			str[0]=0;

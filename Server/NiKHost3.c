@@ -354,10 +354,6 @@ void rexxchgmeet(struct RexxMsg *mess)
 		case 's' : case 'S' :
 			motpek->status = atoi(mess->rm_Args[2]);
 			break;
-/*		case 't' : case 'T' :
-			ts=localtime(&motpek->skapat_tid);
-			sprintf(str,"%02d%02d%02d %02d:%02d",ts->tm_year,ts->tm_mon+1,ts->tm_mday,ts->tm_hour,ts->tm_min);
-			break; */
 		case 'y' : case 'Y' :
 			motpek->type = atoi(mess->rm_Args[2]);
 			break;
@@ -559,7 +555,7 @@ void rexxdumptext(struct RexxMsg *mess)
 		return(0);
 	}
 	ts=localtime(&readhead.tid);
-	sprintf(outbuffer,"\r\n\nText %d  Möte: %s    %2d%02d%02d %02d:%02d\r\n",readhead.nummer,getmotnamn(readhead.mote),ts->tm_year,ts->tm_mon+1,ts->tm_mday,ts->tm_hour,ts->tm_min);
+	sprintf(outbuffer,"\r\n\nText %d  Möte: %s    %4d%02d%02d %02d:%02d\r\n",readhead.nummer,getmotnamn(readhead.mote),ts->tm_year + 1900,ts->tm_mon+1,ts->tm_mday,ts->tm_hour,ts->tm_min);
 	puttekn(outbuffer,-1);
 	if(readhead.person!=-1) sprintf(outbuffer,"Skriven av %s\r\n",getusername(readhead.person));
 	else sprintf(outbuffer,"Skriven av <raderad användare>\r\n");

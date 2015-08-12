@@ -80,7 +80,9 @@ int grabtext(int text,FILE *fpgrab) {
 	}
 	BAMCLEAR(Servermem->bitmaps[nodnr],text%MAXTEXTS);
 	ts=localtime(&grabhead.tid);
-	fprintf(fpgrab,"\n\nText %d  Möte: %s    %2d%02d%02d %02d:%02d\n",grabhead.nummer,getmotnamn(grabhead.mote),ts->tm_year,ts->tm_mon+1,ts->tm_mday,ts->tm_hour,ts->tm_min);
+	fprintf(fpgrab,"\n\nText %d  Möte: %s    %4d%02d%02d %02d:%02d\n",
+                grabhead.nummer, getmotnamn(grabhead.mote), ts->tm_year + 1900,
+                ts->tm_mon + 1, ts->tm_mday, ts->tm_hour, ts->tm_min);
 	if(grabhead.person!=-1) fprintf(fpgrab,"Skriven av %s\n",getusername(grabhead.person));
 	else fprintf(fpgrab,"Skriven av <raderad användare>\n");
 	if(grabhead.kom_till_nr!=-1)

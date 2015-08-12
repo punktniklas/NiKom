@@ -318,12 +318,12 @@ void listfiler(void) {
 		if(nyckel!=-1 && !BAMTEST(sokpek->nycklar,nyckel)) continue;
 		ts=localtime(&sokpek->tid);
 		if(puttekn("\r\n",-1)) return;
-		sprintf(outbuffer,"%-24s %c%c %7d %2d%02d%02d %-28s %2d\r\n",
+		sprintf(outbuffer,"%-24s %c%c %7d %02d%02d%02d %-28s %2d\r\n",
 		              sokpek->namn,
 		              sokpek->flaggor & FILE_NOTVALID ? 'V' : ' ',
 		              sokpek->flaggor & FILE_FREEDL ? 'F' : ' ',
 						  sokpek->size,
-						  ts->tm_year,
+						  ts->tm_year % 100,
 						  ts->tm_mon+1,
 						  ts->tm_mday,
 						  getusername(sokpek->uppladdare),
@@ -1018,12 +1018,12 @@ int sokfil(void) {
 			}
 			found = TRUE;
 			ts=localtime(&filpek->tid);
-			sprintf(outbuffer,"\r\n%-24s %c%c %7d %2d%02d%02d %-28s %2d\r\n",
+			sprintf(outbuffer,"\r\n%-24s %c%c %7d %02d%02d%02d %-28s %2d\r\n",
 				filpek->namn,
 				filpek->flaggor & FILE_NOTVALID ? 'V' : ' ',
 				filpek->flaggor & FILE_FREEDL ? 'F' : ' ',
 					filpek->size,
-					ts->tm_year,
+					ts->tm_year % 100,
 					ts->tm_mon+1,
 					ts->tm_mday,
 					getusername(filpek->uppladdare),
@@ -1117,13 +1117,16 @@ void filstatus(void) {
 		return;
 	}
 	ts=localtime(&vispek->tid);
-	sprintf(outbuffer,"\r\n\nNamn: %s  Fillängd: %d  Datum:%02d%02d%02d",vispek->namn,vispek->size,ts->tm_year,ts->tm_mon+1,ts->tm_mday);
+	sprintf(outbuffer,"\r\n\nNamn: %s  Fillängd: %d  Datum:%4d%02d%02d",
+                vispek->namn, vispek->size, ts->tm_year + 1900, ts->tm_mon + 1,
+                ts->tm_mday);
 	puttekn(outbuffer,-1);
 	sprintf(outbuffer,"\r\nUppladdare: %s  Antal downloads %d",getusername(vispek->uppladdare),vispek->downloads);
 	puttekn(outbuffer,-1);
 	if(vispek->senast_dl) {
-		ts=localtime(&vispek->senast_dl);
-		sprintf(outbuffer,"\r\nSenaste download: %02d%02d%02d  Statusnivå: %d",ts->tm_year,ts->tm_mon+1,ts->tm_mday,vispek->status);
+          ts=localtime(&vispek->senast_dl);
+          sprintf(outbuffer,"\r\nSenaste download: %4d%02d%02d  Statusnivå: %d",
+                  ts->tm_year + 1900, ts->tm_mon + 1, ts->tm_mday, vispek->status);
 	} else sprintf(outbuffer,"\r\nFilen har aldrig blivit nerladdad.  Statusnivå: %d",vispek->status);
 	puttekn(outbuffer,-1);
 	if(vispek->flaggor & FILE_NOTVALID) puttekn("\n\rFilen är inte validerad.",-1);
@@ -1198,12 +1201,12 @@ void nyafiler(void) {
 				headerprinted=TRUE;
 			}
 			ts=localtime(&sokpek->tid);
-			sprintf(outbuffer,"\r\n%-24s %c%c %7d %2d%02d%02d %-28s %2d\r\n",
+			sprintf(outbuffer,"\r\n%-24s %c%c %7d %02d%02d%02d %-28s %2d\r\n",
 		              sokpek->namn,
 		              sokpek->flaggor & FILE_NOTVALID ? 'V' : ' ',
 		              sokpek->flaggor & FILE_FREEDL ? 'F' : ' ',
 						  sokpek->size,
-						  ts->tm_year,
+						  ts->tm_year % 100,
 						  ts->tm_mon+1,
 						  ts->tm_mday,
 						  getusername(sokpek->uppladdare),
