@@ -156,7 +156,7 @@ int nyanv(void) {
 		if(motpek->status & (SKRIVSTYRT | SLUTET)) BAMCLEAR(Servermem->inne[nodnr].motratt,motpek->nummer);
 		else BAMSET(Servermem->inne[nodnr].motratt,motpek->nummer);
 	}
-	memset((void *)Servermem->bitmaps[nodnr],~0,MAXTEXTS/8);
+        InitUnreadTexts(&Servermem->unreadTexts[nodnr]);
 	sprintf(outbuffer,"\r\n\nNamn :        %s\r\n",Servermem->inne[nodnr].namn);
 	puttekn(outbuffer,-1);
 	sprintf(outbuffer,"Gatuadress :  %s\r\n",Servermem->inne[nodnr].gata);
@@ -257,17 +257,12 @@ int nyanv(void) {
 		return(2);
 	}
 	Close(fh);
-	sprintf(filnamn,"NiKom:Users/%d/%d/Bitmap0",x/100,x);
-	if(!(fh=Open(filnamn,MODE_NEWFILE))) {
-		puttekn("\r\n\nKunde inte öppna Bitmapx!\r\n\n",-1);
-		return(2);
-	}
-	if(Write(fh,(void *)Servermem->bitmaps[nodnr],MAXTEXTS/8)==-1) {
-		puttekn("\r\n\nKunde inte skriva Bitmapx!\r\n\n",-1);
-		Close(fh);
-		return(2);
-	}
-	Close(fh);
+
+        if(!WriteUnreadTexts(&Servermem->unreadTexts[nodnr], x)) {
+          puttekn("\r\n\nKunde inte skriva data om olästa texter!\r\n\n",-1);
+          return(2);
+        }
+
 	sprintf(filnamn,"Nikom:Users/%d/%d/.firstletter",x/100,x);
 	if(!(fh=Open(filnamn,MODE_NEWFILE))) {
 		printf("Kunde inte öppna %s\n",filnamn);

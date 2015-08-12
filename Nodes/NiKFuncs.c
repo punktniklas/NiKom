@@ -28,7 +28,7 @@ extern char outbuffer[],inmat[],backspace[],commandhistory[][1024];
 extern struct ReadLetter brevread;
 extern struct MinList edit_list;
 
-long textpek,temppek[MAXMOTE],logintime,extratime;
+long textpek, logintime, extratime;
 int mote2,rad,senast_text_typ,felcnt,nu_skrivs,area2,rexxlogout,
         senast_brev_nr,senast_brev_anv,senast_text_nr,senast_text_mote;
 char *month[] = { "januari","februari","mars","april","maj","juni",
@@ -377,53 +377,51 @@ void varmote(int mote) {
         }
 }
 
-int ga(char *foo)
-{
-        int motnr;
-        char buffer[121], kor;
-        struct Mote *motpek;
+int ga(char *foo) {
+  struct UnreadTexts *unreadTexts = &Servermem->unreadTexts[nodnr];
+  int motnr;
+  char buffer[121], kor;
+  struct Mote *motpek;
 
-        if(matchar(foo,Servermem->cfg.brevnamn)) return(-9);
-        motnr=parsemot(foo);
-        if(motnr==-3)
-        {
-                puttekn("\r\n\nSkriv: Gå <mötesnamn>\r\n\n",-1);
-                return(-5);
-        }
-        if(motnr==-1)
-        {
-                puttekn("\r\n\nFinns inget sådant möte!\r\n\n", -1);
-                return(-5);
-        }
+  if(matchar(foo,Servermem->cfg.brevnamn)) return(-9);
+  motnr=parsemot(foo);
+  if(motnr==-3) {
+    puttekn("\r\n\nSkriv: Gå <mötesnamn>\r\n\n",-1);
+    return(-5);
+  }
+  if(motnr==-1) {
+    puttekn("\r\n\nFinns inget sådant möte!\r\n\n", -1);
+    return(-5);
+  }
 
-        if(!IsMemberConf(motnr, inloggad, &Servermem->inne[nodnr]))
-        {
-        	motpek=getmotpek(motnr);
-			if(MayBeMemberConf(motpek->nummer, inloggad, &Servermem->inne[nodnr]))
-			{
-				sprintf(buffer, "\r\n\nDu är inte medlem i mötet %s, vill du bli medlem? (J/n) ", motpek->namn);
-				puttekn(buffer , -1);
-				while((kor=gettekn())!='j' && kor!='J' && kor!='n' && kor!='N' && kor!='\r');
-				if(kor=='j' || kor=='J' || kor=='\r')
-				{
-					puttekn("Ja!",-1);
-					BAMSET(Servermem->inne[nodnr].motmed, motnr);
-					if(motpek->type == MOTE_ORGINAL)
-						textpek = temppek[motnr] = Servermem->info.lowtext;
-					else if(motpek->type == MOTE_FIDO)
-						textpek = temppek[motnr] = motpek->lowtext;
-				}
-				else
-				{
-					puttekn("Nej!\r\n", -1);
-					return(-5);
-				}
-			}
-			else
-				return(-5);
+  if(!IsMemberConf(motnr, inloggad, &Servermem->inne[nodnr])) {
+    motpek=getmotpek(motnr);
+    if(MayBeMemberConf(motpek->nummer, inloggad, &Servermem->inne[nodnr])) {
+      sprintf(buffer,
+        "\r\n\nDu är inte medlem i mötet %s, vill du bli medlem? (J/n) ",
+        motpek->namn);
+      puttekn(buffer , -1);
+      while((kor=gettekn())!='j' && kor!='J' && kor!='n' && kor!='N' && kor!='\r');
+      if(kor=='j' || kor=='J' || kor=='\r') {
+        puttekn("Ja!",-1);
+        BAMSET(Servermem->inne[nodnr].motmed, motnr);
+        if(motpek->type == MOTE_ORGINAL) {
+          textpek = unreadTexts->lowestPossibleUnreadText[motnr] =
+            Servermem->info.lowtext;
         }
-
-        return(motnr);
+        else if(motpek->type == MOTE_FIDO) {
+          textpek = unreadTexts->lowestPossibleUnreadText[motnr] = motpek->lowtext;
+        }
+      }
+      else {
+        puttekn("Nej!\r\n", -1);
+        return(-5);
+      }
+    }
+    else
+      return(-5);
+  }
+  return(motnr);
 }
 
 void tiden(void)
@@ -843,93 +841,94 @@ int parsemot(char *skri) {
         return(found);
 }
 
-void medlem(char *foo)
-{
-        struct Mote *motpek=(struct Mote *)Servermem->mot_list.mlh_Head;
-        BPTR lock;
-        int motnr, patret, ant = 0;
-        char filnamn[40], motpattern[101], buffer[61];
+void medlem(char *foo) {
+  struct UnreadTexts *unreadTexts = &Servermem->unreadTexts[nodnr];
+  struct Mote *motpek=(struct Mote *)Servermem->mot_list.mlh_Head;
+  BPTR lock;
+  int motnr, patret, ant = 0;
+  char filnamn[40], motpattern[101], buffer[61];
 
-        if(foo[0]=='-' && (foo[1]=='a' || foo[1]=='A'))
-        {
-			for(;motpek->mot_node.mln_Succ;motpek=(struct Mote *)motpek->mot_node.mln_Succ)
-			{
-				if(MayBeMemberConf(motpek->nummer, inloggad, &Servermem->inne[nodnr])
-				  && !IsMemberConf(motpek->nummer, inloggad, &Servermem->inne[nodnr]))
-				{
-					BAMSET(Servermem->inne[nodnr].motmed,motpek->nummer);
-					if(motpek->type==MOTE_ORGINAL)
-						temppek[motpek->nummer]=Servermem->info.lowtext;
-					else if(motpek->type==MOTE_FIDO)
-						temppek[motpek->nummer]=motpek->lowtext;
-				}
-			}
+  if(foo[0]=='-' && (foo[1]=='a' || foo[1]=='A')) {
+    for(;motpek->mot_node.mln_Succ;motpek=(struct Mote *)motpek->mot_node.mln_Succ) {
+      if(MayBeMemberConf(motpek->nummer, inloggad, &Servermem->inne[nodnr])
+         && !IsMemberConf(motpek->nummer, inloggad, &Servermem->inne[nodnr])) {
+        BAMSET(Servermem->inne[nodnr].motmed,motpek->nummer);
+        if(motpek->type==MOTE_ORGINAL) {
+          unreadTexts->lowestPossibleUnreadText[motpek->nummer] =
+            Servermem->info.lowtext;
+        }
+        else if(motpek->type==MOTE_FIDO) {
+          unreadTexts->lowestPossibleUnreadText[motpek->nummer] = motpek->lowtext;
+        }
+      }
+    }
+    textpek=Servermem->info.lowtext;
+    return;
+  }
+  /* TK: 970201 wildcard stöd! */
+  strncpy(buffer,foo,50);
+  patret = ParsePatternNoCase(buffer, motpattern, 98);
+  if(patret == -1)
+    return;
+  else if(patret == 1) {
+    puttekn("\r\n\n", -1);
+    for(;motpek->mot_node.mln_Succ;motpek=(struct Mote *)motpek->mot_node.mln_Succ) {
+      if(MayBeMemberConf(motpek->nummer, inloggad, &Servermem->inne[nodnr])
+         && !IsMemberConf(motpek->nummer, inloggad, &Servermem->inne[nodnr])) {
+        strncpy(buffer,foo,50);
+        ParsePatternNoCase(buffer, motpattern, 98);
+        if(MatchPatternNoCase(motpattern, motpek->namn)) {
+          ant++;
+          sprintf(buffer,"Du är nu med i mötet %s\r\n", motpek->namn);
+          puttekn(buffer,-1);
+          BAMSET(Servermem->inne[nodnr].motmed, motpek->nummer);
+          if(motpek->type==MOTE_ORGINAL) {
+            unreadTexts->lowestPossibleUnreadText[motpek->nummer] =
+              Servermem->info.lowtext;
+          }
+          else if(motpek->type==MOTE_FIDO) {
+            unreadTexts->lowestPossibleUnreadText[motpek->nummer] = motpek->lowtext;
+          }
+        }
+      }
+    }
+    if(ant != 1)
+      sprintf(buffer,"\r\nDu gick med i totalt %d möten\r\n",ant);
+    else
+      strcpy(buffer,"\r\nDu gick med i ett möte\r\n");
 
-			textpek=Servermem->info.lowtext;
-			return;
-        }
-										/* TK: 970201 wildcard stöd! */
-		strncpy(buffer,foo,50);
-		patret = ParsePatternNoCase(buffer, motpattern, 98);
-		if(patret == -1)
-			return;
-		else if(patret == 1)
-		{
-			puttekn("\r\n\n", -1);
-			for(;motpek->mot_node.mln_Succ;motpek=(struct Mote *)motpek->mot_node.mln_Succ)
-			{
-				if(MayBeMemberConf(motpek->nummer, inloggad, &Servermem->inne[nodnr])
-				  && !IsMemberConf(motpek->nummer, inloggad, &Servermem->inne[nodnr]))
-				{
-					strncpy(buffer,foo,50);
-					ParsePatternNoCase(buffer, motpattern, 98);
-					if(MatchPatternNoCase(motpattern, motpek->namn))
-					{
-						ant++;
-						sprintf(buffer,"Du är nu med i mötet %s\r\n", motpek->namn);
-						puttekn(buffer,-1);
-						BAMSET(Servermem->inne[nodnr].motmed, motpek->nummer);
-						if(motpek->type==MOTE_ORGINAL)
-							temppek[motpek->nummer]=Servermem->info.lowtext;
-						else if(motpek->type==MOTE_FIDO)
-							temppek[motpek->nummer]=motpek->lowtext;
-					}
-				}
-			}
-			if(ant != 1)
-				sprintf(buffer,"\r\nDu gick med i totalt %d möten\r\n",ant);
-			else
-				strcpy(buffer,"\r\nDu gick med i ett möte\r\n");
+    puttekn(buffer,-1);
+    return;
+  }
 
-			puttekn(buffer,-1);
-			return;
-		}
-
-        motnr=parsemot(foo);
-        if(motnr==-3) {
-                puttekn("\r\n\nSkriv: Medlem <mötesnamn>\r\neller: Medlem -a för att bli med i alla möten.\r\n\n",-1);
-                return;
-        }
-        if(motnr==-1) {
-                puttekn("\r\n\nFinns inget sådant möte!\r\n\n",-1);
-                return;
-        }
-        if(!MayBeMemberConf(motnr, inloggad, &Servermem->inne[nodnr])) {
-                puttekn("\r\n\nDu har inte rätt att vara med i det mötet!\r\n\n",-1);
-                return;
-        }
-        BAMSET(Servermem->inne[nodnr].motmed,motnr);
-        sprintf(outbuffer, "\r\n\nDu är nu med i mötet %s.\r\n\n",getmotnamn(motnr));
-        puttekn(outbuffer, -1);
-        motpek=getmotpek(motnr);
-        if(motpek->type==MOTE_ORGINAL) textpek=temppek[motnr]=Servermem->info.lowtext;
-        else if(motpek->type==MOTE_FIDO) temppek[motnr]=motpek->lowtext;
-        sprintf(filnamn,"NiKom:Lappar/%d.motlapp",motnr);
-        if(lock=Lock(filnamn,ACCESS_READ))
-        {
-                UnLock(lock);
-                sendfile(filnamn);
-        }
+  motnr=parsemot(foo);
+  if(motnr==-3) {
+    puttekn("\r\n\nSkriv: Medlem <mötesnamn>\r\neller: Medlem -a för att bli med i alla möten.\r\n\n",-1);
+    return;
+  }
+  if(motnr==-1) {
+    puttekn("\r\n\nFinns inget sådant möte!\r\n\n",-1);
+    return;
+  }
+  if(!MayBeMemberConf(motnr, inloggad, &Servermem->inne[nodnr])) {
+    puttekn("\r\n\nDu har inte rätt att vara med i det mötet!\r\n\n",-1);
+    return;
+  }
+  BAMSET(Servermem->inne[nodnr].motmed,motnr);
+  sprintf(outbuffer, "\r\n\nDu är nu med i mötet %s.\r\n\n",getmotnamn(motnr));
+  puttekn(outbuffer, -1);
+  motpek=getmotpek(motnr);
+  if(motpek->type==MOTE_ORGINAL) {
+    textpek = unreadTexts->lowestPossibleUnreadText[motnr] = Servermem->info.lowtext;
+  }
+  else if(motpek->type==MOTE_FIDO) {
+    unreadTexts->lowestPossibleUnreadText[motnr] = motpek->lowtext;
+  }
+  sprintf(filnamn,"NiKom:Lappar/%d.motlapp",motnr);
+  if(lock=Lock(filnamn,ACCESS_READ)) {
+    UnLock(lock);
+    sendfile(filnamn);
+  }
 }
 
 int uttrad(char *foo) {
@@ -1014,13 +1013,19 @@ int unread(int meet) {
         return(0);
 }
 
-int countunread(int meet) {
-        struct Mote *motpek;
-        if(meet==-1) return(countmail(inloggad,Servermem->inne[nodnr].brevpek));
-        motpek=getmotpek(meet);
-        if(motpek->type==MOTE_ORGINAL) return(countmote(meet));
-        if(motpek->type==MOTE_FIDO) return(countfidomote(motpek));
-        return(0);
+int countunread(int conf) {
+  struct Mote *motpek;
+  if(conf == -1) {
+    return(countmail(inloggad,Servermem->inne[nodnr].brevpek));
+  }
+  motpek=getmotpek(conf);
+  if(motpek->type==MOTE_ORGINAL) {
+    return CountUnreadTexts(conf, &Servermem->unreadTexts[nodnr]);
+  }
+  if(motpek->type==MOTE_FIDO) {
+    return countfidomote(motpek);
+  }
+  return 0;
 }
 
 int nextmeet(int curmeet) {
@@ -1057,12 +1062,19 @@ int clearmeet(int meet) {
         return(-5);
 }
 
-void inittemppek(long *pekarray) {
-        struct Mote *motpek;
-        for(motpek=(struct Mote *)Servermem->mot_list.mlh_Head;motpek->mot_node.mln_Succ;motpek=(struct Mote *)motpek->mot_node.mln_Succ)
-                if(motpek->type==MOTE_ORGINAL) pekarray[motpek->nummer]=textpek;
-                else if(motpek->type==MOTE_FIDO)
-                        if(pekarray[motpek->nummer] < motpek->lowtext) pekarray[motpek->nummer] = motpek->lowtext;
+void initLowestPossibleUnreadTexts() {
+  struct UnreadTexts *unreadTexts = &Servermem->unreadTexts[nodnr];
+  struct Mote *motpek;
+  ITER_EL(motpek, Servermem->mot_list, mot_node, struct Mote *) {
+    if(motpek->type==MOTE_ORGINAL) {
+      unreadTexts->lowestPossibleUnreadText[motpek->nummer] = textpek;
+    }
+    else if(motpek->type==MOTE_FIDO) {
+      if(unreadTexts->lowestPossibleUnreadText[motpek->nummer] < motpek->lowtext) {
+        unreadTexts->lowestPossibleUnreadText[motpek->nummer] = motpek->lowtext;
+      }
+    }
+  }
 }
 
 int connection(void)
@@ -1073,7 +1085,7 @@ int connection(void)
         LoadProgramCategory(inloggad);
         NewList((struct List *)&aliaslist);
         if((textpek=Servermem->inne[nodnr].textpek)<Servermem->info.lowtext) textpek=Servermem->info.lowtext;
-        inittemppek(temppek);
+        initLowestPossibleUnreadTexts();
         time(&logintime);
         extratime=0;
         memset(&Statstr,0,sizeof(struct Inloggning));

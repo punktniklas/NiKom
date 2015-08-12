@@ -21,7 +21,7 @@
 
 int CXBRK(void) { return(0); }
 
-extern long textpek,logintime, temppek[];
+extern long textpek,logintime;
 extern int area2, nodnr;
 extern struct MinList aliaslist,edit_list;
 extern char outbuffer[], nodid[], inmat[], reggadnamn[];
@@ -163,7 +163,7 @@ do
 	}
 	sprintf(titel,"Nod #%d CON: %s #%d",nodnr,Servermem->inne[nodnr].namn,inloggad);
 	SetWindowTitles(NiKwind,titel,(UBYTE *)-1L);
-	readuserbitmap(inloggad,Servermem->bitmaps[nodnr],0,temppek);
+        ReadUnreadTexts(&Servermem->unreadTexts[nodnr], inloggad);
 	Servermem->inloggad[nodnr]=inloggad;
 	Servermem->idletime[nodnr] = time(NULL);
 	if(getft("NiKom:Texter/Bulletin.txt")>Servermem->inne[nodnr].senast_in) sendfile("NiKom:Texter/Bulletin.txt");
@@ -189,7 +189,7 @@ do
 	Servermem->info.inloggningar++;
 	Servermem->inne[nodnr].defarea=area2;
 	writeuser(inloggad,&Servermem->inne[nodnr]);
-	writeuserbitmap(inloggad,Servermem->bitmaps[nodnr],0,temppek);
+        WriteUnreadTexts(&Servermem->unreadTexts[nodnr], inloggad);
 	writesenaste();
 	freealiasmem();
 	sprintf(tellstr,"loggade just ut från nod %d",nodnr);

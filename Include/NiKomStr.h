@@ -59,6 +59,8 @@
 #define MAXUSERSCACHED		15
 #define MAXTIMETOCACHEUSER	10	/* Tid i sekunder! */
 
+#define UNREADTEXTS_BITMAPSIZE   32768
+
 /* Defines för getstring() */
 
 #define NUMONLY		3
@@ -166,12 +168,15 @@
 #define NIKSEM_LATEST     7
 #define NIKSEM_MAILBOXES  8
 #define NIKSEM_PRGCAT	  9
+#define NIKSEM_UNREAD     10
 
-#define NIKSEM_NOOF       10 /* Hur många det finns */
+#define NIKSEM_NOOF       11 /* Hur många det finns */
 
 #define BAMTEST(a,b) (((char *)(a))[(b)/8] & 1 << 8-1-(b)%8)
 #define BAMSET(a,b) (((char *)(a))[(b)/8] |= 1 << 8-1-(b)%8)
 #define BAMCLEAR(a,b) (((char *)(a))[(b)/8] &= ~(1 << 8-1-(b)%8))
+
+#define ITER_EL(var, list, nodeField, type) for(var = (type)list.mlh_Head; var->nodeField.mln_Succ; var = (type) var->nodeField.mln_Succ)
 
 /* Flaggor till putstring() */
 #define PS_NOCONV 1
@@ -236,6 +241,12 @@ struct User {
    char namn[41],gata[41],postadress[41],land[41],telefon[21],
       annan_info[61],losen[16],status,rader,protokoll,
       prompt[6],motratt[MAXMOTE/8],motmed[MAXMOTE/8],vote[MAXVOTE];
+};
+
+struct UnreadTexts {
+  long bitmapStartText;
+  char bitmap[UNREADTEXTS_BITMAPSIZE/8];
+  long lowestPossibleUnreadText[MAXMOTE];
 };
 
 struct Kommando {
@@ -379,7 +390,7 @@ struct System
    short texts[MAXTEXTS];
    struct MinList kom_list;
    struct User inne[MAXNOD];
-   char bitmaps[MAXNOD][MAXTEXTS/8];
+   struct UnreadTexts unreadTexts[MAXNOD];
    long nodtyp[MAXNOD],inloggad[MAXNOD],action[MAXNOD],varmote[MAXNOD],
    	xtratime[MAXNOD],connectbps[MAXNOD], idletime[MAXNOD],
    	maxinactivetime[MAXNOD], serverversion, serverrevision;

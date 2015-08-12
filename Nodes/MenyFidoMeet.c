@@ -26,7 +26,6 @@ extern char outbuffer[],*argument,inmat[];
 extern int nodnr,senast_text_typ,senast_text_nr,senast_text_mote,nu_skrivs,inloggad,
         rad,mote2;
 extern struct Header readhead,sparhead;
-extern long temppek[];
 extern struct Inloggning Statstr;
 extern struct MinList edit_list;
 
@@ -49,36 +48,46 @@ void fido_lasa(int tnr,struct Mote *motpek) {
 }
 
 int checkfidomote(struct Mote *motpek) {
-        if(temppek[motpek->nummer]<=motpek->texter) return(TRUE);
-        return(FALSE);
+  if(Servermem->unreadTexts[nodnr].lowestPossibleUnreadText[motpek->nummer]
+     <= motpek->texter) {
+    return TRUE;
+  }
+  return FALSE;
 }
 
 int countfidomote(struct Mote *motpek) {
-        return(motpek->texter - temppek[motpek->nummer] + 1);
+  return motpek->texter
+    - Servermem->unreadTexts[nodnr].lowestPossibleUnreadText[motpek->nummer]
+    + 1;
 }
 
 int clearfidomote(struct Mote *motpek) {
-        int going=TRUE,promret;
-        while(going) {
-                if(temppek[motpek->nummer]>motpek->texter) return(-5);
-                if(temppek[motpek->nummer] < motpek->lowtext) temppek[motpek->nummer] = motpek->lowtext;
-                if((promret=prompt(210))==-1) return(-1);
-                else if(promret==-3) return(-3);
-                else if(promret==-4) puttekn("\r\n\nFinns ingen nästa kommentar!\r\n\n",-1);
-                else if(promret==-8) return(-8);
-                else if(promret==-9) return(-9);
-                else if(promret==-11) return(-11);
-                else if(promret>=0) return(promret);
-/* MENYNOD  tillagt: && activemenu->ret==READTEXT */
-                else if(promret==-2 || promret==-6 && activemenu->ret==READTEXT) {
-                        fido_visatext(temppek[motpek->nummer],motpek);
-                        temppek[motpek->nummer]++;
-                }
-/* MENYNOD */
-                if(activemenu->ret!=READTEXT)
-                        return(-9);
-/* END MENYNOD */
-        }
+  struct UnreadTexts *unreadTexts = &Servermem->unreadTexts[nodnr];
+  int going=TRUE,promret;
+  while(going) {
+    if(unreadTexts->lowestPossibleUnreadText[motpek->nummer] > motpek->texter){
+      return -5;
+    }
+    if(unreadTexts->lowestPossibleUnreadText[motpek->nummer] < motpek->lowtext) {
+      unreadTexts->lowestPossibleUnreadText[motpek->nummer] = motpek->lowtext;
+    }
+    if((promret=prompt(210))==-1) return(-1);
+    else if(promret==-3) return(-3);
+    else if(promret==-4) puttekn("\r\n\nFinns ingen nästa kommentar!\r\n\n",-1);
+    else if(promret==-8) return(-8);
+    else if(promret==-9) return(-9);
+    else if(promret==-11) return(-11);
+    else if(promret>=0) return(promret);
+    /* MENYNOD  tillagt: && activemenu->ret==READTEXT */
+    else if(promret==-2 || promret==-6 && activemenu->ret==READTEXT) {
+      fido_visatext(unreadTexts->lowestPossibleUnreadText[motpek->nummer], motpek);
+      unreadTexts->lowestPossibleUnreadText[motpek->nummer]++;
+    }
+    /* MENYNOD */
+    if(activemenu->ret!=READTEXT)
+      return(-9);
+    /* END MENYNOD */
+  }
 }
 
 void fido_visatext(int text,struct Mote *motpek) {
@@ -293,8 +302,11 @@ int fido_skriv(int komm,int komtill) {
 }
 
 void fido_endast(struct Mote *motpek,int antal) {
-        temppek[motpek->nummer] = motpek->texter - antal +1;
-        if(temppek[motpek->nummer] < motpek->lowtext) temppek[motpek->nummer] = motpek->lowtext;
+  struct UnreadTexts *unreadTexts = &Servermem->unreadTexts[nodnr];
+  unreadTexts->lowestPossibleUnreadText[motpek->nummer] = motpek->texter - antal +1;
+  if(unreadTexts->lowestPossibleUnreadText[motpek->nummer] < motpek->lowtext) {
+    unreadTexts->lowestPossibleUnreadText[motpek->nummer] = motpek->lowtext;
+  }
 }
 
 void fidolistaarende(struct Mote *motpek,int dir) {

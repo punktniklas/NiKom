@@ -24,7 +24,6 @@ char *hittaefter(char *);
 extern struct System *Servermem;
 extern int nodnr,inloggad,radcnt;
 extern char outbuffer[];
-extern long temppek[];
 extern struct Inloggning Statstr;
 extern struct timerequest *inactivereq;
 extern struct MinList edit_list;
@@ -78,7 +77,7 @@ int grabtext(int text,FILE *fpgrab) {
 		puttekn("\r\n\nDu har inte rätt att läsa den texten!\r\n\n",-1);
 		return(0);
 	}
-	BAMCLEAR(Servermem->bitmaps[nodnr],text%MAXTEXTS);
+        ChangeUnreadTextStatus(text, 0, &Servermem->unreadTexts[nodnr]);
 	ts=localtime(&grabhead.tid);
 	fprintf(fpgrab,"\n\nText %d  Möte: %s    %2d%02d%02d %02d:%02d\n",grabhead.nummer,getmotnamn(grabhead.mote),ts->tm_year,ts->tm_mon+1,ts->tm_mday,ts->tm_hour,ts->tm_min);
 	if(grabhead.person!=-1) fprintf(fpgrab,"Skriven av %s\n",getusername(grabhead.person));
@@ -185,79 +184,85 @@ int grabbrev(int text, FILE *fpgrab) {
 }
 
 int grabkom(FILE *fp) {
-	long kom[MAXKOM];
-	int grabret,x=0;
-	memcpy(kom,grabhead.kom_i,MAXKOM*sizeof(long));
-	while(kom[x]!=-1 && x<MAXKOM) {
-		if(Servermem->texts[kom[x]%MAXTEXTS]!=-1 && BAMTEST(Servermem->bitmaps[nodnr],kom[x]%MAXTEXTS) && IsMemberConf(Servermem->texts[kom[x]%MAXTEXTS], inloggad, &Servermem->inne[nodnr])) {
-			if((grabret=grabtext(kom[x],fp))==1) {
-				if(grabkom(fp)) return(1);
-			}
-			else if(grabret==2) return(1);
-		}
-		x++;
-	}
-	return(0);
+  long kom[MAXKOM];
+  int grabret,x=0;
+  memcpy(kom,grabhead.kom_i,MAXKOM*sizeof(long));
+  while(kom[x]!=-1 && x<MAXKOM) {
+    if(Servermem->texts[kom[x] % MAXTEXTS] != -1
+       && IsTextUnread(kom[x], &Servermem->unreadTexts[nodnr])
+       && IsMemberConf(Servermem->texts[kom[x]%MAXTEXTS], inloggad,
+                       &Servermem->inne[nodnr])) {
+      if((grabret=grabtext(kom[x],fp))==1) {
+        if(grabkom(fp)) return(1);
+      }
+      else if(grabret==2) return(1);
+    }
+    x++;
+  }
+  return(0);
 }
 
 void grab(void) {
-	int x,y,grabret;
-	struct Mote *motpek;
-	FILE *fp;
-	char filnamn[20];
-	sprintf(filnamn,"T:Grab%d",nodnr);
-	if(!(fp=fopen(filnamn,"w"))) {
-		puttekn("\r\n\nKunde inte öppna grabfilen!\r\n",-1);
-		return;
-	}
-	if(!CheckIO((struct IORequest *)inactivereq)) {
-		AbortIO((struct IORequest *)inactivereq);
-		WaitIO((struct IORequest *)inactivereq);
-	}
-	radcnt=-9999;
-	sprintf(outbuffer,"\r\nRensar %s..",Servermem->cfg.brevnamn);
-	puttekn(outbuffer,-1);
-	y=getnextletter(inloggad);
-	for(x=Servermem->inne[nodnr].brevpek;x<y;x++) {
-		if(grabbrev(x,fp)==2) {
-			sprintf(outbuffer,"\r\nFel under vid läsandet/skrivandet av brev %d!\r\n",x);
-			puttekn(outbuffer,-1);
-			fclose(fp);
-			return;
-		}
-	}
-	Servermem->inne[nodnr].brevpek=y;
-	for(motpek=(struct Mote *)Servermem->mot_list.mlh_Head;motpek->mot_node.mln_Succ;motpek=(struct Mote *)motpek->mot_node.mln_Succ) {
-		if(motpek->status & SUPERHEMLIGT) continue;
-		if(!IsMemberConf(motpek->nummer, inloggad, &Servermem->inne[nodnr])) continue;
-		sprintf(outbuffer,"\r\nRensar mötet %s...",motpek->namn);
-		puttekn(outbuffer,-1);
-		if(motpek->type==MOTE_ORGINAL) {
-			for(y=temppek[motpek->nummer];y<=Servermem->info.hightext;y++) {
-				if(Servermem->texts[y%MAXTEXTS] != motpek->nummer || !BAMTEST(Servermem->bitmaps[nodnr],y%MAXTEXTS)) continue;
-				if((grabret=grabtext(y,fp))==2) {
-					sprintf(outbuffer,"\r\nFel under vid läsandet/skrivandet av text %d!\r\n",y);
-					puttekn(outbuffer,-1);
-					fclose(fp);
-					return;
-				} else if(grabret && grabkom(fp)) {
-					fclose(fp);
-					return;
-				}
-			}
-		} else if(motpek->type==MOTE_FIDO) {
-			for(y=temppek[motpek->nummer];y<=motpek->texter;y++) {
-				if(grabfidotext(y,motpek,fp)) {
-/*					sprintf(outbuffer,"\r\nFel under vid läsandet/skrivandet av text %d!\r\n",y);
-					puttekn(outbuffer,-1);
-					fclose(fp);
-					return; */
-				}
-			}
-			temppek[motpek->nummer] = motpek->texter+1;
-		}
-	}
-	fclose(fp);
-	puttekn("\r\n\nPackar...",-1);
-	sendrexx(5);
+  int x, y, grabret, unreadText;
+  struct Mote *motpek;
+  FILE *fp;
+  char filnamn[20];
+  sprintf(filnamn,"T:Grab%d",nodnr);
+  if(!(fp=fopen(filnamn,"w"))) {
+    puttekn("\r\n\nKunde inte öppna grabfilen!\r\n",-1);
+    return;
+  }
+  if(!CheckIO((struct IORequest *)inactivereq)) {
+    AbortIO((struct IORequest *)inactivereq);
+    WaitIO((struct IORequest *)inactivereq);
+  }
+  radcnt=-9999;
+  sprintf(outbuffer,"\r\nRensar %s..",Servermem->cfg.brevnamn);
+  puttekn(outbuffer,-1);
+  y=getnextletter(inloggad);
+  for(x=Servermem->inne[nodnr].brevpek;x<y;x++) {
+    if(grabbrev(x,fp)==2) {
+      sprintf(outbuffer,"\r\nFel under vid läsandet/skrivandet av brev %d!\r\n",x);
+      puttekn(outbuffer,-1);
+      fclose(fp);
+      return;
+    }
+  }
+  Servermem->inne[nodnr].brevpek=y;
+  for(motpek=(struct Mote *)Servermem->mot_list.mlh_Head;motpek->mot_node.mln_Succ;motpek=(struct Mote *)motpek->mot_node.mln_Succ) {
+    if(motpek->status & SUPERHEMLIGT) continue;
+    if(!IsMemberConf(motpek->nummer, inloggad, &Servermem->inne[nodnr])) continue;
+    sprintf(outbuffer,"\r\nRensar mötet %s...",motpek->namn);
+    puttekn(outbuffer,-1);
+
+    unreadText = 0;
+    if(motpek->type==MOTE_ORGINAL) {
+      while((unreadText = FindNextUnreadText(unreadText, motpek->nummer,
+          &Servermem->unreadTexts[nodnr])) != -1) {
+        if((grabret = grabtext(unreadText, fp)) == 2) {
+          sprintf(outbuffer,"\r\nFel under vid läsandet/skrivandet av text %d!\r\n",y);
+          puttekn(outbuffer,-1);
+          fclose(fp);
+          return;
+        } else if(grabret && grabkom(fp)) {
+          fclose(fp);
+          return;
+        }
+      }
+    } else if(motpek->type==MOTE_FIDO) {
+      for(unreadText = Servermem->unreadTexts[nodnr].lowestPossibleUnreadText[motpek->nummer];unreadText <= motpek->texter; unreadText++) {
+        if(grabfidotext(unreadText, motpek, fp)) {
+          sprintf(outbuffer,"\r\nFel under vid läsandet/skrivandet av text %d!\r\n",y);
+          puttekn(outbuffer,-1);
+          fclose(fp);
+          return;
+        }
+      }
+      Servermem->unreadTexts[nodnr].lowestPossibleUnreadText[motpek->nummer] =
+        motpek->texter+1;
+    }
+  }
+  fclose(fp);
+  puttekn("\r\n\nPackar...",-1);
+  sendrexx(5);
 }

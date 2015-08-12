@@ -22,7 +22,7 @@
 
 int CXBRK(void) { return(0); }
 
-extern long textpek,logintime, temppek[];
+extern long textpek,logintime;
 extern int area2, dtespeed, radcnt, nodnr, nodestate;
 extern struct MinList aliaslist,edit_list;
 extern char outbuffer[];
@@ -138,7 +138,7 @@ void main(int argc,char *argv[]) {
 	serreqtkn();
 	sprintf(titel,"Nod #%d SER: %s #%d",nodnr,Servermem->inne[nodnr].namn,inloggad);
 	SetWindowTitles(NiKwind,titel,(char *)-1L);
-	readuserbitmap(inloggad,Servermem->bitmaps[nodnr],0,temppek);
+        ReadUnreadTexts(&Servermem->unreadTexts[nodnr], inloggad);
 	if(getft("NiKom:Texter/Bulletin.txt")>Servermem->inne[nodnr].senast_in) sendfile("NiKom:Texter/Bulletin.txt");
 	connection();
 
@@ -177,7 +177,7 @@ void main(int argc,char *argv[]) {
 	Servermem->info.inloggningar++;
 	Servermem->inne[nodnr].defarea=area2;
 	writeuser(inloggad,&Servermem->inne[nodnr]);
-	writeuserbitmap(inloggad,Servermem->bitmaps[nodnr],0,temppek);
+        ReadUnreadTexts(&Servermem->unreadTexts[nodnr], inloggad);
 	writesenaste();
 	abortinactive();
 	freealiasmem();

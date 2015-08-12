@@ -27,7 +27,6 @@ extern struct System *Servermem;
 extern int nodnr,inloggad,mote2,senast_text_typ,radcnt;
 extern char outbuffer[],inmat[],*argument,usernamebuf[],reggadnamn[];
 extern struct Inloggning Statstr;
-extern long temppek[];
 extern struct Header readhead;
 extern struct MinList aliaslist, edit_list;
 
@@ -629,7 +628,7 @@ struct Mote {
 
 void hoppaarende(void) {
 	struct Header hoppahead;
-	int x,hoppade=0;
+	int hoppade=0, nextUnread;
 	if(!argument[0]) {
 		if(senast_text_typ!=TEXT) {
 			puttekn("\r\n\nSkriv: Hoppa Ärende <början av ärendet>\r\n",-1);
@@ -645,13 +644,16 @@ void hoppaarende(void) {
 		puttekn("\r\n\nEtt ärende kan inte vara så långt...\r\n",-1);
 		return;
 	}
-	for(x=temppek[mote2];x<=Servermem->info.hightext;x++) {
-		if(Servermem->texts[x%MAXTEXTS]!=mote2 || !BAMTEST(Servermem->bitmaps[nodnr],x%MAXTEXTS)) continue;
-		if(readtexthead(x,&hoppahead)) return;
-		if(!strncmp(hoppahead.arende,argument,strlen(argument))) {
-			BAMCLEAR(Servermem->bitmaps[nodnr],x%MAXTEXTS);
-			hoppade++;
-		}
+        nextUnread = -1;
+        while((nextUnread = FindNextUnreadText(nextUnread + 1, mote2,
+            &Servermem->unreadTexts[nodnr])) != -1) {
+          if(readtexthead(nextUnread, &hoppahead)) {
+            return;
+          }
+          if(!strncmp(hoppahead.arende,argument,strlen(argument))) {
+            ChangeUnreadTextStatus(nextUnread, 0, &Servermem->unreadTexts[nodnr]);
+            hoppade++;
+          }
 	}
 	if(!hoppade) puttekn("\r\n\nInga texter överhoppade.\r\n",-1);
 	else if(hoppade==1) puttekn("\r\n\n1 text överhoppad.\r\n",-1);
@@ -845,69 +847,6 @@ void freeeditlist(void) {
 	while(el=(struct EditLine *)RemHead((struct List *)&edit_list))
 		FreeMem(el,sizeof(struct EditLine));
 	NewList((struct List *)&edit_list);
-}
-
-int readuserbitmap(int nummer,char *bitmap,int bmnr,long *otherpek) {
-	BPTR fh;
-	char filnamn[40];
-	struct tmppek {
-		long mote, pek;
-	} tp;
-	int ret;
-	sprintf(filnamn,"NiKom:Users/%d/%d/Bitmap%d",nummer/100,nummer,bmnr);
-	NiKForbid();
-	if(!(fh=Open(filnamn,MODE_OLDFILE))) {
-		puttekn("\r\n\nKunde inte öppna Users.dat!\r\n\n",-1);
-		NiKPermit();
-		return(1);
-	}
-	if(Read(fh,(void *)bitmap,MAXTEXTS/8)==-1) {
-		puttekn("\r\n\nKunde inte läsa Users.dat!\r\n\n",-1);
-		Close(fh);
-		NiKPermit();
-		return(1);
-	}
-	if(otherpek) {
-		while((ret = Read(fh,&tp,sizeof(struct tmppek)))>0) otherpek[tp.mote]=tp.pek;
-		if(ret == -1) printf("*** Fel vid bitmapläsningen! ***\n");
-	}
-	Close(fh);
-	NiKPermit();
-	return(0);
-}
-
-int writeuserbitmap(int nummer,char *bitmap,int bmnr,long *otherpek) {
-	BPTR fh;
-	struct Mote *motpek;
-	char filnamn[40];
-	struct tmppek {
-		long mote, pek;
-	} tp;
-	sprintf(filnamn,"NiKom:Users/%d/%d/Bitmap%d",nummer/100,nummer,bmnr);
-	NiKForbid();
-	if(!(fh=Open(filnamn,MODE_NEWFILE))) {
-		puttekn("\r\n\nKunde inte öppna Users.dat!\r\n\n",-1);
-		NiKPermit();
-		return(1);
-	}
-	if(Write(fh,(void *)bitmap,MAXTEXTS/8)==-1) {
-		puttekn("\r\n\nKunde inte skriva Users.dat!\r\n\n",-1);
-		Close(fh);
-		NiKPermit();
-		return(1);
-	}
-	if(otherpek) {
-		motpek=(struct Mote *)Servermem->mot_list.mlh_Head;
-		for(;motpek->mot_node.mln_Succ;motpek = (struct Mote *)motpek->mot_node.mln_Succ) {
-			if(motpek->type != MOTE_FIDO) continue;
-			tp.mote = motpek->nummer;
-			tp.pek = otherpek[motpek->nummer];
-			Write(fh,&tp,sizeof(struct tmppek));
-		}
-	}
-	Close(fh);
-	NiKPermit();
-	return(0);
 }
 
 int rek_flyttagren(int rot,int ack,int tomeet) {

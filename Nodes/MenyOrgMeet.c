@@ -25,7 +25,7 @@ extern char outbuffer[],*argument,inmat[];
 extern int nodnr,senast_text_typ,senast_text_nr,senast_text_mote,nu_skrivs,inloggad,
         rad,mote2;
 extern struct Header readhead,sparhead;
-extern long temppek[],textpek;
+extern long textpek;
 extern struct Inloggning Statstr;
 extern struct MinList edit_list;
 
@@ -104,101 +104,94 @@ void org_lasa(int tnr) {
         org_visatext(tnr);
 }
 
-int checkmote(int mote) {
-       long letpek;
-       int hittat=FALSE;
-       if(temppek[mote]<Servermem->info.lowtext) temppek[mote]=Servermem->info.lowtext;
-       letpek=temppek[mote];
-       while(!hittat && letpek <= Servermem->info.hightext) {
-               if(Servermem->texts[letpek%MAXTEXTS]==mote && BAMTEST(Servermem->bitmaps[nodnr],letpek%MAXTEXTS)) hittat=TRUE;
-               letpek++;
-       }
-       if(!hittat) temppek[mote]=Servermem->info.hightext+1;
-       return(hittat);
+int checkmote(int conf) {
+  long unreadText;
+
+  unreadText = FindNextUnreadText(0, conf, &Servermem->unreadTexts[nodnr]);
+  if(unreadText == -1) {
+    Servermem->unreadTexts[nodnr].lowestPossibleUnreadText[conf] =
+      Servermem->info.hightext+1;
+  }
+  return unreadText != -1;
 }
 
-int countmote(int mote) {
-        int y,cnt=0;
-        if(temppek[mote]<Servermem->info.lowtext) temppek[mote]=Servermem->info.lowtext;
-        for(y=temppek[mote];y<=Servermem->info.hightext;y++)
-                if(Servermem->texts[y%MAXTEXTS]==mote && BAMTEST(Servermem->bitmaps[nodnr],y%MAXTEXTS)) cnt++;
-        return(cnt);
-}
+int clearmote(int conf) {
+  struct UnreadTexts *unreadTexts = &Servermem->unreadTexts[nodnr];
+  int going=TRUE, textnr = 0, promret, komret;
 
-int clearmote(int foo) {
-        int going=TRUE,textnr=temppek[foo],promret,komret;
-        while(going) {
-                while(Servermem->texts[textnr%MAXTEXTS]!=foo && textnr<=Servermem->info.hightext) textnr++;
-                if(textnr>Servermem->info.hightext) return(-5);
-                if(!(BAMTEST(Servermem->bitmaps[nodnr],textnr%MAXTEXTS))) {
-                        textnr++;
-                        continue;
-                }
-                if((promret=prompt(210))==-1) return(-1);
-                else if(promret==-3) return(-3);
-                else if(promret==-4) puttekn("\r\n\nFinns ingen nästa kommentar!\r\n\n",-1);
-                else if(promret==-8) return(-8);
-                else if(promret==-9) return(-9);
-                else if(promret==-11) return(-11);
-                else if(promret>=0) return(promret);
-/* MENYNOD  tillagt: && activemenu->ret==READTEXT */
-                else if(promret==-2 || promret==-6 && activemenu->ret==READTEXT) {
-                        BAMCLEAR(Servermem->bitmaps[nodnr],textnr%MAXTEXTS);
-                        if(org_visatext(textnr)) {
-                                if((komret=clearkom())==-1) return(-1);
-                                else if(komret==-3) return(-3);
-                                else if(komret==-8) return(-8);
-                                else if(komret==-9) return(-9);
-                                else if(komret==-11) return(-11);
-                                else if(komret>=0) return(komret);
-                        }
-                }
-/* MENYNOD */
-                if(activemenu->ret!=READTEXT)
-                        return(-9);
-/* END MENYNOD */
-                if(promret!=-5) textnr++;
-        }
+  while(going) {
+    textnr = FindNextUnreadText(textnr, conf, unreadTexts);
+    if(textnr == -1) {
+      return -5;
+    }
+    if((promret=prompt(210))==-1) return(-1);
+    else if(promret==-3) return(-3);
+    else if(promret==-4) puttekn("\r\n\nFinns ingen nästa kommentar!\r\n\n",-1);
+    else if(promret==-8) return(-8);
+    else if(promret==-9) return(-9);
+    else if(promret==-11) return(-11);
+    else if(promret>=0) return(promret);
+    /* MENYNOD  tillagt: && activemenu->ret==READTEXT */
+    else if(promret==-2 || promret==-6 && activemenu->ret==READTEXT) {
+      ChangeUnreadTextStatus(textnr, 0, unreadTexts);
+      if(org_visatext(textnr)) {
+        if((komret=clearkom())==-1) return(-1);
+        else if(komret==-3) return(-3);
+        else if(komret==-8) return(-8);
+        else if(komret==-9) return(-9);
+        else if(komret==-11) return(-11);
+        else if(komret>=0) return(komret);
+      }
+    }
+    /* MENYNOD */
+    if(activemenu->ret!=READTEXT)
+      return(-9);
+    /* END MENYNOD */
+    if(promret!=-5) textnr++;
+  }
 }
 
 int clearkom(void) {
-        long kom[MAXKOM];
-        int promret,komret,x=0;
-        memcpy(kom,readhead.kom_i,MAXKOM*sizeof(long));
-        while(kom[x]!=-1) {
-                if(Servermem->texts[kom[x]%MAXTEXTS]!=-1 && BAMTEST(Servermem->bitmaps[nodnr],kom[x]%MAXTEXTS) && IsMemberConf(Servermem->texts[kom[x]%MAXTEXTS], inloggad, &Servermem->inne[nodnr])) {
-                        if((promret=prompt(211))==-1) return(-1);
-                        else if(promret==-2) return(-2);
-                        else if(promret==-3) return(-3);
-                        else if(promret==-8) return(-8);
-                        else if(promret==-9) return(-9);
-                        else if(promret==-10) {
-                                sprintf(outbuffer,"\r\n\nDu hoppade över %d texter.\r\n",hoppaover(readhead.nummer,0)-1);
-                                puttekn(outbuffer,-1);
-                                return(-5);
-                        }
-                        else if(promret==-11) return(-11);
-                        else if(promret>=0) return(promret);
-/* MENYNOD  tillagt: && activemenu->ret==READTEXT */
-                        else if(promret==-4 || promret==-6 && activemenu->ret==READTEXT) {
-                                BAMCLEAR(Servermem->bitmaps[nodnr],kom[x]%MAXTEXTS);
-                                if(org_visatext(kom[x])) {
-                                        if((komret=clearkom())==-1) return(-1);
-                                        else if(komret==-3) return(-3);
-                                        else if(komret==-8) return(-8);
-                                        else if(komret==-9) return(-9);
-                                        else if(komret==-11) return(-11);
-                                        else if(komret>=0) return(komret);
-                                }
-                        }
-/* MENYNOD */
-                        if(activemenu->ret!=READTEXT)
-                                return(-9);
-/* END MENYNOD */
-                        if(promret!=-5) x++;
-                } else x++;
-        }
+  long kom[MAXKOM];
+  int promret,komret,x=0;
+  memcpy(kom,readhead.kom_i,MAXKOM*sizeof(long));
+  while(kom[x]!=-1) {
+    if(Servermem->texts[kom[x]%MAXTEXTS]!=-1
+       && IsTextUnread(kom[x], &Servermem->unreadTexts[nodnr])
+       && IsMemberConf(Servermem->texts[kom[x]%MAXTEXTS], inloggad,
+            &Servermem->inne[nodnr])) {
+      if((promret=prompt(211))==-1) return(-1);
+      else if(promret==-2) return(-2);
+      else if(promret==-3) return(-3);
+      else if(promret==-8) return(-8);
+      else if(promret==-9) return(-9);
+      else if(promret==-10) {
+        sprintf(outbuffer,"\r\n\nDu hoppade över %d texter.\r\n",hoppaover(readhead.nummer,0)-1);
+        puttekn(outbuffer,-1);
         return(-5);
+      }
+      else if(promret==-11) return(-11);
+      else if(promret>=0) return(promret);
+      /* MENYNOD  tillagt: && activemenu->ret==READTEXT */
+      else if(promret==-4 || promret==-6 && activemenu->ret==READTEXT) {
+        ChangeUnreadTextStatus(kom[x], 0, &Servermem->unreadTexts[nodnr]);
+        if(org_visatext(kom[x])) {
+          if((komret=clearkom())==-1) return(-1);
+          else if(komret==-3) return(-3);
+          else if(komret==-8) return(-8);
+          else if(komret==-9) return(-9);
+          else if(komret==-11) return(-11);
+          else if(komret>=0) return(komret);
+        }
+      }
+      /* MENYNOD */
+      if(activemenu->ret!=READTEXT)
+        return(-9);
+      /* END MENYNOD */
+      if(promret!=-5) x++;
+    } else x++;
+  }
+  return(-5);
 }
 
 int org_visatext(int text) {
@@ -343,24 +336,9 @@ int org_initheader(int komm) {
         return(0);
 }
 
-void org_endast(int motnr,int antal) {
-        int x, oldtextpek,foo=TRUE;
-        oldtextpek=textpek;
-        for(x=Servermem->info.hightext;x>=Servermem->info.lowtext;x--) {
-                if(Servermem->texts[x%MAXTEXTS]==motnr) {
-                        if(antal) {
-                                BAMSET(Servermem->bitmaps[nodnr],x%MAXTEXTS);
-                                antal--;
-                        } else {
-                                BAMCLEAR(Servermem->bitmaps[nodnr],x%MAXTEXTS);
-                                if(foo) {
-                                        textpek=x;
-                                        foo=FALSE;
-                                }
-                        }
-                }
-        }
-        if(textpek>oldtextpek) textpek=oldtextpek;
-        else if(textpek==oldtextpek) textpek=Servermem->info.lowtext;
-        temppek[motnr]=textpek;
+void org_endast(int conf,int amount) {
+  SetUnreadTexts(conf, amount, &Servermem->unreadTexts[nodnr]);
+  if(textpek > Servermem->unreadTexts[nodnr].lowestPossibleUnreadText[conf]) {
+    textpek = Servermem->unreadTexts[nodnr].lowestPossibleUnreadText[conf];
+  }
 }

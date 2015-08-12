@@ -82,8 +82,6 @@ void createletter(struct RexxMsg *mess);
 void textinfo(struct RexxMsg *mess);
 void nextunread(struct RexxMsg *mess);
 void freeeditlist(void);
-int readuserbitmap(int nummer,char *bitmap,int bmnr);
-int writeuserbitmap(int nummer,char *bitmap,int bmnr);
 struct Mote *getmotpek(int);
 char *getmotnamn(int);
 void meetright(struct RexxMsg *);

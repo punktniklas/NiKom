@@ -456,7 +456,7 @@ void rexxmarktextread(struct RexxMsg *mess)
 
 	anvnr = atoi(mess->rm_Args[1]);
 	textnr = atoi(mess->rm_Args[2]);
-	error = MarkTextRead(anvnr, textnr);
+	error = -6; /* MarkTextRead(anvnr, textnr); */
 	sprintf(retur,"%d", error);
 
 	if(!(mess->rm_Result2=(long)CreateArgstring(retur, strlen(retur))))
@@ -479,7 +479,7 @@ void rexxmarktextunread(struct RexxMsg *mess)
 
 	anvnr = atoi(mess->rm_Args[1]);
 	textnr = atoi(mess->rm_Args[2]);
-	error = MarkTextUnRead(anvnr, textnr);
+	error = -6; /* MarkTextUnRead(anvnr, textnr); */
 	sprintf(retur,"%d", error);
 
 	if(!(mess->rm_Result2=(long)CreateArgstring(retur, strlen(retur))))

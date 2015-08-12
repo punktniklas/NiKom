@@ -47,8 +47,15 @@ int EditUser(LONG, struct TagItem *);
 int EditUserTags(LONG, unsigned long tag1Type, ... );
 void *ReadUser(LONG, LONG);
 int NiKParse(char *, char);
-int MarkTextRead(int, int);
-int MarkTextUnRead(int, int);
+void ChangeUnreadTextStatus(
+  int textNumber, int markAsUnread, struct UnreadTexts *unreadTexts);
+int IsTextUnread(int textNumber, struct UnreadTexts *unreadTexts);
+void InitUnreadTexts(struct UnreadTexts *unreadTexts);
+int FindNextUnreadText(int searchStart, int conf, struct UnreadTexts *unreadTexts);
+int CountUnreadTexts(int conf, struct UnreadTexts *unreadTexts);
+void SetUnreadTexts(int conf, int amount, struct UnreadTexts *unreadTexts);
+int ReadUnreadTexts(struct UnreadTexts *unreadTexts, int userId);
+int WriteUnreadTexts(struct UnreadTexts *unreadTexts, int userId);
 
 /* PrgCat.c */
 

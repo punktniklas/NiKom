@@ -26,7 +26,7 @@ extern struct System *Servermem;
 extern int nodnr,inloggad,senast_text_typ,rad,mote2,buftkn,senast_brev_nr,senast_brev_anv;
 extern char outbuffer[],inmat[],backspace[],*argument,vilkabuf[];
 extern struct MsgPort *timerport,*conreadport,*serreadport;
-extern long textpek,temppek[];
+extern long textpek;
 extern struct Inloggning Statstr;
 extern struct timerequest *timerreq;
 extern char coninput;
@@ -98,7 +98,7 @@ int nyanv(void) {
 		if(motpek->status & (SKRIVSTYRT | SLUTET)) BAMCLEAR(Servermem->inne[nodnr].motratt,motpek->nummer);
 		else BAMSET(Servermem->inne[nodnr].motratt,motpek->nummer);
 	}
-	memset((void *)Servermem->bitmaps[nodnr],~0,MAXTEXTS/8);
+        InitUnreadTexts(&Servermem->unreadTexts[nodnr]);
 	sprintf(outbuffer,"\r\n\nNamn :        %s\r\n",Servermem->inne[nodnr].namn);
 	puttekn(outbuffer,-1);
 	sprintf(outbuffer,"Gatuadress :  %s\r\n",Servermem->inne[nodnr].gata);
@@ -199,17 +199,12 @@ int nyanv(void) {
 		return(2);
 	}
 	Close(fh);
-	sprintf(filnamn,"NiKom:Users/%d/%d/Bitmap0",x/100,x);
-	if(!(fh=Open(filnamn,MODE_NEWFILE))) {
-		puttekn("\r\n\nKunde inte öppna Bitmapx!\r\n\n",-1);
-		return(2);
-	}
-	if(Write(fh,(void *)Servermem->bitmaps[nodnr],MAXTEXTS/8)==-1) {
-		puttekn("\r\n\nKunde inte skriva Bitmapx!\r\n\n",-1);
-		Close(fh);
-		return(2);
-	}
-	Close(fh);
+
+        if(!WriteUnreadTexts(&Servermem->unreadTexts[nodnr], x)) {
+          puttekn("\r\n\nKunde inte skriva data om olästa texter!\r\n\n",-1);
+          return 2;
+        }
+
 	sprintf(filnamn,"Nikom:Users/%d/%d/.firstletter",x/100,x);
 	if(!(fh=Open(filnamn,MODE_NEWFILE))) {
 		printf("Kunde inte öppna %s\n",filnamn);
@@ -312,13 +307,15 @@ char *strang;
 void status(void) {
 	struct User readuserstr;
 	struct Mote *motpek=(struct Mote *)Servermem->mot_list.mlh_Head;
-	int nummer,nod,x,cnt=0,olasta=FALSE,tot=0;
+	int nummer,nod,cnt=0,olasta=FALSE,tot=0;
 	struct tm *ts;
 	struct UserGroup *listpek;
-	char filnamn[100],userbitmap[MAXTEXTS/8];
+	char filnamn[100];
+        struct UnreadTexts unreadTextsBuf, *unreadTexts;
+
 	if(argument[0]==0) {
 		memcpy(&readuserstr,&Servermem->inne[nodnr],sizeof(struct User));
-		memcpy(userbitmap,Servermem->bitmaps[nodnr],MAXTEXTS/8);
+                unreadTexts = &Servermem->unreadTexts[nodnr];
 		nummer=inloggad;
 		readuserstr.textpek=textpek;
 	} else {
@@ -330,10 +327,13 @@ void status(void) {
 		if(nod<MAXNOD)
 		{
 			memcpy(&readuserstr,&Servermem->inne[nod],sizeof(struct User));
-			memcpy(userbitmap,Servermem->bitmaps[nod],MAXTEXTS/8);
+                        unreadTexts = &Servermem->unreadTexts[nod];
 		} else {
 			if(readuser(nummer,&readuserstr)) return;
-			if(readuserbitmap(nummer,userbitmap,0,NULL)) return;
+                        if(!ReadUnreadTexts(&unreadTextsBuf, nummer)) {
+                          return;
+                        }
+                        unreadTexts = &unreadTextsBuf;
 		}
 	}
 	sprintf(outbuffer,"\r\n\nStatus för %s #%d\r\n\n",readuserstr.namn,nummer);
@@ -423,14 +423,12 @@ void status(void) {
 		if(motpek->status & SUPERHEMLIGT) continue;
 		if(IsMemberConf(motpek->nummer, nummer, &readuserstr)) {
 			cnt=0;
-			switch(motpek->type)
-			{
-				case MOTE_ORGINAL :
-					if(readuserstr.textpek < Servermem->info.lowtext) readuserstr.textpek = Servermem->info.lowtext;
-					for(x=readuserstr.textpek;x<=Servermem->info.hightext;x++)
-						if(Servermem->texts[x%MAXTEXTS]==motpek->nummer && BAMTEST(userbitmap,x%MAXTEXTS)) cnt++;
-
-				default : break;
+			switch(motpek->type) {
+                        case MOTE_ORGINAL :
+                          cnt = CountUnreadTexts(motpek->nummer, unreadTexts);
+                          break;
+                        default :
+                          break;
 			}
 			if(cnt && MaySeeConf(motpek->nummer, inloggad, &Servermem->inne[nodnr]))
 			{
@@ -831,7 +829,7 @@ int hoppaover(int rot,int ack) {
 	long kom_i[MAXKOM];
 	if(readtexthead(rot,&hoppahead)) return(ack);
 	memcpy(kom_i,hoppahead.kom_i,MAXKOM*sizeof(long));
-	BAMCLEAR(Servermem->bitmaps[nodnr],(rot%MAXTEXTS));
+        ChangeUnreadTextStatus(rot, 0, &Servermem->unreadTexts[nodnr]);
 	ack++;
 	while(kom_i[x]!=-1 && x<MAXKOM) {
 		ack=hoppaover(kom_i[x],ack);

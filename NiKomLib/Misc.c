@@ -476,3 +476,7 @@ int parsenyckel(char *skri, struct NiKomBase *NiKomBase)
 	}
 	return(found);
 }
+
+void MakeUserFilePath(char* string, int userId, char *fileName) {
+  sprintf(string, "NiKom:Users/%d/%d/%s", userId/100, userId, fileName);
+}

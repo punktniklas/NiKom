@@ -18,7 +18,6 @@
 extern struct System *Servermem;
 extern int nodnr, inloggad;
 extern char outbuffer[],inmat[], *argument;
-extern long temppek[];
 
 struct Mote *getmotpek(int motnr) {
 	struct Mote *letpek=(struct Mote *)Servermem->mot_list.mlh_Head;
@@ -168,7 +167,7 @@ void SaveCurrentUser(int inloggad, int nodnr)
 	time(&tid);
 	Servermem->inne[nodnr].senast_in=tid;
 	writeuser(inloggad,&Servermem->inne[nodnr]);
-	writeuserbitmap(inloggad,Servermem->bitmaps[nodnr],0,temppek);
+        WriteUnreadTexts(&Servermem->unreadTexts[nodnr], inloggad);
 	SaveProgramCategory(inloggad);
 }
 

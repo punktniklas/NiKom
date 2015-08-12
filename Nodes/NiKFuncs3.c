@@ -29,7 +29,7 @@ extern char outbuffer[],inmat[],*argument,reggadnamn[];
 extern struct Header sparhead,readhead;
 extern struct MsgPort *permitport,*serverport,*NiKomPort;
 extern struct Inloggning Statstr;
-extern long logintime,temppek[];
+extern long logintime;
 extern struct MinList edit_list;
 extern struct ReadLetter brevspar;
 

@@ -102,9 +102,10 @@ int __saveds __asm LIBCreateUser(register __d0 LONG nodnummer, register __a0 str
 	struct ShortUser *allokpek;
 	struct Mote *motpek=(struct Mote *)NiKomBase->Servermem->mot_list.mlh_Head;
 	long tid, anvnummer = -1;
-	char dirnamn[100],filnamn[40], bitmap[MAXTEXTS/8];
+	char dirnamn[100],filnamn[40];
 	BPTR lock,fh;
 	ULONG tmp;
+        struct UnreadTexts unreadTexts;
 	
 	if(!(newuser=AllocMem(sizeof(struct User),MEMF_CLEAR | MEMF_PUBLIC))) return(-1);
 
@@ -255,8 +256,6 @@ int __saveds __asm LIBCreateUser(register __d0 LONG nodnummer, register __a0 str
 	time(&tid);
 	newuser->forst_in = tid;
 
-	memset((void *)bitmap,~0,MAXTEXTS/8);
-
 	if(anvnummer == -1)
 	{
 		anvnummer = ((struct ShortUser *)NiKomBase->Servermem->user_list.mlh_TailPred)->nummer+1;
@@ -320,20 +319,10 @@ int __saveds __asm LIBCreateUser(register __d0 LONG nodnummer, register __a0 str
 		return(-4);
 	}
 	Close(fh);
-	sprintf(filnamn,"NiKom:Users/%d/%d/Bitmap0",anvnummer/100,anvnummer);
-	if(!(fh=Open(filnamn,MODE_NEWFILE)))
-	{
-		FreeMem(newuser,sizeof(struct User));
-		LIBUnLockNiKomBase(NiKomBase);
-		return(-4);
-	}
-	if(Write(fh,(void *)bitmap,MAXTEXTS/8)==-1) {
-		Close(fh);
-		FreeMem(newuser,sizeof(struct User));
-		LIBUnLockNiKomBase(NiKomBase);
-		return(-4);
-	}
-	Close(fh);
+
+        LIBInitUnreadTexts(&unreadTexts, NiKomBase);
+        LIBWriteUnreadTexts(&unreadTexts, anvnummer, NiKomBase);
+
 	sprintf(filnamn,"Nikom:Users/%d/%d/.firstletter",anvnummer/100,anvnummer);
 	if(!(fh=Open(filnamn,MODE_NEWFILE)))
 	{

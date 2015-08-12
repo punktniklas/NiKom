@@ -2,6 +2,7 @@
 #include <exec/memory.h>
 #include <dos/dos.h>
 #include "NiKomStr.h"
+#include "NiKomLib.h"
 #include "Serverfuncs.h"
 #include <rexx/storage.h>
 #include <proto/exec.h>
@@ -22,7 +23,6 @@ extern struct System *Servermem;
 
 struct Header infohead= { 0,0,0,0,{0},0,-1 };
 struct MinList edit_list;
-char userbitmap[MAXTEXTS/8];
 
 void freeeditlist(void);
 char *hittaefter(char *);
@@ -592,9 +592,11 @@ void textinfo(struct RexxMsg *mess) {
 }
 
 void nextunread(struct RexxMsg *mess) {
-        int x,text,motnr,anv;
+  int x,text,motnr,anv, nextUnread;
         struct Mote *motpek;
         char str[100];
+        struct UnreadTexts *unreadTexts, unreadTextsBuf;
+
         if((!mess->rm_Args[1]) || (!mess->rm_Args[2]) || (!mess->rm_Args[3])) {
                 mess->rm_Result1=1;
                 mess->rm_Result2=NULL;
@@ -623,29 +625,29 @@ void nextunread(struct RexxMsg *mess) {
                 return;
         }
 
-		for(x=0;x<MAXNOD;x++)
-			if(anv==Servermem->inloggad[x]) break;
+        for(x=0;x<MAXNOD;x++)
+          if(anv==Servermem->inloggad[x]) break;
 
-		if(x<MAXNOD)
-		{
-			memcpy(&userbitmap, &Servermem->bitmaps[x][0], MAXTEXTS/8);
-		}
-		else
-		{
-	        if(readuserbitmap(anv,userbitmap,0))
-	        {
-                if(!(mess->rm_Result2=(long)CreateArgstring("-4",strlen("-4"))))
-                        printf("Kunde inte allokera en ArgString\n");
-                mess->rm_Result1=0;
-                return;
-	        }
-		}
-
-        for(x=text+1;x<=Servermem->info.hightext;x++) {
-                if(motnr==Servermem->texts[x%MAXTEXTS] && BAMTEST(userbitmap,x%MAXTEXTS)) break;
+        if(x < MAXNOD) {
+          unreadTexts = &Servermem->unreadTexts[x];
         }
-        if(x>Servermem->info.hightext) strcpy(str,"-5");
-        else sprintf(str,"%d",x);
+        else {
+          if(!ReadUnreadTexts(&unreadTextsBuf, anv)) {
+            if(!(mess->rm_Result2=(long)CreateArgstring("-4",strlen("-4")))) {
+              printf("Kunde inte allokera en ArgString\n");
+              mess->rm_Result1=0;
+              return;
+            }
+          }
+          unreadTexts = &unreadTextsBuf;
+        }
+
+        nextUnread = FindNextUnreadText(text + 1, motnr, unreadTexts);
+        if(nextUnread == -1) {
+          strcpy(str, "-5");
+        } else {
+          sprintf(str, "%d", nextUnread);
+        }
         if(!(mess->rm_Result2=(long)CreateArgstring(str,strlen(str))))
                 printf("Kunde inte allokera en ArgString\n");
         mess->rm_Result1=0;
@@ -657,38 +659,6 @@ void freeeditlist(void) {
                 FreeMem(el,sizeof(struct EditLine));
         NewList((struct List *)&edit_list);
 }
-
-int readuserbitmap(int nummer,char *bitmap,int bmnr) {
-        BPTR fh;
-        char filnamn[40];
-        sprintf(filnamn,"NiKom:Users/%d/%d/Bitmap%d",nummer/100,nummer,bmnr);
-        if(!(fh=Open(filnamn,MODE_OLDFILE))) {
-                return(1);
-        }
-        if(Read(fh,(void *)bitmap,MAXTEXTS/8)==-1) {
-                Close(fh);
-                return(1);
-        }
-        Close(fh);
-        return(0);
-}
-
-/*
-int writeuserbitmap(int nummer,char *bitmap,int bmnr) {
-        BPTR fh;
-        char filnamn[40];
-        sprintf(filnamn,"NiKom:Users/%d/%d/Bitmap%d",nummer/100,nummer,bmnr);
-        if(!(fh=Open(filnamn,MODE_OLDFILE))) {
-                return(1);
-        }
-        if(Write(fh,(void *)bitmap,MAXTEXTS/8)==-1) {
-                Close(fh);
-                return(1);
-        }
-        Close(fh);
-        return(0);
-}
-*/
 
 struct Mote *getmotpek(int motnr) {
         struct Mote *letpek=(struct Mote *)Servermem->mot_list.mlh_Head;

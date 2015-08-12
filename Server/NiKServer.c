@@ -1005,7 +1005,10 @@ void sparatext(struct NiKMess *message) {
 	if(Write(fh,(void *)&headpek->mote,2)==-1)
 		printf("Fel vid skrivandet av Textmot.dat\n");
 	Close(fh);
-	if(message->nod>=0) BAMCLEAR(Servermem->bitmaps[message->nod],Servermem->info.hightext%MAXTEXTS);
+	if(message->nod >=0 ) {
+          ChangeUnreadTextStatus(Servermem->info.hightext, 0,
+            &Servermem->unreadTexts[message->nod]);
+        }
 	message->data=Servermem->info.hightext;
 	if(Servermem->info.hightext-Servermem->info.lowtext+1==MAXTEXTS) radera(512);
 }
@@ -1015,7 +1018,6 @@ void radera(int texter) {
 	long oldlowtext=Servermem->info.lowtext;
 	int x;
 	char filnamn[40];
-	char userbitmap[MAXTEXTS/8];
 	struct ShortUser *scan;
 	if(texter>(Servermem->info.hightext-Servermem->info.lowtext)) {
 		printf("Kan inte radera så många texter!\n");
@@ -1033,41 +1035,6 @@ void radera(int texter) {
 		DeleteFile(filnamn);
 	}
 	Servermem->info.lowtext+=texter;
-	for(scan=(struct ShortUser *)Servermem->user_list.mlh_Head;scan->user_node.mln_Succ;scan=(struct ShortUser *)scan->user_node.mln_Succ) {
-		sprintf(filnamn,"NiKom:Users/%d/%d/Bitmap0",scan->nummer/100,scan->nummer);
-		if(!(fh=Open(filnamn,MODE_OLDFILE))) {
-			printf("Kunde inte öppna %s\n",filnamn);
-			break;
-		}
-		if(Read(fh,(void *)userbitmap,MAXTEXTS/8)==-1) {
-			printf("Fel vid läsandet av %s\n",filnamn);
-			Close(fh);
-			break;
-		}
-		if((oldlowtext+texter)%MAXTEXTS > oldlowtext%MAXTEXTS) memset(&userbitmap[(oldlowtext%MAXTEXTS)/8],~0,texter/8);
-		else {
-			memset(&userbitmap[(oldlowtext%MAXTEXTS)/8],~0,(MAXTEXTS-(oldlowtext%MAXTEXTS))/8);
-			memset(userbitmap,~0,(texter-(MAXTEXTS-(oldlowtext%MAXTEXTS)))/8);
-		}
-		if(Seek(fh,0,OFFSET_BEGINNING)==-1) {
-			printf("Kunde inte söka i %s\n",filnamn);
-			Close(fh);
-			break;
-		}
-		if(Write(fh,(void *)userbitmap,MAXTEXTS/8)==-1) {
-			printf("Fel vid skrivandet av %s\n",filnamn);
-			Close(fh);
-			break;
-		}
-		Close(fh);
-	}
-	for(x=0;x<MAXNOD;x++) {
-		if((oldlowtext+texter)%MAXTEXTS > oldlowtext%MAXTEXTS) memset(&Servermem->bitmaps[x][(oldlowtext%MAXTEXTS)/8],~0,texter/8);
-		else {
-			memset(&Servermem->bitmaps[x][(oldlowtext%MAXTEXTS)/8],~0,(MAXTEXTS-(oldlowtext%MAXTEXTS))/8);
-			memset(Servermem->bitmaps[x],~0,(texter-(MAXTEXTS-(oldlowtext%MAXTEXTS)))/8);
-		}
-	}
 }
 
 void writeinfo(void) {
