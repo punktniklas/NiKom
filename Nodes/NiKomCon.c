@@ -112,7 +112,7 @@ void main(int argc, char **argv) {
 																	  WA_DepthGadget,TRUE,
 																	  WA_CloseGadget,TRUE,
 																	  WA_SimpleRefresh,TRUE,
-																	  WA_ScreenTitle,"NiKom © Tomas Kärki 1996-1998",
+																	  WA_ScreenTitle,"NiKomCon",
 																	  WA_AutoAdjust,TRUE,
 																	  WA_PubScreenName,tmppscreen,
 																	  TAG_DONE)))
