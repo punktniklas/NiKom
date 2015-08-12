@@ -56,7 +56,7 @@ struct Window *openmywindow(char *screenname) {
 										WA_CloseGadget,TRUE,
 										WA_SimpleRefresh,TRUE,
 										WA_Title,titel,
-										WA_ScreenTitle,"NiKom © Tomas Kärki 1996-1998",
+										WA_ScreenTitle,"NiKom Prenode",
 										WA_AutoAdjust,TRUE,
 										WA_PubScreenName,screenname,
 										TAG_DONE));

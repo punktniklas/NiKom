@@ -1004,7 +1004,9 @@ void listaarende(void) {
 		ts=localtime(&lahead.tid);
 		if(lahead.kom_till_nr==-1) strcpy(kom,"   -");
 		else sprintf(kom,"%d",lahead.kom_till_nr);
-		sprintf(outbuffer,"%-34s%6d %6s %02d%02d%02d %s\r\n",namn,lahead.nummer,kom,ts->tm_year,ts->tm_mon+1,ts->tm_mday,lahead.arende);
+		sprintf(outbuffer,"%-34s%6d %6s %02d%02d%02d %s\r\n", namn,
+                        lahead.nummer, kom, ts->tm_year % 100, ts->tm_mon + 1,
+                        ts->tm_mday, lahead.arende);
 		if(puttekn(outbuffer,-1)) return;
 	}
 }

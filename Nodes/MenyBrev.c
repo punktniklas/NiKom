@@ -371,7 +371,8 @@ int initbrevheader(int tillpers) {
         }
         time(&tid);
         ts=localtime(&tid);
-        sprintf(brevspar.date,"%2d%02d%02d %02d:%02d",ts->tm_year,ts->tm_mon+1,ts->tm_mday,ts->tm_hour,ts->tm_min);
+        sprintf(brevspar.date,"%02d%02d%02d %02d:%02d", ts->tm_year + 1900,
+                ts->tm_mon + 1, ts->tm_mday, ts->tm_hour, ts->tm_min);
         strcpy(brevspar.systemid,"NiKom");
         sprintf(outbuffer,"\r\n\nMöte: %s\r\n",Servermem->cfg.brevnamn);
         puttekn(outbuffer,-1);
@@ -786,7 +787,8 @@ void initpersheader(void) {
         }
         time(&tid);
         ts=localtime(&tid);
-        sprintf(brevspar.date,"%2d%02d%02d %02d:%02d",ts->tm_year,ts->tm_mon+1,ts->tm_mday,ts->tm_hour,ts->tm_min);
+        sprintf(brevspar.date,"%02d%02d%02d %02d:%02d", ts->tm_year + 1900,
+                ts->tm_mon + 1, ts->tm_mday, ts->tm_hour, ts->tm_min);
         strcpy(brevspar.systemid,"NiKom");
         sprintf(outbuffer,"\r\n\nMöte: %s\r\n",Servermem->cfg.brevnamn);
         puttekn(outbuffer,-1);

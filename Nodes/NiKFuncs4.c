@@ -573,7 +573,9 @@ void motesstatus(void) {
 	sprintf(outbuffer,"\r\nSkapat av:       %s",getusername(motpek->skapat_av));
 	puttekn(outbuffer,-1);
 	ts=localtime(&motpek->skapat_tid);
-	sprintf(outbuffer,"\r\nSkapat tid:      %2d%02d%02d  %02d:%02d",ts->tm_year,ts->tm_mon+1,ts->tm_mday,ts->tm_hour,ts->tm_min);
+	sprintf(outbuffer,"\r\nSkapat tid:      %4d%02d%02d  %02d:%02d",
+                ts->tm_year + 1900, ts->tm_mon + 1, ts->tm_mday, ts->tm_hour,
+                ts->tm_min);
 	puttekn(outbuffer,-1);
 	sprintf(outbuffer,"\r\nMötesnummer:     %d",motpek->nummer);
 	puttekn(outbuffer,-1);
@@ -764,7 +766,8 @@ void logevent(char *str) {
 	char logbuf[150];
 	time(&tid);
 	ts=localtime(&tid);
-	sprintf(logbuf,"%2d%02d%02d %02d:%02d - %s\n",ts->tm_year,ts->tm_mon+1,ts->tm_mday,ts->tm_hour,ts->tm_min,str);
+	sprintf(logbuf,"%4d%02d%02d %02d:%02d - %s\n", ts->tm_year + 1900,
+                ts->tm_mon + 1, ts->tm_mday, ts->tm_hour, ts->tm_min, str);
 	if(!(fh=Open(Servermem->cfg.logfile,MODE_OLDFILE))) {
 		if(!(fh=Open(Servermem->cfg.logfile,MODE_NEWFILE))) {
 			printf("Kunde inte öppna logfilen!\n");
@@ -787,7 +790,8 @@ void debuglog(char *typ, char *str) {
 	char logbuf[8192];
 	time(&tid);
 	ts=localtime(&tid);
-	sprintf(logbuf,"%2d%02d%02d %02d:%02d - %s: %s\n",ts->tm_year,ts->tm_mon+1,ts->tm_mday,ts->tm_hour,ts->tm_min,typ,str);
+	sprintf(logbuf,"%4d%02d%02d %02d:%02d - %s: %s\n", ts->tm_year + 1900,
+                ts->tm_mon + 1, ts->tm_mday, ts->tm_hour, ts->tm_min, typ, str);
 	if(!(fh=Open("NiKom:Debug.log",MODE_OLDFILE))) {
 		if(!(fh=Open("NiKom:Debug.log",MODE_NEWFILE))) {
 			printf("Kunde inte öppna logfilen!\n");

@@ -478,7 +478,8 @@ void createletter(struct RexxMsg *mess) {
         FPuts(fhout,bugbuf);
         time(&tid);
         ts=localtime(&tid);
-        sprintf(bugbuf,"Date: %2d%02d%02d %02d:%02d\n",ts->tm_year,ts->tm_mon+1,ts->tm_mday,ts->tm_hour,ts->tm_min);
+        sprintf(bugbuf,"Date: %4d%02d%02d %02d:%02d\n", ts->tm_year + 1900,
+                ts->tm_mon + 1, ts->tm_mday, ts->tm_hour, ts->tm_min);
         FPuts(fhout,bugbuf);
         sprintf(bugbuf,"Subject: %s\n",mess->rm_Args[2]);
         FPuts(fhout,bugbuf);
@@ -580,7 +581,9 @@ void textinfo(struct RexxMsg *mess) {
                         break;
                 case 't' : case 'T' :
                         ts=localtime(&infohead.tid);
-                        sprintf(str,"%02d%02d%02d %02d:%02d",ts->tm_year,ts->tm_mon+1,ts->tm_mday,ts->tm_hour,ts->tm_min);
+                        sprintf(str,"%4d%02d%02d %02d:%02d", ts->tm_year + 1900,
+                                ts->tm_mon + 1, ts->tm_mday, ts->tm_hour,
+                                ts->tm_min);
                         break;
                 defualt :
                         str[0]=0;

@@ -1275,7 +1275,7 @@ void main() {
 		Servermem->UserCached[x].LatestUsedUserCache = -1; */
 	}
 	GetNiKomVersion(NULL,NULL,nikomrel);
-	sprintf(titel,"NiKom %s © Tomas Kärki 0 noder aktiva", nikomrel);
+	sprintf(titel,"NiKom %s,  0 noder aktiva", nikomrel);
 	if(pubscreen[0]=='-') tmppscreen=NULL;
 	else tmppscreen=pubscreen;
 	if(!(lockscreen=LockPubScreen(tmppscreen)))
@@ -1292,7 +1292,7 @@ void main() {
 																			WA_DepthGadget,TRUE,
 																			WA_CloseGadget,TRUE,
 																			WA_NoCareRefresh,TRUE,
-																			WA_ScreenTitle,"NiKom © Tomas Kärki 1996-1998.",
+																			WA_ScreenTitle,"NiKom Server",
 																			WA_AutoAdjust,TRUE,
 																			WA_PubScreen,lockscreen))) {
 		UnlockPubScreen(NULL,lockscreen);
@@ -1328,14 +1328,14 @@ void main() {
 						} else {
 							MyNiKMess->data=NULL;
 						}
-						sprintf(titel,"NiKom %s © Tomas Kärki  %d noder aktiva", nikomrel, noder);
+						sprintf(titel,"NiKom %s,  %d noder aktiva", nikomrel, noder);
 						SetWindowTitles(NiKWindow,titel,(UBYTE *)-1L);
 						break;
 
 					case NODSLUTAR :
 						noder--;
 						Servermem->nodtyp[MyNiKMess->nod]=0;
-						sprintf(titel,"NiKom %s © Tomas Kärki  %d noder aktiva", nikomrel, noder);
+						sprintf(titel,"NiKom %s,  %d noder aktiva", nikomrel, noder);
 						SetWindowTitles(NiKWindow,titel,(UBYTE *)-1L);
 						break;
 

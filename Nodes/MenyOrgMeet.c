@@ -212,7 +212,10 @@ int org_visatext(int text) {
                 return(0);
         }
         ts=localtime(&readhead.tid);
-        sprintf(outbuffer,"\r\n\nText %d  Möte: %s    %2d%02d%02d %02d:%02d\r\n",readhead.nummer,getmotnamn(readhead.mote),ts->tm_year,ts->tm_mon+1,ts->tm_mday,ts->tm_hour,ts->tm_min);
+        sprintf(outbuffer,"\r\n\nText %d  Möte: %s    %4d%02d%02d %02d:%02d\r\n",
+                readhead.nummer, getmotnamn(readhead.mote),
+                ts->tm_year + 1900, ts->tm_mon + 1, ts->tm_mday, ts->tm_hour,
+                ts->tm_min);
         puttekn(outbuffer,-1);
         if(readhead.person!=-1) sprintf(outbuffer,"Skriven av %s\r\n",getusername(readhead.person));
         else sprintf(outbuffer,"Skriven av <raderad användare>\r\n");
@@ -309,7 +312,9 @@ int org_initheader(int komm) {
         sparhead.tid=tid;
         sparhead.textoffset=(long)&edit_list;
         sparhead.status=0;
-        sprintf(outbuffer,"\r\n\nMöte: %s    %2d%02d%02d %02d:%02d\r\n",getmotnamn(sparhead.mote),ts->tm_year,ts->tm_mon+1,ts->tm_mday,ts->tm_hour,ts->tm_min);
+        sprintf(outbuffer,"\r\n\nMöte: %s    %4d%02d%02d %02d:%02d\r\n",
+                getmotnamn(sparhead.mote), ts->tm_year + 1900, ts->tm_mon + 1,
+                ts->tm_mday, ts->tm_hour, ts->tm_min);
         puttekn(outbuffer,-1);
         sprintf(outbuffer,"Skriven av %s\r\n",getusername(inloggad));
         puttekn(outbuffer,-1);

@@ -16,10 +16,10 @@ void aboutmeny(void) {
         int libver, librev;
         char rel[20];
         GetNiKomVersion(&libver,&librev,rel);
-        sprintf(outbuffer,"\n\n\rNiKom %s, © Tomas Kärki 1996-1998\r\n",rel);
+        sprintf(outbuffer,"\n\n\rNiKom %s © Niklas Lindholm 1990-1996, 2015 & Tomas Kärki 1996-1998\r\n",rel);
         puttekn(outbuffer,-1);
 
-        sprintf(outbuffer,"Meny-nod v%d.%d © Tomas Kärki 1996-1998\r\n",atoi(NIKVERSION),atoi(NIKREVISION));
+        sprintf(outbuffer,"Meny-nod v%d.%d\r\n",atoi(NIKVERSION),atoi(NIKREVISION));
         puttekn(outbuffer,-1);
 
 		sprintf(outbuffer,"Server v%d.%d\r\n", Servermem->serverversion, Servermem->serverrevision);
