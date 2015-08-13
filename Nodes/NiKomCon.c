@@ -163,7 +163,9 @@ do
 	}
 	sprintf(titel,"Nod #%d CON: %s #%d",nodnr,Servermem->inne[nodnr].namn,inloggad);
 	SetWindowTitles(NiKwind,titel,(UBYTE *)-1L);
-        ReadUnreadTexts(&Servermem->unreadTexts[nodnr], inloggad);
+        if(!ReadUnreadTexts(&Servermem->unreadTexts[nodnr], inloggad)) {
+          printf("Error reading unread text info for user %d\n", inloggad);
+        }
 	Servermem->inloggad[nodnr]=inloggad;
 	Servermem->idletime[nodnr] = time(NULL);
 	if(getft("NiKom:Texter/Bulletin.txt")>Servermem->inne[nodnr].senast_in) sendfile("NiKom:Texter/Bulletin.txt");

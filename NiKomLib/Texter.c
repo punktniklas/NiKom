@@ -62,7 +62,7 @@ void __saveds __asm LIBInitUnreadTexts(
    register __a6 struct NiKomBase *NiKomBase) {
   unreadTexts->bitmapStartText = NiKomBase->Servermem->info.lowtext;
   memset(unreadTexts->bitmap, 0xff, UNREADTEXTS_BITMAPSIZE/8);
-  memset(unreadTexts->lowestPossibleUnreadText, 0, MAXMOTE);
+  memset(unreadTexts->lowestPossibleUnreadText, 0, MAXMOTE * sizeof(long));
 }
 
 /*
@@ -123,10 +123,11 @@ void __saveds __asm LIBSetUnreadTexts(
   register __a0 struct UnreadTexts *unreadTexts,
   register __a6 struct NiKomBase *NiKomBase) {
 
-  int i, lowestUnreadText = NiKomBase->Servermem->info.hightext;
+  int i, lowestUnreadText = NiKomBase->Servermem->info.hightext + 1;
 
   for(i = NiKomBase->Servermem->info.hightext;
-      i >= unreadTexts->bitmapStartText && i >= NiKomBase->Servermem->info.lowtext;
+      (i >= unreadTexts->bitmapStartText)
+        && (i >= NiKomBase->Servermem->info.lowtext);
       i--) {
     if(NiKomBase->Servermem->texts[i % MAXTEXTS] == conf) {
       if(amount) {
@@ -162,13 +163,14 @@ int __saveds __asm LIBReadUnreadTexts(
     return 0;
   }
   if(Read(file, unreadTexts->bitmap, UNREADTEXTS_BITMAPSIZE/8)
-     != sizeof(struct ConfAndText)) {
+     != UNREADTEXTS_BITMAPSIZE/8) {
     Close(file);
     ReleaseSemaphore(&NiKomBase->Servermem->semaphores[NIKSEM_UNREAD]);
     return 0;
   }
   unreadTexts->bitmapStartText = NiKomBase->Servermem->info.lowtext;
 
+  memset(unreadTexts->lowestPossibleUnreadText, 0, MAXMOTE * sizeof(long));
   while((readRes = Read(file,&cat,sizeof(struct ConfAndText)))
         == sizeof(struct ConfAndText)) {
     unreadTexts->lowestPossibleUnreadText[cat.conf] = cat.text;

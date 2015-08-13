@@ -138,7 +138,9 @@ void main(int argc,char *argv[]) {
 	serreqtkn();
 	sprintf(titel,"Nod #%d SER: %s #%d",nodnr,Servermem->inne[nodnr].namn,inloggad);
 	SetWindowTitles(NiKwind,titel,(char *)-1L);
-        ReadUnreadTexts(&Servermem->unreadTexts[nodnr], inloggad);
+        if(!ReadUnreadTexts(&Servermem->unreadTexts[nodnr], inloggad)) {
+          printf("Error reading unread text info for user %d\n", inloggad);
+        }
 	if(getft("NiKom:Texter/Bulletin.txt")>Servermem->inne[nodnr].senast_in) sendfile("NiKom:Texter/Bulletin.txt");
 	connection();
 
@@ -177,7 +179,7 @@ void main(int argc,char *argv[]) {
 	Servermem->info.inloggningar++;
 	Servermem->inne[nodnr].defarea=area2;
 	writeuser(inloggad,&Servermem->inne[nodnr]);
-        ReadUnreadTexts(&Servermem->unreadTexts[nodnr], inloggad);
+        WriteUnreadTexts(&Servermem->unreadTexts[nodnr], inloggad);
 	writesenaste();
 	abortinactive();
 	freealiasmem();
