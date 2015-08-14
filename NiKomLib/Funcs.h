@@ -60,41 +60,6 @@ int __saveds __asm LIBFreeProgramCategory( register __d0 int usernumber, registe
 int __saveds __asm LIBLoadProgramCategory( register __d0 int, register __a6 struct NiKomBase *);
 int __saveds __asm LIBSaveProgramCategory( register __d0 int, register __a6 struct NiKomBase *);
 
-void __saveds __asm LIBChangeUnreadTextStatus(
-   register __d0 int textNumber,
-   register __d1 int markAsUnread,
-   register __a0 struct UnreadTexts *unreadTexts,
-   register __a6 struct NiKomBase *NiKomBase);
-int __saveds __asm LIBIsTextUnread(
-  register __d0 int textNumber,
-  register __a0 struct UnreadTexts *unreadTexts,
-  register __a6 struct NiKomBase *NiKomBase);
-int __saveds __asm LIBFindNextUnreadText(
-  register __d0 int searchStart,
-  register __d1 int conf,
-  register __a0 struct UnreadTexts *unreadTexts,
-  register __a6 struct NiKomBase *NiKomBase);
-void __saveds __asm LIBInitUnreadTexts(
-   register __a0 struct UnreadTexts *unreadTexts,
-   register __a6 struct NiKomBase *NiKomBase);
-int __saveds __asm LIBCountUnreadTexts(
-  register __d0 int conf,
-  register __a0 struct UnreadTexts *unreadTexts,
-  register __a6 struct NiKomBase *NiKomBase);
-void __saveds __asm LIBSetUnreadTexts(
-  register __d0 int conf,
-  register __d1 int amount,
-  register __a0 struct UnreadTexts *unreadTexts,
-  register __a6 struct NiKomBase *NiKomBase);
-int __saveds __asm LIBReadUnreadTexts(
-  register __a0 struct UnreadTexts *unreadTexts,
-  register __d0 int userId,
-  register __a6 struct NiKomBase *NiKomBase);
-int __saveds __asm LIBWriteUnreadTexts(
-  register __a0 struct UnreadTexts *unreadTexts,
-  register __d0 int userId,
-  register __a6 struct NiKomBase *NiKomBase);
-
 int __saveds __asm LIBCheckPassword(register __d0 LONG usernumber, register __a0 char *password, register __a6 struct NiKomBase *NiKomBase);
 char *__saveds __asm LIBCryptPassword(register __a0 char *password, register __a6 struct NiKomBase *NiKomBase);
 

@@ -2,7 +2,8 @@
 #include "NiKomLib.h"
 #include "NiKomBase.h"
 
-#include "funcs.h"
+#include "UnreadTexts.h"
+#include "Funcs.h"
 
 #include <ctype.h>
 #include <stdlib.h>

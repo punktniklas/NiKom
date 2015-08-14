@@ -320,8 +320,8 @@ int __saveds __asm LIBCreateUser(register __d0 LONG nodnummer, register __a0 str
 	}
 	Close(fh);
 
-        LIBInitUnreadTexts(&unreadTexts, NiKomBase);
-        LIBWriteUnreadTexts(&unreadTexts, anvnummer, NiKomBase);
+        InitUnreadTexts(&unreadTexts);
+        WriteUnreadTexts(&unreadTexts, anvnummer);
 
 	sprintf(filnamn,"Nikom:Users/%d/%d/.firstletter",anvnummer/100,anvnummer);
 	if(!(fh=Open(filnamn,MODE_NEWFILE)))
