@@ -21,6 +21,27 @@ void trimLowestPossibleUnreadText(struct UnreadTexts *unreadTexts, int conf,
 
 /* ******* Library functions ******** */
 
+/****** nikom.library/ChangeUnreadTextStatus *************************
+
+    NAME
+        ChangeUnreadTextStatus -- Marks a text as read or unread.
+
+    SYNOPSIS
+        ChangeUnreadTextStatus(textNumber, markAsUnread, unreadTexts)
+                               D0          D1            A0
+        void ChangeUnreadTextStatus(int, int, struct UnreadTexts *);
+
+    FUNCTION
+        Marks the given text number as either read or unread in the
+        given unreadTexts struct.
+
+    INPUTS
+        textNumber   - the text number to mark.
+        markAsUnread - 0 to mark as read, non-zero to mark as unread.
+        unreadTexts  - the UnreadTexts structure to make changes to.
+
+**********************************************************************/
+
 void __saveds __asm LIBChangeUnreadTextStatus(
    register __d0 int textNumber,
    register __d1 int markAsUnread,
@@ -44,6 +65,31 @@ void __saveds __asm LIBChangeUnreadTextStatus(
    }
 }
 
+/****** nikom.library/IsTextUnread ***********************************
+
+    NAME
+        IsTextUnread -- Checks if a text is unread or not
+
+    SYNOPSIS
+        status = IsTextUnread(textNumber, unreadTexts)
+        D0                    D0          A0
+        int IsTextUnread(int, struct UnreadTexts *);
+
+    FUNCTION
+        Checks if the given text number is unread or not. Texts lower
+        than the range of the internal bitmap are always considered to
+        be read. Texts higher than the range are always considered to
+        be unread.
+
+    RESULT
+        status - non-zero if the given text is unread, zero otherwise.
+
+    INPUTS
+        textNumber   - the text number to check.
+        unreadTexts  - the UnreadTexts structure to make changes to.
+
+**********************************************************************/
+
 int __saveds __asm LIBIsTextUnread(
   register __d0 int textNumber,
   register __a0 struct UnreadTexts *unreadTexts,
@@ -58,6 +104,25 @@ int __saveds __asm LIBIsTextUnread(
   return BAMTEST(unreadTexts->bitmap, textNumber % UNREADTEXTS_BITMAPSIZE);
 }
 
+/****** nikom.library/InitUnreadTexts ********************************
+
+    NAME
+        InitUnreadTexts -- Initializes an UnreadTexts struct.
+
+    SYNOPSIS
+        InitUnreadTexts(unreadTexts)
+                        A0
+        void InitUnreadTexts(struct UnreadTexts *);
+
+    FUNCTION
+        Initializes the given UnreadTexts structure to have all texts
+        marked as unread.
+
+    INPUTS
+        unreadTexts  - the UnreadTexts structure to initialize.
+
+**********************************************************************/
+
 void __saveds __asm LIBInitUnreadTexts(
    register __a0 struct UnreadTexts *unreadTexts,
    register __a6 struct NiKomBase *NiKomBase) {
@@ -66,11 +131,35 @@ void __saveds __asm LIBInitUnreadTexts(
   memset(unreadTexts->lowestPossibleUnreadText, 0, MAXMOTE * sizeof(long));
 }
 
-/*
- * Doc: If search start is lower than the bitmap it will start from the bitmap.
- * So it's ok to start searching from 0, regardless of how many texts the
- * system has.
- */
+/****** nikom.library/FindNextUnreadText *****************************
+
+    NAME
+        FindNextUnreadText -- Finds the next unread text in a conf.
+
+    SYNOPSIS
+        textNumber = FindNextUnreadText(searchStart, conf, unreadTexts)
+        D0                              D0           D1    A0
+        int FindNextUnreadText(int, int, struct UnreadTexts *);
+
+    FUNCTION
+        Searches for the lowest unread text in the given conference
+        starting from searchStart. If the given search start is
+        lower than either the lowest text in the system or the range
+        of the internal bitmap the search will start from the lowest
+        valid text number. I.e. if you want to find the lowest unread
+        text available it's safe to use 0 as search start.
+
+    INPUTS
+        searchStart - the text number to start searching from.
+        conf        - The conference to search in.
+        unreadTexts - the UnreadTexts structure to search in
+
+    RESULT
+        textNumber - The lowest unread text that is higher or equal
+                     to search start. Or -1 if no unread text is found.
+
+**********************************************************************/
+
 int __saveds __asm LIBFindNextUnreadText(
   register __d0 int searchStart,
   register __d1 int conf,
@@ -98,6 +187,28 @@ int __saveds __asm LIBFindNextUnreadText(
   return -1;
 }
 
+/****** nikom.library/CountUnreadTexts *******************************
+
+    NAME
+        CountUnreadTexts -- Counts the number of unread texts in a conf.
+
+    SYNOPSIS
+        count = CountUnreadTexts(conf, unreadTexts)
+        D0                       D0    A0
+        int CountUnreadTexts(int, struct UnreadTexts *);
+
+    FUNCTION
+        Counts the number of unread texts in the conference.
+
+    INPUTS
+        conf        - The conference to count.
+        unreadTexts - the UnreadTexts structure to search in
+
+    RESULT
+        count - The number of unread texts in the conference.
+
+**********************************************************************/
+
 int __saveds __asm LIBCountUnreadTexts(
   register __d0 int conf,
   register __a0 struct UnreadTexts *unreadTexts,
@@ -117,6 +228,27 @@ int __saveds __asm LIBCountUnreadTexts(
   }  
   return cnt;
 }
+
+/****** nikom.library/SetUnreadTexts *********************************
+
+    NAME
+        SetUnreadTexts -- Marks the given number of texts as unread
+
+    SYNOPSIS
+        SetUnreadTexts(conf, amount, unreadTexts)
+        D0             D0    D1      A0
+        SetUnreadTexts(int, int, struct UnreadTexts *);
+
+    FUNCTION
+        Marks the 'amount' highest texts in the given conference as
+        unread and all other texts as read.
+
+    INPUTS
+        conf        - The conference to mark unread texts in.
+        amount      - The amount of texts to mark as unread.
+        unreadTexts - the UnreadTexts structure to change
+
+**********************************************************************/
 
 void __saveds __asm LIBSetUnreadTexts(
   register __d0 int conf,
@@ -146,6 +278,29 @@ void __saveds __asm LIBSetUnreadTexts(
 struct ConfAndText {
   long conf, text;
 };
+
+/****** nikom.library/ReadUnreadTexts ********************************
+
+    NAME
+        ReadUnreadTexts -- Reads an UnreadTexts structure from disk
+
+    SYNOPSIS
+        success = ReadUnreadTexts(unreadTexts, userId)
+        D0                        A0           D0
+        int ReadUnreadTexts(struct UnreadTexts *, int);
+
+    FUNCTION
+        Read the unread texts data for the given user into the given
+        UnreadTexts structure.
+
+    INPUTS
+        unreadTexts - the UnreadTexts structure to read into.
+        userId      - The user to read data for.
+
+    RESULT
+        succes - Non-zero on success, zero on failure.
+
+**********************************************************************/
 
 int __saveds __asm LIBReadUnreadTexts(
   register __a0 struct UnreadTexts *unreadTexts,
@@ -181,6 +336,29 @@ int __saveds __asm LIBReadUnreadTexts(
   ReleaseSemaphore(&NiKomBase->Servermem->semaphores[NIKSEM_UNREAD]);
   return readRes == 0;
 }
+
+/****** nikom.library/WriteUnreadTexts ********************************
+
+    NAME
+        WriteUnreadTexts -- Writes an UnreadTexts structure to disk
+
+    SYNOPSIS
+        success = WriteUnreadTexts(unreadTexts, userId)
+        D0                         A0           D0
+        int WriteUnreadTexts(struct UnreadTexts *, int);
+
+    FUNCTION
+        Writes the unread texts data for the given user from the given
+        UnreadTexts structure.
+
+    INPUTS
+        unreadTexts - the UnreadTexts structure to write.
+        userId      - The user to write data for.
+
+    RESULT
+        succes - Non-zero on success, zero on failure.
+
+**********************************************************************/
 
 int __saveds __asm LIBWriteUnreadTexts(
   register __a0 struct UnreadTexts *unreadTexts,
