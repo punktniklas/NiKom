@@ -342,6 +342,10 @@ struct ProgramDataCache
 	int usernumber;
 };
 
+struct LegacyConversionData {
+  long lowTextWhenBitmap0ConversionStarted;
+};
+
 struct System
 {
    short texts[MAXTEXTS];
@@ -369,6 +373,7 @@ struct System
    struct NodeType nodetypes[MAXNODETYPES];
    struct SignalSemaphore semaphores[NIKSEM_NOOF];
    struct ProgramDataCache *PrgDataCache;
+   struct LegacyConversionData legacyConversionData;
 };
 
 struct NiKMess {

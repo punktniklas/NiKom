@@ -18,6 +18,8 @@
 void shiftBitmap(struct UnreadTexts *unreadTexts, int textNumberToAccomodate);
 void trimLowestPossibleUnreadText(struct UnreadTexts *unreadTexts, int conf,
   struct System *Servermem);
+int maybeConvertUnreadTextsData(int userId, struct UnreadTexts *unreadTexts,
+  struct NiKomBase *NiKomBase);
 
 /* ******* Library functions ******** */
 
@@ -308,33 +310,26 @@ int __saveds __asm LIBReadUnreadTexts(
   register __a6 struct NiKomBase *NiKomBase) {
   BPTR file;
   char filepath[41];
-  int readRes;
-  struct ConfAndText cat;
+  int readRes, convertRes;
 
   ObtainSemaphore(&NiKomBase->Servermem->semaphores[NIKSEM_UNREAD]);
 
-  MakeUserFilePath(filepath, userId, "Bitmap0");
+  convertRes = maybeConvertUnreadTextsData(userId, unreadTexts, NiKomBase);
+  if(convertRes != 2) {
+    ReleaseSemaphore(&NiKomBase->Servermem->semaphores[NIKSEM_UNREAD]);
+    return convertRes;
+  }
+
+  MakeUserFilePath(filepath, userId, "UnreadTexts");
   if(!(file = Open(filepath, MODE_OLDFILE))) {
     ReleaseSemaphore(&NiKomBase->Servermem->semaphores[NIKSEM_UNREAD]);
     return 0;
   }
-  if(Read(file, unreadTexts->bitmap, UNREADTEXTS_BITMAPSIZE/8)
-     != UNREADTEXTS_BITMAPSIZE/8) {
-    Close(file);
-    ReleaseSemaphore(&NiKomBase->Servermem->semaphores[NIKSEM_UNREAD]);
-    return 0;
-  }
-  unreadTexts->bitmapStartText = NiKomBase->Servermem->info.lowtext;
-
-  memset(unreadTexts->lowestPossibleUnreadText, 0, MAXMOTE * sizeof(long));
-  while((readRes = Read(file,&cat,sizeof(struct ConfAndText)))
-        == sizeof(struct ConfAndText)) {
-    unreadTexts->lowestPossibleUnreadText[cat.conf] = cat.text;
-  }
-
+  readRes = Read(file, unreadTexts, sizeof(struct UnreadTexts));
   Close(file);
   ReleaseSemaphore(&NiKomBase->Servermem->semaphores[NIKSEM_UNREAD]);
-  return readRes == 0;
+
+  return readRes == sizeof(struct UnreadTexts);
 }
 
 /****** nikom.library/WriteUnreadTexts ********************************
@@ -367,37 +362,18 @@ int __saveds __asm LIBWriteUnreadTexts(
   BPTR file;
   char filepath[41];
   int writeRes;
-  struct Mote *conf;
-  struct ConfAndText cat;
 
   ObtainSemaphore(&NiKomBase->Servermem->semaphores[NIKSEM_UNREAD]);
 
-  MakeUserFilePath(filepath, userId, "Bitmap0");
+  MakeUserFilePath(filepath, userId, "UnreadTexts");
   if(!(file = Open(filepath, MODE_NEWFILE))) {
     ReleaseSemaphore(&NiKomBase->Servermem->semaphores[NIKSEM_UNREAD]);
     return 0;
   }
-  if(Write(file, unreadTexts->bitmap, UNREADTEXTS_BITMAPSIZE/8) == -1) {
-    Close(file);
-    ReleaseSemaphore(&NiKomBase->Servermem->semaphores[NIKSEM_UNREAD]);
-    return 0;
-  }
-
-  ITER_EL(conf, NiKomBase->Servermem->mot_list, mot_node, struct Mote *) {
-    if(conf->type != MOTE_FIDO) {
-      continue;
-    }
-    cat.conf = conf->nummer;
-    cat.text = unreadTexts->lowestPossibleUnreadText[conf->nummer];
-    writeRes = Write(file, &cat, sizeof(struct ConfAndText));
-    if(writeRes == -1) {
-      break;
-    }
-  }
-
+  writeRes = Write(file, unreadTexts, sizeof(struct UnreadTexts));
   Close(file);
   ReleaseSemaphore(&NiKomBase->Servermem->semaphores[NIKSEM_UNREAD]);
-  return writeRes != -1;
+  return writeRes == sizeof(struct UnreadTexts);
 }
 
 void shiftBitmap(struct UnreadTexts *unreadTexts, int textNumberToAccomodate) {
@@ -420,4 +396,42 @@ void trimLowestPossibleUnreadText(struct UnreadTexts *unreadTexts, int conf,
   if(unreadTexts->lowestPossibleUnreadText[conf] < Servermem->info.lowtext) {
     unreadTexts->lowestPossibleUnreadText[conf] = Servermem->info.lowtext;
   }
+}
+
+/*
+ * Returns 0 - conversion failed
+ *         1 - conversion succeeded
+ *         2 - no conversion to do
+ */
+int maybeConvertUnreadTextsData(int userId, struct UnreadTexts *unreadTexts,
+    struct NiKomBase *NiKomBase) {
+  BPTR file;
+  char filepath[41];
+  int readRes, writeSuccess, deleteSuccess = 0;
+  struct ConfAndText cat;
+
+  MakeUserFilePath(filepath, userId, "Bitmap0");
+  if(!(file = Open(filepath, MODE_OLDFILE))) {
+    return 2;
+  }
+  if(Read(file, unreadTexts->bitmap, UNREADTEXTS_BITMAPSIZE/8)
+     != UNREADTEXTS_BITMAPSIZE/8) {
+    Close(file);
+    return 0;
+  }
+  unreadTexts->bitmapStartText =
+    NiKomBase->Servermem->legacyConversionData.lowTextWhenBitmap0ConversionStarted;
+
+  memset(unreadTexts->lowestPossibleUnreadText, 0, MAXMOTE * sizeof(long));
+  while((readRes = Read(file,&cat,sizeof(struct ConfAndText)))
+        == sizeof(struct ConfAndText)) {
+    unreadTexts->lowestPossibleUnreadText[cat.conf] = cat.text;
+  }
+  Close(file);
+
+  writeSuccess = WriteUnreadTexts(unreadTexts, userId);
+  if(writeSuccess) {
+    deleteSuccess = DeleteFile(filepath);
+  }
+  return writeSuccess && deleteSuccess;
 }

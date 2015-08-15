@@ -16,6 +16,7 @@
 #include "NiKomstr.h"
 #include "ServerFuncs.h"
 #include "NiKomLib.h"
+#include "Config.h"
 
 #define ERROR	10
 #define OK	0
@@ -1263,6 +1264,7 @@ void main() {
 	InitServermem(Servermem); /* Kör igång nikom.library */
 	GetServerversion();
 	scanfidomoten();
+        initLegacyCoonversionData();
 
 	for(x=0;x<MAXNOD;x++) {
 		Servermem->nodtyp[x]=0;
