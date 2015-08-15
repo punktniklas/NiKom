@@ -1,1 +1,1 @@
-int initLegacyCoonversionData(void);
+int initLegacyConversionData(void);

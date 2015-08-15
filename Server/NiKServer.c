@@ -1264,7 +1264,7 @@ void main() {
 	InitServermem(Servermem); /* Kör igång nikom.library */
 	GetServerversion();
 	scanfidomoten();
-        initLegacyCoonversionData();
+        initLegacyConversionData();
 
 	for(x=0;x<MAXNOD;x++) {
 		Servermem->nodtyp[x]=0;

@@ -8,7 +8,7 @@
 
 extern struct System *Servermem;
 
-int initLegacyCoonversionData(void) {
+int initLegacyConversionData(void) {
   BPTR file;
   char line[100];
   int putsRes = 0;
