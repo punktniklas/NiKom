@@ -26,7 +26,6 @@ extern struct System *Servermem;
 extern int nodnr,inloggad,senast_text_typ,rad,mote2,buftkn,senast_brev_nr,senast_brev_anv;
 extern char outbuffer[],inmat[],backspace[],*argument,vilkabuf[];
 extern struct MsgPort *timerport,*conreadport,*serreadport;
-extern long textpek;
 extern struct Inloggning Statstr;
 extern struct timerequest *timerreq;
 extern char coninput;
@@ -91,7 +90,6 @@ int nyanv(void) {
 	Servermem->inne[nodnr].status=Servermem->cfg.defaultstatus;
 	Servermem->inne[nodnr].rader=Servermem->cfg.defaultrader;
 	Servermem->inne[nodnr].protokoll=Servermem->cfg.defaultprotokoll;
-	Servermem->inne[nodnr].textpek=Servermem->info.lowtext;
 	Servermem->inne[nodnr].brevpek=0;
 	memset((void *)Servermem->inne[nodnr].motmed,0,MAXMOTE/8);
 	for(;motpek->mot_node.mln_Succ;motpek=(struct Mote *)motpek->mot_node.mln_Succ) {
@@ -317,7 +315,6 @@ void status(void) {
 		memcpy(&readuserstr,&Servermem->inne[nodnr],sizeof(struct User));
                 unreadTexts = &Servermem->unreadTexts[nodnr];
 		nummer=inloggad;
-		readuserstr.textpek=textpek;
 	} else {
 		if((nummer=parsenamn(argument))==-1) {
 			puttekn("\r\n\nFinns ingen som heter så eller har det numret\r\n\n",-1);

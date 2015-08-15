@@ -221,7 +221,7 @@ struct ShortUser {
 };
 
 struct User {
-   long tot_tid,forst_in,senast_in,read,skrivit,flaggor,textpek,brevpek,
+   long tot_tid,forst_in,senast_in,read,skrivit,flaggor,former_textpek,brevpek,
       grupper,defarea,downloadbytes,chrset,uploadbytes,reserv5,upload,download,
       loggin,shell;
    char namn[41],gata[41],postadress[41],land[41],telefon[21],

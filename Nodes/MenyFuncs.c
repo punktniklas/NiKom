@@ -54,7 +54,7 @@ extern char outbuffer[],inmat[],backspace[],commandhistory[][1024];
 extern struct ReadLetter brevread;
 extern struct MinList edit_list;
 
-long textpek, logintime, extratime;
+long logintime, extratime;
 int mote2,rad,senast_text_typ,felcnt,nu_skrivs,area2,rexxlogout,
        senast_brev_nr,senast_brev_anv,senast_text_nr,senast_text_mote;
 char *month[] = { "Januari","Februari","Mars","April","Maj","Juni",
@@ -1131,15 +1131,13 @@ void medlem(char *foo) {
          && !IsMemberConf(motpek->nummer, inloggad, &Servermem->inne[nodnr])) {
         BAMSET(Servermem->inne[nodnr].motmed,motpek->nummer);
         if(motpek->type==MOTE_ORGINAL) {
-          unreadTexts->lowestPossibleUnreadText[motpek->nummer] =
-            Servermem->info.lowtext;
+          unreadTexts->lowestPossibleUnreadText[motpek->nummer] = 0;
         }
         else if(motpek->type==MOTE_FIDO) {
           unreadTexts->lowestPossibleUnreadText[motpek->nummer] = motpek->lowtext;
         }
       }
     }
-    textpek=Servermem->info.lowtext;
     return;
   }
   motnr=parsemot(foo);
@@ -1160,7 +1158,7 @@ void medlem(char *foo) {
   puttekn(outbuffer,-1);
   motpek=getmotpek(motnr);
   if(motpek->type==MOTE_ORGINAL) {
-    textpek = unreadTexts->lowestPossibleUnreadText[motnr] = Servermem->info.lowtext;
+    unreadTexts->lowestPossibleUnreadText[motnr] = 0;
   }
   else if(motpek->type==MOTE_FIDO) {
     unreadTexts->lowestPossibleUnreadText[motnr] = motpek->lowtext;
@@ -1289,14 +1287,11 @@ END MENYNOD */
         return(-5);
 }
 
-void initLowestPossibleUnreadTexts() {
+void trimLowestPossibleUnreadTextsForFido(void) {
   struct UnreadTexts *unreadTexts = &Servermem->unreadTexts[nodnr];
   struct Mote *motpek;
   ITER_EL(motpek, Servermem->mot_list, mot_node, struct Mote *) {
-    if(motpek->type==MOTE_ORGINAL) {
-      unreadTexts->lowestPossibleUnreadText[motpek->nummer] = textpek;
-    }
-    else if(motpek->type==MOTE_FIDO) {
+    if(motpek->type==MOTE_FIDO) {
       if(unreadTexts->lowestPossibleUnreadText[motpek->nummer] < motpek->lowtext) {
         unreadTexts->lowestPossibleUnreadText[motpek->nummer] = motpek->lowtext;
       }
@@ -1316,8 +1311,7 @@ int connection(void) {
         LoadProgramCategory(inloggad);
 
         NewList((struct List *)&aliaslist);
-        if((textpek=Servermem->inne[nodnr].textpek)<Servermem->info.lowtext) textpek=Servermem->info.lowtext;
-        initLowestPossibleUnreadTexts();
+        trimLowestPossibleUnreadTextsForFido();
         time(&logintime);
         extratime=0;
         memset(&Statstr,0,sizeof(struct Inloggning));
@@ -1461,7 +1455,6 @@ END MENYNOD */
                                 continue;
                         }
                 }
-                textpek=Servermem->info.hightext+1;
                 promret=prompt(306);
                 if(promret==-1) puttekn("\r\n\nFinns inga fler möten med olästa texter\r\n",-1);
                 else if(promret==-2) puttekn("\r\n\nFinns inga olästa texter i detta möte\r\n",-1);

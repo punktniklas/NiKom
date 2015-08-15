@@ -24,7 +24,7 @@
 #define EJKOM	0
 
 extern struct System *Servermem;
-extern int nodnr,inloggad,mote2,textpek,senast_text_typ,senast_text_nr,senast_text_mote,nu_skrivs,rad,connectbps;
+extern int nodnr,inloggad,mote2,senast_text_typ,senast_text_nr,senast_text_mote,nu_skrivs,rad,connectbps;
 extern char outbuffer[],inmat[],*argument,reggadnamn[];
 extern struct Header sparhead,readhead;
 extern struct MsgPort *permitport,*serverport,*NiKomPort;

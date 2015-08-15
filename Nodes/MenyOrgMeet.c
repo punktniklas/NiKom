@@ -25,7 +25,6 @@ extern char outbuffer[],*argument,inmat[];
 extern int nodnr,senast_text_typ,senast_text_nr,senast_text_mote,nu_skrivs,inloggad,
         rad,mote2;
 extern struct Header readhead,sparhead;
-extern long textpek;
 extern struct Inloggning Statstr;
 extern struct MinList edit_list;
 
@@ -343,7 +342,4 @@ int org_initheader(int komm) {
 
 void org_endast(int conf,int amount) {
   SetUnreadTexts(conf, amount, &Servermem->unreadTexts[nodnr]);
-  if(textpek > Servermem->unreadTexts[nodnr].lowestPossibleUnreadText[conf]) {
-    textpek = Servermem->unreadTexts[nodnr].lowestPossibleUnreadText[conf];
-  }
 }

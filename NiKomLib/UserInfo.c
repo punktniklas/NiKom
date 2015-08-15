@@ -92,7 +92,7 @@ extern void __saveds debug_req(char *reqtext,APTR arg);
         DeleteUser(), EditUser(), ReadUser() och SortUserlist()
 
 ******************************************************************************
-* Följande bör nog nollas: US_Group, US_Brevpek, US_Textpek och resten...
+* Följande bör nog nollas: US_Group, US_Brevpek och resten...
 *
 */
 
@@ -259,7 +259,6 @@ int __saveds __asm LIBCreateUser(register __d0 LONG nodnummer, register __a0 str
 	if(anvnummer == -1)
 	{
 		anvnummer = ((struct ShortUser *)NiKomBase->Servermem->user_list.mlh_TailPred)->nummer+1;
-		newuser->textpek = NiKomBase->Servermem->info.lowtext;
 		newuser->status = NiKomBase->Servermem->cfg.defaultstatus;
 		newuser->protokoll = NiKomBase->Servermem->cfg.defaultprotokoll;
 
@@ -283,7 +282,7 @@ int __saveds __asm LIBCreateUser(register __d0 LONG nodnummer, register __a0 str
 	}
 	else
 	{
-		newuser->textpek = newuser->protokoll = 0;
+		newuser->protokoll = 0;
 	}
 
 	LIBLockNiKomBase(NiKomBase);
@@ -588,7 +587,7 @@ int __saveds __asm LIBEditUser(register __d0 LONG usernumber, register __a0 stru
 		user.shell = tmp;
 
 /* struct User {
-   long tot_tid,forst_in,senast_in,read,skrivit,flaggor,textpek,brevpek,
+   long tot_tid,forst_in,senast_in,read,skrivit,flaggor,former_textpek,brevpek,
       grupper,defarea,reserv2,chrset,reserv4,reserv5,upload,download,
       loggin,shell;
    char namn[41],gata[41],postadress[41],land[41],telefon[21],
@@ -796,7 +795,7 @@ void *__saveds __asm LIBReadUser(register __d0 LONG usernumber, register __d1 LO
 		return (void *) -1;
 }
 /* struct User {
-   long tot_tid,forst_in,senast_in,read,skrivit,flaggor,textpek,brevpek,
+   long tot_tid,forst_in,senast_in,read,skrivit,flaggor,former_textpek,brevpek,
       grupper,defarea,reserv2,chrset,reserv4,reserv5,upload,download,
       loggin,shell;
    char namn[41],gata[41],postadress[41],land[41],telefon[21],

@@ -150,7 +150,6 @@ int nyanv(void) {
 	Servermem->inne[nodnr].shell = 0;
 	Servermem->inne[nodnr].status=Servermem->cfg.defaultstatus;
 	Servermem->inne[nodnr].protokoll=Servermem->cfg.defaultprotokoll;
-	Servermem->inne[nodnr].textpek=Servermem->info.lowtext;
 	Servermem->inne[nodnr].brevpek=0;
 	memset((void *)Servermem->inne[nodnr].motmed,0,MAXMOTE/8);
 	for(;motpek->mot_node.mln_Succ;motpek=(struct Mote *)motpek->mot_node.mln_Succ) {

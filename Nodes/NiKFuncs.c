@@ -28,7 +28,7 @@ extern char outbuffer[],inmat[],backspace[],commandhistory[][1024];
 extern struct ReadLetter brevread;
 extern struct MinList edit_list;
 
-long textpek, logintime, extratime;
+long logintime, extratime;
 int mote2,rad,senast_text_typ,felcnt,nu_skrivs,area2,rexxlogout,
         senast_brev_nr,senast_brev_anv,senast_text_nr,senast_text_mote;
 char *month[] = { "januari","februari","mars","april","maj","juni",
@@ -406,11 +406,10 @@ int ga(char *foo) {
         puttekn("Ja!",-1);
         BAMSET(Servermem->inne[nodnr].motmed, motnr);
         if(motpek->type == MOTE_ORGINAL) {
-          textpek = unreadTexts->lowestPossibleUnreadText[motnr] =
-            Servermem->info.lowtext;
+          unreadTexts->lowestPossibleUnreadText[motnr] = 0;
         }
         else if(motpek->type == MOTE_FIDO) {
-          textpek = unreadTexts->lowestPossibleUnreadText[motnr] = motpek->lowtext;
+          unreadTexts->lowestPossibleUnreadText[motnr] = motpek->lowtext;
         }
       }
       else {
@@ -854,15 +853,13 @@ void medlem(char *foo) {
          && !IsMemberConf(motpek->nummer, inloggad, &Servermem->inne[nodnr])) {
         BAMSET(Servermem->inne[nodnr].motmed,motpek->nummer);
         if(motpek->type==MOTE_ORGINAL) {
-          unreadTexts->lowestPossibleUnreadText[motpek->nummer] =
-            Servermem->info.lowtext;
+          unreadTexts->lowestPossibleUnreadText[motpek->nummer] = 0;
         }
         else if(motpek->type==MOTE_FIDO) {
           unreadTexts->lowestPossibleUnreadText[motpek->nummer] = motpek->lowtext;
         }
       }
     }
-    textpek=Servermem->info.lowtext;
     return;
   }
   /* TK: 970201 wildcard stöd! */
@@ -883,8 +880,7 @@ void medlem(char *foo) {
           puttekn(buffer,-1);
           BAMSET(Servermem->inne[nodnr].motmed, motpek->nummer);
           if(motpek->type==MOTE_ORGINAL) {
-            unreadTexts->lowestPossibleUnreadText[motpek->nummer] =
-              Servermem->info.lowtext;
+            unreadTexts->lowestPossibleUnreadText[motpek->nummer] = 0;
           }
           else if(motpek->type==MOTE_FIDO) {
             unreadTexts->lowestPossibleUnreadText[motpek->nummer] = motpek->lowtext;
@@ -919,7 +915,7 @@ void medlem(char *foo) {
   puttekn(outbuffer, -1);
   motpek=getmotpek(motnr);
   if(motpek->type==MOTE_ORGINAL) {
-    textpek = unreadTexts->lowestPossibleUnreadText[motnr] = Servermem->info.lowtext;
+    unreadTexts->lowestPossibleUnreadText[motnr] = 0;
   }
   else if(motpek->type==MOTE_FIDO) {
     unreadTexts->lowestPossibleUnreadText[motnr] = motpek->lowtext;
@@ -1062,14 +1058,11 @@ int clearmeet(int meet) {
         return(-5);
 }
 
-void initLowestPossibleUnreadTexts() {
+void trimLowestPossibleUnreadTextsForFido(void) {
   struct UnreadTexts *unreadTexts = &Servermem->unreadTexts[nodnr];
   struct Mote *motpek;
   ITER_EL(motpek, Servermem->mot_list, mot_node, struct Mote *) {
-    if(motpek->type==MOTE_ORGINAL) {
-      unreadTexts->lowestPossibleUnreadText[motpek->nummer] = textpek;
-    }
-    else if(motpek->type==MOTE_FIDO) {
+    if(motpek->type==MOTE_FIDO) {
       if(unreadTexts->lowestPossibleUnreadText[motpek->nummer] < motpek->lowtext) {
         unreadTexts->lowestPossibleUnreadText[motpek->nummer] = motpek->lowtext;
       }
@@ -1084,8 +1077,7 @@ int connection(void)
         dellostsay();
         LoadProgramCategory(inloggad);
         NewList((struct List *)&aliaslist);
-        if((textpek=Servermem->inne[nodnr].textpek)<Servermem->info.lowtext) textpek=Servermem->info.lowtext;
-        initLowestPossibleUnreadTexts();
+        trimLowestPossibleUnreadTextsForFido();
         time(&logintime);
         extratime=0;
         memset(&Statstr,0,sizeof(struct Inloggning));
@@ -1174,7 +1166,6 @@ int connection(void)
                                 continue;
                         }
                 }
-                textpek=Servermem->info.hightext+1;
                 promret=prompt(306);
                 if(promret==-1) puttekn("\r\n\nFinns inga fler möten med olästa texter\r\n",-1);
                 else if(promret==-2) puttekn("\r\n\nFinns inga olästa texter i detta möte\r\n",-1);

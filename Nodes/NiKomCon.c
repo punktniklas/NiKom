@@ -21,7 +21,7 @@
 
 int CXBRK(void) { return(0); }
 
-extern long textpek,logintime;
+extern long logintime;
 extern int area2, nodnr;
 extern struct MinList aliaslist,edit_list;
 extern char outbuffer[], nodid[], inmat[], reggadnamn[];
@@ -183,7 +183,6 @@ do
 	Servermem->inloggad[nodnr]=-1;
 
 	Servermem->action[nodnr]=0;
-	Servermem->inne[nodnr].textpek=textpek;
 	time(&tid);
 	Servermem->inne[nodnr].senast_in=tid;
 	Servermem->inne[nodnr].tot_tid+=(tid-logintime);
