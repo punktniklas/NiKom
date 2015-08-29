@@ -545,7 +545,7 @@ void rexxdumptext(struct RexxMsg *mess)
 	}
 
 	text = atoi(mess->rm_Args[1]);
-	if(Servermem->texts[text%MAXTEXTS]==-1)
+	if(GetConferenceForText(text) == -1)
 	{
 		return;
 	}
@@ -585,7 +585,7 @@ void rexxdumptext(struct RexxMsg *mess)
 	puttekn(outbuffer,-1);
 	x=0;
 	while(readhead.kom_i[x]!=-1) {
-		if(Servermem->texts[readhead.kom_i[x]%MAXTEXTS]!=-1 && IsMemberConf(Servermem->texts[readhead.kom_i[x]%MAXTEXTS], inloggad, &Servermem->inne[nodnr])) {
+		if(GetConferenceForText(readhead.kom_i[x]) != -1 && IsMemberConf(GetConferenceForText(readhead.kom_i[x]), inloggad, &Servermem->inne[nodnr])) {
 			sprintf(outbuffer,"  (Kommentar i text %d av %s)\r\n",readhead.kom_i[x],getusername(readhead.kom_av[x]));
 			puttekn(outbuffer,-1);
 		}

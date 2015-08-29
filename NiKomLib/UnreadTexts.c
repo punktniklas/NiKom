@@ -3,6 +3,7 @@
 #include "NiKomBase.h"
 
 #include "UnreadTexts.h"
+#include "ConferenceTexts.h"
 #include "Funcs.h"
 
 #include <ctype.h>
@@ -168,23 +169,22 @@ int __saveds __asm LIBFindNextUnreadText(
   register __a0 struct UnreadTexts *unreadTexts,
   register __a6 struct NiKomBase *NiKomBase) {
 
-  int i;
+  int textInConf;
 
   trimLowestPossibleUnreadText(unreadTexts, conf, NiKomBase->Servermem);
   if(searchStart < unreadTexts->lowestPossibleUnreadText[conf]) {
     searchStart = unreadTexts->lowestPossibleUnreadText[conf];
   }
 
-  for(i = searchStart; i <= NiKomBase->Servermem->info.hightext; i++) {
-    if(conf != NiKomBase->Servermem->texts[i%MAXTEXTS]) {
-      continue;
+  textInConf = searchStart;
+  while((textInConf = FindNextTextInConference(textInConf, conf)) != -1) {
+    if(textInConf >= (unreadTexts->bitmapStartText + UNREADTEXTS_BITMAPSIZE)) {
+      return textInConf;
     }
-    if(i >= (unreadTexts->bitmapStartText + UNREADTEXTS_BITMAPSIZE)) {
-      return i;
+    if(BAMTEST(unreadTexts->bitmap, textInConf % UNREADTEXTS_BITMAPSIZE)) {
+      return textInConf;
     }
-    if(BAMTEST(unreadTexts->bitmap, i % UNREADTEXTS_BITMAPSIZE)) {
-      return i;
-    }
+    textInConf++;
   }
   return -1;
 }
@@ -216,18 +216,17 @@ int __saveds __asm LIBCountUnreadTexts(
   register __a0 struct UnreadTexts *unreadTexts,
   register __a6 struct NiKomBase *NiKomBase) {
 
-  int i, cnt = 0;
+  int textInConf, cnt = 0;
 
   trimLowestPossibleUnreadText(unreadTexts, conf, NiKomBase->Servermem);
 
-  for(i = unreadTexts->lowestPossibleUnreadText[conf];
-      i <= NiKomBase->Servermem->info.hightext; i++) {
-    if(NiKomBase->Servermem->texts[i % MAXTEXTS] == conf
-       && (i >= (unreadTexts->bitmapStartText + UNREADTEXTS_BITMAPSIZE)
-           || BAMTEST(unreadTexts->bitmap, i % UNREADTEXTS_BITMAPSIZE))) {
-         cnt++;
+  textInConf = unreadTexts->lowestPossibleUnreadText[conf] - 1;
+  while((textInConf = FindNextTextInConference(textInConf + 1, conf)) != -1) {
+    if(textInConf >= (unreadTexts->bitmapStartText + UNREADTEXTS_BITMAPSIZE)
+       || BAMTEST(unreadTexts->bitmap, textInConf % UNREADTEXTS_BITMAPSIZE)) {
+      cnt++;
     }
-  }  
+  }
   return cnt;
 }
 
@@ -264,7 +263,7 @@ void __saveds __asm LIBSetUnreadTexts(
       (i >= unreadTexts->bitmapStartText)
         && (i >= NiKomBase->Servermem->info.lowtext);
       i--) {
-    if(NiKomBase->Servermem->texts[i % MAXTEXTS] == conf) {
+    if(GetConferenceForText(i) == conf) {
       if(amount) {
         ChangeUnreadTextStatus(i, 1, unreadTexts);
         amount--;

@@ -22,17 +22,21 @@
 #define OK	0
 #define VERSION	33
 
+/* Local functions */
+
 void cleanup(int,char *);
 void getkmd(void);
 void getconfig(void);
 void getmoten(void);
-void gettextmot(void);
+void readConferenceTexts(void);
 void getnamn(void);
 void getinfo(void);
 void initflaggor(void);
 void sparatext(struct NiKMess *);
 void radera(int);
-
+int maybeConvertConferenceTextData(int numberOfTexts);
+void readIntoConfTextsArray(int arrayIndex, int fileIndex, int textsToRead,
+                            BPTR file);
 int CXBRK(void) { return(0); }
 
 char pubscreen[40],reggadnamn[60];
@@ -470,15 +474,79 @@ void getfiler(void) {	/* Ändrad för nikfiles.data 960707 JÖ */
 	printf("Filerna inlästa\n");
 }
 
-void gettextmot(void) {
-	BPTR fh;
-	int words;
-	if(!(fh=Open("NiKom:DatoCfg/Textmot.dat",MODE_OLDFILE)))
-		cleanup(ERROR,"Kunde inte öppna NiKom:DatoCfg/Textmot.dat");
-	words=FRead(fh,(void *)Servermem->texts,2,MAXTEXTS);
-	if(words!=MAXTEXTS) printf("Fel vid läsandet av Textmot.dat\n");
-	else printf("Textmot.dat inläst (%d words)\n",words);
-	Close(fh);
+void readConferenceTexts(void) {
+  int numberOfTexts;
+  BPTR file;
+
+  numberOfTexts = Servermem->info.hightext - Servermem->info.lowtext + 1;
+  Servermem->confTexts.arraySize = numberOfTexts + 1000;
+  if(!(Servermem->confTexts.texts =
+       AllocMem(Servermem->confTexts.arraySize * sizeof(short),
+                MEMF_CLEAR | MEMF_PUBLIC))) {
+    cleanup(ERROR, "Can't allocate ConferenceTexts array");
+  }
+
+  if(maybeConvertConferenceTextData(numberOfTexts)) {
+    return;
+  }
+
+  printf("Reading ConferenceTexts.dat\n");
+  if(!(file = Open("NiKom:DatoCfg/ConferenceTexts.dat",MODE_OLDFILE))) {
+    cleanup(ERROR, "Can't open ConferenceTexts.dat");
+  }
+  readIntoConfTextsArray(0, 0, numberOfTexts, file);
+  Close(file);
+}
+
+#define OLD_MAX_TEXTS 32768
+
+int maybeConvertConferenceTextData(int numberOfTexts) {
+  BPTR file;
+  int textsToRead, lowtextArrayPos, hightextArrayPos;
+
+  if(!(file = Open("NiKom:DatoCfg/Textmot.dat",MODE_OLDFILE))) {
+    return 0;
+  }
+  printf("Converting old Textmot.dat into ConferenceTexts.dat.\n");
+  printf("  Number of texts to convert: %d\n", numberOfTexts);
+
+  lowtextArrayPos = Servermem->info.lowtext % OLD_MAX_TEXTS;
+  hightextArrayPos = Servermem->info.hightext % OLD_MAX_TEXTS;
+
+  if(lowtextArrayPos > hightextArrayPos) {
+    readIntoConfTextsArray(OLD_MAX_TEXTS - lowtextArrayPos,
+                           0, hightextArrayPos + 1, file);
+    textsToRead = OLD_MAX_TEXTS - lowtextArrayPos;
+  } else {
+    textsToRead = hightextArrayPos - lowtextArrayPos + 1;
+  }
+  readIntoConfTextsArray(0, lowtextArrayPos, textsToRead, file);
+  Close(file);
+
+  printf("  Textmot.dat read, writing ConferenceTexts.dat.\n");
+  if(!WriteConferenceTexts()) {
+    cleanup(ERROR, "Couldn't write ConferenceTexts.dat.");
+  }
+  printf("  ConferenceTexts.dat written, deleting Textmot.dat.\n");
+  if(!DeleteFile("NiKom:DatoCfg/Textmot.dat")) {
+    cleanup(ERROR, "Couldn't delete Textmot.dat.");
+  }
+  printf("  Conversion finished.\n");
+}
+
+void readIntoConfTextsArray(int arrayIndex, int fileIndex, int textsToRead,
+                            BPTR file) {
+  printf("  Reading from position %d.\n", fileIndex);
+  if(Seek(file, fileIndex * sizeof(short), OFFSET_BEGINNING) == -1) {
+    Close(file);
+    cleanup(ERROR, "Couldn't seek in file.");
+  }
+  printf("  Reading %d texts into index %d.\n", textsToRead, arrayIndex);
+  if(FRead(file, &Servermem->confTexts.texts[arrayIndex], sizeof(short), textsToRead)
+     != textsToRead) {
+    Close(file);
+    cleanup(ERROR, "Couldn't read from file.");
+  }
 }
 
 int adduser(int nummer) {
@@ -993,19 +1061,8 @@ void sparatext(struct NiKMess *message) {
 	}
 	Close(fh);
 	Servermem->info.hightext++;
-	Servermem->texts[Servermem->info.hightext%MAXTEXTS]=headpek->mote;
-	if(!(fh=Open("NiKom:DatoCfg/Textmot.dat",MODE_OLDFILE))) {
-		printf("Kunde inte öppna Textmot.dat\n");
-		return;
-	}
-	if(Seek(fh,(Servermem->info.hightext%MAXTEXTS)*2,OFFSET_BEGINNING)==-1) {
-		printf("Kunde inte söka i Textmot.dat\n",-1);
-		Close(fh);
-		return;
-	}
-	if(Write(fh,(void *)&headpek->mote,2)==-1)
-		printf("Fel vid skrivandet av Textmot.dat\n");
-	Close(fh);
+        SetConferenceForText(Servermem->info.hightext, headpek->mote, TRUE);
+
 	if(message->nod >=0 ) {
           ChangeUnreadTextStatus(Servermem->info.hightext, 0,
             &Servermem->unreadTexts[message->nod]);
@@ -1015,11 +1072,9 @@ void sparatext(struct NiKMess *message) {
 }
 
 void radera(int texter) {
-	BPTR fh;
 	long oldlowtext=Servermem->info.lowtext;
 	int x;
 	char filnamn[40];
-	struct ShortUser *scan;
 	if(texter>(Servermem->info.hightext-Servermem->info.lowtext)) {
 		printf("Kan inte radera så många texter!\n");
 		return;
@@ -1175,31 +1230,35 @@ int getkeyfile(void) {
 }
 
 void cleanup(int kod,char *fel) {
-	if(rexxport) {
-		addhost(FALSE);
-		DeletePort(rexxport);
-	}
-	if(NiKomBase) InitServermem(NULL); /* Stänger av nikom.library */
-	if(Servermem) {
-		writeinfo();
-		freegroupmem();
-		freefilemem();
-		freecommandmem();
-		freemotmem();
-		freeshortusermem();
-		freeloginmem();
-		FreeMem(Servermem,sizeof(struct System));
-	}
-	if(NiKWindow) CloseWindow(NiKWindow);
-	if(nodereplyport) DeleteMsgPort(nodereplyport);
-	if(permitport) DeletePort(permitport);
-	if(NiKPort) DeletePort(NiKPort);
-	if(NiKomBase) CloseLibrary(NiKomBase);
-	if(UtilityBase) CloseLibrary(UtilityBase);
-	if(RexxSysBase) CloseLibrary((struct Library *)RexxSysBase);
-	if(IntuitionBase) CloseLibrary((struct Library *)IntuitionBase);
-	printf("%s",fel);
-	exit(kod);
+  if(rexxport) {
+    addhost(FALSE);
+    DeletePort(rexxport);
+  }
+  if(NiKomBase) InitServermem(NULL); /* Stänger av nikom.library */
+  if(Servermem) {
+    writeinfo();
+    freegroupmem();
+    freefilemem();
+    freecommandmem();
+    freemotmem();
+    freeshortusermem();
+    freeloginmem();
+    if(Servermem->confTexts.texts != NULL) {
+      FreeMem(Servermem->confTexts.texts,
+              Servermem->confTexts.arraySize * sizeof(short));
+    }
+    FreeMem(Servermem,sizeof(struct System));
+  }
+  if(NiKWindow) CloseWindow(NiKWindow);
+  if(nodereplyport) DeleteMsgPort(nodereplyport);
+  if(permitport) DeletePort(permitport);
+  if(NiKPort) DeletePort(NiKPort);
+  if(NiKomBase) CloseLibrary(NiKomBase);
+  if(UtilityBase) CloseLibrary(UtilityBase);
+  if(RexxSysBase) CloseLibrary((struct Library *)RexxSysBase);
+  if(IntuitionBase) CloseLibrary((struct Library *)IntuitionBase);
+  printf("%s",fel);
+  exit(kod);
 }
 
 void main() {
@@ -1246,12 +1305,14 @@ void main() {
 	NewList((struct List *)&Servermem->mot_list);
 	for(x=0;x<MAXAREA;x++) NewList((struct List *)&Servermem->areor[x].ar_list);
 	for(x=0; x < NIKSEM_NOOF; x++) InitSemaphore(&Servermem->semaphores[x]);
+	InitServermem(Servermem); /* Kör igång nikom.library */
+
 	getinfo();
 	getgrupper();
 	getkmd();
 	getconfig();
 	getmoten();
-	gettextmot();
+	readConferenceTexts();
 	getnamn();
 	getfidocfg();
 	getnodetypescfg();
@@ -1261,7 +1322,6 @@ void main() {
 	getstatus();
 	getareor();
 	getfiler();
-	InitServermem(Servermem); /* Kör igång nikom.library */
 	GetServerversion();
 	scanfidomoten();
         initLegacyConversionData();

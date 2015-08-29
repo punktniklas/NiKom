@@ -149,7 +149,6 @@ int getnextletter(int user);
 int getfirstletter(int user);
 int readuser(int nummer,struct User *user);
 int writeuser(int nummer,struct User *user);
-int writetextmot(int nummer,short variabel);
 void rensatexter(void);
 void gamlatexter(void);
 void gamlabrev(void);

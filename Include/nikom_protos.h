@@ -77,4 +77,10 @@ int SysInfo(char *);
 int CheckPassword(int, char *);
 char *CryptPassword(char *);
 
+/* ConferenceTexts.c */
+int GetConferenceForText(int textNumber);
+void SetConferenceForText(int textNumber, int conf, int saveToDisk);
+int FindNextTextInConference(int searchStart, int conf);
+int FindPrevTextInConference(int searchStart, int conf);
+int WriteConferenceTexts(void);
 #endif /* NIKOM_PROTOS_H */

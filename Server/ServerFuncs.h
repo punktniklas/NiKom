@@ -12,7 +12,6 @@ void getconfig(void);
 void getmoten(void);
 void getareor(void);
 void getfiler(void);
-void gettextmot(void);
 int adduser(int nummer);
 void scanuserdir(char *dirnamn);
 void getnamn(void);

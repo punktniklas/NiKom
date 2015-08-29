@@ -34,52 +34,56 @@ struct Library *FifoBase;
 char gruppnamebuf[41];
 
 int movetext(void) {
-	int nummer,motnr;
-	struct Mote *motpek;
-	struct Header movehead;
-	if(!isdigit(argument[0])) {
-		puttekn("\r\n\nSkriv: Flytta Text <textnummer> <möte>\r\n",-1);
-		return(0);
-	}
-	if((nummer=atoi(argument))<Servermem->info.lowtext || nummer>Servermem->info.hightext) {
-		puttekn("\r\n\nTexten finns inte!\r\n",-1);
-		return(0);
-	}
-	argument=hittaefter(argument);
-	if(!argument[0]) {
-		puttekn("\r\n\nTill vilket möte: ",-1);
-		if(getstring(EKO,45,NULL)) return(1);
-		if(!inmat[0]) return(0);
-		argument=inmat;
-	}
-	if((motnr=parsemot(argument))==-1) {
-		puttekn("\r\n\nMötet finns inte!\r\n",-1);
-		return(0);
-	}
-	if(Servermem->texts[nummer%MAXTEXTS]==motnr) {
-		puttekn("\r\n\nTexten är redan i det mötet!\r\n",-1);
-		return(0);
-	}
-	if(readtexthead(nummer,&movehead)) return(0);
-	motpek=getmotpek(Servermem->texts[nummer%MAXTEXTS]);
-	if(!motpek) {
-		puttekn("\n\n\rTexten är inte i något möte\n\r",-1);
-		return(0);
-	}
-	if(movehead.person!=inloggad && !MayAdminConf(motpek->nummer, inloggad, &Servermem->inne[nodnr])) {
-		puttekn("\r\n\nDu har ingen rätt att flytta den texten\r\n",-1);
-		return(0);
-	}
-	if(!MayWriteConf(motnr, inloggad, &Servermem->inne[nodnr]) || !MayReplyConf(motnr, inloggad, &Servermem->inne[nodnr])) {
-		puttekn("\n\n\rDu har ingen rätt att flytta texten till det mötet.\n\r",-1);
-		return(0);
-	}
-	motpek=getmotpek(motnr);
-	sprintf(outbuffer,"\r\n\nFlyttar texten till %s.\r\n",motpek->namn);
-	puttekn(outbuffer,-1);
-	movehead.mote=motnr;
-	if(writetexthead(nummer,&movehead)) return(0);
-	writetextmot(nummer,motnr);
+  int nummer, newConf, oldConf;
+  struct Mote *motpek;
+  struct Header movehead;
+  if(!isdigit(argument[0])) {
+    puttekn("\r\n\nSkriv: Flytta Text <textnummer> <möte>\r\n",-1);
+    return(0);
+  }
+  if((nummer=atoi(argument))<Servermem->info.lowtext || nummer>Servermem->info.hightext) {
+    puttekn("\r\n\nTexten finns inte!\r\n",-1);
+    return(0);
+  }
+  argument=hittaefter(argument);
+  if(!argument[0]) {
+    puttekn("\r\n\nTill vilket möte: ",-1);
+    if(getstring(EKO,45,NULL)) return(1);
+    if(!inmat[0]) return(0);
+    argument=inmat;
+  }
+  if((newConf = parsemot(argument))==-1) {
+    puttekn("\r\n\nMötet finns inte!\r\n",-1);
+    return(0);
+  }
+  oldConf = GetConferenceForText(nummer);
+  if(newConf == oldConf) {
+    puttekn("\r\n\nTexten är redan i det mötet!\r\n",-1);
+    return(0);
+  }
+  if(readtexthead(nummer,&movehead)) return(0);
+  motpek=getmotpek(oldConf);
+  if(!motpek) {
+    puttekn("\n\n\rTexten är inte i något möte\n\r",-1);
+    return(0);
+  }
+  if(movehead.person != inloggad
+     && !MayAdminConf(motpek->nummer, inloggad, &Servermem->inne[nodnr])) {
+    puttekn("\r\n\nDu har ingen rätt att flytta den texten\r\n",-1);
+    return(0);
+  }
+  if(!MayWriteConf(newConf, inloggad, &Servermem->inne[nodnr])
+     || !MayReplyConf(newConf, inloggad, &Servermem->inne[nodnr])) {
+    puttekn("\n\n\rDu har ingen rätt att flytta texten till det mötet.\n\r",-1);
+    return(0);
+  }
+  motpek = getmotpek(newConf);
+  sprintf(outbuffer,"\r\n\nFlyttar texten till %s.\r\n",motpek->namn);
+  puttekn(outbuffer,-1);
+  movehead.mote = newConf;
+  if(writetexthead(nummer,&movehead)) return(0);
+  SetConferenceForText(nummer, newConf, TRUE);
+  return 0;
 }
 
 char *getusername(int nummer) {
@@ -861,7 +865,7 @@ int rek_flyttagren(int rot,int ack,int tomeet) {
 	memcpy(kom_i,flyttahead.kom_i,MAXKOM*sizeof(long));
 	flyttahead.mote=tomeet;
 	if(writetexthead(rot,&flyttahead)) return(ack);
-	writetextmot(rot,tomeet);
+        SetConferenceForText(rot, tomeet, TRUE);
 	ack++;
 	while(kom_i[x]!=-1 && x<MAXKOM) {
 		ack=rek_flyttagren(kom_i[x],ack,tomeet);

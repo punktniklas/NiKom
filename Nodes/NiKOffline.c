@@ -62,13 +62,13 @@ int grabfidotext(int text,struct Mote *motpek,FILE *fpgrab) {
 }
 
 int grabtext(int text,FILE *fpgrab) {
-	int x;
+  int x, confId;
 	struct EditLine *el;
 	struct tm *ts;
 	Servermem->inne[nodnr].read++;
 	Servermem->info.lasta++;
 	Statstr.read++;
-	if(Servermem->texts[text%MAXTEXTS]==-1) {
+	if(GetConferenceForText(text) == -1) {
 		puttekn("\r\n\nTexten är raderad!\r\n\n",-1);
 		if(Servermem->inne[nodnr].status<Servermem->cfg.st.medmoten) return(0);
 	}
@@ -98,11 +98,14 @@ int grabtext(int text,FILE *fpgrab) {
 	freeeditlist();
 	fprintf(fpgrab,"\n(Slut på text %d av %s)\n",grabhead.nummer,getusername(grabhead.person));
 	x=0;
-	while(grabhead.kom_i[x]!=-1) {
-		if(Servermem->texts[grabhead.kom_i[x]%MAXTEXTS]!=-1 && IsMemberConf(Servermem->texts[grabhead.kom_i[x]%MAXTEXTS], inloggad, &Servermem->inne[nodnr])) {
-			fprintf(fpgrab,"  (Kommentar i text %d av %s)\n",grabhead.kom_i[x],getusername(grabhead.kom_av[x]));
-		}
-		x++;
+	while(grabhead.kom_i[x] != -1) {
+          confId = GetConferenceForText(grabhead.kom_i[x]);
+          if(confId != -1
+             && IsMemberConf(confId, inloggad, &Servermem->inne[nodnr])) {
+            fprintf(fpgrab,"  (Kommentar i text %d av %s)\n",
+                    grabhead.kom_i[x],getusername(grabhead.kom_av[x]));
+          }
+          x++;
 	}
 	fprintf(fpgrab,">>>>>");
 	if(grabhead.kom_i[0]!=-1) return(1);
@@ -187,13 +190,13 @@ int grabbrev(int text, FILE *fpgrab) {
 
 int grabkom(FILE *fp) {
   long kom[MAXKOM];
-  int grabret,x=0;
+  int grabret, x=0, confId;
   memcpy(kom,grabhead.kom_i,MAXKOM*sizeof(long));
   while(kom[x]!=-1 && x<MAXKOM) {
-    if(Servermem->texts[kom[x] % MAXTEXTS] != -1
+    confId = GetConferenceForText(kom[x]);
+    if(confId != -1
        && IsTextUnread(kom[x], &Servermem->unreadTexts[nodnr])
-       && IsMemberConf(Servermem->texts[kom[x]%MAXTEXTS], inloggad,
-                       &Servermem->inne[nodnr])) {
+       && IsMemberConf(confId, inloggad, &Servermem->inne[nodnr])) {
       if((grabret=grabtext(kom[x],fp))==1) {
         if(grabkom(fp)) return(1);
       }

@@ -38,50 +38,51 @@ int org_skriv(void) {
 }
 
 int org_kommentera(void) {
-	int nummer,editret;
-	struct Mote *motpek;
-	nummer=atoi(argument);
-	if(argument[0]) {
-		if(nummer<Servermem->info.lowtext || nummer>Servermem->info.hightext) {
-			puttekn("\r\n\nTexten finns inte!\r\n\n",-1);
-			return(0);
-		}
-		if(!MayBeMemberConf(Servermem->texts[nummer%MAXTEXTS], inloggad, &Servermem->inne[nodnr])) {
-			puttekn("\r\n\nDu har inga rättigheter i mötet där texten finns!\r\n\n",-1);
-			return(0);
-		}
-		motpek=getmotpek(Servermem->texts[nummer%MAXTEXTS]);
-		if(!motpek) {
-			puttekn("\n\n\rHmm.. Mötet där texten ligger finns inte..\n\r",-1);
-			return(0);
-		}
-		if(motpek->status & KOMSKYDD) {
-			if(!MayReplyConf(motpek->nummer, inloggad, &Servermem->inne[nodnr])) {
-				puttekn("\r\n\nDu får inte kommentera i kommentarsskyddade möten!\r\n\n",-1);
-				return(0);
-			} else {
-				puttekn("\r\n\nVill du verkligen kommentera i ett kommentarsskyddat möte? ",-1);
-				if(!jaellernej('j','n',2)) return(0);
-			}
-		}
-		if(readtexthead(nummer,&readhead)) return(0);
-		senast_text_typ=TEXT;
-		senast_text_nr=nummer;
-		senast_text_mote=motpek->nummer;
-	}
-	motpek=getmotpek(senast_text_mote);
-	if(!motpek) {
-		puttekn("\n\n\rHmm.. Mötet där texten ligger finns inte..\n\r",-1);
-		return(0);
-	}
-	if(org_initheader(KOM)) return(1);
-	nu_skrivs=TEXT;
-	if((editret=edittext(NULL))==1) return(1);
-	else if(!editret)	{
-		org_linkkom();
-		org_sparatext();
-	}
-	return(0);
+  int nummer, editret, confId;
+  struct Mote *motpek;
+  nummer=atoi(argument);
+  if(argument[0]) {
+    if(nummer<Servermem->info.lowtext || nummer>Servermem->info.hightext) {
+      puttekn("\r\n\nTexten finns inte!\r\n\n",-1);
+      return(0);
+    }
+    confId = GetConferenceForText(nummer);
+    if(!MayBeMemberConf(confId, inloggad, &Servermem->inne[nodnr])) {
+      puttekn("\r\n\nDu har inga rättigheter i mötet där texten finns!\r\n\n",-1);
+      return(0);
+    }
+    motpek=getmotpek(confId);
+    if(!motpek) {
+      puttekn("\n\n\rHmm.. Mötet där texten ligger finns inte..\n\r",-1);
+      return(0);
+    }
+    if(motpek->status & KOMSKYDD) {
+      if(!MayReplyConf(motpek->nummer, inloggad, &Servermem->inne[nodnr])) {
+        puttekn("\r\n\nDu får inte kommentera i kommentarsskyddade möten!\r\n\n",-1);
+        return(0);
+      } else {
+        puttekn("\r\n\nVill du verkligen kommentera i ett kommentarsskyddat möte? ",-1);
+        if(!jaellernej('j','n',2)) return(0);
+      }
+    }
+    if(readtexthead(nummer,&readhead)) return(0);
+    senast_text_typ=TEXT;
+    senast_text_nr=nummer;
+    senast_text_mote=motpek->nummer;
+  }
+  motpek=getmotpek(senast_text_mote);
+  if(!motpek) {
+    puttekn("\n\n\rHmm.. Mötet där texten ligger finns inte..\n\r",-1);
+    return(0);
+  }
+  if(org_initheader(KOM)) return(1);
+  nu_skrivs=TEXT;
+  if((editret=edittext(NULL))==1) return(1);
+  else if(!editret)	{
+    org_linkkom();
+    org_sparatext();
+  }
+  return(0);
 }
 
 void org_lasa(int tnr) {
@@ -136,13 +137,13 @@ int clearmote(int conf) {
 
 int clearkom(void) {
   long kom[MAXKOM];
-  int promret,komret,x=0;
+  int promret,komret,x=0, confId;
   memcpy(kom,readhead.kom_i,MAXKOM*sizeof(long));
   while(kom[x]!=-1) {
-    if(Servermem->texts[kom[x]%MAXTEXTS]!=-1
+    confId = GetConferenceForText(kom[x]);
+    if(confId != -1
        && IsTextUnread(kom[x], &Servermem->unreadTexts[nodnr])
-       && IsMemberConf(Servermem->texts[kom[x]%MAXTEXTS], inloggad,
-            &Servermem->inne[nodnr])) {
+       && IsMemberConf(confId, inloggad, &Servermem->inne[nodnr])) {
       if((promret=prompt(211))==-1) return(-1);
       else if(promret==-2) return(-2);
       else if(promret==-3) return(-3);
@@ -172,69 +173,77 @@ int clearkom(void) {
   return(-5);
 }
 
-int org_visatext(int text)
-{
-	int x,length;
-	struct tm *ts;
-	struct EditLine *el;
-	Servermem->inne[nodnr].read++;
-	Servermem->info.lasta++;
-	Statstr.read++;
-	if(Servermem->texts[text%MAXTEXTS]==-1) {
-		sprintf(outbuffer,"\n\n\rText %d är raderad!\n\n\r",text);
-		puttekn(outbuffer,-1);
-		if(Servermem->inne[nodnr].status<Servermem->cfg.st.medmoten) return(0);
-	}
-	if(readtexthead(text,&readhead)) return(0);
-	if(!MayReadConf(readhead.mote, inloggad, &Servermem->inne[nodnr])) {
-		puttekn("\r\n\nDu har inte rätt att läsa den texten!\r\n\n",-1);
-		return(0);
-	}
-	ts=localtime(&readhead.tid);
-	sprintf(outbuffer,"\r\n\nText %d  Möte: %s    %4d%02d%02d %02d:%02d\r\n",
-                readhead.nummer, getmotnamn(readhead.mote),
-                ts->tm_year + 1900, ts->tm_mon + 1, ts->tm_mday, ts->tm_hour,
-                ts->tm_min);
-	puttekn(outbuffer,-1);
-	if(readhead.person!=-1) sprintf(outbuffer,"Skriven av %s\r\n",getusername(readhead.person));
-	else sprintf(outbuffer,"Skriven av <raderad användare>\r\n");
-	puttekn(outbuffer,-1);
-	if(readhead.kom_till_nr!=-1) {
-		sprintf(outbuffer,"Kommentar till text %d av %s\r\n",readhead.kom_till_nr,getusername(readhead.kom_till_per));
-		puttekn(outbuffer,-1);
-	}
-	sprintf(outbuffer,"Ärende: %s\r\n",readhead.arende);
-	puttekn(outbuffer,-1);
-	if(Servermem->inne[nodnr].flaggor & STRECKRAD) {
-		length=strlen(outbuffer);
-		for(x=0;x<length-2;x++) outbuffer[x]='-';
-		outbuffer[x]=0;
-		puttekn(outbuffer,-1);
-		puttekn("\r\n\n",-1);
-	} else puttekn("\n",-1);
-	if(readtextlines(TEXT,readhead.textoffset,readhead.rader,readhead.nummer))
-		puttekn("\n\rFel vid läsandet i Text.dat\n\r",-1);
-	for(el=(struct EditLine *)edit_list.mlh_Head;el->line_node.mln_Succ;el=(struct EditLine *)el->line_node.mln_Succ)
-	{
-		if(puttekn(el->text,-1)) break;
-		eka('\r');
-	}
-	freeeditlist();
-	sprintf(outbuffer,"\n(Slut på text %d av %s)\r\n",readhead.nummer,getusername(readhead.person));
-	puttekn(outbuffer,-1);
-	x=0;
-	while(readhead.kom_i[x]!=-1) {
-		if(Servermem->texts[readhead.kom_i[x]%MAXTEXTS]!=-1 && IsMemberConf(Servermem->texts[readhead.kom_i[x]%MAXTEXTS], inloggad, &Servermem->inne[nodnr])) {
-			sprintf(outbuffer,"  (Kommentar i text %d av %s)\r\n",readhead.kom_i[x],getusername(readhead.kom_av[x]));
-			puttekn(outbuffer,-1);
-		}
-		x++;
-	}
-	senast_text_typ=TEXT;
-	senast_text_nr=readhead.nummer;
-	senast_text_mote=readhead.mote;
-	if(readhead.kom_i[0]!=-1) return(1);
-	return(0);
+int org_visatext(int text) {
+  int x,length, confId;
+  struct tm *ts;
+  struct EditLine *el;
+  Servermem->inne[nodnr].read++;
+  Servermem->info.lasta++;
+  Statstr.read++;
+  if(GetConferenceForText(text) == -1) {
+    sprintf(outbuffer,"\n\n\rText %d är raderad!\n\n\r",text);
+    puttekn(outbuffer,-1);
+    if(Servermem->inne[nodnr].status<Servermem->cfg.st.medmoten) return(0);
+  }
+  if(readtexthead(text,&readhead)) {
+    return(0);
+  }
+  if(!MayReadConf(readhead.mote, inloggad, &Servermem->inne[nodnr])) {
+    puttekn("\r\n\nDu har inte rätt att läsa den texten!\r\n\n",-1);
+    return(0);
+  }
+  ts=localtime(&readhead.tid);
+  sprintf(outbuffer,"\r\n\nText %d  Möte: %s    %4d%02d%02d %02d:%02d\r\n",
+          readhead.nummer, getmotnamn(readhead.mote),
+          ts->tm_year + 1900, ts->tm_mon + 1, ts->tm_mday, ts->tm_hour,
+          ts->tm_min);
+  puttekn(outbuffer,-1);
+  sprintf(outbuffer,"Skriven av %s\r\n", readhead.person !=-1
+          ? getusername(readhead.person) : "<raderad användare>");
+  puttekn(outbuffer,-1);
+  if(readhead.kom_till_nr!=-1) {
+    sprintf(outbuffer,"Kommentar till text %d av %s\r\n", readhead.kom_till_nr,
+            getusername(readhead.kom_till_per));
+    puttekn(outbuffer,-1);
+  }
+  sprintf(outbuffer,"Ärende: %s\r\n",readhead.arende);
+  puttekn(outbuffer,-1);
+  if(Servermem->inne[nodnr].flaggor & STRECKRAD) {
+    length=strlen(outbuffer);
+    for(x=0;x<length-2;x++) outbuffer[x]='-';
+    outbuffer[x]=0;
+    puttekn(outbuffer,-1);
+    puttekn("\r\n\n",-1);
+  } else puttekn("\n",-1);
+  if(readtextlines(TEXT,readhead.textoffset,readhead.rader,readhead.nummer))
+    puttekn("\n\rFel vid läsandet i Text.dat\n\r",-1);
+  for(el=(struct EditLine *)edit_list.mlh_Head;
+      el->line_node.mln_Succ;
+      el=(struct EditLine *)el->line_node.mln_Succ) {
+    if(puttekn(el->text,-1)) break;
+    eka('\r');
+  }
+  freeeditlist();
+  sprintf(outbuffer, "\n(Slut på text %d av %s)\r\n", readhead.nummer,
+          getusername(readhead.person));
+  puttekn(outbuffer,-1);
+  x=0;
+  while(readhead.kom_i[x]!=-1) {
+    confId = GetConferenceForText(readhead.kom_i[x]);
+    if(confId != -1 && IsMemberConf(confId, inloggad, &Servermem->inne[nodnr])) {
+      sprintf(outbuffer, "  (Kommentar i text %d av %s)\r\n", readhead.kom_i[x],
+              getusername(readhead.kom_av[x]));
+      puttekn(outbuffer,-1);
+    }
+    x++;
+  }
+  senast_text_typ=TEXT;
+  senast_text_nr=readhead.nummer;
+  senast_text_mote=readhead.mote;
+  if(readhead.kom_i[0]!=-1) {
+    return(1);
+  }
+  return(0);
 }
 
 void org_sparatext(void) {

@@ -155,8 +155,9 @@
 #define NIKSEM_MAILBOXES  8
 #define NIKSEM_PRGCAT	  9
 #define NIKSEM_UNREAD     10
+#define NIKSEM_CONFTEXTS  11
 
-#define NIKSEM_NOOF       11 /* Hur många det finns */
+#define NIKSEM_NOOF       12 /* Hur många det finns */
 
 #define BAMTEST(a,b) (((char *)(a))[(b)/8] & 1 << 8-1-(b)%8)
 #define BAMSET(a,b) (((char *)(a))[(b)/8] |= 1 << 8-1-(b)%8)
@@ -346,34 +347,40 @@ struct LegacyConversionData {
   long lowTextWhenBitmap0ConversionStarted;
 };
 
-struct System
-{
-   short texts[MAXTEXTS];
-   struct MinList kom_list;
-   struct User inne[MAXNOD];
-   struct UnreadTexts unreadTexts[MAXNOD];
-   long nodtyp[MAXNOD],inloggad[MAXNOD],action[MAXNOD],varmote[MAXNOD],
-   	xtratime[MAXNOD],connectbps[MAXNOD], idletime[MAXNOD],
-   	maxinactivetime[MAXNOD], serverversion, serverrevision;
-   char *vilkastr[MAXNOD], nodid[MAXNOD][20], watchserial[MAXNOD],
+/* Keeps track of what conference a text is in. A value of -1 means the text
+ * is deleted. Index 0 of the array is Sysinfo.lowtext. */
+struct ConferenceTexts {
+  int arraySize;
+  short *texts;
+};
+
+struct System {
+  struct ConferenceTexts confTexts;
+  struct MinList kom_list;
+  struct User inne[MAXNOD];
+  struct UnreadTexts unreadTexts[MAXNOD];
+  long nodtyp[MAXNOD],inloggad[MAXNOD],action[MAXNOD],varmote[MAXNOD],
+    xtratime[MAXNOD],connectbps[MAXNOD], idletime[MAXNOD],
+    maxinactivetime[MAXNOD], serverversion, serverrevision;
+  char *vilkastr[MAXNOD], nodid[MAXNOD][20], watchserial[MAXNOD],
     CallerID[MAXNOD][81];
-   struct MinList mot_list;
-   struct MinList user_list;
-   struct MinList shell_list;
-   struct MinList grupp_list;
-   char flaggnamn[32][51];
-   struct Config cfg;
-   struct SysInfo info;
-   struct SayString *say[MAXNOD];
-   struct Inloggning senaste[MAXSENASTE];
-   struct Area areor[MAXAREA];
-   char Nyckelnamn[MAXNYCKLAR][41];
-   struct MinList special_login;
-   struct FidoData fidodata;
-   struct NodeType nodetypes[MAXNODETYPES];
-   struct SignalSemaphore semaphores[NIKSEM_NOOF];
-   struct ProgramDataCache *PrgDataCache;
-   struct LegacyConversionData legacyConversionData;
+  struct MinList mot_list;
+  struct MinList user_list;
+  struct MinList shell_list;
+  struct MinList grupp_list;
+  char flaggnamn[32][51];
+  struct Config cfg;
+  struct SysInfo info;
+  struct SayString *say[MAXNOD];
+  struct Inloggning senaste[MAXSENASTE];
+  struct Area areor[MAXAREA];
+  char Nyckelnamn[MAXNYCKLAR][41];
+  struct MinList special_login;
+  struct FidoData fidodata;
+  struct NodeType nodetypes[MAXNODETYPES];
+  struct SignalSemaphore semaphores[NIKSEM_NOOF];
+  struct ProgramDataCache *PrgDataCache;
+  struct LegacyConversionData legacyConversionData;
 };
 
 struct NiKMess {

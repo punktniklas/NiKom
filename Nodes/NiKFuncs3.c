@@ -82,55 +82,55 @@ int endast(void) {
 }
 
 int personlig(void) {
-	int nummer,editret;
-	struct Mote *motpek;
-	if(argument[0]) {
-		if(mote2==-1) {
-			puttekn("\r\n\nBrev kommenterar du som vanligt med 'kommentera'.\r\n\n",-1);
-			return(0);
-		}
-		nummer=atoi(argument);
-		motpek=getmotpek(mote2);
-		if(motpek->type == MOTE_ORGINAL) {
-			if(nummer<Servermem->info.lowtext || nummer>Servermem->info.hightext) {
-				puttekn("\r\n\nTexten finns inte!\r\n\n",-1);
-				return(0);
-			}
-			if(!MayBeMemberConf(Servermem->texts[nummer%MAXTEXTS], inloggad, &Servermem->inne[nodnr])) {
-				puttekn("\r\n\nDu har inte rätt att kommentera den texten!\r\n\n",-1);
-				return(0);
-			}
-			if(readtexthead(nummer,&readhead)) return(0);
-			senast_text_mote = Servermem->texts[nummer%MAXTEXTS];
-		} else if(motpek->type == MOTE_FIDO) {
-			if(nummer<motpek->lowtext || nummer>motpek->texter) {
-				puttekn("\r\n\nTexten finns inte!\r\n\n",-1);
-				return(0);
-			}
-			senast_text_mote = motpek->nummer;
-		}
-		senast_text_typ=TEXT;
-		senast_text_nr = nummer;
-	} else {
-		if(senast_text_typ==BREV) {
-			puttekn("\r\n\nBrev kommenterar du som vanligt med 'kommentera'.\r\n\n",-1);
-			return(0);
-		}
-		if(!(motpek=getmotpek(senast_text_mote))) {
-			puttekn("\n\n\rHmm.. Mötet där texten finns existerar inte..\n\r",-1);
-			return(0);
-		}
-
-	}
-	if(motpek->type == MOTE_FIDO) {
-		nu_skrivs = BREV_FIDO;
-		return(fido_brev(NULL,NULL,motpek));
-	}
-	nu_skrivs=BREV;
-	initpersheader();
-	if((editret=edittext(NULL))==1) return(1);
-	if(!editret) sparabrev();
-	return(0);
+  int nummer, editret, confId;
+  struct Mote *motpek;
+  if(argument[0]) {
+    if(mote2==-1) {
+      puttekn("\r\n\nBrev kommenterar du som vanligt med 'kommentera'.\r\n\n",-1);
+      return(0);
+    }
+    nummer=atoi(argument);
+    motpek=getmotpek(mote2);
+    if(motpek->type == MOTE_ORGINAL) {
+      if(nummer<Servermem->info.lowtext || nummer>Servermem->info.hightext) {
+        puttekn("\r\n\nTexten finns inte!\r\n\n",-1);
+        return(0);
+      }
+      confId = GetConferenceForText(nummer);
+      if(!MayBeMemberConf(confId, inloggad, &Servermem->inne[nodnr])) {
+        puttekn("\r\n\nDu har inte rätt att kommentera den texten!\r\n\n",-1);
+        return(0);
+      }
+      if(readtexthead(nummer,&readhead)) return(0);
+      senast_text_mote = confId;
+    } else if(motpek->type == MOTE_FIDO) {
+      if(nummer<motpek->lowtext || nummer>motpek->texter) {
+        puttekn("\r\n\nTexten finns inte!\r\n\n",-1);
+        return(0);
+      }
+      senast_text_mote = motpek->nummer;
+    }
+    senast_text_typ=TEXT;
+    senast_text_nr = nummer;
+  } else {
+    if(senast_text_typ==BREV) {
+      puttekn("\r\n\nBrev kommenterar du som vanligt med 'kommentera'.\r\n\n",-1);
+      return(0);
+    }
+    if(!(motpek=getmotpek(senast_text_mote))) {
+      puttekn("\n\n\rHmm.. Mötet där texten finns existerar inte..\n\r",-1);
+      return(0);
+    }
+  }
+  if(motpek->type == MOTE_FIDO) {
+    nu_skrivs = BREV_FIDO;
+    return(fido_brev(NULL,NULL,motpek));
+  }
+  nu_skrivs=BREV;
+  initpersheader();
+  if((editret=edittext(NULL))==1) return(1);
+  if(!editret) sparabrev();
+  return(0);
 }
 
 void radtext(void) {
@@ -138,7 +138,7 @@ void radtext(void) {
 	struct Header radhead;
 	struct Mote *motpek;
 	nummer = atoi(argument);
-	motpek=getmotpek(Servermem->texts[nummer%MAXTEXTS]);
+	motpek=getmotpek(GetConferenceForText(nummer));
 	if(motpek->type != MOTE_ORGINAL) {
 		puttekn("\n\n\rDu kan bara radera texter i interna möten.\n\n\r",-1);
 		return;
@@ -152,55 +152,51 @@ void radtext(void) {
 		puttekn("\r\n\nDu kan bara radera texter av dig själv!\r\n\n",-1);
 		return;
 	}
-	writetextmot(nummer,-1);
+        SetConferenceForText(nummer, -1, TRUE);
 }
 
 int radmot(void) {
-	int motnr,x,words;
-	char lappfile[40];
-	BPTR fh;
-	struct Mote *motpek;
-	if((motnr=parsemot(argument))==-1) {
-		puttekn("\r\n\nFinns inget möte som heter så!\r\n\n",-1);
-		return(-5);
-	}
-	if(motnr==-3) {
-		puttekn("\r\n\nSkriv: Radera Möte <mötesnamn>\r\n\n",-1);
-		return(-5);
-	}
-	motpek=getmotpek(motnr);
-	if(!motpek) printf("ARRRRGH!! Fel på motpek!\n");
-	if(!MayAdminConf(motnr, inloggad, &Servermem->inne[nodnr])) {
-	   	puttekn("\n\n\rDu har ingen rätt att radera det mötet!\n\r",-1);
-	   	return(-5);
-	}
-	sprintf(outbuffer,"\r\n\nÄr du säker på att du vill radera mötet %s? ",motpek->namn);
-	puttekn(outbuffer,-1);
-	if(!jaellernej('j','n',2)) {
-		puttekn("Nej\n\n\r",-1);
-		return(-5);
-	}
-	puttekn("Ja\r\n\n",-1);
-	Remove((struct Node *)motpek);
-	motpek->namn[0]=0;
-	writemeet(motpek);
-	FreeMem(motpek,sizeof(struct Mote));
-	sprintf(lappfile,"NiKom:Lappar/%d.motlapp",motnr);
-	DeleteFile(lappfile);
-	for(x=Servermem->info.lowtext;x<=Servermem->info.hightext;x++) {
-		if(Servermem->texts[x%MAXTEXTS]==motnr) Servermem->texts[x%MAXTEXTS]=-1;
-	}
-	NiKForbid();
-	if(!(fh=Open("NiKom:DatoCfg/Textmot.dat",MODE_OLDFILE))) {
-		puttekn("\r\n\nKunde inte öppna NiKom:DatoCfg/Textmot.dat\r\n\n",-1);
-		NiKPermit();
-		return(-5);
-	}
-	words=Write(fh,(void *)Servermem->texts,2*MAXTEXTS);
-	if(words==-1) puttekn("\r\n\nFel vid skrivandet av Textmot.dat\r\n\n",-1);
-	Close(fh);
-	NiKPermit();
-	return(mote2==motnr ? -9 : -5);
+  int motnr, textNumber;
+  char lappfile[40];
+  struct Mote *motpek;
+  if((motnr=parsemot(argument))==-1) {
+    puttekn("\r\n\nFinns inget möte som heter så!\r\n\n",-1);
+    return(-5);
+  }
+  if(motnr==-3) {
+    puttekn("\r\n\nSkriv: Radera Möte <mötesnamn>\r\n\n",-1);
+    return(-5);
+  }
+  motpek=getmotpek(motnr);
+  if(!motpek) printf("ARRRRGH!! Fel på motpek!\n");
+  if(!MayAdminConf(motnr, inloggad, &Servermem->inne[nodnr])) {
+    puttekn("\n\n\rDu har ingen rätt att radera det mötet!\n\r",-1);
+    return(-5);
+  }
+  sprintf(outbuffer,"\r\n\nÄr du säker på att du vill radera mötet %s? ",motpek->namn);
+  puttekn(outbuffer,-1);
+  if(!jaellernej('j','n',2)) {
+    puttekn("Nej\n\n\r",-1);
+    return(-5);
+  }
+  puttekn("Ja\r\n\n",-1);
+  Remove((struct Node *)motpek);
+  motpek->namn[0]=0;
+  writemeet(motpek);
+  FreeMem(motpek,sizeof(struct Mote));
+  sprintf(lappfile,"NiKom:Lappar/%d.motlapp",motnr);
+  DeleteFile(lappfile);
+  
+  textNumber = 0;
+  while((textNumber = FindNextTextInConference(textNumber, motnr)) != -1) {
+    SetConferenceForText(textNumber, -1, FALSE);
+    textNumber++;
+  }
+
+  if(!WriteConferenceTexts()) {
+    puttekn("\r\n\nFel vid skrivandet av Textmot.dat\r\n\n",-1);
+  }
+  return(mote2==motnr ? -9 : -5);
 }
 
 int andmot(void) {
@@ -720,32 +716,6 @@ int writeuser(int nummer,struct User *user) {
 	return(0);
 }
 
-int writetextmot(int nummer,short variabel) {
-	BPTR fh;
-	Servermem->texts[nummer%MAXTEXTS]=variabel;
-	NiKForbid();
-	if(!(fh=Open("NiKom:DatoCfg/Textmot.dat",MODE_OLDFILE))) {
-		puttekn("Kunde inte öppna Textmot.dat\n",-1);
-		NiKPermit();
-		return(1);
-	}
-	if(Seek(fh,(nummer%MAXTEXTS)*2,OFFSET_BEGINNING)==-1) {
-		puttekn("Kunde inte söka i Textmot.dat\n",-1);
-		Close(fh);
-		NiKPermit();
-		return(1);
-	}
-	if(Write(fh,(void *)&variabel,2)==-1) {
-		puttekn("Fel vid skrivandet av Textmot.dat\n",-1);
-		Close(fh);
-		NiKPermit();
-		return(1);
-	}
-	Close(fh);
-	NiKPermit();
-	return(0);
-}
-
 void rensatexter(void) {
 	int antal=0;
 	if(!(antal=atoi(argument))) {
@@ -916,7 +886,7 @@ int dumpatext(void) {
 		puttekn("\r\n\nTexten finns inte!\r\n",-1);
 		return(0);
 	}
-	if(!MayReadConf(Servermem->texts[tnr%MAXTEXTS], inloggad, &Servermem->inne[nodnr])) {
+	if(!MayReadConf(GetConferenceForText(tnr), inloggad, &Servermem->inne[nodnr])) {
 		puttekn("\r\n\nDu har inte rätt att dumpa den texten!\r\n",-1);
 		return(0);
 	}
@@ -966,49 +936,59 @@ int dumpatext(void) {
 }
 
 void listaarende(void) {
-	char *nextarg=argument,namn[50],kom[10];
-	int x,dir=-1,from=-1,baratexter=FALSE;
-	struct Mote *motpek;
-	struct Header lahead;
-	struct tm *ts;
-	if(mote2==-1) {
-		sprintf(outbuffer,"\n\n\rAnvänd 'Lista Brev' i %s\n\r",Servermem->cfg.brevnamn);
-		puttekn(outbuffer,-1);
-		return;
-	}
-	while(nextarg[0]) {
-		if(nextarg[0]=='-') {
-			if(nextarg[1]=='t' || nextarg[1]=='T') baratexter=TRUE;
-			else if(nextarg[1]=='f' || nextarg[1]=='F') {
-				dir=1;
-				if(from<0) from=-2;
-			}
-		} else if(isdigit(nextarg[0])) from=atoi(nextarg);
-		nextarg=hittaefter(nextarg);
-	}
-	motpek=getmotpek(mote2);
-	if(motpek->type==MOTE_FIDO) {
-		fidolistaarende(motpek,dir);
-		return;
-	}
-	puttekn("\r\n\nNamn                              Text    Kom   Datum  Ärende",-1);
-	puttekn("\r\n-------------------------------------------------------------------------\r\n",-1);
-	if(from==-1) from=Servermem->info.hightext;
-	else if(from==-2) from=Servermem->info.lowtext;
-	for(x=from;x>=Servermem->info.lowtext && x<=Servermem->info.hightext;x+=dir) {
-		if(Servermem->texts[x%MAXTEXTS]!=mote2) continue;
-		if(readtexthead(x,&lahead)) return;
-		if(lahead.kom_till_nr!=-1 && baratexter) continue;
-		strcpy(namn,getusername(lahead.person));
-		lahead.arende[22]=0;
-		ts=localtime(&lahead.tid);
-		if(lahead.kom_till_nr==-1) strcpy(kom,"   -");
-		else sprintf(kom,"%d",lahead.kom_till_nr);
-		sprintf(outbuffer,"%-34s%6d %6s %02d%02d%02d %s\r\n", namn,
-                        lahead.nummer, kom, ts->tm_year % 100, ts->tm_mon + 1,
-                        ts->tm_mday, lahead.arende);
-		if(puttekn(outbuffer,-1)) return;
-	}
+  char *nextarg=argument,namn[50],kom[10];
+  int forward = FALSE, textNumber = -1, baratexter = FALSE;
+  struct Mote *motpek;
+  struct Header lahead;
+  struct tm *ts;
+  if(mote2==-1) {
+    sprintf(outbuffer,"\n\n\rAnvänd 'Lista Brev' i %s\n\r",Servermem->cfg.brevnamn);
+    puttekn(outbuffer,-1);
+    return;
+  }
+  while(nextarg[0]) {
+    if(nextarg[0]=='-') {
+      if(nextarg[1]=='t' || nextarg[1]=='T') baratexter=TRUE;
+      else if(nextarg[1]=='f' || nextarg[1]=='F') {
+        forward = TRUE;
+      }
+    } else if(isdigit(nextarg[0])) {
+      textNumber = atoi(nextarg);
+    }
+    nextarg=hittaefter(nextarg);
+  }
+  motpek=getmotpek(mote2);
+  if(motpek->type==MOTE_FIDO) {
+    fidolistaarende(motpek, forward ? 1 : -1);
+    return;
+  }
+  puttekn("\r\n\nNamn                              Text    Kom   Datum  Ärende",-1);
+  puttekn("\r\n-------------------------------------------------------------------------\r\n",-1);
+
+  if(textNumber == -1) {
+    textNumber = (forward ? -1 : INT_MAX);
+  } else {
+    textNumber += (forward ? -1 : 1);
+  }
+  while((textNumber = (forward
+                       ? FindNextTextInConference(textNumber + 1, mote2)
+                       : FindPrevTextInConference(textNumber - 1, mote2))) != -1) {
+    if(readtexthead(textNumber, &lahead)) {
+      return;
+    }
+    if(lahead.kom_till_nr!=-1 && baratexter) {
+      continue;
+    }
+    strcpy(namn,getusername(lahead.person));
+    lahead.arende[22]=0;
+    ts=localtime(&lahead.tid);
+    if(lahead.kom_till_nr==-1) strcpy(kom,"   -");
+    else sprintf(kom,"%d",lahead.kom_till_nr);
+    sprintf(outbuffer,"%-34s%6d %6s %02d%02d%02d %s\r\n", namn,
+            lahead.nummer, kom, ts->tm_year % 100, ts->tm_mon + 1,
+            ts->tm_mday, lahead.arende);
+    if(puttekn(outbuffer,-1)) return;
+  }
 }
 
 void tellallnodes(char *str) {

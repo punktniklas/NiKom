@@ -544,12 +544,11 @@ void textinfo(struct RexxMsg *mess) {
                 return;
         }
 
-        if(Servermem->texts[nummer%MAXTEXTS] == -1)
-        {
-			if(!(mess->rm_Result2=(long)CreateArgstring("-3",strlen("-3"))))
-				printf("Kunde inte allokera en ArgString\n");
-			mess->rm_Result1=0;
-			return;
+        if(GetConferenceForText(nummer) == -1) {
+          if(!(mess->rm_Result2=(long)CreateArgstring("-3",strlen("-3"))))
+            printf("Kunde inte allokera en ArgString\n");
+          mess->rm_Result1=0;
+          return;
         }
 
         if(nummer!=infohead.nummer) readtexthead(nummer,&infohead);
@@ -571,8 +570,8 @@ void textinfo(struct RexxMsg *mess) {
                         sprintf(str,"%d",infohead.kom_till_nr);
                         break;
                 case 'm' : case 'M' :
-                        sprintf(str,"%d",Servermem->texts[nummer%MAXTEXTS]);
-                        break;
+                  sprintf(str, "%d", GetConferenceForText(nummer));
+                  break;
                 case 'p' : case 'P' :
                         sprintf(str,"%d",infohead.kom_till_per);
                         break;
