@@ -11,8 +11,33 @@
 
 #define CONFTEXTS_DAT "NiKom:DatoCfg/ConferenceTexts.dat"
 
+/* ******* Local functions ******** */
+
 int writeSingleConfText(int arrayPos, struct System *Servermem);
 int growConfTextsArray(int neededPos, struct System *Servermem);
+
+/* ******* Library functions ******** */
+
+/****** nikom.library/GetConferenceForText *************************
+
+    NAME
+        GetConferenceForText -- Returns the conference the given text is in.
+
+    SYNOPSIS
+        GetConferenceForText(textNumber)
+                             D0
+        int GetConferenceForText(int);
+
+    FUNCTION
+        Returns the conference the given text is in.
+
+    RESULT
+        conf - The conference the text is in.
+
+    INPUTS
+        textNumber - the text number.
+
+**********************************************************************/
 
 int __saveds __asm LIBGetConferenceForText(
    register __d0 int textNumber,
@@ -25,6 +50,34 @@ int __saveds __asm LIBGetConferenceForText(
   return NiKomBase->Servermem->confTexts
     .texts[textNumber - NiKomBase->Servermem->info.lowtext];
 }
+
+/****** nikom.library/SetConferenceForText *************************
+
+    NAME
+        SetConferenceForText -- Sets the conference the given text is in.
+
+    SYNOPSIS
+        SetConferenceForText(textNumber, conf, saveToDisk)
+                             D0          D1    D2
+        void SetConferenceForText(int, int, int);
+
+    FUNCTION
+        Sets the conference the given text is in. If the text number
+        is lower than the lowest text or higher than the highest text
+        in the system this function will do nothing.
+
+        If saveToDisk is non zero the change will also be written to
+        disk. Not writing to disk can be useful if a large number of
+        changes is to be made in which case opening and closing the file
+        for every change will be inefficient. In this case the function
+        WriteConferenceTexts() should be called when all changes are made.
+
+    INPUTS
+        textNumber - the text number.
+        conf       - the conference to set for the text.
+        saveToDisk - non zero if changes should be written to disk
+
+**********************************************************************/
 
 void __saveds __asm LIBSetConferenceForText(
    register __d0 int textNumber,
@@ -50,6 +103,30 @@ void __saveds __asm LIBSetConferenceForText(
   }
 }
 
+/****** nikom.library/FindNextTextInConference *************************
+
+    NAME
+        FindNextTextInConference -- Searches for the next text in the conference.
+
+    SYNOPSIS
+        FindNextTextInConference(searchStart, conf)
+                                 D0           D1
+        int FindNextTextInConference(int, int);
+
+    FUNCTION
+        Searches for the next text in the given conference. The search
+        starts at (and includes) the given text number. If no text is
+        found -1 is returned.
+
+    RESULT
+        textNumber - the next text or -1 if none is found.
+
+    INPUTS
+        searchStart - The text to start searching at
+        conf        - The conference to search for
+
+**********************************************************************/
+
 int __saveds __asm LIBFindNextTextInConference(
    register __d0 int searchStart,
    register __d1 int conf,
@@ -69,6 +146,30 @@ int __saveds __asm LIBFindNextTextInConference(
   return -1;
 }
 
+/****** nikom.library/FindPrevTextInConference *************************
+
+    NAME
+        FindPrevTextInConference -- Searches for the previous text in the conference.
+
+    SYNOPSIS
+        FindPrevTextInConference(searchStart, conf)
+                                 D0           D1
+        int FindPrevTextInConference(int, int);
+
+    FUNCTION
+        Searches for the previous text in the given conference. The search
+        starts at (and includes) the given text number. If no text is
+        found -1 is returned.
+
+    RESULT
+        textNumber - the previous text or -1 if none is found.
+
+    INPUTS
+        searchStart - The text to start searching at
+        conf        - The conference to search for
+
+**********************************************************************/
+
 int __saveds __asm LIBFindPrevTextInConference(
    register __d0 int searchStart,
    register __d1 int conf,
@@ -87,6 +188,26 @@ int __saveds __asm LIBFindPrevTextInConference(
   }
   return -1;
 }
+
+/****** nikom.library/WriteConferenceTexts *************************
+
+    NAME
+        WriteConferenceTexts -- Writes conference text data to disk.
+
+    SYNOPSIS
+        WriteConferenceTexts()
+
+        int WriteConferenceTexts(void);
+
+    FUNCTION
+        Writes the entire array of conference text data to disk,
+        overwriting existing contents. If there are no texts in the
+        system this function will do nothing.
+
+    RESULT
+        sucess - Zero if writing failed, non zero otherwise.
+
+**********************************************************************/
 
 int __saveds __asm LIBWriteConferenceTexts(
    register __a6 struct NiKomBase *NiKomBase) {
