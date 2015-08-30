@@ -28,7 +28,7 @@ int getpoint(char *);
 void getfidocfg(void);
 void getnodetypescfg(void);
 void sparatext(struct NiKMess *message);
-void radera(int texter);
+void purgeOldTexts(int numberOfTexts);
 void writeinfo(void);
 void addhost(int);
 void freefilemem(void);
@@ -91,7 +91,7 @@ int parsegrupp(char *);
 void keyinfo(struct RexxMsg *);
 void getdir(struct RexxMsg *);
 int choosedir(int, char *, int);
-void deloldtexts(struct RexxMsg *);
+void rexxPurgeOldTexts(struct RexxMsg *);
 void movefile(struct RexxMsg *);
 void rexxnextpatternfile(struct RexxMsg *);
 

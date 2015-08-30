@@ -20,3 +20,6 @@ int __saveds __asm LIBFindPrevTextInConference(
    register __a6 struct NiKomBase *NiKomBase);
 int __saveds __asm LIBWriteConferenceTexts(
    register __a6 struct NiKomBase *NiKomBase);
+int __saveds __asm LIBDeleteConferenceTexts(
+   register __d0 int numberOfTexts,
+   register __a6 struct NiKomBase *NiKomBase);

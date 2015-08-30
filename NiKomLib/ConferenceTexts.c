@@ -233,6 +233,54 @@ int __saveds __asm LIBWriteConferenceTexts(
   return writeRes == textsToWrite * sizeof(short);
 }
 
+/****** nikom.library/DeleteConferenceTexts *************************
+
+    NAME
+        DeleteConferenceTexts -- Deletes texts from the conference texts array
+
+    SYNOPSIS
+        DeleteConferenceTexts(numberOfTexts)
+                              D0
+        int DeleteConferenceTexts(int);
+
+    FUNCTION
+        Deletes the given number of texts from the conference texts
+        array and updates Servermem->info.lowtext. WARNING: This
+        should always be followed by deleting files in NiKom:Moten.
+        This function will not take care of that.
+
+        The number of texts to delete must be a multiple of 512 and
+        can not be higher than the total number of texts in the system.
+
+    RESULT
+        success - Zero if bad input or writing the new array failed.
+
+    INPUTS
+        numberOfTexts - The number of texts to delete.
+
+**********************************************************************/
+
+int __saveds __asm LIBDeleteConferenceTexts(
+   register __d0 int numberOfTexts,
+   register __a6 struct NiKomBase *NiKomBase) {
+
+  int newTotalTexts;
+
+  newTotalTexts = NiKomBase->Servermem->info.hightext
+    - NiKomBase->Servermem->info.lowtext
+    + 1
+    - numberOfTexts;
+  if((numberOfTexts % 512) != 0 || newTotalTexts < 0) {
+    return 0;
+  }
+
+  memmove(NiKomBase->Servermem->confTexts.texts,
+          &NiKomBase->Servermem->confTexts.texts[numberOfTexts],
+          newTotalTexts * sizeof(short));
+  NiKomBase->Servermem->info.lowtext += numberOfTexts;
+  return WriteConferenceTexts();
+}
+
 int writeSingleConfText(int arrayPos, struct System *Servermem) {
   BPTR file;
   int writeRes;

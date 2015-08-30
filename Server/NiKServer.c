@@ -33,7 +33,6 @@ void getnamn(void);
 void getinfo(void);
 void initflaggor(void);
 void sparatext(struct NiKMess *);
-void radera(int);
 int maybeConvertConferenceTextData(int numberOfTexts);
 void readIntoConfTextsArray(int arrayIndex, int fileIndex, int textsToRead,
                             BPTR file);
@@ -1068,29 +1067,24 @@ void sparatext(struct NiKMess *message) {
             &Servermem->unreadTexts[message->nod]);
         }
 	message->data=Servermem->info.hightext;
-	if(Servermem->info.hightext-Servermem->info.lowtext+1==MAXTEXTS) radera(512);
 }
 
-void radera(int texter) {
-	long oldlowtext=Servermem->info.lowtext;
-	int x;
-	char filnamn[40];
-	if(texter>(Servermem->info.hightext-Servermem->info.lowtext)) {
-		printf("Kan inte radera så många texter!\n");
-		return;
-	}
-	if(!texter) {
-		printf("Det är ganska meningslöst att radera 0 texter, eller hur..\n");
-		return;
-	}
+void purgeOldTexts(int numberOfTexts) {
+  long oldlowtext = Servermem->info.lowtext;
+  int i;
+  char filename[40];
 
-	for(x=0;x<texter;x+=512) {
-		sprintf(filnamn,"NiKom:Moten/Head%d.dat",(oldlowtext+x)/512);
-		DeleteFile(filnamn);
-		sprintf(filnamn,"NiKom:Moten/Text%d.dat",(oldlowtext+x)/512);
-		DeleteFile(filnamn);
-	}
-	Servermem->info.lowtext+=texter;
+  if(!DeleteConferenceTexts(numberOfTexts)) {
+    printf("Failed deleting texts from the conference texts array\n");
+    return;
+  }
+  
+  for(i=0; i < numberOfTexts; i += 512) {
+    sprintf(filename, "NiKom:Moten/Head%d.dat", (oldlowtext + i) / 512);
+    DeleteFile(filename);
+    sprintf(filename, "NiKom:Moten/Text%d.dat", (oldlowtext + i) / 512);
+    DeleteFile(filename);
+  }
 }
 
 void writeinfo(void) {
@@ -1403,8 +1397,6 @@ void main() {
 
 					case SPARATEXTEN :
 						sparatext(MyNiKMess);
-					/*	if(Servermem->info.hightext-Servermem->info.lowtext+1==MAXTEXTS) radera(512); */
-					/* TK970313: Adderat i slutet av sparatext() funktionen istället. */
 						break;
 					case FORBID :
 						ReplyMsg((struct Message *)MyNiKMess);
@@ -1412,7 +1404,7 @@ void main() {
 						dummymess=(struct NiKMess *)GetMsg(permitport);
 						break;
 					case RADERATEXTER :
-						radera(MyNiKMess->data);
+						purgeOldTexts(MyNiKMess->data);
 						break;
 					case READCFG :
 						getconfig();

@@ -62,4 +62,5 @@ SetConferenceForText(textNumber,conf,saveToDisk)(D0,D1,D2)
 FindNextTextInConference(searchStart,conf)(D0,D1)
 FindPrevTextInConference(searchStart,conf)(D0,D1)
 WriteConferenceTexts()
+DeleteConferenceTexts(numberOfTexts)(D0)
 ##end

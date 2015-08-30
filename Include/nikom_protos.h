@@ -83,4 +83,5 @@ void SetConferenceForText(int textNumber, int conf, int saveToDisk);
 int FindNextTextInConference(int searchStart, int conf);
 int FindPrevTextInConference(int searchStart, int conf);
 int WriteConferenceTexts(void);
+int DeleteConferenceTexts(int numberOfTexts);
 #endif /* NIKOM_PROTOS_H */

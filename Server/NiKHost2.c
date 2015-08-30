@@ -16,6 +16,7 @@
 #include "/include/memwatch.h"
 #endif
 
+#include "RexxUtil.h"
 
 struct Fil *parsefil(char *,int);
 
@@ -1239,34 +1240,25 @@ void getdir(struct RexxMsg *mess) {
         mess->rm_Result1=0;
 }
 
-void deloldtexts(struct RexxMsg *mess) {
-        int texter;
-        if(!mess->rm_Args[1]) {
-                mess->rm_Result1=1;
-               mess->rm_Result2=NULL;
-                return;
-        }
-        texter = atoi(mess->rm_Args[1]);
-       if(texter <= 0) {
-                if(!(mess->rm_Result2=(long)CreateArgstring("-1",strlen("-1"))))
-                        printf("Kunde inte allokera en ArgString\n");
-                mess->rm_Result1=0;
-                return;
-        }
-       if(texter >= (Servermem->info.hightext - Servermem->info.lowtext)) {
-                if(!(mess->rm_Result2=(long)CreateArgstring("-2",strlen("-2"))))
-                        printf("Kunde inte allokera en ArgString\n");
-                mess->rm_Result1=0;
-                return;
-        }
-        if(texter % 512) {
-                if(!(mess->rm_Result2=(long)CreateArgstring("-3",strlen("-3"))))
-                        printf("Kunde inte allokera en ArgString\n");
-                mess->rm_Result1=0;
-                return;
-        }
-        radera(texter);
-        if(!(mess->rm_Result2=(long)CreateArgstring("0",strlen("0"))))
-                printf("Kunde inte allokera en ArgString\n");
-        mess->rm_Result1=0;
+void rexxPurgeOldTexts(struct RexxMsg *mess) {
+  int numberOfTexts;
+  if(!mess->rm_Args[1]) {
+    SetRexxErrorResult(mess, 1);
+    return;
+  }
+  numberOfTexts = atoi(mess->rm_Args[1]);
+  if(numberOfTexts <= 0) {
+    SetRexxResultString(mess, "-1");
+    return;
+  }
+  if(numberOfTexts >= (Servermem->info.hightext - Servermem->info.lowtext)) {
+    SetRexxResultString(mess, "-2");
+    return;
+  }
+  if(numberOfTexts % 512) {
+    SetRexxResultString(mess, "-3");
+    return;
+  }
+  purgeOldTexts(numberOfTexts);
+  SetRexxResultString(mess, "0");
 }

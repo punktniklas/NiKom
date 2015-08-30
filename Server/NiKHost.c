@@ -46,7 +46,7 @@ void handlerexx(struct RexxMsg *mess) {
 	else if(!stricmp(mess->rm_Args[0],"CHGFILE")) chgfile(mess);
 	else if(!stricmp(mess->rm_Args[0],"KEYINFO")) keyinfo(mess);
 	else if(!stricmp(mess->rm_Args[0],"GETDIR")) getdir(mess);
-	else if(!stricmp(mess->rm_Args[0],"DELOLDTEXTS")) deloldtexts(mess);
+	else if(!stricmp(mess->rm_Args[0],"DELOLDTEXTS")) rexxPurgeOldTexts(mess);
 	else if(!stricmp(mess->rm_Args[0],"SENDNODEMESS")) rxsendnodemess(mess);
 	else if(!stricmp(mess->rm_Args[0],"STATUSINFO")) rexxstatusinfo(mess);
 	else if(!stricmp(mess->rm_Args[0],"AREARIGHT")) rexxarearight(mess);
