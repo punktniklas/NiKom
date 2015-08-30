@@ -1,7 +1,7 @@
 CPU   = 68020
 FLAGS = NMINC STRMERGE CPU=$(CPU) DEBUG=FULL IDIR=/Include
 OBJS  = NiKServer.o NiKHost.o NiKHost2.o NiKHost3.o NiKSerVersion.o NodeComm.o \
-	Config.o
+	Config.o RexxUtil.o
 
 NIKVERSION  = `/GetNiKomVersion.rexx Version /NiKVersion.txt`
 NIKREVISION = `/GetNiKomVersion.rexx ServerRevision /NiKVersion.txt`
@@ -19,7 +19,7 @@ clean:
 NiKServer: $(OBJS)
   slink FROM lib:c.o $(OBJS) \
         TO Debug/$(CPU)/NiKServer \
-        LIB lib:sc.lib+lib:amiga.lib+lib:rexxglue.o \
+        LIB lib:sc.lib+lib:amiga.lib \
         NOALVS NOICONS
   slink FROM Debug/$(CPU)/NiKServer TO NoDebug/$(CPU)/NiKServer NODEBUG NOICONS
 
@@ -33,8 +33,11 @@ NiKHost.o: NiKHost.c /Include/NiKomStr.h
 NiKHost2.o: NiKHost2.c /Include/NiKomStr.h
   sc $(FLAGS) NiKHost2.c
 
-NiKHost3.o: NiKHost3.c /Include/NiKomStr.h
+NiKHost3.o: NiKHost3.c /Include/NiKomStr.h RexxUtil.h
   sc $(FLAGS) NiKHost3.c
+
+RexxUtil.o: RexxUtil.c RexxUtil.h
+  sc $(FLAGS) RexxUtil.c
 
 NiKSerVersion.o: NiKSerVersion.c NiKServer.o NiKHost.o NiKHost2.o NiKHost3.o NodeComm.o /NiKVersion.txt
   sc $(FLAGS) DEFINE=NIKSERVERVERSION=$(NIKVERSION) DEFINE=NIKSERVERREVISION=$(NIKREVISION) NiKSerVersion.c

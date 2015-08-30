@@ -15,6 +15,8 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "RexxUtil.h"
+
 extern struct System *Servermem;
 
 void rxsendnodemess(struct RexxMsg *mess) {
@@ -438,50 +440,69 @@ void rexxaddprogramdata(struct RexxMsg *mess)
 }
 
 
-void rexxmarktextread(struct RexxMsg *mess)
-{
-	int textnr, anvnr, error;
-	char retur[10];
-
-	if(!mess->rm_Args[1] || !mess->rm_Args[2])
-	{
-		mess->rm_Result1=1;
-		mess->rm_Result2=NULL;
-		return;
-	}
-
-	anvnr = atoi(mess->rm_Args[1]);
-	textnr = atoi(mess->rm_Args[2]);
-	error = -6; /* MarkTextRead(anvnr, textnr); */
-	sprintf(retur,"%d", error);
-
-	if(!(mess->rm_Result2=(long)CreateArgstring(retur, strlen(retur))))
-		printf("Kunde inte allokera en ArgString\n");
-	mess->rm_Result1=0;
-	return;
+void rexxmarktextread(struct RexxMsg *mess) {
+  rexxmarktext(mess, 0);
 }
 
-void rexxmarktextunread(struct RexxMsg *mess)
-{
-	int textnr, anvnr, error;
-	char retur[10];
+void rexxmarktextunread(struct RexxMsg *mess) {
+  rexxmarktext(mess, 1);
+}
+  
+void rexxmarktext(struct RexxMsg *mess, int desiredUnreadStatus) {
+  int textNr, userId, i, needToSave = FALSE;
+  struct UnreadTexts *unreadTexts;
+  static struct UnreadTexts unreadTextsBuf;
 
-	if(!mess->rm_Args[1] || !mess->rm_Args[2])
-	{
-		mess->rm_Result1=1;
-		mess->rm_Result2=NULL;
-		return;
-	}
+  if(!mess->rm_Args[1] || !mess->rm_Args[2]) {
+    SetRexxErrorResult(mess, 1);
+    return;
+  }
 
-	anvnr = atoi(mess->rm_Args[1]);
-	textnr = atoi(mess->rm_Args[2]);
-	error = -6; /* MarkTextUnRead(anvnr, textnr); */
-	sprintf(retur,"%d", error);
+  userId = atoi(mess->rm_Args[1]);
+  textNr = atoi(mess->rm_Args[2]);
 
-	if(!(mess->rm_Result2=(long)CreateArgstring(retur, strlen(retur))))
-		printf("Kunde inte allokera en ArgString\n");
-	mess->rm_Result1=0;
-	return;
+  if(!userexists(userId)) {
+    SetRexxResultString(mess, "-1");
+    return;
+  }
+
+  if(textNr < Servermem->info.lowtext || textNr > Servermem->info.hightext) {
+    SetRexxResultString(mess, "-2");
+    return;
+  }
+  
+  if(GetConferenceForText(textNr) == -1) {
+    SetRexxResultString(mess, "-5");
+    return;
+  }
+    
+
+  for(i=0; i < MAXNOD; i++) {
+    if(Servermem->inloggad[i] == userId) {
+      unreadTexts = &Servermem->unreadTexts[i];
+      break;
+    }
+  }
+  if(unreadTexts == NULL) {
+    unreadTexts = &unreadTextsBuf;
+    if(!ReadUnreadTexts(unreadTexts, userId)) {
+      SetRexxResultString(mess, "-4");
+      return;
+    }
+    needToSave = TRUE;
+  }
+
+  if(desiredUnreadStatus == (IsTextUnread(textNr, unreadTexts) ? 1 : 0)) {
+    SetRexxResultString(mess, "-3");
+    return;
+  }
+
+  ChangeUnreadTextStatus(textNr, desiredUnreadStatus, unreadTexts);
+  if(needToSave) {
+    WriteUnreadTexts(unreadTexts, userId);
+  }
+
+  SetRexxResultString(mess, "0");
 }
 
 void rexxconsoletext(struct RexxMsg *mess)

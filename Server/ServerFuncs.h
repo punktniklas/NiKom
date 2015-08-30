@@ -111,6 +111,7 @@ void rexxgetprogramdata(struct RexxMsg *);
 void rexxaddprogramdata(struct RexxMsg *);
 void rexxmarktextread(struct RexxMsg *);
 void rexxmarktextunread(struct RexxMsg *);
+void rexxmarktext(struct RexxMsg *mess, int desiredUnreadStatus);
 void rexxconsoletext(struct RexxMsg *);
 void rexxcheckuserpassword(struct RexxMsg *);
 
