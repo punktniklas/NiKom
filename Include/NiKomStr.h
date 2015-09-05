@@ -29,7 +29,6 @@
 /* Maximala antal */
 #define MAXMOT			5
 #define MAXKOM			15
-#define MAXTEXTS		32768
 #define MAXBREV			2048
 #define MAXNOD			32
 #define MAXMOTE			2048
