@@ -2,4 +2,6 @@
 *.o
 Debug
 NoDebug
+/InitNiKom/InitNiKom
 nikom_pragmas.h
+/NiKomBinDistr.lha
