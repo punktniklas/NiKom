@@ -1,5 +1,26 @@
 ---------------------------------------------------------------------------
-                         NiKom v1.61, 2015-08-xx
+                         NiKom v2.0.0, 201x-yy-zz
+---------------------------------------------------------------------------
+- The handling of texts in conferences and how the system remembers what
+  texts that are read vs unread for each user has been completely reworked.
+  The main effect of this is that there no longer is a limit of 32768
+  texts in the system. There is still a limit though that the read/unread
+  status of texts still only handles 32768 texts. Texts that are too old
+  will automatically be assumed to be read. The window of texts where the
+  status is remembered will shift upwards for each user individually as
+  it is needed to mark newer texts as read.
+
+  When this version of NiKServer starts up the first time it will convert
+  the old file Textmot.dat (in DatoCfg) to ConferenceTexts.dat. It will
+  also create a new file LegacyConversion.dat to store what the lowest text
+  in the system was when this version was deployed. As each user logs in
+  for the first time their Bitmap0 file will be converted into the file
+  UnreadTexts.
+  Make sure you make a backup of all files before installing this version
+  if you think you may want to revert back to an older version.
+
+---------------------------------------------------------------------------
+                         NiKom v1.61, 2015-08-25
 ---------------------------------------------------------------------------
 
 - Datum på tvåtusentalet skrivs nu ut korrekt.

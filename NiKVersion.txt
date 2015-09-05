@@ -1,7 +1,7 @@
-Release: v1.61
-Version: 20
-ServerRevision: 51
-LibraryRevision: 51
-KOMRevision: 51
-MenyRevision: 51
-PreNodeRevision: 51
+Release: v2.0.0dev
+Version: 21
+ServerRevision: 1
+LibraryRevision: 1
+KOMRevision: 1
+MenyRevision: 1
+PreNodeRevision: 1
