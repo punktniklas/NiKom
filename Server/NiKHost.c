@@ -1371,13 +1371,14 @@ void chguser(struct RexxMsg *mess) {
 			else Servermem->inne[x].upload=atoi(mess->rm_Args[2]);
 			break;
 		case 'x' : case 'X' :
-			if(Servermem->cfg.cfgflags & NICFG_CRYPTEDPASSWORDS)
-				strncpy(temp, CryptPassword(mess->rm_Args[2]),15);
-			else
-				strncpy(temp, mess->rm_Args[2],15);
-			if(x==MAXNOD) strncpy(chguseruser.losen,temp,15);
-			else strncpy(Servermem->inne[x].losen,temp,15);
-			break;
+                  if(Servermem->cfg.cfgflags & NICFG_CRYPTEDPASSWORDS) {
+                    CryptPassword(mess->rm_Args[2], temp);
+                  } else {
+                    strncpy(temp, mess->rm_Args[2], 15);
+                  }
+                  if(x==MAXNOD) strncpy(chguseruser.losen,temp,15);
+                  else strncpy(Servermem->inne[x].losen,temp,15);
+                  break;
 		default : break;
 	}
 	if(x==MAXNOD && writeuser(user,&chguseruser)) mess->rm_Result1=3;

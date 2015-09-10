@@ -96,7 +96,7 @@ int nyanv(void) {
 	long tid;
 	int going=TRUE,x=0;
 	struct ShortUser *allokpek;
-	char dirnamn[100],filnamn[40];
+	char dirnamn[100], filnamn[40], encryptedPwd[14];
 	UBYTE tillftkn;
 	if(bytteckenset()) return(0);
 	puttekn("\r\n\n",-1);
@@ -219,8 +219,10 @@ int nyanv(void) {
 		if(inmat[0]) strncpy(Servermem->inne[nodnr].prompt,inmat,5);
 		puttekn("\r\n\nStämmer allt nu? (J/n) ",-1);
 	}
-	if(Servermem->cfg.cfgflags & NICFG_CRYPTEDPASSWORDS)
-		strcpy(Servermem->inne[nodnr].losen, CryptPassword(Servermem->inne[nodnr].losen));
+	if(Servermem->cfg.cfgflags & NICFG_CRYPTEDPASSWORDS) {
+          CryptPassword(Servermem->inne[nodnr].losen, encryptedPwd);
+          strcpy(Servermem->inne[nodnr].losen, encryptedPwd);
+        }
 
 	puttekn("Ja",-1);
 	x=((struct ShortUser *)Servermem->user_list.mlh_TailPred)->nummer+1;

@@ -60,10 +60,6 @@ int __saveds __asm LIBFreeProgramCategory( register __d0 int usernumber, registe
 int __saveds __asm LIBLoadProgramCategory( register __d0 int, register __a6 struct NiKomBase *);
 int __saveds __asm LIBSaveProgramCategory( register __d0 int, register __a6 struct NiKomBase *);
 
-int __saveds __asm LIBCheckPassword(register __d0 LONG usernumber, register __a0 char *password, register __a6 struct NiKomBase *NiKomBase);
-char *__saveds __asm LIBCryptPassword(register __a0 char *password, register __a6 struct NiKomBase *NiKomBase);
-
-
 /* Andra trevliga små funktioner */
 
 /* UserLibInit.c */
@@ -139,8 +135,3 @@ struct ProgramDataCache *CheckifUserisCached(int, struct NiKomBase *);
 struct ProgramCategory *CacheProgramDataforUser(int, struct NiKomBase *);
 void InsertProgramDataCachedUser(int, struct ProgramCategory *, struct NiKomBase *);
 void RemoveFirstCachedUser(struct NiKomBase *);
-
-/* FCrypt.c */
-
-char *crypt(char *buf, char *salt);
-#define KEYLENGTH 2

@@ -1,0 +1,21 @@
+CPU   = 68020
+FLAGS = NMINC STRMERGE CPU=$(CPU) IDIR=//NiKomLib
+OBJS = CryptPasswords.o FCrypt.o
+
+all: CryptPasswords
+
+clean:
+  delete *.o
+  delete CryptPasswords
+
+CryptPasswords: $(OBJS)
+  slink FROM lib:c.o $(OBJS) \
+        TO CryptPasswords \
+        LIB lib:sc.lib+lib:amiga.lib \
+        NOALVS NOICONS NODEBUG
+
+CryptPasswords.o: CryptPasswords.c //NiKomLib/FCrypt.h
+  sc $(FLAGS) CryptPasswords.c
+
+FCrypt.o: //NiKomLib/FCrypt.c
+  sc $(FLAGS) OBJNAME=FCrypt.o //NiKomLib/FCrypt.c

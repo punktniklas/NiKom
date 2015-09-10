@@ -80,6 +80,8 @@
 #define const
 #endif
 
+#include <time.h>
+#include <stdlib.h>
 /* I now assume that you have des.h available */
 #include "des.h"
 
@@ -706,3 +708,20 @@ DES_LONG Eswap1;
 	return(0);
 	}
 
+/************* Extra functions added for NiKom **********/
+
+char *generateSalt(char *saltbuf, int saltLength) {
+  int i, rnd;
+  unsigned int clock[2];
+
+  timer(clock);
+  srand(clock[1]);
+
+  for(i = 0; i < saltLength; i++) {
+    rnd = rand() % 50;
+    saltbuf[i] = rnd < 25 ? rnd + 65 : rnd + 72;
+  }
+  saltbuf[saltLength] = '\0';
+
+  return saltbuf;
+}

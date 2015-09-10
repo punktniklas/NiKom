@@ -40,12 +40,6 @@ void DeleteNiKHash(NiKHash *);
 int InsertNiKHash(NiKHash *, int, void *);
 void *GetNiKHashData(NiKHash *, int);
 void *RemoveNiKHashData(NiKHash *, int); */
-int CreateUser(LONG, struct TagItem *);
-int CreateUserTags(LONG, unsigned long tag1Type, ... );
-int DeleteUser(LONG, ULONG nummer);
-int EditUser(LONG, struct TagItem *);
-int EditUserTags(LONG, unsigned long tag1Type, ... );
-void *ReadUser(LONG, LONG);
 int NiKParse(char *, char);
 void ChangeUnreadTextStatus(
   int textNumber, int markAsUnread, struct UnreadTexts *unreadTexts);
@@ -74,8 +68,8 @@ int SysInfo(char *);
 
 /* Crypt.c */
 
-int CheckPassword(int, char *);
-char *CryptPassword(char *);
+int CheckPassword(char *, char *);
+char *CryptPassword(char *, char *);
 
 /* ConferenceTexts.c */
 int GetConferenceForText(int textNumber);

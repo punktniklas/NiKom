@@ -526,25 +526,22 @@ void rexxconsoletext(struct RexxMsg *mess)
 	mess->rm_Result1=0;
 }
 
-void rexxcheckuserpassword(struct RexxMsg *mess)
-{
-	int anvnummer;
-	char retvarde[5];
+void rexxcheckuserpassword(struct RexxMsg *mess) {
+  int userId;
+  struct User user;
 
-	if(!mess->rm_Args[1] || !mess->rm_Args[2])
-	{
-		mess->rm_Result1=1;
-		mess->rm_Result2=NULL;
-		return;
-	}
+  if(!mess->rm_Args[1] || !mess->rm_Args[2]) {
+    SetRexxErrorResult(mess, 1);
+    return;
+  }
 
-	anvnummer = atoi(mess->rm_Args[1]);
+  userId = atoi(mess->rm_Args[1]);
+  if(readuser(userId, &user)) {
+    SetRexxResultString(mess, "-1");
+    return;
+  }
 
-	sprintf(retvarde, "%d", CheckPassword(anvnummer, mess->rm_Args[2]));
-
-	if(!(mess->rm_Result2=(long)CreateArgstring(retvarde, strlen(retvarde))))
-		printf("Kunde inte allokera en ArgString\n");
-	mess->rm_Result1=0;
+  SetRexxResultString(mess, CheckPassword(mess->rm_Args[2], user.losen) ? "1" : "0");
 }
 
 void rexxdumptext(struct RexxMsg *mess)

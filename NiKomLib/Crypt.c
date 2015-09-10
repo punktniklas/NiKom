@@ -1,118 +1,70 @@
- #include <string.h>
+#include <string.h>
 #include <time.h>
 #include <stdlib.h>
 
 #include <exec/types.h>
 #include <utility/tagitem.h>
 
-#include "/include/nikomstr.h"
-#include "/Include/NiKomLib.h"
-#include "funcs.h"
-#include "nikombase.h"
+#include "NiKomStr.h"
+#include "NiKomLib.h"
+#include "NiKomBase.h"
+#include "Funcs.h"
+#include "FCrypt.h"
+
+#define SALTLENGTH 2
 
 char *getcryptkey(void);
 
 /****** nikom.library/CheckPassword ******************************************
 
     NAME
-        CheckPassword -- Kollar en användares lösenord.
+        CheckPassword -- Checks a given password
 
     SYNOPSIS
-        error = CheckPassword ( usernumber, password)
-        d0                   	    d0		   a0
-        int CheckPassword ( LONG, char *)
+        success = CheckPassword(clearText, correctPassword)
+        D0                      A0         A1
+        int CheckPassword(char *, char *)
 
     FUNCTION
-    	Kollar om lösenordet som anges stämmer med användarens
-    	lösenord.
+        Checks if the given clear text password matched the given
+        correct password. If the config flag NICFG_CRYPTEDPASSWORDS
+        is true the correct password is assumed to be encrypted. If
+        not a simple string comparison is performed between the two
+        strings.
     	
-    INPUTS
-    	usernumber - Användarnumret.
-        password   - Lösenord att jämföra med användarens lösenord.
-
     RESULT
-        error - Ger följande felmeddeladen:
-             1	- Lösenordet var korrekt.
-             0	- Lösenordet var inte korrekt.
-            -1  - Finns ingen sådan användare
+        Returns non-zero if the passwords match, non zero otherwise.
 
+    INPUTS
+    	clearText - The clear text password that should be checked.
+        correctPassword - The correct password to compare against.
         
-    EXAMPLE
+*******************************************************************************/
 
-    NOTES
+int __saveds __asm LIBCheckPassword(
+  register __a0 char *clearText,
+  register __a1 char *correctPassword,
+  register __a6 struct NiKomBase *NiKomBase) {
 
-    BUGS
+  char salt[SALTLENGTH+1], cryptbuf[14];
 
-    SEE ALSO
-        DeleteUser(), EditUser(), ReadUser() och SortUserlist()
-
-******************************************************************************
-* Följande bör nog nollas: US_Group, US_Brevpek, US_Textpek och resten...
-*
-*/
-
-int __saveds __asm LIBCheckPassword(register __d0 LONG usernumber, register __a0 char *password, register __a6 struct NiKomBase *NiKomBase)
-{
-	char CurrentPassword[16];
-	char key[KEYLENGTH+1];
-	int i;
-
-	if(ReadUser(usernumber, US_Name) == (void *)-2)
-		return -1;
-
-	strcpy(CurrentPassword, (char *)ReadUser(usernumber, US_Password));
-
-	if(NiKomBase->Servermem->cfg.cfgflags & NICFG_CRYPTEDPASSWORDS)
-	{ /* Krypterat lösenord */
-		for(i=0;i<KEYLENGTH;i++)
-			key[i] = CurrentPassword[i];
-		key[KEYLENGTH] = 0;
-
-		if(!(strcmp(crypt(password, key), CurrentPassword)))
-			return 1;
-		else
-			return 0;
-	}
-	else
-	{ /* Icke krypterat lösenord */
-		if(!(strcmp(CurrentPassword, password)))
-			return 1;
-		else
-			return 0;
-	}
+  if(NiKomBase->Servermem->cfg.cfgflags & NICFG_CRYPTEDPASSWORDS) {
+    strncpy(salt, correctPassword, SALTLENGTH);
+    salt[SALTLENGTH] = 0;
+    des_fcrypt(clearText, salt, cryptbuf);
+    return strcmp(cryptbuf, correctPassword) == 0 ? TRUE : FALSE;
+  } else {
+    return strcmp(clearText, correctPassword) == 0 ? TRUE : FALSE;
+  }
 }
 
-char *__saveds __asm LIBCryptPassword(register __a0 char *password, register __a6 struct NiKomBase *NiKomBase)
-{
-	char crypted[36], key[KEYLENGTH+1];
+char *__saveds __asm LIBCryptPassword(
+  register __a0 char *clearText,
+  register __a1 char *resultBuf,
+  register __a6 struct NiKomBase *NiKomBase) {
+  char salt[SALTLENGTH+1];
 	
-	strcpy(key, getcryptkey());
-	strcpy(crypted, crypt(password, key));
-	return &crypted[0];
-}
-
-char *getcryptkey(void)
-{
-	int i, slump;
-	char key[KEYLENGTH+1];
-	unsigned int clock[2];
-
-	timer(clock);
-	srand(clock[1]);
-
-	for(i=0;i<KEYLENGTH+1;i++)
-	{
-		slump = rand() % 50;
-		if(slump<25)
-		{
-			key[i] = slump + 65;
-		}
-		else
-		{
-			key[i] = slump + 72;
-		}
-	}
-	key[KEYLENGTH] = NULL;
-
-	return &key[0];
+  generateSalt(salt, SALTLENGTH);
+  des_fcrypt(clearText, salt, resultBuf);
+  return resultBuf;
 }

@@ -1,5 +1,5 @@
-#include "/Include/NiKomStr.h"
-#include "/Include/NiKomLib.h"
+#include "NiKomStr.h"
+#include "NiKomLib.h"
 #include "NiKomBase.h"
 
 #include "funcs.h"
@@ -10,6 +10,9 @@
 #include <string.h>
 #include <exec/memory.h>
 #include <proto/exec.h>
+#include <proto/utility.h>
+
+char usernamebuf[50];
 
 /****** nikom.library/NiKParse ******************************************
 
@@ -327,6 +330,80 @@ say CommandInfo(102,'n') --> LISTA ANVÄNDARE
 */
 
 /* Funktioner som används i olika delar av libraryts rutiner... */
+
+int parsenamn(skri, NiKomBase)
+char *skri;
+struct NiKomBase *NiKomBase;
+{
+	int going=TRUE,going2=TRUE,found=-1, nummer;
+	char *faci,*skri2;
+	struct ShortUser *letpek;
+	if(skri[0]==0 || skri[0]==' ') return(-3);
+ 	if(isdigit(skri[0]) || (skri[0]=='#' && isdigit(skri[1]))) {
+		if(skri[0]=='#') skri++;
+		nummer=atoi(skri);
+		faci=getusername(nummer, NiKomBase);
+		if(!strcmp(faci,"<Raderad Användare>") || !strcmp(faci,"<Felaktigt användarnummer>")) return(-1);
+		else return(nummer);
+	}
+	if(matchar(skri,"sysop")) return(0);
+	letpek=(struct ShortUser *)NiKomBase->Servermem->user_list.mlh_Head;
+	while(letpek->user_node.mln_Succ && going) {
+		faci=letpek->namn;
+		skri2=skri;
+		going2=TRUE;
+		if(matchar(skri2,faci)) {
+			while(going2) {
+				skri2=hittaefter(skri2);
+				faci=hittaefter(faci);
+				if(skri2[0]==0) {
+					found=letpek->nummer;
+					going2=going=FALSE;
+				}
+				else if(faci[0]==0) going2=FALSE;
+				else if(!matchar(skri2,faci)) {
+					faci=hittaefter(faci);
+					if(faci[0]==0 || !matchar(skri2,faci)) going2=FALSE;
+				}
+			}
+		}
+		letpek=(struct ShortUser *)letpek->user_node.mln_Succ;
+	}
+	return(found);
+}
+
+char *getusername(int nummer, struct NiKomBase *NiKomBase) {
+	struct ShortUser *letpek;
+	int found=FALSE;
+/*	if(!reggadnamn[0] && nummer>=5) return((char *)0xbadbad42); */
+	for(letpek=(struct ShortUser *)NiKomBase->Servermem->user_list.mlh_Head;letpek->user_node.mln_Succ;letpek=(struct ShortUser *)letpek->user_node.mln_Succ) {
+		if(letpek->nummer==nummer) {
+			if(letpek->namn[0]) sprintf(usernamebuf,"%s #%d",letpek->namn,nummer);
+			else strcpy(usernamebuf,"<Raderad Användare>");
+			found=TRUE;
+			break;
+		}
+	}
+	if(!found) strcpy(usernamebuf,"<Felaktigt användarnummer>");
+	return(usernamebuf);
+}
+
+int matchar(skrivet,facit)
+char *skrivet,*facit;
+{
+	int mat=TRUE,count=0;
+	char tmpskrivet,tmpfacit;
+	if(facit!=NULL) {
+		while(mat && skrivet[count]!=' ' && skrivet[count]!=0) {
+			if(skrivet[count]=='*') { count++; continue; }
+			tmpskrivet=ToUpper(skrivet[count]);
+			tmpfacit=ToUpper(facit[count]);
+			if(tmpskrivet!=tmpfacit) mat=FALSE;
+			count++;
+		}
+	}
+	return(mat);
+}
 
 int parsekom(char *skri, struct NiKomBase *NiKomBase)
 {

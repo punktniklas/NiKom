@@ -1,5 +1,5 @@
 OBJS    = LibInit.o UserLibInit.o Matrix.o Rexx.o Lock.o ReadFidoText.o Echo.o \
-          NodeTypes.o Conf.o Version.o Terminal.o ServerComm.o Hash.o UserInfo.o \
+          NodeTypes.o Conf.o Version.o Terminal.o ServerComm.o Hash.o \
           Misc.o PrgCat.o UnreadTexts.o Crypt.o FCrypt.o ConferenceTexts.o
 SCFLAGS = STREQ STRINGMERGE NOSTKCHK LIBCODE UNSIGNEDCHAR IDIR=/Include
 DEBUG   = DEBUG=LINE
@@ -68,9 +68,6 @@ ServerComm.o   : ServerComm.c   nikom.fd /Include/NiKomLib.h /Include/NiKomStr.h
 
 Hash.o         : Hash.c         nikom.fd /Include/NiKomLib.h /Include/NiKomStr.h
 
-UserInfo.o     : UserInfo.c		nikom.fd /Include/NiKomLib.h /Include/NiKomStr.h
-   sc $(SCFLAGS) $(DEBUG) COMMENTNEST $*
-
 Misc.o         : Misc.c			nikom.fd /Include/NiKomLib.h /Include/NiKomStr.h
 	sc $(SCFLAGS) $(DEBUG) COMMENTNEST $*
 
@@ -87,8 +84,7 @@ ConferenceTexts.o : ConferenceTexts.c nikom.fd /Include/NiKomLib.h \
 		/Include/NiKomStr.h ConferenceTexts.h UnreadTexts.h
 	sc $(SCFLAGS) $(DEBUG) $*
 
-Crypt.o : Crypt.c	nikom.fd /Include/NiKomLib.h /Include/NiKomStr.h
-	sc $(SCFLAGS) $(DEBUG) COMMENTNEST $*
+Crypt.o : Crypt.c nikom.fd /Include/NiKomLib.h /Include/NiKomStr.h FCrypt.h
 
 FCrypt.o : FCrypt.c Des.h
 	sc $(SCFLAGS) $(DEBUG) COMMENTNEST $*

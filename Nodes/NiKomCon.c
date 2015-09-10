@@ -153,7 +153,7 @@ do
 					getstring(STAREKO,15,NULL);
 				else
 					getstring(EJEKO,15,NULL);
-				if(CheckPassword(inloggad, inmat))
+				if(CheckPassword(inmat, Servermem->inne[nodnr].losen))
 				{
 					forsok=FALSE;
 					going=FALSE;

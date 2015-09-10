@@ -175,7 +175,7 @@ reloginspec:
 				{
 					if(getstring(EJEKO,15,NULL)) { car=FALSE; break; }
 				}
-				if(CheckPassword(inloggad, inmat))
+				if(CheckPassword(inmat, Servermem->inne[nodnr].losen))
 				{
 					forsok=FALSE;
 					going=FALSE;

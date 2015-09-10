@@ -38,7 +38,7 @@ int nyanv(void) {
 	int going=TRUE,x=0;
 	UBYTE tillftkn;
 	struct ShortUser *allokpek;
-	char dirnamn[100],filnamn[40];
+	char dirnamn[100], filnamn[40], encryptedPwd[14];
 	puttekn("\r\n\n",-1);
 	sendfile("NiKom:Texter/NyAnv.txt");
 	while(going) {
@@ -159,8 +159,10 @@ int nyanv(void) {
 		if(inmat[0]) strncpy(Servermem->inne[nodnr].prompt,inmat,5);
 		puttekn("\r\n\nStämmer allt nu? (J/n) ",-1);
 	}
-	if(Servermem->cfg.cfgflags & NICFG_CRYPTEDPASSWORDS)
-		strcpy(Servermem->inne[nodnr].losen, CryptPassword(Servermem->inne[nodnr].losen));
+	if(Servermem->cfg.cfgflags & NICFG_CRYPTEDPASSWORDS) {
+          CryptPassword(Servermem->inne[nodnr].losen, encryptedPwd);
+          strcpy(Servermem->inne[nodnr].losen, encryptedPwd);
+        }
 
 	puttekn("Ja",-1);
 	x=((struct ShortUser *)Servermem->user_list.mlh_TailPred)->nummer+1;
@@ -525,11 +527,12 @@ int andraanv(void) {
 
 	puttekn(outbuffer,-1);
 	if(getstring(EKO,15,NULL)) return(1);
-	if(inmat[0])
-	{
-		strncpy(readuserstr.losen,inmat,15);
-		if(Servermem->cfg.cfgflags & NICFG_CRYPTEDPASSWORDS)
-			strcpy(readuserstr.losen, CryptPassword(readuserstr.losen));
+	if(inmat[0]) {
+          if(Servermem->cfg.cfgflags & NICFG_CRYPTEDPASSWORDS) {
+            CryptPassword(inmat, readuserstr.losen);
+          } else {
+            strncpy(readuserstr.losen, inmat, 15);
+          }
 	}
 	sprintf(outbuffer,"\r\nPrompt : (%s) ",readuserstr.prompt);
 	puttekn(outbuffer,-1);
