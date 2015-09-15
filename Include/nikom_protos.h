@@ -61,11 +61,6 @@ int SaveProgramCategory(int);
 void DisplayAll(char *, struct ProgramCategory *);
 void Debuglog(char *);
 
-/* Misc.c */
-
-int NiKParse(char *, char);
-int SysInfo(char *);
-
 /* Crypt.c */
 
 int CheckPassword(char *, char *);

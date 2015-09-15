@@ -4,6 +4,7 @@
 
 #include "UnreadTexts.h"
 #include "ConferenceTexts.h"
+#include "Util.h"
 #include "Funcs.h"
 
 #include <ctype.h>

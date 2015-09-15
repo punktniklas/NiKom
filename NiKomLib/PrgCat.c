@@ -15,54 +15,20 @@
 /****** nikom.library/AddProgramData ******************************************
 
     NAME
-        NiKParse  -- Parsrar olika typer av information och ger ett nummer som svar
+        AddProgramData  -- <todo>
     SYNOPSIS
-        result = AddProgramData( anvnummer, filnamn, kategori, typ, data )
-        d0                 		     d0		 d1		  a0	   a1	   a2   a3
-        int NiKParse( char * , char *, char *, char * )
+        result = AddProgramData(anvnummer, filnamn, kategori, typ, data)
+        D0                      D0         D1       A1        A2   A3
 
     FUNCTION
-
-		Parsrar ett mötesnamn, areanamn, kommandonamn, användarnamn
-		eller nyckelnamn till resp. nummer.
-
     INPUTS
-
-		Subject kan vara följande:
-		k - kommando
-		m - mötesnamn
-		n - användarnamn
-		a - areanamn
-		y - nyckelnamn
-
-		Sträng är en sträng innehållande ett namn på något som
-		visas av subjektet.
-
     RESULT
-
-        Numret på den typ som önskades.
-        
-        Returnerar:
-        -1 om namnet på "string":en inte kunde hittas för det aktuella subjektet.
-        -2 Om subjektet inte finns.
-        
-
     EXAMPLE
-
-		say NiKParse('ni li','n') ==> 0
-		variabel="li mö"
-		say NiKParse(variabel,'k') ==> 101
-
     NOTES
-
     BUGS
-
     SEE ALSO
-        
 
-******************************************************************************
-*
-*/
+******************************************************************************/
 
 int __saveds __asm LIBAddProgramData( register __d0 int usernumber, register __a1 char *kategorinamn, register __a2 char *typ, register __a3 char *data, register __a6 struct NiKomBase *NiKomBase)
 {
@@ -214,59 +180,6 @@ struct ProgramDataCache *CheckifUserisCached(int usernumber, struct NiKomBase *N
 
 	return prgdata;
 }
-
-/****** nikom.library/GetProgramData ******************************************
-
-    NAME
-        NiKParse  -- Parsrar olika typer av information och ger ett nummer som svar
-    SYNOPSIS
-        nummer = NiKParse( string, subjekt )
-        d0                 a0      d0
-        int NiKParse( char * , char * )
-
-    FUNCTION
-
-		Parsrar ett mötesnamn, areanamn, kommandonamn, användarnamn
-		eller nyckelnamn till resp. nummer.
-
-    INPUTS
-
-		Subject kan vara följande:
-		k - kommando
-		m - mötesnamn
-		n - användarnamn
-		a - areanamn
-		y - nyckelnamn
-
-		Sträng är en sträng innehållande ett namn på något som
-		visas av subjektet.
-
-    RESULT
-
-        Numret på den typ som önskades.
-
-        
-        Returnerar:
-        -1 om namnet på "string":en inte kunde hittas för det aktuella subjektet.
-        -2 Om subjektet inte finns.
-        
-
-    EXAMPLE
-
-		say NiKParse('ni li','n') ==> 0
-		variabel="li mö"
-		say NiKParse(variabel,'k') ==> 101
-
-    NOTES
-
-    BUGS
-
-    SEE ALSO
-        
-
-******************************************************************************
-*
-*/
 
 char __saveds __asm *LIBGetProgramData( register __d0 int usernumber, register __a0 char *filnamn, register __a1 char *kategorinamn, register __a2 char *typ, register __a6 struct NiKomBase *NiKomBase)
 {

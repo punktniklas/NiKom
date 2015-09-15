@@ -102,23 +102,6 @@ struct MsgPort *SafePutToPort(struct NiKMess *, char *);
 long sendservermess(short, long, long, long, long);
 int linksaystring(int, int, char *, struct NiKomBase *);
 
-/* UserInfo.c */
-
-char *getusername(int, struct NiKomBase *);
-int matchar(char * ,char *);
-int parsenamn(char *, struct NiKomBase *);
-int writeuser(int, struct User *);
-int readuser(int, struct User *);
-
-/* Misc.c */
-
-int parsekom(char *skri, struct NiKomBase *NiKomBase);
-int parsemot(char *skri, struct NiKomBase *NiKomBase);
-int parsearea(char *skri, struct NiKomBase *NiKomBase);
-int parsenyckel(char *skri, struct NiKomBase *NiKomBase);
-int countbps(struct NiKomBase *NiKomBase);
-void MakeUserFilePath(char* string, int userId, char *filename);
-
 /* PrgCat.c */
 /* void DisplayAll(char *, struct ProgramCategory *); */
 int InsertProgramCategory(char *, struct ProgramCategory **);
