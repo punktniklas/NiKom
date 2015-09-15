@@ -16,9 +16,10 @@ int deleteDir(char *dirname);
 
 struct Library *NiKomBase;
 
+/* A minimal user with name "Sysop" and password "sysop". */
 struct User userData = {
 	0L,0L,0L,0L,0L,0L,0L,0L,0L,0L,0L,0L,0L,0L,0L,0L,0L,0L,
-	"Sysop","","","","","","sysop",
+	"Sysop","","","","","","hX62xN2A/dI0Q",
 	100,25,0,"-->","","",""
 };
 struct SysInfo sysInfo;
