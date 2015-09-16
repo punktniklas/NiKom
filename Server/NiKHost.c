@@ -63,8 +63,6 @@ void handlerexx(struct RexxMsg *mess) {
 		mess->rm_Result1=10;
 		mess->rm_Result2=1L;
 	}
-	/* if(mess->rm_Result2) printf("Returnerar: Result1=%d Result2=%s\n",mess->rm_Result1,mess->rm_Result2);
-	else printf("Returnerar: Result1=%d Result2=%d\n",mess->rm_Result1,mess->rm_Result2); */
 }
 
 int writefiles(int area)
@@ -479,10 +477,6 @@ void chgmote(struct RexxMsg *mess)
 			ok = 1;
 			strncpy(motpek->tagnamn, mess->rm_Args[3], 49);
 			break;
-/*		case 'g' : case 'G' :
-*			ok = 1;
-*			sprintf(str,"%d,%d",(unsigned int)motpek->grupper/65536,(unsigned int)motpek->grupper%65536);
-*			break; */
 		case 'h' : case 'H' :
 			ok = 1;
 			motpek->texter = atoi(mess->rm_Args[3]);
@@ -538,23 +532,19 @@ void chgmote(struct RexxMsg *mess)
 void writemeet(struct Mote *motpek)
 {
 	BPTR fh;
-/*	NiKForbid(); */
 	if(!(fh=Open("NiKom:DatoCfg/Möten.dat",MODE_OLDFILE))) {
 		printf("\r\n\nKunde inte öppna Möten.dat\r\n");
-/*		NiKPermit(); */
 		return;
 	}
 	if(Seek(fh,motpek->nummer*sizeof(struct Mote),OFFSET_BEGINNING)==-1) {
 		printf("\r\n\nKunde inte söka i Moten.dat!\r\n\n");
 		Close(fh);
-/*		NiKPermit(); */
 		return;
 	}
 	if(Write(fh,(void *)motpek,sizeof(struct Mote))==-1) {
 		printf("\r\n\nFel vid skrivandet av Möten.dat\r\n");
 	}
 	Close(fh);
-/*	NiKPermit(); */
 }
 
 void nikparse(struct RexxMsg *mess) {
@@ -686,7 +676,6 @@ void sysinfo(struct RexxMsg *mess) {
 			sprintf(str,"%d",Servermem->info.areor);
 			break;
 		case 'T' : case 't' :
-			/* sortbps(&Servermem->info.bps,&Servermem->info.antbps); */
 			while(Servermem->info.bps[++tmp] > 0);
 
 			sprintf(str,"%d",tmp);
@@ -748,22 +737,6 @@ void swapbps(long *bps, long *bps2)
 	*bps = *bps2;
 	*bps2 = tmp;
 }
-
-/*
-void sortbps(long *bps[], long *antbps[])
-{
-	int i, j, tmp = -1;
-
-	while(Servermem->info.bps[++tmp] > 0);
-
-	for(i=0;i<tmp;i++)
-		for(j=0;j<i;j++)
-			if(Servermem->info.antbps[i] < Servermem->info.antbps[j])
-			{
-				swapbps(&Servermem->info.bps[i], &Servermem->info.bps[j]);
-				swapbps(&Servermem->info.antbps[i], &Servermem->info.antbps[j]);
-			}
-} */
 
 void rexxreadcfg(struct RexxMsg *mess) {
 	getconfig();
@@ -875,33 +848,14 @@ int parse(char *skri) {
 					nummer=kompek->nummer;
 				}
 				else if(forst==(struct Kommando *)1L) {
-					/* puttekn(kompek->namn,-1);
-					puttekn("\r",-1); */
 				} else {
-					/* puttekn("\r\n\nFLERTYDIGT KOMMANDO\r\n\n",-1);
-					puttekn(forst->namn,-1);
-					puttekn("\r",-1);
-					puttekn(kompek->namn,-1);
-					puttekn("\r",-1); */
 					forst=(struct Kommando *)1L;
 				}
 			}
 		}
 	}
-	/* if(forst!=NULL && forst!=(struct Kommando *)1L) {
-		argument=hittaefter(skri);
-		if(forst->antal_ord==2) argument=hittaefter(argument);
-	} */
 	if(forst==NULL) return(-1);
 	else if(forst==(struct Kommando *)1L) return(-2);
-	/* else if(forst->status > Servermem->inne[nodnr].status ||
-		forst->minlogg > Servermem->inne[nodnr].loggin ||
-		forst->mindays*86400 > time(&tid)-Servermem->inne[nodnr].forst_in) return(-4);
-	if(forst->losen[0]) {
-		puttekn("\r\n\nLösen: ",-1);
-		getstring(EJEKO,20,NULL);
-		if(strcmp(forst->losen,inmat)) return(-5);
-	} */
 	return(nummer);
 }
 
@@ -1387,7 +1341,7 @@ void chguser(struct RexxMsg *mess) {
 		printf("Kunde inte allokera en ArgString\n");
 }
 
-void skapafil(struct RexxMsg *mess) {   /* Ändrad för nikfiles.data 960707 JÖ */
+void skapafil(struct RexxMsg *mess) {
 	struct Fil *fil;
 	char filnamn[100];
 	long tid;

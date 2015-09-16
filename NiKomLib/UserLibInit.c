@@ -26,44 +26,6 @@ char reggadnamn[60]; /* Namnet på den som reggat NiKom. */
  *  nikom.librarys privata initiuerings/cleanup-rutiner.
  */
 
-/* Det här ska inte behövas längre eftersom Servern initierar Servermem
-*  när den startar upp.
-*
-*struct MsgPort *SafePutToPort(message,portname)
-*struct NiKMess *message;
-*char *portname;
-*{
-*	struct MsgPort *port;
-*	Forbid();
-*	port=(struct MsgPort *)FindPort(portname);
-*	if(port) PutMsg(port,(struct Message *)message);
-*	Permit();
-*	return(port);
-*}
-*
-*struct System *getservermem(void) {
-*	struct MsgPort *port;
-*	struct NiKMess *mess;
-*	struct System *Servermem=NULL;
-*	if(port=CreateMsgPort()) {
-*		if(mess=(struct NiKMess *)AllocMem(sizeof(struct NiKMess),MEMF_PUBLIC | MEMF_CLEAR)) {
-*			mess->stdmess.mn_Node.ln_Type = NT_MESSAGE;
-*			mess->stdmess.mn_Length = sizeof(struct NiKMess);
-*			mess->stdmess.mn_ReplyPort=port;
-*			mess->kommando=GETADRESS;
-*			if(SafePutToPort(mess,"NiKomPort")) {
-*				WaitPort(port);
-*				GetMsg(port);
-*				Servermem=(struct System *)mess->data;
-*			}
-*			FreeMem(mess,sizeof(struct NiKMess));
-*		}
-*		DeleteMsgPort(port);
-*	}
-*	return(Servermem);
-*}
-*/
-
 void copychrstables(struct NiKomBase *NiKomBase) {
 
 #include "chartabs.h"
@@ -97,13 +59,6 @@ __UserLibInit(register __a6 struct NiKomBase * NiKomBase)
 		CloseLibrary((struct Library *)DOSBase);
 		return(ERROR);
 	}
-/*	if(!(NiKomBase->Servermem=getservermem())) {
-*		CloseLibrary(UtilityBase);                      Det här behövs inte längre eftersom
-*		CloseLibrary(RexxSysBase);                      Servern fyller i Servermem när den
-*		CloseLibrary((struct Library *)IntuitionBase);  startar
-*		CloseLibrary((struct Library *)DOSBase);
-*		return(ERROR);
-*	} */
 	if(!getlastmatrix(NiKomBase)) {
 		CloseLibrary(UtilityBase);
 		CloseLibrary(RexxSysBase);

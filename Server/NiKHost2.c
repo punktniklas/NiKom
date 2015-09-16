@@ -224,7 +224,7 @@ void rexxnextpatternfile(struct RexxMsg *mess)
 	return;
 }
 
-void rexxraderafil(struct RexxMsg *mess) {      /* Ändrad för nikfiles.data 960707 JÖ */
+void rexxraderafil(struct RexxMsg *mess) {
         struct Fil *pek;
         char filnamn[110];
         int area;
@@ -825,7 +825,6 @@ void chgmeetright(struct RexxMsg *mess) {
 
 /*
 ** movefile - flyttar en fil från en area till en annan
-** 980805 JÖ
 ** AREXXDOC:
 
 MoveFile(filnamn,area,ny area)
@@ -922,7 +921,7 @@ void movefile(struct RexxMsg *mess) {
         mess->rm_Result1=0;
 }
 
-void chgfile(struct RexxMsg *mess) { /* Uppdaterad för nikfiles.data 960707 JÖ */
+void chgfile(struct RexxMsg *mess) {
         struct Fil *filpek;
         FILE *infil, *utfil;
         long tmpflaggor;
