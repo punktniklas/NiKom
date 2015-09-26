@@ -1,5 +1,6 @@
 CPU     = 68020
-FLAGS   = NMINC STRMERGE CPU=$(CPU) DEBUG=FULL GST=Include:all.gst IDIR=/Include
+FLAGS   = NMINC STRMERGE CPU=$(CPU) DEBUG=FULL GST=Include:all.gst \
+          IDIR=/Include IDIR=/UtilLib
 OBJS    = ServerComm.o Terminal.o NiKFuncs.o NiKFuncs2.o NiKFuncs3.o NiKFuncs4.o \
           NiKFuncs5.o NiKEditor.o NiKRexx.o NiKFiles.o NiKVersion.o Brev.o \
           OrgMeet.o FidoMeet.o _tzset.o
@@ -42,21 +43,21 @@ clean:
 NiKomCon: $(OBJS) $(CONOBJS)
   slink FROM lib:c.o $(CONOBJS) $(OBJS) \
         TO Debug/$(CPU)/NiKomCon \
-        LIB lib:sc.lib+lib:amiga.lib+lib:rexxglue.o \
+        LIB lib:sc.lib+lib:amiga.lib+/UtilLib/Debug/$(CPU)/nikomutils.lib \
         NOALVS NOICONS
   slink debug/$(CPU)/NiKomCon TO nodebug/$(CPU)/NiKomCon NODEBUG NOICONS
 
 NiKomSer: $(OBJS) $(SEROBJS)
   slink FROM lib:c.o $(SEROBJS) $(OBJS) \
         TO Debug/$(CPU)/NiKomSer \
-        LIB lib:sc.lib+lib:amiga.lib+lib:rexxglue.o \
+        LIB lib:sc.lib+lib:amiga.lib+/UtilLib/Debug/$(CPU)/nikomutils.lib \
         NOALVS NOICONS VERBOSE
   slink debug/$(CPU)/NiKomSer TO noDebug/$(CPU)/NiKomSer NODEBUG NOICONS
 
 MenyCon: $(MENYOBJS) $(CONOBJS)
   slink FROM lib:c.o $(CONOBJS) $(MENYOBJS) \
         TO Debug/$(CPU)/MenyCon \
-        LIB lib:sc.lib+lib:amiga.lib+lib:rexxglue.o \
+        LIB lib:sc.lib+lib:amiga.lib+/UtilLib/Debug/$(CPU)/nikomutils.lib \
         NOALVS NOICONS
   slink Debug/$(CPU)/MenyCon TO NoDebug/$(CPU)/MenyCon NODEBUG NOICONS
 
@@ -64,7 +65,7 @@ MenyCon: $(MENYOBJS) $(CONOBJS)
 MenySer: $(MENYOBJS) $(SEROBJS)
   slink FROM lib:c.o $(SEROBJS) $(MENYOBJS) \
         TO Debug/$(CPU)/MenySer \
-        LIB lib:sc.lib+lib:amiga.lib+lib:rexxglue.o \
+        LIB lib:sc.lib+lib:amiga.lib+/UtilLib/Debug/$(CPU)/nikomutils.lib \
         NOALVS NOICONS
   slink Debug/$(CPU)/MenySer TO NoDebug/$(CPU)/MenySer NODEBUG NOICONS
 

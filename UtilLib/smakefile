@@ -1,0 +1,22 @@
+CPU     = 68020
+SCFLAGS = NMINC STRMERGE CPU=$(CPU) DEBUG=FULL IDIR=/Include
+OBJS    = DiskUtils.o FileAreaUtils.o
+
+all: nikomutils.lib
+
+setup:
+  makedir Debug Debug/$(CPU)
+
+clean:
+  delete *.o
+  delete Debug/$(CPU)/*
+
+.c.o :
+  sc $(SCFLAGS) $*
+
+nikomutils.lib: $(OBJS)
+  oml -v Debug/$(CPU)/nikomutils.lib r $(OBJS)
+
+DiskUtils.o: DiskUtils.c DiskUtils.h
+
+FileAreaUtils.o: FileAreaUtils.c FileAreaUtils.h

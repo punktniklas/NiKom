@@ -15,6 +15,8 @@
 #include <xpr_lib.h>
 #include "NiKomstr.h"
 #include "NiKomFuncs.h"
+#include "DiskUtils.h"
+#include "FileAreaUtils.h"
 
 #define EKO		1
 #define EJEKO	0
@@ -527,7 +529,8 @@ int upload(void) {	/* Ändrad för nikfiles.data 960707 JÖ */
 		puttekn("\r\nBeskrivning:\r\n",-1);
 		if(getstring(EKO,70,NULL)) { FreeMem(allokpek,sizeof(struct Fil)); return(1); }
 		strcpy(allokpek->beskr,inmat);
-		dirnr=choosedir(area,allokpek->nycklar,allokpek->size);
+		dirnr = ChooseDirectoryInFileArea(
+                  area, allokpek->nycklar, allokpek->size);
 		if(dirnr==-1) {
 			puttekn("\r\n\nKunde inte hitta något lämpligt directory för filen!\r\n",-1);
 			DeleteFile(tmpfullname);
@@ -587,107 +590,81 @@ int upload(void) {	/* Ändrad för nikfiles.data 960707 JÖ */
 }
 
 int recbinfile(char *dir) {
-	int xprreturkod,bytesfree;
-	char zmodeminit[100];
-	struct InfoData *id;
-	BPTR lock;
+  int xprreturkod;
+  char zmodeminit[100];
 
-	ulfiles = 0;
-	if(access(dir,0)) {
-		puttekn("\r\nDirectoryt finns inte!\r\n",-1);
-		return(2);
-	}
-	if(!(id=AllocMem(sizeof(struct InfoData),MEMF_CLEAR))) {
-		puttekn("\r\nKunde inte allokera en InfoData-struktur!\r\n",-1);
-		return(2);
-	}
-	if(!(lock=Lock(dir,ACCESS_READ))) {
-		puttekn("\r\nKunde inte få ett Lock för directoryt!\r\n",-1);
-		FreeMem(id,sizeof(struct InfoData));
-		return(2);
-	}
-	if(!Info(lock,id)) {
-		puttekn("\r\nKunde inte få info om devicet!\r\n",-1);
-		UnLock(lock);
-		FreeMem(id,sizeof(struct InfoData));
-		return(2);
-	}
-	bytesfree=(id->id_NumBlocks - id->id_NumBlocksUsed)*id->id_BytesPerBlock;
-	UnLock(lock);
-	FreeMem(id,sizeof(struct InfoData));
-	if(bytesfree < Servermem->cfg.diskfree) {
-		puttekn("\r\nTyvärr, gränsen för hur full disken får bli har överskridits!\r\n",-1);
-		return(2);
-	}
-	if(Servermem->cfg.ar.preup2) sendrexx(Servermem->cfg.ar.preup2);
-	sprintf(zmodeminit,"%s%s",zinitstring,dir);
-	if(!(XProtocolBase=(struct Library *)OpenLibrary("xprzmodem.library",0L))) {
-		puttekn("\r\n\nKunde inte öppna xprzmodem.library!\r\n",-1);
-		return(2);
-	}
-	if(!(xio=(struct XPR_IO *)AllocMem(sizeof(struct XPR_IO),MEMF_PUBLIC | MEMF_CLEAR))) {
-		puttekn("\r\n\nKunde inte allokera en io-struktur\r\n",-1);
-		CloseLibrary(XProtocolBase);
-		return(2);
-	}
-	NewList((struct List *)&tf_list);
+  ulfiles = 0;
+  if(access(dir,0)) {
+    puttekn("\r\nDirectoryt finns inte!\r\n",-1);
+    return 2;
+  }
 
-	puttekn("\r\nDu kan börja sända med Zmodem. Du kan nu skicka fler filer!",-1);
-	puttekn("\r\nTryck Ctrl-X några gånger för att avbryta.\r\n",-1);
-	AbortIO((struct IORequest *)serreadreq);
-	WaitIO((struct IORequest *)serreadreq);
-	if(!CheckIO((struct IORequest *)inactivereq)) {
-		AbortIO((struct IORequest *)inactivereq);
-		WaitIO((struct IORequest *)inactivereq);
-	}
-	xpr_setup(xio);
-	xio->xpr_filename=zmodeminit;
-	XProtocolSetup(xio);
-	xprreturkod=XProtocolReceive(xio);
-	Delay(30);
-	XProtocolCleanup(xio);
-	CloseLibrary(XProtocolBase);
-	if(!CheckIO((struct IORequest *)serreadreq)) {
-		AbortIO((struct IORequest *)serreadreq);
-		WaitIO((struct IORequest *)serreadreq);
-		printf("Serreadreq avbruten!!\n");
-	}
-	if(!CheckIO((struct IORequest *)timerreq)) {
-		AbortIO((struct IORequest *)timerreq);
-		WaitIO((struct IORequest *)timerreq);
-		printf("Timerreq avbruten!!\n");
-	}
-	FreeMem(xio,sizeof(struct XPR_IO));
-	Delay(100);
-	serchangereq->IOSer.io_Command=CMD_CLEAR;
-	DoIO((struct IORequest *)serchangereq);
-	serchangereq->IOSer.io_Command=CMD_FLUSH;
-	DoIO((struct IORequest *)serchangereq);
-	serreqtkn();
-	updateinactive();
-	if(Servermem->cfg.ar.postup2) sendrexx(Servermem->cfg.ar.postup2);
-/*	if(Servermem->cfg.logmask & LOG_RECFILE) {
-		sprintf(outbuffer,"Tar emot filen %s från %s",xprfilnamn,getusername(inloggad));
-		logevent(outbuffer);
-	}
-	if(xprreturkod) {
-		puttekn("\r\n\nÖverföringen lyckades.\r\n",-1);
-		sprintf(outbuffer,"Hastighet: %d cps\n\r",cps);
-		puttekn(outbuffer,-1);
-		return(0);
-	} else {
-		puttekn("\r\n\nÖverföringen misslyckades.\r\n",-1);
-		return(2);
-	} Removed by Tomas Kärki 22/1 1996 */
+  if(!HasPartitionEnoughFreeSpace(dir, Servermem->cfg.diskfree)) {
+    puttekn("\r\nTyvärr, gränsen för hur full disken får bli har överskridits!\r\n",-1);
+    return 2;
+  }
 
-	if(ulfiles > 0) {
-		puttekn("\r\n\nÖverföringen lyckades.\r\n",-1);
-		return(0);
-	}
-	else {
-		puttekn("\r\n\nÖverföringen misslyckades.\r\n",-1);
-		return(2);
-	}
+  if(Servermem->cfg.ar.preup2) {
+    sendrexx(Servermem->cfg.ar.preup2);
+  }
+  sprintf(zmodeminit,"%s%s",zinitstring,dir);
+  if(!(XProtocolBase = (struct Library *) OpenLibrary("xprzmodem.library", 0L))) {
+    puttekn("\r\n\nKunde inte öppna xprzmodem.library!\r\n",-1);
+    return 2;
+  }
+  if(!(xio = (struct XPR_IO *)
+       AllocMem(sizeof(struct XPR_IO), MEMF_PUBLIC | MEMF_CLEAR))) {
+    puttekn("\r\n\nKunde inte allokera en io-struktur\r\n",-1);
+    CloseLibrary(XProtocolBase);
+    return 2;
+  }
+  NewList((struct List *)&tf_list);
+  
+  puttekn("\r\nDu kan börja sända med Zmodem. Du kan nu skicka fler filer!",-1);
+  puttekn("\r\nTryck Ctrl-X några gånger för att avbryta.\r\n",-1);
+  AbortIO((struct IORequest *)serreadreq);
+  WaitIO((struct IORequest *)serreadreq);
+  if(!CheckIO((struct IORequest *)inactivereq)) {
+    AbortIO((struct IORequest *)inactivereq);
+    WaitIO((struct IORequest *)inactivereq);
+  }
+  xpr_setup(xio);
+  xio->xpr_filename = zmodeminit;
+  XProtocolSetup(xio);
+  xprreturkod = XProtocolReceive(xio);
+  Delay(30);
+  XProtocolCleanup(xio);
+  CloseLibrary(XProtocolBase);
+  if(!CheckIO((struct IORequest *)serreadreq)) {
+    AbortIO((struct IORequest *)serreadreq);
+    WaitIO((struct IORequest *)serreadreq);
+    printf("Serreadreq avbruten!!\n");
+  }
+  if(!CheckIO((struct IORequest *)timerreq)) {
+    AbortIO((struct IORequest *)timerreq);
+    WaitIO((struct IORequest *)timerreq);
+    printf("Timerreq avbruten!!\n");
+  }
+  FreeMem(xio,sizeof(struct XPR_IO));
+  Delay(100);
+  serchangereq->IOSer.io_Command=CMD_CLEAR;
+  DoIO((struct IORequest *)serchangereq);
+  serchangereq->IOSer.io_Command=CMD_FLUSH;
+  DoIO((struct IORequest *)serchangereq);
+  serreqtkn();
+  updateinactive();
+  if(Servermem->cfg.ar.postup2) {
+    sendrexx(Servermem->cfg.ar.postup2);
+  }
+
+  if(ulfiles > 0) {
+    puttekn("\r\n\nÖverföringen lyckades.\r\n",-1);
+    return 0;
+  }
+  else {
+    puttekn("\r\n\nÖverföringen misslyckades.\r\n",-1);
+    return 2;
+  }
 }
 
 int sendbinfile(void) {

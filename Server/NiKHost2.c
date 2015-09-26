@@ -15,6 +15,7 @@
 #ifdef MWDEBUG
 #include "/include/memwatch.h"
 #endif
+#include "FileAreaUtils.h"
 
 #include "RexxUtil.h"
 
@@ -1104,67 +1105,6 @@ int parsegrupp(char *skri) {
         return(found);
 }
 
-int choosedir(int area,char *nycklar,int size) {
-        int bra=0,dir=0,dirbra=0,x,y;
-        struct InfoData *id;
-        BPTR lock;
-        for(y=0;y<MAXNYCKLAR;y++) if(BAMTEST(nycklar,y) && BAMTEST(Servermem->areor[area].nycklar[0],y))
-                dirbra++;
-        for(x=1;x<16;x++) {
-                if(!Servermem->areor[area].dir[x][0]) continue;
-                bra=0;
-                for(y=0;y<MAXNYCKLAR;y++) {
-                        if(BAMTEST(nycklar,y) && BAMTEST(Servermem->areor[area].nycklar[x],y))
-                                bra++;
-                }
-                if(bra>=dirbra) {
-                        dirbra=bra;
-                        dir=x;
-                }
-        }
-        if(!(id=(struct InfoData *)AllocMem(sizeof(struct InfoData),MEMF_CLEAR))) {
-                printf("\n\nKunde inte allokera en InfoData-struktur!\n");
-                return(-1);
-        }
-        if(!(lock=Lock(Servermem->areor[area].dir[dir],ACCESS_READ))) {
-                printf("\n\nKunde inte få ett Lock för %s!\n",Servermem->areor[area].dir[dir]);
-                FreeMem(id,sizeof(struct InfoData));
-                return(-1);
-        }
-        if(!Info(lock,id)) {
-                printf("\n\nKunde inte få Info() för %s!\n",Servermem->areor[area].dir[dir]);
-                UnLock(lock);
-                FreeMem(id,sizeof(struct InfoData));
-                return(-1);
-        }
-        UnLock(lock);
-        if((id->id_NumBlocks - id->id_NumBlocksUsed) * id->id_BytesPerBlock > size) {
-                FreeMem(id,sizeof(struct InfoData));
-                return(dir);
-        }
-        for(x=0;x<16;x++) {
-                if(!Servermem->areor[area].dir[x][0]) continue;
-                if(!(lock=Lock(Servermem->areor[area].dir[x],ACCESS_READ))) {
-                        printf("\n\nKunde inte få ett Lock för %s!\n",Servermem->areor[area].dir[x]);
-                        FreeMem(id,sizeof(struct InfoData));
-                        return(-1);
-                }
-                if(!Info(lock,id)) {
-                        printf("\n\nKunde inte få Info() för %s!\n",Servermem->areor[area].dir[x]);
-                        UnLock(lock);
-                        FreeMem(id,sizeof(struct InfoData));
-                        return(-1);
-                }
-                UnLock(lock);
-                if((id->id_NumBlocks - id->id_NumBlocksUsed) * id->id_BytesPerBlock > size) {
-                        FreeMem(id,sizeof(struct InfoData));
-                        return(x);
-                }
-        }
-        FreeMem(id,sizeof(struct InfoData));
-        return(-1);
-}
-
 void keyinfo(struct RexxMsg *mess) {
         char str[40];
         int nr;
@@ -1222,7 +1162,7 @@ void getdir(struct RexxMsg *mess) {
                                         else BAMSET(nycklar,nyckel);
                                 }
                         }
-                        dirnr=choosedir(areanum,nycklar,0); //0=size
+                        dirnr = ChooseDirectoryInFileArea(areanum, nycklar, 0);
                         if(dirnr<0 || dirnr>15)
                         {
                                 str[0]=0;

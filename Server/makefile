@@ -1,5 +1,5 @@
 CPU   = 68020
-FLAGS = NMINC STRMERGE CPU=$(CPU) DEBUG=FULL IDIR=/Include
+FLAGS = NMINC STRMERGE CPU=$(CPU) DEBUG=FULL IDIR=/Include IDIR=/UtilLib
 OBJS  = NiKServer.o NiKHost.o NiKHost2.o NiKHost3.o NiKSerVersion.o NodeComm.o \
 	Config.o RexxUtil.o
 
@@ -19,7 +19,7 @@ clean:
 NiKServer: $(OBJS)
   slink FROM lib:c.o $(OBJS) \
         TO Debug/$(CPU)/NiKServer \
-        LIB lib:sc.lib+lib:amiga.lib \
+        LIB lib:sc.lib+lib:amiga.lib+/UtilLib/Debug/$(CPU)/nikomutils.lib \
         NOALVS NOICONS
   slink FROM Debug/$(CPU)/NiKServer TO NoDebug/$(CPU)/NiKServer NODEBUG NOICONS
 

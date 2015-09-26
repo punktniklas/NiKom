@@ -13,6 +13,7 @@
 #include <error.h>
 #include "NiKomstr.h"
 #include "NiKomFuncs.h"
+#include "DiskUtils.h"
 
 #define ERROR	10
 #define OK		0
@@ -1244,71 +1245,6 @@ int editkey(char *bitmap) {
 		}
 	} while(inmat[0]!=0);
 	return(0);
-}
-
-int choosedir(int area,char *nycklar,int size) {
-	int bra=0,dir=0,dirbra=0,x,y;
-	struct InfoData *id;
-	BPTR lock;
-	for(y=0;y<MAXNYCKLAR;y++) if(BAMTEST(nycklar,y) && BAMTEST(Servermem->areor[area].nycklar[0],y))
-		dirbra++;
-	for(x=1;x<16;x++) {
-		if(!Servermem->areor[area].dir[x][0]) continue;
-		bra=0;
-		for(y=0;y<MAXNYCKLAR;y++) {
-			if(BAMTEST(nycklar,y) && BAMTEST(Servermem->areor[area].nycklar[x],y))
-				bra++;
-		}
-		if(bra>=dirbra) {
-			dirbra=bra;
-			dir=x;
-		}
-	}
-	if(!(id=(struct InfoData *)AllocMem(sizeof(struct InfoData),MEMF_CLEAR))) {
-		puttekn("\r\n\nKunde inte allokera en InfoData-struktur!\r\n",-1);
-		return(-1);
-	}
-	if(!(lock=Lock(Servermem->areor[area].dir[dir],ACCESS_READ))) {
-		sprintf(outbuffer,"\r\n\nKunde inte få ett Lock för %s!\r\n",Servermem->areor[area].dir[dir]);
-		puttekn(outbuffer,-1);
-		FreeMem(id,sizeof(struct InfoData));
-		return(-1);
-	}
-	if(!Info(lock,id)) {
-		sprintf(outbuffer,"\r\n\nKunde inte få Info() för %s!\r\n",Servermem->areor[area].dir[dir]);
-		puttekn(outbuffer,-1);
-		UnLock(lock);
-		FreeMem(id,sizeof(struct InfoData));
-		return(-1);
-	}
-	UnLock(lock);
-	if((id->id_NumBlocks - id->id_NumBlocksUsed) * id->id_BytesPerBlock > size) {
-		FreeMem(id,sizeof(struct InfoData));
-		return(dir);
-	}
-	for(x=0;x<16;x++) {
-		if(!Servermem->areor[area].dir[x][0]) continue;
-		if(!(lock=Lock(Servermem->areor[area].dir[x],ACCESS_READ))) {
-			sprintf(outbuffer,"\r\n\nKunde inte få ett Lock för %s!\r\n",Servermem->areor[area].dir[x]);
-			puttekn(outbuffer,-1);
-			FreeMem(id,sizeof(struct InfoData));
-			return(-1);
-		}
-		if(!Info(lock,id)) {
-			sprintf(outbuffer,"\r\n\nKunde inte få Info() för %s!\r\n",Servermem->areor[area].dir[x]);
-			puttekn(outbuffer,-1);
-			UnLock(lock);
-			FreeMem(id,sizeof(struct InfoData));
-			return(-1);
-		}
-		UnLock(lock);
-		if((id->id_NumBlocks - id->id_NumBlocksUsed) * id->id_BytesPerBlock > size) {
-			FreeMem(id,sizeof(struct InfoData));
-			return(x);
-		}
-	}
-	FreeMem(id,sizeof(struct InfoData));
-	return(-1);
 }
 
 void validerafil(void) {

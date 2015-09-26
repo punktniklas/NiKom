@@ -1,5 +1,10 @@
 del NiKomBinDistr.lha
 
+cd UtilLib
+smake clean
+smake
+cd /
+
 cd NiKomLib
 smake clean
 smake
