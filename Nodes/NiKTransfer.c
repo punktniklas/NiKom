@@ -599,7 +599,8 @@ int recbinfile(char *dir) {
     return 2;
   }
 
-  if(!HasPartitionEnoughFreeSpace(dir, Servermem->cfg.diskfree)) {
+  if(Servermem->cfg.diskfree != 0
+     && !HasPartitionEnoughFreeSpace(dir, Servermem->cfg.diskfree)) {
     puttekn("\r\nTyvärr, gränsen för hur full disken får bli har överskridits!\r\n",-1);
     return 2;
   }
