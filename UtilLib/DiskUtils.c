@@ -2,6 +2,7 @@
 #include <proto/dos.h>
 
 #include "DiskUtils.h"
+#include "Logging.h"
 
 int HasPartitionEnoughFreeSpace(char *path, int neededBytes) {
   struct InfoData __aligned id;
@@ -9,11 +10,11 @@ int HasPartitionEnoughFreeSpace(char *path, int neededBytes) {
   int neededBlocks, freeBlocks;
 
   if(!(lock = Lock(path, ACCESS_READ))) {
-    // TODO: Log error
+    LogEvent(SYSTEM_LOG, ERROR, "Can't get a file system lock for %s", path);
     return 0;
   }
   if(!Info(lock, &id)) {
-    // TODO: Log error
+    LogEvent(SYSTEM_LOG, ERROR, "Error calling dos/Info() for %s", path);
     UnLock(lock);
     return 0;
   }

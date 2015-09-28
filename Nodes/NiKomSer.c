@@ -141,7 +141,8 @@ void main(int argc,char *argv[]) {
   SetWindowTitles(NiKwind,titel,(char *)-1L);
   if(!ReadUnreadTexts(&Servermem->unreadTexts[nodnr], inloggad)) {
     puttekn("Error reading unread text info.\r\n", -1);
-    // TODO: Log error
+    LogEvent(SYSTEM_LOG, ERROR,
+             "Can't read unread text info for user %d", inloggad);
     cleanup(ERROR, "Error reading unread text info.\n");
   }
   if(getft("NiKom:Texter/Bulletin.txt")>Servermem->inne[nodnr].senast_in) {

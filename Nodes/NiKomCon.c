@@ -165,7 +165,8 @@ void main(int argc, char **argv) {
     SetWindowTitles(NiKwind,titel,(UBYTE *)-1L);
     if(!ReadUnreadTexts(&Servermem->unreadTexts[nodnr], inloggad)) {
       puttekn("Error reading unread text info.\r\n", -1);
-      // TODO: Log error
+      LogEvent(SYSTEM_LOG, ERROR,
+               "Can't read unread text info for user %d", inloggad);
       goto panik;
     }
     Servermem->inloggad[nodnr]=inloggad;
