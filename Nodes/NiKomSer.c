@@ -13,6 +13,7 @@
 #include "NiKomstr.h"
 #include "NiKomFuncs.h"
 #include "NiKomLib.h"
+#include "Logging.h"
 
 #define ERROR	128
 #define OK	0
@@ -152,8 +153,8 @@ void main(int argc,char *argv[]) {
   if(nodestate & NIKSTATE_NOCARRIER) {
     conputtekn("\nCarrier dropped\n",-1);
     if(Servermem->cfg.logmask & LOG_CARDROPPED) {
-      sprintf(outbuffer,"%s släpper carriern (nod %d)",getusername(inloggad),nodnr);
-      logevent(outbuffer);
+      LogEvent(USAGE_LOG, WARN, "%s släpper carriern (nod %d)",
+               getusername(inloggad), nodnr);
     }
     if(Servermem->cfg.ar.cardropped) sendrexx(Servermem->cfg.ar.cardropped);
   } else {
@@ -172,8 +173,8 @@ void main(int argc,char *argv[]) {
   SaveProgramCategory(inloggad);
   Servermem->inloggad[nodnr]=-1;
   if(Servermem->cfg.logmask & LOG_UTLOGG) {
-    sprintf(outbuffer,"%s loggar ut från nod %d",getusername(inloggad),nodnr);
-    logevent(outbuffer);
+    LogEvent(USAGE_LOG, INFO, "%s loggar ut från nod %d",
+             getusername(inloggad), nodnr);
   }
   Servermem->action[nodnr]=0;
   time(&tid);

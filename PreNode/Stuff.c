@@ -39,30 +39,6 @@ char *strang;
 	return(*strang==0 ? strang : ++strang);
 }
 
-void logevent(char *str) {
-	BPTR fh;
-	long tid;
-	struct tm *ts;
-	char logbuf[150];
-	time(&tid);
-	ts=localtime(&tid);
-	sprintf(logbuf,"%4d%02d%02d %02d:%02d - %s\n", ts->tm_year + 1900,
-                ts->tm_mon + 1, ts->tm_mday, ts->tm_hour, ts->tm_min,str);
-	if(!(fh=Open(Servermem->cfg.logfile,MODE_OLDFILE))) {
-		if(!(fh=Open(Servermem->cfg.logfile,MODE_NEWFILE))) {
-			printf("Kunde inte öppna logfilen!\n");
-			return;
-		}
-	}
-	if(Seek(fh,0,OFFSET_END)==-1) {
-		printf("Fel vid sökandet i logfilen!\n");
-		Close(fh);
-		return;
-	}
-	if(Write(fh,logbuf,strlen(logbuf))==-1) printf("Kunde inte skriva till logfilen!\n");
-	Close(fh);
-}
-
 int jaellernej(char val1,char val2,int defulle) {
 	UBYTE tk;
 	radcnt=0;

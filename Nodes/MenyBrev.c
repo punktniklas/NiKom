@@ -583,7 +583,7 @@ int fido_brev(char *tillpers,char *adr,struct Mote *motpek) {
         if(Servermem->cfg.logmask & LOG_BREV) {
                 strcpy(tmpfrom,getusername(inloggad));
                 sprintf(outbuffer,"%s skickar brev %d till %s (%d:%d/%d.%d)",tmpfrom,x,ft.touser,ft.tozone,ft.tonet,ft.tonode,ft.topoint);
-                logevent(outbuffer);
+                //logevent(outbuffer);
         }
         puttekn("Vill du ha en kopia av brevet i din egen brevlåda? ",-1);
         if(jaellernej('j','n',2)) savefidocopy(&ft,inloggad);
@@ -670,7 +670,7 @@ void sparabrev(void) {
         if(Servermem->cfg.logmask & LOG_BREV) {
                 strcpy(bugbuf,getusername(inloggad));
                 sprintf(outbuffer,"%s skickar brev %d till %s",bugbuf,nr,getusername(till));
-                logevent(outbuffer);
+                //logevent(outbuffer);
         }
         motstr=hittaefter(brevspar.to);
         if(motstr[0]) {
@@ -696,7 +696,7 @@ void sparabrev(void) {
                 if(Servermem->cfg.logmask & LOG_BREV) {
                         strcpy(bugbuf,getusername(inloggad));
                         sprintf(outbuffer,"%s skickar brev %d till %s",bugbuf,nr,getusername(mot));
-                        logevent(outbuffer);
+                        //logevent(outbuffer);
                 }
                 motstr=hittaefter(motstr);
         }

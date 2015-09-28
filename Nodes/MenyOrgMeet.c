@@ -273,7 +273,7 @@ void org_sparatext(void) {
         puttekn(outbuffer,-1);
         if(Servermem->cfg.logmask & LOG_TEXT) {
                 sprintf(outbuffer,"%s skriver text %d i %s",getusername(inloggad),nummer,getmotnamn(sparhead.mote));
-                logevent(outbuffer);
+                //logevent(outbuffer);
         }
         freeeditlist();
 }

@@ -11,6 +11,7 @@
 #include "NiKomstr.h"
 #include "NiKomFuncs.h"
 #include "NiKomLib.h"
+#include "Logging.h"
 
 #define ERROR	10
 #define OK		0
@@ -553,9 +554,9 @@ int fido_brev(char *tillpers,char *adr,struct Mote *motpek) {
 	sprintf(outbuffer,"Brevet fick nummer %d\r\n\n",x);
 	puttekn(outbuffer,-1);
 	if(Servermem->cfg.logmask & LOG_BREV) {
-		strcpy(tmpfrom,getusername(inloggad));
-		sprintf(outbuffer,"%s skickar brev %d till %s (%d:%d/%d.%d)",tmpfrom,x,ft.touser,ft.tozone,ft.tonet,ft.tonode,ft.topoint);
-		logevent(outbuffer);
+          LogEvent(USAGE_LOG, INFO, "%s skickar brev %d till %s (%d:%d/%d.%d)",
+                   getusername(inloggad), x,
+                   ft.touser, ft.tozone, ft.tonet, ft.tonode, ft.topoint);
 	}
 	puttekn("Vill du ha en kopia av brevet i din egen brevlåda? ",-1);
 	if(jaellernej('j','n',2)) savefidocopy(&ft,inloggad);
@@ -640,9 +641,9 @@ void sparabrev(void) {
 	sprintf(outbuffer,"\r\nBrevet fick nummer %d hos %s\r\n",nr,getusername(till));
 	puttekn(outbuffer,-1);
 	if(Servermem->cfg.logmask & LOG_BREV) {
-		strcpy(bugbuf,getusername(inloggad));
-		sprintf(outbuffer,"%s skickar brev %d till %s",bugbuf,nr,getusername(till));
-		logevent(outbuffer);
+          strcpy(bugbuf,getusername(inloggad));
+          LogEvent(USAGE_LOG, INFO, "%s skickar brev %d till %s",
+                   bugbuf, nr, getusername(till));
 	}
 	motstr=hittaefter(brevspar.to);
 	if(motstr[0]) {
@@ -666,9 +667,9 @@ void sparabrev(void) {
 		sprintf(outbuffer,"\r\nBrevet fick nummer %d hos %s\r\n",nr,getusername(mot));
 		puttekn(outbuffer,-1);
 		if(Servermem->cfg.logmask & LOG_BREV) {
-			strcpy(bugbuf,getusername(inloggad));
-			sprintf(outbuffer,"%s skickar brev %d till %s",bugbuf,nr,getusername(mot));
-			logevent(outbuffer);
+                  strcpy(bugbuf, getusername(inloggad));
+                  LogEvent(USAGE_LOG, INFO, "%s skickar brev %d till %s",
+                           bugbuf, nr, getusername(mot));
 		}
 		motstr=hittaefter(motstr);
 	}

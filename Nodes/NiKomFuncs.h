@@ -192,8 +192,6 @@ void remalias(void);
 void defalias(void);
 void alias(void);
 int speciallogin(char bokstav);
-void logevent(char *str);
-void debuglog(char *typ, char *str);
 int readtextlines(char typ,long pos,int rader,int nummer);
 void freeeditlist(void);
 void listabrev(void);

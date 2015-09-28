@@ -1,6 +1,6 @@
 CPU     = 68020
 SCFLAGS = NMINC STRMERGE CPU=$(CPU) DEBUG=FULL IDIR=/Include
-OBJS    = DiskUtils.o FileAreaUtils.o
+OBJS    = DiskUtils.o FileAreaUtils.o Logging.o
 
 all: nikomutils.lib
 
@@ -20,3 +20,5 @@ nikomutils.lib: $(OBJS)
 DiskUtils.o: DiskUtils.c DiskUtils.h
 
 FileAreaUtils.o: FileAreaUtils.c FileAreaUtils.h
+
+Logging.o: Logging.c Logging.h

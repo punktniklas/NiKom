@@ -60,7 +60,6 @@ void rxsendrawfile(struct RexxMsg *mess);
 
 /* Prototypes for functions defined in Stuff.c */
 char *hittaefter(char *);
-void logevent(char *);
 int jaellernej(char,char,int);
 int speciallogin(char);
 int nyanv(void);

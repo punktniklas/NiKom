@@ -14,6 +14,7 @@
 #include "NiKomstr.h"
 #include "NiKomLib.h"
 #include "PreNodeFuncs.h"
+#include "Logging.h"
 
 #define ERROR	10
 #define OK	0
@@ -182,8 +183,8 @@ void main(int argc,char *argv[]) {
             } else forsok--;
         }
         if(going && (Servermem->cfg.logmask & LOG_FAILINLOGG)) {
-          sprintf(outbuffer,"Nod %d, %s angivet som namn, fel lösen.", nodnr,getusername(inloggad));
-          logevent(outbuffer);
+          LogEvent(USAGE_LOG, WARN, "Nod %d, %s angivet som namn, fel lösen.",
+                   nodnr, getusername(inloggad));
         }
         if(going) going++;
       } else if(inloggad==-1) puttekn("\r\nHittar ej namnet\r\n",-1);

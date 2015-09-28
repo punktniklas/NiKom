@@ -13,6 +13,7 @@
 #include "NiKomstr.h"
 #include "NiKomLib.h"
 #include "PreNodeFuncs.h"
+#include "Logging.h"
 
 #define ERROR	10
 #define OK	0
@@ -284,13 +285,14 @@ void waitconnect(void) {
 				}
 
 				if(Servermem->cfg.logmask & LOG_CONNECTION) {
-					len=strlen(buf);
-					if(buf[len-1]=='\r') buf[len-1]=0;
-					if(Servermem->CallerID[nodnr])
-						sprintf(outbuffer,"%s (nod %d) CallerID %s", buf, nodnr, Servermem->CallerID[nodnr]);
-					else
-						sprintf(outbuffer,"%s (nod %d)",buf,nodnr);
-					logevent(outbuffer);
+                                  len=strlen(buf);
+                                  if(buf[len-1]=='\r') buf[len-1]=0;
+                                  if(Servermem->CallerID[nodnr]) {
+                                    LogEvent(USAGE_LOG, INFO, "%s (nod %d) CallerID %s",
+                                             buf, nodnr, Servermem->CallerID[nodnr]);
+                                  } else {
+                                    LogEvent(USAGE_LOG, INFO, "%s (nod %d)",buf,nodnr);
+                                  }
 				}
 				AbortIO((struct IORequest *)serreadreq);
 				WaitIO((struct IORequest *)serreadreq);
@@ -339,8 +341,7 @@ void waitconnect(void) {
 				return;
 			} else if(!strncmp(buf,"NO CARRIER",10)) {
 				if(Servermem->cfg.logmask & LOG_NOCONNECT) {
-					sprintf(outbuffer,"RING på nod %d, men ingen CONNECT",nodnr);
-					logevent(outbuffer);
+                                  LogEvent(USAGE_LOG, INFO, "RING på nod %d, men ingen CONNECT", nodnr);
 				}
 				Servermem->inloggad[nodnr] = -1;
 				sendat(init);

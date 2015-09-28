@@ -12,6 +12,7 @@
 #include "NiKomstr.h"
 #include "NiKomFuncs.h"
 #include "NiKomLib.h"
+#include "Logging.h"
 
 #define ERROR	10
 #define OK		0
@@ -186,7 +187,7 @@ int fido_skriv(int komm,int komtill) {
 	struct FidoDomain *fd;
 	struct Mote *motpek;
 	struct FidoLine *fl;
-	char bugbuf[100],filnamn[15],fullpath[100],msgid[50];
+	char filnamn[15],fullpath[100],msgid[50];
 	Servermem->action[nodnr] = SKRIVER;
 	Servermem->varmote[nodnr] = mote2;
 	motpek = getmotpek(mote2);
@@ -282,9 +283,8 @@ int fido_skriv(int komm,int komtill) {
 	sprintf(outbuffer,"Texten fick nummer %d\r\n\n",nummer);
 	puttekn(outbuffer,-1);
 	if(Servermem->cfg.logmask & LOG_BREV) {
-		strcpy(bugbuf,getusername(inloggad));
-		sprintf(outbuffer,"%s skriver text %d i %s",bugbuf,nummer,motpek->namn);
-		logevent(outbuffer);
+          LogEvent(USAGE_LOG, INFO, "%s skriver text %d i %s",
+                   getusername(inloggad), nummer, motpek->namn);
 	}
 	while(first=(struct MinNode *)RemHead((struct List *)&ft.text)) FreeMem(first,sizeof(struct EditLine));
 	NewList((struct List *)&edit_list);

@@ -343,7 +343,7 @@ menyinloop:
                                         if(menykmdpek->logstr[0])
                                         {
                                             sprintf(outbuffer,"%s %s",getusername(inloggad),menykmdpek->logstr);
-                                            logevent(outbuffer);
+                                            //logevent(outbuffer);
                                         }
                                         if(menykmdpek->vilkainfo[0])
                                         {
@@ -360,7 +360,7 @@ menyinloop:
                                         if(kmdpek->logstr[0])
                                         {
                                                 sprintf(outbuffer,"%s %s",getusername(inloggad),kmdpek->logstr);
-                                                logevent(outbuffer);
+                                                //logevent(outbuffer);
                                         }
                                         if(kmdpek->vilkainfo[0])
                                         {
@@ -1323,7 +1323,7 @@ int connection(void) {
         senast_text_typ=0;
         if(Servermem->cfg.logmask & LOG_INLOGG) {
                 sprintf(outbuffer,"%s loggar in på nod %d",getusername(inloggad),nodnr);
-                logevent(outbuffer);
+                //logevent(outbuffer);
         }
         sprintf(tellstr,"loggade just in på nod %d",nodnr);
         tellallnodes(tellstr);

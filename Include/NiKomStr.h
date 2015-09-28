@@ -155,8 +155,9 @@
 #define NIKSEM_PRGCAT	  9
 #define NIKSEM_UNREAD     10
 #define NIKSEM_CONFTEXTS  11
+#define NIKSEM_LOGFILES   12
 
-#define NIKSEM_NOOF       12 /* Hur många det finns */
+#define NIKSEM_NOOF       13 /* Hur många det finns */
 
 #define BAMTEST(a,b) (((char *)(a))[(b)/8] & 1 << 8-1-(b)%8)
 #define BAMSET(a,b) (((char *)(a))[(b)/8] |= 1 << 8-1-(b)%8)

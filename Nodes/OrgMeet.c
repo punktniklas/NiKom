@@ -11,6 +11,7 @@
 #include "NiKomstr.h"
 #include "NiKomFuncs.h"
 #include "NiKomLib.h"
+#include "Logging.h"
 
 #define ERROR	10
 #define OK		0
@@ -260,8 +261,8 @@ void org_sparatext(void) {
 	sprintf(outbuffer,"\r\nTexten fick nummer %d\r\n",nummer);
 	puttekn(outbuffer,-1);
 	if(Servermem->cfg.logmask & LOG_TEXT) {
-		sprintf(outbuffer,"%s skriver text %d i %s",getusername(inloggad),nummer,getmotnamn(sparhead.mote));
-		logevent(outbuffer);
+          LogEvent(USAGE_LOG, INFO, "%s skriver text %d i %s",
+                   getusername(inloggad), nummer, getmotnamn(sparhead.mote));
 	}
 	freeeditlist();
 }

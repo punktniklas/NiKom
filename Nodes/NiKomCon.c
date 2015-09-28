@@ -13,6 +13,7 @@
 #include "NiKomstr.h"
 #include "NiKomFuncs.h"
 #include "NiKomLib.h"
+#include "Logging.h"
 
 #define ERROR	10
 #define OK	0
@@ -174,8 +175,8 @@ void main(int argc, char **argv) {
     connection();
 
     if(Servermem->cfg.logmask & LOG_UTLOGG) {
-      sprintf(outbuffer,"%s loggar ut från nod %d",getusername(inloggad),nodnr);
-      logevent(outbuffer);
+      LogEvent(USAGE_LOG, INFO, "%s loggar ut från nod %d",
+               getusername(inloggad), nodnr);
     }
     if(Servermem->say[nodnr]) displaysay();
     if(Servermem->cfg.ar.utlogg) sendrexx(Servermem->cfg.ar.utlogg);

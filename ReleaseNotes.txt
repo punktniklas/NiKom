@@ -19,6 +19,18 @@
   Make sure you make a backup of all files before installing this version
   if you think you may want to revert back to an older version.
 
+- The logging has been overhauled to make way for better logging in the
+  future. There are now two different logfiles which will be created in
+  the directory NiKom:Log. Usage.log is the same as the old logfile and
+  covers events due to user actions. System.log is a new log file to
+  cover internals of NiKom, especially problems with the system. The events
+  that are logged to this system will grow over time.
+
+  Events can be logged on different severity levels: DEBUG, INFO, VERBOSE,
+  WARN, ERROR and CRITICAL. It is currently not possible to configure what
+  levels that should be logged but this is planned for the future. It's also
+  currently not possible to configure the location of the log files.
+
 ---------------------------------------------------------------------------
                          NiKom v1.61, 2015-08-25
 ---------------------------------------------------------------------------

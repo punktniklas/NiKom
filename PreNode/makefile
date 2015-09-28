@@ -1,5 +1,5 @@
 CPU=68020
-FLAGS = NMINC STRMERGE CPU=$(CPU) DEBUG=FULL IDIR=/Include
+FLAGS = NMINC STRMERGE CPU=$(CPU) DEBUG=FULL IDIR=/Include IDIR=/UtilLib
 OBJS = Ser.o SerialIO.o Terminal.o ServerComm.o Modem.o Rexx.o Stuff.o Version.o
 
 NIKVERSION   = `/GetNiKomVersion.rexx Version /NiKVersion.txt`
@@ -16,7 +16,9 @@ clean:
   delete Debug/$(CPU)/* NoDebug/$(CPU)/*
 
 PreNode: $(OBJS)
-  slink FROM lib:c.o $(OBJS) TO Debug/$(CPU)/PreNode LIB lib:sc.lib lib:amiga.lib lib:rexxglue.o NOALVS
+  slink FROM lib:c.o $(OBJS) TO Debug/$(CPU)/PreNode \
+        LIB lib:sc.lib lib:amiga.lib /UtilLib/Debug/$(CPU)/nikomutils.lib \
+        NOALVS
   slink Debug/$(CPU)/PreNode TO NoDebug/$(CPU)/PreNode NODEBUG NOICONS
 
 Ser.o: Ser.c /Include/NiKomStr.h

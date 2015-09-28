@@ -17,6 +17,7 @@
 #include "NiKomFuncs.h"
 #include "DiskUtils.h"
 #include "FileAreaUtils.h"
+#include "Logging.h"
 
 #define EKO		1
 #define EJEKO	0
@@ -193,8 +194,8 @@ long __saveds __regargs nik_update(struct XPR_UPDATE *update) {
 				else
 				{
 					if(Servermem->cfg.logmask & LOG_RECFILE) {
-						sprintf(outbuffer,"Tog emot filen %s från %s",xprfilnamn,getusername(inloggad));
-						logevent(outbuffer);
+                                          LogEvent(USAGE_LOG, INFO, "Tog emot filen %s från %s",
+                                                   xprfilnamn, getusername(inloggad));
 					}
 					strcpy(tf->Filnamn,xprfilnamn);
 					tf->cps = cps;
@@ -396,8 +397,8 @@ int download(void) {
 	if(Servermem->cfg.logmask & LOG_DOWNLOAD) {
 		for(tf=(struct TransferFiles *)tf_list.mlh_Head;tf->node.mln_Succ;tf=(struct TransferFiles *)tf->node.mln_Succ)
 			if(tf->sucess) {
-				sprintf(outbuffer,"%s laddar ner %s (%d cps)",getusername(inloggad),tf->filpek->namn,tf->cps);
-				logevent(outbuffer);
+                          LogEvent(USAGE_LOG, INFO, "%s laddar ner %s (%d cps)",
+                                   getusername(inloggad), tf->filpek->namn, tf->cps);
 			}
 	}
 	for(tf=(struct TransferFiles *)tf_list.mlh_Head;tf->node.mln_Succ;tf=(struct TransferFiles *)tf->node.mln_Succ) {
@@ -551,8 +552,8 @@ int upload(void) {	/* Ändrad för nikfiles.data 960707 JÖ */
 		Servermem->inne[nodnr].upload++;
 		Statstr.ul++;
 		if(Servermem->cfg.logmask & LOG_UPLOAD) {
-			sprintf(outbuffer,"%s laddar upp %s",getusername(inloggad),allokpek->namn);
-			logevent(outbuffer);
+                  LogEvent(USAGE_LOG, INFO, "%s laddar upp %s",
+                           getusername(inloggad), allokpek->namn);
 		}
 		if(Servermem->cfg.ar.postup1) sendrexx(Servermem->cfg.ar.postup1);
 		puttekn("\r\n\nVill du skriva en längre beskrivning? (J/n) ",-1);
@@ -719,8 +720,8 @@ int sendbinfile(void) {
 	if(Servermem->cfg.logmask & LOG_SENDFILE) {
 		for(tf=(struct TransferFiles *)tf_list.mlh_Head;tf->node.mln_Succ;tf=(struct TransferFiles *)tf->node.mln_Succ)
 			if(tf->sucess) {
-				sprintf(outbuffer,"Skickar filen %s till %s",tf->path,getusername(inloggad));
-				logevent(outbuffer);
+                          LogEvent(USAGE_LOG, INFO, "Skickar filen %s till %s",
+                                   tf->path, getusername(inloggad));
 			}
 	}
 	for(tf=(struct TransferFiles *)tf_list.mlh_Head;tf->node.mln_Succ;tf=(struct TransferFiles *)tf->node.mln_Succ)

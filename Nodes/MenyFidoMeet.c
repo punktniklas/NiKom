@@ -294,7 +294,7 @@ int fido_skriv(int komm,int komtill) {
         if(Servermem->cfg.logmask & LOG_BREV) {
                 strcpy(bugbuf,getusername(inloggad));
                 sprintf(outbuffer,"%s skriver text %d i %s",bugbuf,nummer,motpek->namn);
-                logevent(outbuffer);
+                //logevent(outbuffer);
         }
         while(first=(struct MinNode *)RemHead((struct List *)&ft.text)) FreeMem(first,sizeof(struct EditLine));
         NewList((struct List *)&edit_list);

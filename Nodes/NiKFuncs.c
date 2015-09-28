@@ -13,6 +13,7 @@
 #include "NiKomstr.h"
 #include "NiKomFuncs.h"
 #include "NiKomLib.h"
+#include "Logging.h"
 
 #define ERROR   10
 #define OK              0
@@ -116,10 +117,9 @@ int prompt(int kmd) {
                 kmdpek = getkmdpek(parseret);
                 if(!kmdpek) return(-5);
                 if(kmdpek->before) sendautorexx(kmdpek->before);
-                if(kmdpek->logstr[0])
-                {
-                        sprintf(outbuffer,"%s %s",getusername(inloggad),kmdpek->logstr);
-                        logevent(outbuffer);
+                if(kmdpek->logstr[0]) {
+                  LogEvent(USAGE_LOG, INFO, "%s %s",
+                           getusername(inloggad), kmdpek->logstr);
                 }
                 if(kmdpek->vilkainfo[0])
                 {
@@ -1088,8 +1088,8 @@ int connection(void)
         Servermem->vilkastr[nodnr]=vilkabuf;
         senast_text_typ=0;
         if(Servermem->cfg.logmask & LOG_INLOGG) {
-                sprintf(outbuffer,"%s loggar in på nod %d",getusername(inloggad),nodnr);
-                logevent(outbuffer);
+          LogEvent(USAGE_LOG, INFO, "%s loggar in på nod %d",
+                   getusername(inloggad), nodnr);
         }
         sprintf(tellstr,"loggade just in på nod %d",nodnr);
         tellallnodes(tellstr);
