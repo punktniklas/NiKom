@@ -20,8 +20,6 @@ struct DosLibrary *DOSBase;
 struct IntuitionBase *IntuitionBase;
 struct Library *RexxSysBase, *UtilityBase;
 
-char reggadnamn[60]; /* Namnet på den som reggat NiKom. */
-
 /*
  *  nikom.librarys privata initiuerings/cleanup-rutiner.
  */
@@ -68,7 +66,6 @@ __UserLibInit(register __a6 struct NiKomBase * NiKomBase)
 	}
 	InitSemaphore(& NiKomBase->sem);
 	copychrstables(NiKomBase);
-	getkeyfile();
 
 	return (OK);
 }
@@ -85,50 +82,4 @@ __UserLibCleanup(register __a6 struct NiKomBase * NiKomBase)
 void __saveds __asm
 LIBInitServermem(register __a0 struct System *Servermem, register __a6 struct NiKomBase * NiKomBase) {
 	NiKomBase->Servermem = Servermem;
-}
-
-int getkeyfile(void) {
-	BPTR fh;
-	long checksum,serial,cnt,len,countcs=0;
-	char tmp;
-	if(!(fh=Open("NiKom:NiKom.key",MODE_OLDFILE))) return(1);
-	if(Read(fh,&checksum,sizeof(long))==-1) {
-		Close(fh);
-		return(0);
-	}
-	if(Read(fh,&serial,sizeof(long))==-1) {
-		Close(fh);
-		return(0);
-	}
-	if(serial%42 && Seek(fh,serial%42,OFFSET_CURRENT)==-1) {
-		Close(fh);
-		return(0);
-	}
-	Flush(fh);
-	if((len=FGetC(fh))==-1) {
-		Close(fh);
-		return(0);
-	}
-	for(cnt=0;cnt<len;cnt++) {
-		if((reggadnamn[cnt]=FGetC(fh))==-1) {
-			Close(fh);
-			return(0);
-		}
-		tmp=~reggadnamn[cnt];
-		tmp&=44;
-		reggadnamn[cnt]&=~44;
-		reggadnamn[cnt]|=tmp;
-		countcs+=reggadnamn[cnt];
-		if(FGetC(fh)==-1) {
-			Close(fh);
-			return(0);
-		}
-		if(FGetC(fh)==-1) {
-			Close(fh);
-			return(0);
-		}
-	}
-	Close(fh);
-	countcs=countcs*serial*4711/33;
-	if(countcs!=checksum) return(0);
 }

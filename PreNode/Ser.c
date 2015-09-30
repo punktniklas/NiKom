@@ -34,7 +34,7 @@ struct MsgPort *rexxport, *nikomnodeport;
 char rexxportnamn[20], pubscreen[40],nodid[20], nikomnodeportnamn[15];
 int inloggad, getty,gettybps,relogin=FALSE,ypos,xpos,ysize,xsize;
 
-extern char commandhistory[], inmat[], outbuffer[], reggadnamn[];
+extern char commandhistory[], inmat[], outbuffer[];
 extern int hangupdelay, dtespeed, highbaud, nodnr, nodestate;
 extern struct System *Servermem;
 
@@ -126,8 +126,6 @@ void main(int argc,char *argv[]) {
   if(getty) dtespeed = gettybps;
   else dtespeed = highbaud;
   if(!OpenIO(NiKwind)) cleanup(ERROR,"Couldn't setup IO");
-  if(!getkeyfile())
-    cleanup(ERROR,"Korrupt nyckelfil\n");
   strcpy(Servermem->nodid[nodnr],nodid);
   conreqtkn();
   serreqtkn();

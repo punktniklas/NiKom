@@ -6,7 +6,7 @@
 #include "NiKomLib.h"
 #include "NiKomStr.h"
 
-extern char outbuffer[],reggadnamn[];
+extern char outbuffer[];
 extern struct System *Servermem;
 
 char dosversion[]="\0$VER: NiKomCon/Ser " NIKVERSION "." NIKREVISION " " __AMIGADATE__;
@@ -24,10 +24,4 @@ void nikversion(void)
 	puttekn(outbuffer,-1);
 	sprintf(outbuffer,"NiKom.library v%d.%d\r\n",libver,librev);
 	puttekn(outbuffer,-1);
-	if(reggadnamn[0]) {
-		puttekn("Registrerad på ",-1);
-		puttekn(reggadnamn,-1);
-		puttekn("\r\n",-1);
-	}
-/*	else puttekn("Oregistrerad demoversion\r\n",-1); */
 }

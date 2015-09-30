@@ -17,7 +17,6 @@ extern char outbuffer[];
 extern struct System *Servermem;
 
 char inmat[1024];     /* Används av getstring() */
-char reggadnamn[60]; /* Lagrar vem som har reggat NiKom */
 int radcnt = 0;
 
 char commandhistory[10][1025];
@@ -398,52 +397,6 @@ int getstring(int eko,int maxtkn, char *defaultstring) {
 	}
 	if(historycnt>-1) historycnt--;
 	return(0);
-}
-
-int getkeyfile(void) {
-	BPTR fh;
-	long checksum,serial,cnt,len,countcs=0;
-	char tmp;
-	if(!(fh=Open("NiKom:NiKom.key",MODE_OLDFILE))) return(1);
-	if(Read(fh,&checksum,sizeof(long))==-1) {
-		Close(fh);
-		return(0);
-	}
-	if(Read(fh,&serial,sizeof(long))==-1) {
-		Close(fh);
-		return(0);
-	}
-	if(serial%42 && Seek(fh,serial%42,OFFSET_CURRENT)==-1) {
-		Close(fh);
-		return(0);
-	}
-	Flush(fh);
-	if((len=FGetC(fh))==-1) {
-		Close(fh);
-		return(0);
-	}
-	for(cnt=0;cnt<len;cnt++) {
-		if((reggadnamn[cnt]=FGetC(fh))==-1) {
-			Close(fh);
-			return(0);
-		}
-		tmp=~reggadnamn[cnt];
-		tmp&=44;
-		reggadnamn[cnt]&=~44;
-		reggadnamn[cnt]|=tmp;
-		countcs+=reggadnamn[cnt];
-		if(FGetC(fh)==-1) {
-			Close(fh);
-			return(0);
-		}
-		if(FGetC(fh)==-1) {
-			Close(fh);
-			return(0);
-		}
-	}
-	Close(fh);
-	countcs=countcs*serial*4711/33;
-	if(countcs!=checksum) return(0);
 }
 
 int incantrader(void)

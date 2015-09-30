@@ -23,7 +23,7 @@
 
 extern struct System *Servermem;
 extern int radcnt,nodnr,inloggad;
-extern char outbuffer[],inmat[],reggadnamn[];
+extern char outbuffer[],inmat[];
 
 char usernamebuf[50];
 
@@ -343,7 +343,6 @@ int readuser(int nummer,struct User *user) {
 char *getusername(int nummer) {
 	struct ShortUser *letpek;
 	int found=FALSE;
-/*	if(!reggadnamn[0] && nummer>=5) return((char *)0xbadbad42); */
 	for(letpek=(struct ShortUser *)Servermem->user_list.mlh_Head;letpek->user_node.mln_Succ;letpek=(struct ShortUser *)letpek->user_node.mln_Succ) {
 		if(letpek->nummer==nummer) {
 			if(letpek->namn[0]) sprintf(usernamebuf,"%s #%d",letpek->namn,nummer);

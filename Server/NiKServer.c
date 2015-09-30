@@ -38,7 +38,7 @@ void readIntoConfTextsArray(int arrayIndex, int fileIndex, int textsToRead,
                             BPTR file);
 int CXBRK(void) { return(0); }
 
-char pubscreen[40],reggadnamn[60];
+char pubscreen[40];
 int xpos,ypos;
 struct MsgPort *NiKPort,*permitport,*rexxport, *nodereplyport;
 struct IntuitionBase *IntuitionBase=NULL;
@@ -553,7 +553,6 @@ int adduser(int nummer) {
 	struct User tempuser;
 	struct ShortUser *inspek,*allok;
 	char filnamn[100];
-/*	if(!reggadnamn[0] && nummer>4) return(1); */
 	sprintf(filnamn,"NiKom:Users/%d/%d/Data",nummer/100,nummer);
 	if(!(fh=Open(filnamn,MODE_OLDFILE))) {
 		printf("Kunde inte öppna %s\n",filnamn);
@@ -1177,52 +1176,6 @@ void freegroupmem(void) {
 	}
 }
 
-int getkeyfile(void) {
-	BPTR fh;
-	long checksum,serial,cnt,len,countcs=0;
-	char tmp;
-	if(!(fh=Open("NiKom:NiKom.key",MODE_OLDFILE))) return(1);
-	if(Read(fh,&checksum,sizeof(long))==-1) {
-		Close(fh);
-		return(0);
-	}
-	if(Read(fh,&serial,sizeof(long))==-1) {
-		Close(fh);
-		return(0);
-	}
-	if(serial%42 && Seek(fh,serial%42,OFFSET_CURRENT)==-1) {
-		Close(fh);
-		return(0);
-	}
-	Flush(fh);
-	if((len=FGetC(fh))==-1) {
-		Close(fh);
-		return(0);
-	}
-	for(cnt=0;cnt<len;cnt++) {
-		if((reggadnamn[cnt]=FGetC(fh))==-1) {
-			Close(fh);
-			return(0);
-		}
-		tmp=~reggadnamn[cnt];
-		tmp&=44;
-		reggadnamn[cnt]&=~44;
-		reggadnamn[cnt]|=tmp;
-		countcs+=reggadnamn[cnt];
-		if(FGetC(fh)==-1) {
-			Close(fh);
-			return(0);
-		}
-		if(FGetC(fh)==-1) {
-			Close(fh);
-			return(0);
-		}
-	}
-	Close(fh);
-	countcs=countcs*serial*4711/33;
-	if(countcs!=checksum) return(0);
-}
-
 void cleanup(int kod,char *fel) {
   if(rexxport) {
     addhost(FALSE);
@@ -1269,10 +1222,6 @@ void main() {
 	Permit();
 	if(port) {
 		printf("Det finns redan en server igång.\n");
-		exit(10);
-	}
-	if(!getkeyfile()) {
-		printf("Korrupt nyckelfil.\n");
 		exit(10);
 	}
 	if(!(IntuitionBase=(struct IntuitionBase *)OpenLibrary("intuition.library",VERSION)))

@@ -25,7 +25,7 @@
 
 extern struct System *Servermem;
 extern int nodnr,inloggad,mote2,senast_text_typ,senast_text_nr,senast_text_mote,nu_skrivs,rad,connectbps;
-extern char outbuffer[],inmat[],*argument,reggadnamn[];
+extern char outbuffer[],inmat[],*argument;
 extern struct Header sparhead,readhead;
 extern struct MsgPort *permitport,*serverport,*NiKomPort;
 extern struct Inloggning Statstr;
@@ -1052,7 +1052,6 @@ void radlapp(void) {
 int userexists(int nummer) {
 	struct ShortUser *letpek;
 	int found=FALSE;
-/*	if(!reggadnamn[0] && nummer >= 5) return(0); */
 	for(letpek=(struct ShortUser *)Servermem->user_list.mlh_Head;letpek->user_node.mln_Succ;letpek=(struct ShortUser *)letpek->user_node.mln_Succ) {
 		if(letpek->nummer==nummer) {
 			found=TRUE;

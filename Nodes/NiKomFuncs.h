@@ -51,7 +51,6 @@ void sereka(char tecken);
 int sendtoser(char *pekare, int);
 
 /* Terminal.c.. */
-int getkeyfile(void);
 int getnumber(int *minvarde, int *maxvarde, int *defaultvarde);
 int checkvalue(char *buffer);
 

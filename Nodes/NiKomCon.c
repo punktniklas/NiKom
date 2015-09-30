@@ -25,7 +25,7 @@ int CXBRK(void) { return(0); }
 extern long logintime;
 extern int area2, nodnr;
 extern struct MinList aliaslist,edit_list;
-extern char outbuffer[], nodid[], inmat[], reggadnamn[];
+extern char outbuffer[], nodid[], inmat[];
 extern struct System *Servermem;
 
 struct IntuitionBase *IntuitionBase=NULL;
@@ -119,8 +119,6 @@ void main(int argc, char **argv) {
                                                TAG_DONE)))
     cleanup(ERROR,"Kunde inte öppna fönstret\n");
   if(!OpenIO(NiKwind)) cleanup(ERROR,"Kunde inte öppna IO\n");
-  if(!getkeyfile())
-    cleanup(ERROR,"Korrupt nyckelfil\n");
   strcpy(Servermem->nodid[nodnr],nodid);
   sprintf(titel,"Nod #%d CON: <Ingen inloggad>",nodnr);
   SetWindowTitles(NiKwind,titel,(UBYTE *)-1L);

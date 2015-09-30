@@ -30,7 +30,7 @@
 #define EKO             1
 #define EJEKO           0
 
-extern char outbuffer[], *argument, inmat[],reggadnamn[], dosversion[];
+extern char outbuffer[], *argument, inmat[], dosversion[];
 extern struct System *Servermem;
 extern int inloggad, radcnt, nodnr, area2, mote2, felcnt;
 

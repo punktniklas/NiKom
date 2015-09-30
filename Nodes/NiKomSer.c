@@ -131,8 +131,6 @@ void main(int argc,char *argv[]) {
                                                WA_PubScreenName,tmppscreen,
                                                TAG_DONE)))
     cleanup(ERROR,"Kunde inte öppna fönstret\n");
-  if(!getkeyfile())
-    cleanup(ERROR,"Korrupt nyckelfil\n");
   if(!OpenIO(NiKwind)) cleanup(ERROR,"Kunde inte öppna IO\n");
   inloggad=Servermem->inloggad[nodnr];
   conreqtkn();

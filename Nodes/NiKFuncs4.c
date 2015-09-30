@@ -25,7 +25,7 @@
 
 extern struct System *Servermem;
 extern int nodnr,inloggad,mote2,senast_text_typ,radcnt;
-extern char outbuffer[],inmat[],*argument,usernamebuf[],reggadnamn[];
+extern char outbuffer[],inmat[],*argument,usernamebuf[];
 extern struct Inloggning Statstr;
 extern struct Header readhead;
 extern struct MinList aliaslist, edit_list;
@@ -89,7 +89,6 @@ int movetext(void) {
 char *getusername(int nummer) {
 	struct ShortUser *letpek;
 	int found=FALSE;
-/*	if(!reggadnamn[0] && nummer>=5) return((char *)0xbadbad42); */
 	for(letpek=(struct ShortUser *)Servermem->user_list.mlh_Head;letpek->user_node.mln_Succ;letpek=(struct ShortUser *)letpek->user_node.mln_Succ)
 	{
 		if(letpek->nummer==nummer) {

@@ -62,11 +62,6 @@ int __saveds __asm LIBSaveProgramCategory( register __d0 int, register __a6 stru
 
 /* Andra trevliga små funktioner */
 
-/* UserLibInit.c */
-struct MsgPort *SafePutToPort(struct NiKMess *,char *);
-struct System *getservermem(void);
-int getkeyfile(void);
-
 /* Matrix.c */
 int getlastmatrix(struct NiKomBase *);
 void debug_req(char *,APTR);
@@ -90,9 +85,6 @@ void rexxdebugreq(struct RexxMsg *);
 /* Echo.c */
 struct Mote *getmotpek(int, struct System *);
 
-/* conf.c */
-int bamtest(char *, int);
-
 /* terminal.c */
 UBYTE convnokludge(UBYTE);
 
@@ -103,7 +95,6 @@ long sendservermess(short, long, long, long, long);
 int linksaystring(int, int, char *, struct NiKomBase *);
 
 /* PrgCat.c */
-/* void DisplayAll(char *, struct ProgramCategory *); */
 int InsertProgramCategory(char *, struct ProgramCategory **);
 int InsertProgramData(char *, char *, char *, struct ProgramCategory *);
 struct ProgramCategory *GetCategorypek(char *, struct ProgramCategory *);
