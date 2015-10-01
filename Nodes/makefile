@@ -7,26 +7,11 @@ OBJS    = ServerComm.o Terminal.o NiKFuncs.o NiKFuncs2.o NiKFuncs3.o NiKFuncs4.o
 CONOBJS = NiKomCon.o ConsoleIO.o NiKConTrans.o NiKConOffline.o
 SEROBJS = NiKomSer.o SerialIO.o NiKTransfer.o NiKOffline.o
 
-MENYOBJS    = menyversion.o ServerComm.o Terminal.o MenyFuncs.o NiKFuncs2.o \
-              NiKFuncs3.o NiKFuncs4.o NiKFuncs5.o NiKEditor.o NiKRexx.o \
-              NiKFiles.o MenyBrev.o MenyOrgMeet.o MenyFidoMeet.o _tzset.o \
-              Meny1.o sprakstrings.o noansi.o
-
 NIKVERSION      = `/GetNiKomVersion.rexx Version /NiKVersion.txt`
 NIKKOMREVISION  = `/GetNiKomVersion.rexx KOMRevision /NiKVersion.txt`
-NIKMENYREVISION = `/GetNiKomVersion.rexx MenyRevision /NiKVersion.txt`
 
 
-all: NiKomCon NiKomSer MenyCon MenySer
-
-install: all
-	copy nodebug/$(CPU)/nikomcon NiKom:c
-	copy nodebug/$(CPU)/nikomser NiKom:c
-	copy nodebug/$(CPU)/prenode NiKom:c
-	copy nodebug/$(CPU)/nikserver NiKom:c
-	copy nodebug/$(CPU)/menycon NiKom:c
-	copy nodebug/$(CPU)/menyser NiKom:c
-	copy nodebug/nikom.library libs:
+all: NiKomCon NiKomSer
 
 setup:
   makedir Debug
@@ -53,21 +38,6 @@ NiKomSer: $(OBJS) $(SEROBJS)
         LIB lib:sc.lib+lib:amiga.lib+/UtilLib/Debug/$(CPU)/nikomutils.lib \
         NOALVS NOICONS VERBOSE
   slink debug/$(CPU)/NiKomSer TO noDebug/$(CPU)/NiKomSer NODEBUG NOICONS
-
-MenyCon: $(MENYOBJS) $(CONOBJS)
-  slink FROM lib:c.o $(CONOBJS) $(MENYOBJS) \
-        TO Debug/$(CPU)/MenyCon \
-        LIB lib:sc.lib+lib:amiga.lib+/UtilLib/Debug/$(CPU)/nikomutils.lib \
-        NOALVS NOICONS
-  slink Debug/$(CPU)/MenyCon TO NoDebug/$(CPU)/MenyCon NODEBUG NOICONS
-
-
-MenySer: $(MENYOBJS) $(SEROBJS)
-  slink FROM lib:c.o $(SEROBJS) $(MENYOBJS) \
-        TO Debug/$(CPU)/MenySer \
-        LIB lib:sc.lib+lib:amiga.lib+/UtilLib/Debug/$(CPU)/nikomutils.lib \
-        NOALVS NOICONS
-  slink Debug/$(CPU)/MenySer TO NoDebug/$(CPU)/MenySer NODEBUG NOICONS
 
 NiKomCon.o: NiKomCon.c /Include/NiKomStr.h
   sc $(FLAGS) NiKomCon.c OBJNAME=NiKomCon.o
@@ -137,29 +107,3 @@ FidoMeet.o: FidoMeet.c /Include/NiKomStr.h /Include/NiKomLib.h
 
 _tzset.o: sc:source/_tzset.c
   sc $(FLAGS) PARM=BOTH DEFINE=LESS_GETENV=1 OBJNAME=_tzset.o sc:source/_tzset.c
-
-
-
-MenyFuncs.o: MenyFuncs.c /Include/NiKomStr.h /Include/NiKomLib.h MenyStr.h sprakstrings.h
-  sc $(FLAGS) MenyFuncs.c OBJNAME=MenyFuncs.o
-
-MenyBrev.o: MenyBrev.c /Include/NiKomStr.h
-  sc $(FLAGS) MenyBrev.c OBJNAME=MenyBrev.o
-
-MenyOrgMeet.o: MenyOrgMeet.c /Include/NiKomStr.h
-  sc $(FLAGS) MenyOrgMeet.c OBJNAME=MenyOrgMeet.o
-
-MenyFidoMeet.o: MenyFidoMeet.c /Include/NiKomStr.h /Include/NiKomLib.h
-  sc $(FLAGS) MenyFidoMeet.c OBJNAME=MenyFidoMeet.o
-
-Meny1.o: Meny1.c /Include/NiKomStr.h /Include/NiKomLib.h MenyStr.h sprakstrings.h
-  sc $(FLAGS) Meny1.c OBJNAME=Meny1.o
-
-sprakstrings.o: sprakstrings.c sprakstrings.h
-  SC $(FLAGS) sprakstrings.c OBJNAME=sprakstrings.o
-
-menyversion.o: menyversion.c /NiKVersion.txt
-  sc $(FLAGS) DEFINE=NIKVERSION=$(NIKVERSION) DEFINE=NIKREVISION=$(NIKMENYREVISION) MenyVersion.c
-
-noansi.o: noansi.c
-  SC $(FLAGS) noansi.c OBJNAME=noansi.o

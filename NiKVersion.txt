@@ -3,5 +3,4 @@ Version: 21
 ServerRevision: 1
 LibraryRevision: 1
 KOMRevision: 1
-MenyRevision: 1
 PreNodeRevision: 1
