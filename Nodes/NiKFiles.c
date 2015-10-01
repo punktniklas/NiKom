@@ -14,6 +14,7 @@
 #include "NiKomstr.h"
 #include "NiKomFuncs.h"
 #include "DiskUtils.h"
+#include "Terminal.h"
 
 #define ERROR	10
 #define OK		0

@@ -4,13 +4,13 @@
 #include <proto/dos.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <stdarg.h>
 #include "NiKomstr.h"
 #include "NiKomFuncs.h"
 #include "NiKomLib.h"
-
-#ifndef _PPC
-	#include <string.h>
-#endif
+#include "Logging.h"
+#include "Terminal.h"
 
 extern int nodnr, rxlinecount;
 extern char outbuffer[];
@@ -21,23 +21,25 @@ int radcnt = 0;
 
 char commandhistory[10][1025];
 
-void sendfile(char *filnamn) {
-	FILE *fp;
-	int going=TRUE;
-	char buff[1025];
-	if(fp=fopen(filnamn,"r"))
-	{
-		while(going)
-		{
-			if(!(fgets(buff,1023,fp))) going=FALSE;
-			else if(puttekn(buff,-1)) going=FALSE;
-			eka((char)13);
-		}
-		fclose(fp);
-	} else {
-		sprintf(buff,"Can't open %s",filnamn);
-		puttekn(buff,-1);
-	}
+int checkvalue(char *buffer);
+
+void sendfile(char *filename) {
+  FILE *fp;
+  char buff[1025];
+  if(!(fp=fopen(filename, "r"))) {
+    LogEvent(SYSTEM_LOG, ERROR, "Can't open file %s for reading.", filename);
+    SendString("Internal error.\r\n");
+    return;
+  }
+  for(;;) {
+    if(!(fgets(buff, 1023, fp))) {
+      break;
+    }
+    if(SendString("%s\r", buff)) {
+      break;
+    }
+  }
+  fclose(fp);
 }
 
 int getnumber(int *minvarde, int *maxvarde, int *defaultvarde)
@@ -328,7 +330,7 @@ int getstring(int eko,int maxtkn, char *defaultstring) {
 					strcpy(inmat,commandhistory[historycnt]);
 				if(pos) sprintf(outbuffer,"\x1b\x5b%d\x44\x1b\x5b\x4a%s",pos,inmat);
 				else sprintf(outbuffer,"\x1b\x5b\x4a%s",inmat);
-				puttekn(outbuffer,-1);
+				putstring(outbuffer, -1, 0);
 				pos=antal=strlen(inmat);
 				modified=FALSE;
 			} else if(tillftkn=='\x42' && historycnt>0 && commandhistory[historycnt-1][0]) {
@@ -342,7 +344,7 @@ int getstring(int eko,int maxtkn, char *defaultstring) {
 					strcpy(inmat,commandhistory[historycnt]);
 				if(pos) sprintf(outbuffer,"\x1b\x5b%d\x44\x1b\x5b\x4a%s",pos,inmat);
 				else sprintf(outbuffer,"\x1b\x5b\x4a%s",inmat);
-				puttekn(outbuffer,-1);
+				putstring(outbuffer, -1, 0);
 				pos=antal=strlen(inmat);
 				modified=FALSE;
 			} else if(tillftkn=='\x42' && (historycnt==0 || historycnt==-1)) {
@@ -481,4 +483,34 @@ int conputtekn(char *pekare,int size)
 	}
 
 	return(aborted);
+}
+
+/*
+ * Sends a string to the user. The arguments are compatible with printf().
+ * The first argument is a char pointer to a format string and it's
+ * followed by zero or more arguments to resolve the placeholders in the
+ * format string.
+ *
+ * Returns 0 if everything is normal or non zero if sending was interrupted.
+ * Interruption could be e.g. because the user has pressed Ctrl-C or that
+ * the carrier has been dropped.
+ *
+ * TODO: This should be the default function to use for any code that
+ * wants to do normal output to the user. Over time calls to puttekn()
+ * should be replaced with calls to SendString() and the global variable
+ * outbuffer should be made internal to this function/module.
+ * There will probably have to be added other versions of this function
+ * like SendStringCon() and a function to replace putstring() (that
+ * doesn't count lines and pause with a <RETURN> prompt). They should
+ * all just be wrappers to one common code path to send strings.
+ */
+int SendString(char *fmt, ...) {
+  va_list arglist;
+  int ret;
+
+  va_start(arglist, fmt);
+  vsprintf(outbuffer, fmt, arglist);
+  ret = puttekn(outbuffer, -1);
+  va_end(arglist);
+  return ret;
 }

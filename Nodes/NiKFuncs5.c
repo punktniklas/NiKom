@@ -11,6 +11,7 @@
 #include "NiKomstr.h"
 #include "NiKomlib.h"
 #include "NiKomFuncs.h"
+#include "Terminal.h"
 
 #define EKO		1
 #define EJEKO	0

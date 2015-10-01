@@ -13,6 +13,7 @@
 #include "NiKomFuncs.h"
 #include "NiKomLib.h"
 #include "Logging.h"
+#include "Terminal.h"
 
 #define ERROR	10
 #define OK		0

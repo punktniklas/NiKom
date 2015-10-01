@@ -15,6 +15,7 @@
 #include "NiKomFuncs.h"
 #include "NiKomstr.h"
 #include "MenyFuncs.h"
+#include "Terminal.h"
 
 #define ERROR   10
 #define OK              0

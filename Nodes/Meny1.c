@@ -18,6 +18,7 @@
 #include "NiKomFuncs.h"
 #include "NiKomLib.h"
 #include "MenyFuncs.h"
+#include "Terminal.h"
 
 #include "MenyStr.h"
 #include "sprakstrings.h"

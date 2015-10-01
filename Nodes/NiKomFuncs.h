@@ -1,3 +1,9 @@
+/*
+ * TODO: The long time goal is for this file to die. Every .c
+ * file should be a module that should have a corresponding .h
+ * file that contains the public functions of that module.
+ */
+
 /* Prototypes for functions defined in NiKomSer.c */
 BYTE OpenConsole(struct Window *window);
 BYTE OpenSerial(struct IOExtSer *writereq,struct IOExtSer *readreq,struct IOExtSer *changereq);
@@ -15,9 +21,7 @@ void conreqtkn(void);
 void serreqtkn(void);
 void putstring(char *pekare,int size, long flags);
 int puttekn(char *pekare,int size);
-int conputtekn(char *pekare,int size);
 void modemcmd(char *pekare,int size);
-void sendfile(char *filnamn);
 void paus(ULONG tid);
 struct MsgPort *SafePutToPort(struct NiKMess *message,char *portname);
 int getstring(int eko,int maxtkn, char *);
@@ -49,10 +53,6 @@ int sendtosercon(char *conpek, char *serpek, int consize, int sersize);
 int serputtekn(char *pekare,int size);
 void sereka(char tecken);
 int sendtoser(char *pekare, int);
-
-/* Terminal.c.. */
-int getnumber(int *minvarde, int *maxvarde, int *defaultvarde);
-int checkvalue(char *buffer);
 
 /* ServerComm.c.. */
 long sendservermess(short, long);

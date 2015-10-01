@@ -18,6 +18,7 @@
 #include "DiskUtils.h"
 #include "FileAreaUtils.h"
 #include "Logging.h"
+#include "Terminal.h"
 
 #define EKO		1
 #define EJEKO	0
