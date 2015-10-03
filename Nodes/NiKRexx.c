@@ -14,6 +14,7 @@
 #include "NiKomstr.h"
 #include "NiKomFuncs.h"
 #include "Terminal.h"
+#include "RexxUtils.h"
 
 #define ERROR   10
 #define OK              0
@@ -712,10 +713,5 @@ void rxgetnumber(struct RexxMsg *mess) {
   }
 
   sprintf(retstr, "%d", GetNumber(minvalue, maxvalue, defaultvaluestr));
-  if(mess->rm_Action & 1L<<RXFB_RESULT)
-    {
-      if(!(mess->rm_Result2=(long)CreateArgstring(retstr,strlen(retstr))))
-        puttekn("\r\n\nKunde inte allokera en Argstring!\r\n\n",-1);
-    }
-  mess->rm_Result1=0;
+  SetRexxResultString(mess, retstr);
 }

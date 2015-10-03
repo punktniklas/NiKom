@@ -15,7 +15,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "RexxUtil.h"
+#include "RexxUtils.h"
 
 extern struct System *Servermem;
 

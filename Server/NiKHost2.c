@@ -16,8 +16,7 @@
 #include "/include/memwatch.h"
 #endif
 #include "FileAreaUtils.h"
-
-#include "RexxUtil.h"
+#include "RexxUtils.h"
 
 struct Fil *parsefil(char *,int);
 

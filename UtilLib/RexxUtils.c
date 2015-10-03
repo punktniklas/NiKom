@@ -1,14 +1,16 @@
 #include <rexx/storage.h>
 #include <proto/rexxsyslib.h>
 #include <string.h>
-#include <stdio.h>
 
-#include "RexxUtil.h"
+#include "RexxUtils.h"
+#include "Logging.h"
 
 void SetRexxResultString(struct RexxMsg *mess, char *resultStr) {
   mess->rm_Result1=0;
-  if(!(mess->rm_Result2 = (long)CreateArgstring(resultStr, strlen(resultStr)))) {
-    printf("Couldn't allocate an ARexx ArgString\n");
+  if(mess->rm_Action & RXFF_RESULT) {
+    if(!(mess->rm_Result2 = (long)CreateArgstring(resultStr, strlen(resultStr)))) {
+      LogEvent(SYSTEM_LOG, ERROR, "Couldn't allocate an ARexx ArgString.");
+    }
   }
 }
 
