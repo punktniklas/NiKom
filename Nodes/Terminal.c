@@ -42,363 +42,252 @@ void sendfile(char *filename) {
   fclose(fp);
 }
 
-int getnumber(int *minvarde, int *maxvarde, int *defaultvarde)
-{
-	int pos = 0, antal = 0, minus = 0, ok;
-	char buffer[20];
-	UBYTE tillftkn;
-
-	memset(inmat,0,20);
-	if(defaultvarde != 0)
-	{
-		sprintf(inmat, "%d", *defaultvarde);
-		putstring(inmat, -1, 0);
-		antal = pos = strlen(inmat);
-	}
-
-	while((tillftkn=gettekn())!=13)
-	{
-		ok = 1;
-		if(tillftkn==1 && pos) { /* CTRL-A */
-			char movebuf[8];
-			sprintf(movebuf,"\x1b\x5b%d\x44",pos);
-			putstring(movebuf,-1,0);
-			pos=0;
-		}
-		else if(tillftkn==5 && pos<antal) { /* CTRL-E */
-			char movebuf[8];
-			sprintf(movebuf,"\x1b\x5b%d\x43",antal-pos);
-			putstring(movebuf,-1,0);
-			pos=antal;
-		}
-		else if(tillftkn > 47 && tillftkn < 58) /* 0 -> 9 */
-		{
-			inmat[antal] = 0;
-			strcpy(buffer, inmat);
-			movmem(&buffer[pos], &buffer[pos+1], antal-pos);
-			buffer[pos]=tillftkn;
-			buffer[antal+1] = 0;
-
-			if(!checkvalue(buffer))
-				ok = 0;
-			else
-			{
-				if(minvarde != 0 && atoi(buffer) < *minvarde)
-					ok = 0;
-				if((maxvarde != 0 && atoi(buffer) > *maxvarde) || (strlen(buffer) > 10+(buffer[0] == '-')))
-					ok = 0;
-			}
-
-			if(ok)
-			{
-				if(Servermem->inne[nodnr].flaggor & SEKVENSANSI) putstring("\x1b\x5b\x31\x40",-1,0);
-				eka(tillftkn);
-				movmem(&inmat[pos],&inmat[pos+1],antal-pos);
-				inmat[pos++]=tillftkn;
-				antal++;
-			}
-			else
-				eka('\a');
-		}
-		else if(tillftkn == '-')
-		{
-			if(!pos && !minus && (minvarde == 0 || *minvarde < 0))
-			{
-				if(Servermem->inne[nodnr].flaggor & SEKVENSANSI) putstring("\x1b\x5b\x31\x40",-1,0);
-				eka(tillftkn);
-				movmem(&inmat[pos],&inmat[pos+1],antal-pos);
-				inmat[pos++]=tillftkn;
-				antal++;
-				minus = 1;
-			}
-			else
-				eka('\a');
-		}
-		else if(tillftkn==8) /* Radera tecknet framför cursorn */
-		{
-			if(pos)
-			{
-				if(Servermem->inne[nodnr].flaggor & SEKVENSANSI) putstring("\x1b\x5b\x44\x1b\x5b\x50",-1,0);
-				else putstring("\b \b",-1,0);
-				if(pos == 1 && inmat[1] == '-') minus = 0;
-				movmem(&inmat[pos],&inmat[pos-1],antal-pos);
-				pos--;
-				antal--;
-			}
-			else
-				eka('\a');
-		}
-		else if(tillftkn==127 && (Servermem->inne[nodnr].flaggor & SEKVENSANSI))
-		{
-			if(pos!=antal)
-			{
-				putstring("\x1b\x5b\x50",-1,0);
-				movmem(&inmat[pos+1],&inmat[pos],antal-pos);
-				antal--;
-			}
-			else
-				eka('\a');
-		}
-		else if((tillftkn=='\x9b'
-					|| (tillftkn=='\x1b'
-						&& ((tillftkn=gettekn())=='['
-							|| tillftkn=='Ä'))))
-		{
-			if((tillftkn=gettekn())=='\x44' && pos)
-			{
-				putstring("\x1b\x5b\x44",-1,0);
-				pos--;
-			} else if(tillftkn=='\x43' && pos<antal)
-			{
-				putstring("\x1b\x5b\x43",-1,0);
-				pos++;
-			} else if(tillftkn=='\x41' && (Servermem->inne[nodnr].flaggor & SEKVENSANSI))
-			{
-				inmat[antal] = 0;
-				if(maxvarde == 0 || (maxvarde != 0 && atoi(inmat) < *maxvarde))
-				{
-					if(pos) sprintf(outbuffer,"\x1b\x5b%d\x44\x1b\x5b\x4a",pos);
-					else strcpy(outbuffer,"\x1b\x5b\x4a");
-					putstring(outbuffer,-1,0);
-					sprintf(inmat,"%d",atoi(inmat)+1);
-					antal = pos = strlen(inmat);
-					putstring(inmat,-1,0);
-				}
-				else
-					eka('\a');
-			}
-			else if(tillftkn=='\x42' && (Servermem->inne[nodnr].flaggor & SEKVENSANSI))
-			{
-				inmat[antal] = 0;
-				if(maxvarde == 0 || (maxvarde != 0 && atoi(inmat) > *minvarde))
-				{
-					if(pos) sprintf(outbuffer,"\x1b\x5b%d\x44\x1b\x5b\x4a",pos);
-					else strcpy(outbuffer,"\x1b\x5b\x4a");
-					putstring(outbuffer,-1,0);
-					sprintf(inmat,"%d",atoi(inmat)-1);
-					antal = pos = strlen(inmat);
-					putstring(inmat,-1,0);
-				}
-				else
-					eka('\a');
-			}
-		}
-		else if(tillftkn==10)
-		{
-			if(carrierdropped()) return(1);
-		}
-		else if(tillftkn==24 && (Servermem->inne[nodnr].flaggor & SEKVENSANSI))
-		{
-			if(pos) sprintf(outbuffer,"\x1b\x5b%d\x44\x1b\x5b\x4a",pos);
-			else strcpy(outbuffer,"\x1b\x5b\x4a");
-			putstring(outbuffer,-1,0);
-			memset(inmat,0,20);
-			pos=antal=0;
-		}
-		else
-			eka('\a');
-	}
-
-	inmat[antal] = 0;
-	return atoi(inmat);
+int getstring(int echo, int maxchrs, char *defaultStr) {
+  return GetStringX(echo, maxchrs, defaultStr, NULL, NULL, NULL);
 }
 
-int checkvalue(char *buffer)
-{
-	int i = 0, minok = 1, maxok = 1;
-	char *MAX = "2147483647", *MIN = "2147483646";
-
-	if(buffer[0] == '-') i = 1;
-
-	if(strlen(buffer) == 10 || (i == 1 && strlen(buffer) == 11))
-	{
-		while(i < 10+(buffer[0] == '-') && minok && maxok)
-		{
-			if(buffer[0] == '-')
-			{
-				if(buffer[i] > MIN[i-1])
-						minok = 0;
-			}
-			else
-			{
-				if(buffer[i] > MAX[i])
-					maxok = 0;
-			}
-			i++;
-		}
-	}
-
-	if(!minok) printf("-%s not OK\n", buffer);
-	if(!maxok) printf("+%s not OK\n", buffer);
-
-	return maxok && minok;
+int printableCharactersAccepted(unsigned char c) {
+  return (c > 31 && c < 127) || (c > 159 && c <= 255);
 }
 
-int getstring(int eko,int maxtkn, char *defaultstring) {
-	int antal=0,pos=0,x,modified=FALSE;
-	UBYTE tillftkn;
-	static int historycnt=-1;
-	radcnt=0;
+int digitCharactersAccepted(unsigned char c) {
+  return (c >= '0' && c <= '9') || c == '-';
+}
 
-	memset(inmat,0,1023);
-	if(defaultstring != NULL)
-	{
-		antal = strlen(defaultstring);
-		pos = strlen(defaultstring);
-		putstring(defaultstring,-1,0);
-		strcpy(inmat,defaultstring);
-	}
+struct GetNumberData {
+  int minvalue, maxvalue;
+};  
 
-	while((tillftkn=gettekn())!=13)
-	{
-		if(tillftkn==1 && pos) { /* CTRL-A */
-			char movebuf[8];
-			sprintf(movebuf,"\x1b\x5b%d\x44",pos);
-			putstring(movebuf,-1,0);
-			pos=0;
-		} else if(tillftkn==5 && pos<antal) { /* CTRL-E */
-			char movebuf[8];
-			sprintf(movebuf,"\x1b\x5b%d\x43",antal-pos);
-			putstring(movebuf,-1,0);
-			pos=antal;
-		}
+int numberStringAccepted(char *str, void *data) {
+  struct GetNumberData *getNumberData = (struct GetNumberData *) data;
+  int intvalue;
+  char tmpstr[12];
 
-		if((tillftkn>31 && tillftkn<127) || (tillftkn>159 && tillftkn<=255)) {
-			if(antal<maxtkn) {
-				if(eko)
-				{
-					if(Servermem->inne[nodnr].flaggor & SEKVENSANSI) putstring("\x1b\x5b\x31\x40",-1,0);
-					if(eko!=STAREKO)
-						eka(tillftkn);
-					else
-						eka('*');
-				}
-				movmem(&inmat[pos],&inmat[pos+1],antal-pos);
-				inmat[pos++]=tillftkn;
-				antal++;
-				modified=TRUE;
-			} else eka('\a');
-		} else if(tillftkn==8) {
-			if(pos) {
-				if(eko) {
-					if(Servermem->inne[nodnr].flaggor & SEKVENSANSI) putstring("\x1b\x5b\x44\x1b\x5b\x50",-1,0);
-					else putstring("\b \b",-1,0);
-				}
-				movmem(&inmat[pos],&inmat[pos-1],antal-pos);
-				pos--;
-				antal--;
-				modified=TRUE;
-			}
-		} else if(tillftkn==10) {
-			if(carrierdropped()) return(1);
-		} else if(tillftkn==24 && (Servermem->inne[nodnr].flaggor & SEKVENSANSI))
-		{
-			if(eko) {
-				if(pos) sprintf(outbuffer,"\x1b\x5b%d\x44\x1b\x5b\x4a",pos);
-				else strcpy(outbuffer,"\x1b\x5b\x4a");
-				putstring(outbuffer,-1,0);
-			}
-			memset(inmat,0,1023);
-			pos=antal=0;
-		} else if(tillftkn==127 && (Servermem->inne[nodnr].flaggor & SEKVENSANSI))
-		{
-			if(pos!=antal) {
-				if(eko) putstring("\x1b\x5b\x50",-1,0);
-				movmem(&inmat[pos+1],&inmat[pos],antal-pos);
-				antal--;
-				modified=TRUE;
-			}
-		} else if(eko
-		          && (tillftkn=='\x9b'
-		              || (tillftkn=='\x1b'
-		                  && ((tillftkn=gettekn())=='['
-		                       || tillftkn=='Ä')))) {
-			if((tillftkn=gettekn())=='\x44' && pos) {
-				putstring("\x1b\x5b\x44",-1,0);
-				pos--;
-			} else if(tillftkn=='\x43' && pos<antal) {
-				putstring("\x1b\x5b\x43",-1,0);
-				pos++;
-			} else if(tillftkn=='\x41' && historycnt<9 && commandhistory[historycnt+1][0]) {
-				historycnt++;
-				if(strlen(commandhistory[historycnt]) > maxtkn)
-				{
-					strncpy(inmat,commandhistory[historycnt], maxtkn);
-					inmat[strlen(inmat)] = NULL;
-				}
-				else
-					strcpy(inmat,commandhistory[historycnt]);
-				if(pos) sprintf(outbuffer,"\x1b\x5b%d\x44\x1b\x5b\x4a%s",pos,inmat);
-				else sprintf(outbuffer,"\x1b\x5b\x4a%s",inmat);
-				putstring(outbuffer, -1, 0);
-				pos=antal=strlen(inmat);
-				modified=FALSE;
-			} else if(tillftkn=='\x42' && historycnt>0 && commandhistory[historycnt-1][0]) {
-				historycnt--;
-				if(strlen(commandhistory[historycnt]) > maxtkn)
-				{
-					strncpy(inmat,commandhistory[historycnt], maxtkn);
-					inmat[strlen(inmat)] = NULL;
-				}
-				else
-					strcpy(inmat,commandhistory[historycnt]);
-				if(pos) sprintf(outbuffer,"\x1b\x5b%d\x44\x1b\x5b\x4a%s",pos,inmat);
-				else sprintf(outbuffer,"\x1b\x5b\x4a%s",inmat);
-				putstring(outbuffer, -1, 0);
-				pos=antal=strlen(inmat);
-				modified=FALSE;
-			} else if(tillftkn=='\x42' && (historycnt==0 || historycnt==-1)) {
-				historycnt=-1;
-				if(eko==1) {
-					if(pos) sprintf(outbuffer,"\x1b\x5b%d\x44\x1b\x5b\x4a",pos);
-					else strcpy(outbuffer,"\x1b\x5b\x4a");
-					putstring(outbuffer,-1,0);
-				}
-				memset(inmat,0,1023);
-				pos=antal=0;
-/* BEGIN SHIFT-CSI */
-			}
-			else if(tillftkn==' ')
-			{
-				if((tillftkn=gettekn())=='A' && pos) { /* shift left */
-					char movebuf[8];
-					sprintf(movebuf,"\x1b\x5b%d\x44",pos);
-					putstring(movebuf,-1,0);
-					pos=0;
-				} else if(tillftkn=='@' && pos<antal) { /* shift right */
-					char movebuf[8];
-					sprintf(movebuf,"\x1b\x5b%d\x43",antal-pos);
-					putstring(movebuf,-1,0);
-					pos=antal;
-				}
-/* END SHIFT-CSI */
-			}
-		}
-	}
-	inmat[antal]=0;
-	if(eko==STAREKO)
-	{
-		if(pos!=antal)
-		{
-			char movebuf[8];
-			sprintf(movebuf,"\x1b\x5b%d\x43",antal-pos);
-			putstring(movebuf,-1,0);
-		}
+  intvalue = atoi(str);
+  sprintf(tmpstr, "%d", intvalue);
+  if(strcmp(str, tmpstr) != 0) {
+    return 0;
+  }
+  return intvalue >= getNumberData->minvalue && intvalue <= getNumberData->maxvalue;
+}
 
-		for(x=0;x<antal;x++)
-		{
-			if(Servermem->inne[nodnr].flaggor & SEKVENSANSI) putstring("\x1b\x5b\x44\x1b\x5b\x50",-1,0);
-			else putstring("\b \b",-1,0);
-		}
-	}
-	eka('\r');
-	if(inmat[0] && eko==1 && modified) {
-		for(x=9;x>0;x--) strcpy(commandhistory[x],commandhistory[x-1]);
-		strncpy(commandhistory[0],inmat,1023);
-		historycnt=-1;
-	}
-	if(historycnt>-1) historycnt--;
-	return(0);
+int GetNumber(int minvalue, int maxvalue, char *defaultStr) {
+  char minstr[12], maxstr[12];
+  int minlen, maxlen;
+  struct GetNumberData getNumberData;
+
+  sprintf(minstr, "%d", minvalue);
+  sprintf(maxstr, "%d", maxvalue);
+  minlen = strlen(minstr);
+  maxlen = strlen(maxstr);
+  getNumberData.minvalue = minvalue;
+  getNumberData.maxvalue = maxvalue;
+  if(GetStringX(EKO, minlen > maxlen ? minlen : maxlen, defaultStr,
+                digitCharactersAccepted, numberStringAccepted,
+                &getNumberData)) {
+    return 0;
+  }
+  return atoi(inmat);
+}
+
+int GetStringX(int echo, int maxchrs, char *defaultStr,
+               int (*isCharacterAccepted)(unsigned char),
+               int (*isStringAccepted)(char *, void *),
+               void *customData) {
+  int size = 0, pos=0, i, modified = FALSE;
+  unsigned char inchr;
+  static int historycnt = -1;
+  radcnt = 0;
+
+  memset(inmat,0,1023);
+  if(defaultStr != NULL) {
+    size = pos = strlen(defaultStr);
+    SendStringNoBrk(defaultStr);
+    strcpy(inmat, defaultStr);
+  }
+  if(isCharacterAccepted == NULL) {
+    isCharacterAccepted = &printableCharactersAccepted;
+  }
+
+  for(;;) {
+    inchr = gettekn();
+
+    if(inchr == '\r') {
+      inmat[size] = '\0';
+      if(isStringAccepted == NULL || isStringAccepted(inmat, customData)) {
+        break;
+      }
+    }
+    else if(inchr == 1 && pos > 0) { // CTRL-A
+      SendStringNoBrk("\x1b\x5b%d\x44", pos);
+      pos = 0;
+    }
+    else if(inchr == 5 && pos < size) { /* CTRL-E */
+      SendStringNoBrk("\x1b\x5b%d\x43", size - pos);
+      pos = size;
+    }
+    else if(isCharacterAccepted(inchr)) {
+      if(size >= maxchrs) {
+        eka('\a');
+        continue;
+      }
+      if(echo) {
+        if(Servermem->inne[nodnr].flaggor & SEKVENSANSI) {
+          SendStringNoBrk("\x1b\x5b\x31\x40");
+        }
+        if(echo != STAREKO) {
+          eka(inchr);
+        } else {
+          eka('*');
+        }
+      }
+      movmem(&inmat[pos], &inmat[pos+1], size - pos);
+      inmat[pos++] = inchr;
+      size++;
+      modified = TRUE;
+    }
+    else if(inchr==8) {
+      if(pos == 0) {
+        continue;
+      }
+      if(echo) {
+        if(Servermem->inne[nodnr].flaggor & SEKVENSANSI) {
+          SendStringNoBrk("\x1b\x5b\x44\x1b\x5b\x50",-1,0);
+        }
+        else {
+          SendStringNoBrk("\b \b",-1,0);
+        }
+      }
+      movmem(&inmat[pos], &inmat[pos - 1], size - pos);
+      pos--;
+      size--;
+      modified = TRUE;
+    }
+    else if(inchr == '\n') {
+      if(carrierdropped()) {
+        return 1;
+      }
+    }
+    else if(inchr == 24 && (Servermem->inne[nodnr].flaggor & SEKVENSANSI)) { //Ctrl-X
+      if(echo) {
+        if(pos > 0) {
+          SendStringNoBrk("\x1b\x5b%d\x44\x1b\x5b\x4a", pos);
+        } else {
+          SendStringNoBrk("\x1b\x5b\x4a");
+        }
+      }
+      memset(inmat, 0, 1023);
+      pos = size = 0;
+    }
+    else if(inchr == 127 && (Servermem->inne[nodnr].flaggor & SEKVENSANSI)) {
+      if(pos != size) {
+        if(echo) {
+          SendStringNoBrk("\x1b\x5b\x50");
+        }
+        movmem(&inmat[pos + 1], &inmat[pos], size - pos);
+        size--;
+        modified = TRUE;
+      }
+    } else if(inchr == '\x9b' || inchr == '\x1b') {
+      if(inchr == '\x1b') {
+        inchr = gettekn();
+        if(inchr != '[' && inchr != 'Ä') {
+          continue;
+        }
+      }
+      if(!echo) {
+        continue;
+      }
+
+      inchr = gettekn();
+      if(inchr == '\x44' && pos > 0) { // Arrow left
+        SendStringNoBrk("\x1b\x5b\x44",-1,0);
+        pos--;
+      } else if(inchr=='\x43' && pos < size) { // Arrow right
+        SendStringNoBrk("\x1b\x5b\x43",-1,0);
+        pos++;
+      } else if(inchr == '\x41') { // Arrow up
+        if(historycnt >= 9 || commandhistory[historycnt + 1][0] == '\0') {
+          continue;
+        }
+        historycnt++;
+        strncpy(inmat, commandhistory[historycnt], maxchrs);
+        inmat[maxchrs] = '\0';
+        if(pos > 0) {
+          SendStringNoBrk("\x1b\x5b%d\x44\x1b\x5b\x4a%s", pos, inmat);
+        } else {
+          SendStringNoBrk("\x1b\x5b\x4a%s", inmat);
+        }
+        pos = size = strlen(inmat);
+        modified=FALSE;
+      } else if(inchr=='\x42') { // Arrow down
+        if(historycnt == 0 || historycnt == -1) {
+          historycnt = -1;
+          if(echo == 1) {
+            if(pos > 0) {
+              SendStringNoBrk("\x1b\x5b%d\x44\x1b\x5b\x4a",pos);
+            } else {
+              SendStringNoBrk("\x1b\x5b\x4a");
+            }
+          }
+          memset(inmat,0,1023);
+          pos=size=0;
+          continue;
+        }
+        
+        if(historycnt == 0 || commandhistory[historycnt-1][0] == '\0') {
+          continue;
+        }
+
+        historycnt--;
+        strncpy(inmat, commandhistory[historycnt], maxchrs);
+        inmat[maxchrs] = '\0';
+        if(pos) {
+          SendStringNoBrk("\x1b\x5b%d\x44\x1b\x5b\x4a%s", pos, inmat);
+        } else {
+          SendStringNoBrk("\x1b\x5b\x4a%s", inmat);
+        }
+        pos = size = strlen(inmat);
+        modified=FALSE;
+      } else if(inchr==' ') { // Shift-something
+        inchr = gettekn();
+        if(inchr == 'A' && pos > 0) { // Shift left
+          SendStringNoBrk("\x1b\x5b%d\x44", pos);
+          pos = 0;
+        } else if(inchr == '@' && pos < size) { // Shift right
+          SendStringNoBrk("\x1b\x5b%d\x43", size - pos);
+          pos = size;
+        }
+      }
+    }
+  }
+  inmat[size] = 0;
+  if(echo == STAREKO) {
+    if(pos != size) {
+      SendStringNoBrk("\x1b\x5b%d\x43", size - pos);
+    }
+
+    for(i = 0; i < size; i++) {
+      if(Servermem->inne[nodnr].flaggor & SEKVENSANSI) {
+        SendStringNoBrk("\x1b\x5b\x44\x1b\x5b\x50");
+      } else {
+        SendStringNoBrk("\b \b");
+      }
+    }
+  }
+  eka('\r');
+
+  if(inmat[0] && echo == 1 && modified) {
+    for(i = 9; i > 0; i--) {
+      strcpy(commandhistory[i], commandhistory[i-1]);
+    }
+    strncpy(commandhistory[0], inmat, 1023);
+    historycnt=-1;
+  }
+  if(historycnt > -1) {
+    historycnt--;
+  }
+  return 0;
 }
 
 int incantrader(void)
@@ -513,4 +402,14 @@ int SendString(char *fmt, ...) {
   ret = puttekn(outbuffer, -1);
   va_end(arglist);
   return ret;
+}
+
+int SendStringNoBrk(char *fmt, ...) {
+  va_list arglist;
+
+  va_start(arglist, fmt);
+  vsprintf(outbuffer, fmt, arglist);
+  putstring(outbuffer, -1, 0);
+  va_end(arglist);
+  return 0;
 }

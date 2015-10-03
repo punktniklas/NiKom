@@ -10,6 +10,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <time.h>
+#include <limits.h>
 #include "NiKomstr.h"
 #include "NiKomFuncs.h"
 #include "Terminal.h"
@@ -689,49 +690,32 @@ void rxchglatestinfo(struct RexxMsg *mess) {
         mess->rm_Result1=0;
 }
 
-void rxgetnumber(struct RexxMsg *mess)
-{
-	int minvarde, maxvarde, defaultvarde, returvarde;
-	char retstr[15];
-	char *pek1 = NULL, *pek2 = NULL, *pek3 = NULL;
+void rxgetnumber(struct RexxMsg *mess) {
+  int minvalue = INT_MIN, maxvalue = INT_MAX, defaultvalue;
+  char retstr[12], defaultvaluestr[12] = "";
+  char *arg1 = NULL, *arg2 = NULL, *arg3 = NULL;
+  
+  arg1 = hittaefter(mess->rm_Args[0]);
+  arg2 = hittaefter(arg1);
+  arg3 = hittaefter(arg2);
 
-	pek1=hittaefter(mess->rm_Args[0]);
-	if(pek1)
-		pek2=hittaefter(pek1);
-	if(pek2)
-		pek3=hittaefter(pek2);
+  if(arg1[0] && !arg2[0]) {
+    defaultvalue = atoi(arg1);
+    sprintf(defaultvaluestr, "%d", defaultvalue);
+  } else if(arg1[0] && arg2[0]) {
+    minvalue = atoi(arg1);
+    maxvalue = atoi(arg2);
+    if(arg3[0]) {
+      defaultvalue = atoi(arg3);
+      sprintf(defaultvaluestr, "%d", defaultvalue);
+    }
+  }
 
-	if(pek1[0] && !pek2[0])
-	{
-		defaultvarde = atoi(pek1);
-		returvarde = getnumber(0, 0, &defaultvarde);
-	}
-	else if(pek1[0] && pek2[0])
-	{
-		minvarde = atoi(pek1);
-		maxvarde = atoi(pek2);
-		if(pek3[0])
-		{
-			defaultvarde = atoi(pek3);
-			returvarde = getnumber(&minvarde, &maxvarde, &defaultvarde);
-		}
-		else
-		{
-			returvarde = getnumber(&minvarde, &maxvarde, 0);
-		}
-
-	}
-	else
-	{
-		returvarde = getnumber(0, 0, 0);
-	}
-
-	sprintf(retstr,"%d",returvarde);
-	if(mess->rm_Action & 1L<<RXFB_RESULT)
-	{
-		if(!(mess->rm_Result2=(long)CreateArgstring(retstr,strlen(retstr))))
-			puttekn("\r\n\nKunde inte allokera en Argstring!\r\n\n",-1);
-	}
-	mess->rm_Result1=0;
-
+  sprintf(retstr, "%d", GetNumber(minvalue, maxvalue, defaultvaluestr));
+  if(mess->rm_Action & 1L<<RXFB_RESULT)
+    {
+      if(!(mess->rm_Result2=(long)CreateArgstring(retstr,strlen(retstr))))
+        puttekn("\r\n\nKunde inte allokera en Argstring!\r\n\n",-1);
+    }
+  mess->rm_Result1=0;
 }
