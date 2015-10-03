@@ -117,5 +117,4 @@ void rexxcheckuserpassword(struct RexxMsg *);
 
 /* NodeComm.c */
 void setnodestate(struct NiKMess *);
-struct MsgPort *SafePutToPort(struct NiKMess *, char *);
 long sendnodemess(short, long, long, long, long);

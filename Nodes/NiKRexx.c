@@ -15,6 +15,8 @@
 #include "NiKomFuncs.h"
 #include "Terminal.h"
 #include "RexxUtils.h"
+#include "ExecUtils.h"
+#include "Logging.h"
 
 #define ERROR   10
 #define OK              0
@@ -39,7 +41,6 @@ int commonsendrexx(int komnr,int hasarg) {
         char macronamn[1081],*rexxargs1;
         int going = TRUE;
         struct RexxMsg *nikrexxmess,*tempmess;
-        struct MsgPort *rexxmastport;
 
         sendrexxrc=-5;
         if(!hasarg)
@@ -57,14 +58,11 @@ int commonsendrexx(int komnr,int hasarg) {
                 return(-5);
         }
         nikrexxmess->rm_Action=RXCOMM | RXFB_TOKEN;
-        Forbid();
-        if(!(rexxmastport=(struct MsgPort *)FindPort("REXX"))) {
-                Permit();
-                puttekn("\r\n\nRexxMast är inte igång!\r\n\n",-1);
-                return(-5);
+        if(!SafePutToPort((struct Message *)nikrexxmess, "REXX")) {
+          LogEvent(SYSTEM_LOG, ERROR, "Can't launch ARexx script, REXX port not found.");
+          return -5;
         }
-        PutMsg(rexxmastport,(struct Message *)nikrexxmess);
-        Permit();
+
         while(going) {
                 tempmess = (struct RexxMsg *)WaitPort(rexxport);
                 if(!tempmess) printf("*** Something's fishy around here... ***\n");

@@ -8,6 +8,7 @@
 #include "NiKomLib.h"
 #include <proto/exec.h>
 #include <exec/exec.h>
+#include "ExecUtils.h"
 
 static struct NiKMess *servermess;
 static struct MsgPort *serverport, *NiKomPort, *permitport;
@@ -33,7 +34,7 @@ int initnode(int type) {
 		servermess->data=type;
 	}
 
-	if(!(NiKomPort=SafePutToPort(servermess,"NiKomPort"))) {
+	if(!(NiKomPort = SafePutToPort((struct Message *)servermess, "NiKomPort"))) {
 		printf("Hittar inte NiKServer\n");
 		return(FALSE);
 	}
@@ -59,18 +60,6 @@ void shutdownnode(int type) {
 	}
 	if(servermess) FreeMem(servermess,sizeof(struct NiKMess));
 	if(serverport) DeleteMsgPort(serverport);
-}
-
-struct MsgPort *SafePutToPort(message,portname)
-struct NiKMess *message;
-char *portname;
-{
-	struct MsgPort *port;
-	Forbid();
-	port=(struct MsgPort *)FindPort(portname);
-	if(port) PutMsg(port,(struct Message *)message);
-	Permit();
-	return(port);
 }
 
 void NiKForbid(void) {

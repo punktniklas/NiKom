@@ -23,7 +23,6 @@ void putstring(char *pekare,int size, long flags);
 int puttekn(char *pekare,int size);
 void modemcmd(char *pekare,int size);
 void paus(ULONG tid);
-struct MsgPort *SafePutToPort(struct NiKMess *message,char *portname);
 int carrierdropped(void);
 void getnodeconfig(char *);
 char convseventoeight(char foo);
