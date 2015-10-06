@@ -2,10 +2,6 @@
 @rem Konverterad till .guide-format av Daniel Hutmacher och Tomas Kärki.
 @node Main "Innehållsförteckning:"
 
-   Denna dokumentation är Copyright ©1991 - 1996 Niklas Lindholm.
-   Omskriven till AmigaGuide (hypertext)-format av Daniel Hutmacher.
-   Numera skriven av Tomas Kärki 1996-1998.
-
                   @{"     Om ARexx-interfacet     " link About}
 
           @{"    Nummerserier    " link Nummer} @{" Interna kommandon  " link Interna}
@@ -14,63 +10,33 @@
 
                   @{"        Referens-del         " link Referens}
 
-             @{"    !  Nyheter i NiKom v1.60beta1  !    " link News160beta1}
-             @{"    !  Nyheter i NiKom v1.60beta2  !    " link News160beta2}
-
-            För fixar efter v1.60beta2 se @{"NiKom.guide" link "NiKom.guide/Main"}
-@endnode
-@node News160beta2 "Nyheter i NiKom v1.60beta2!"
-
-Buggfixar:
-
-- ARexx-funktionen @{"SysSettings()" link "ARexx.guide/SysSettings"} hette av misstag SystemInfo detta är nu fixat.
-  Kommandot heter numera alltså korrekt SysSettings och du måste ändra
-  i alla ARexx-scripts som använder SystemInfo.
-
-- ARexx-funktionen @{"TextInfo()" link "ARexx.guide/TextInfo"} returnerar nu -3 om en text är raderad.
-
-- SysInfo fungerade inte riktigt som den skulle, vilket kunde ge flera entries med
-  samma hastighet om man körde prenoden hela tiden, dvs inte via TrapDoor eller dylikt program.
-  Detta är numera fixat!
-
-Nya saker:
-
-- ARexx-program som körs vid prompterna behöver inte längre ha något speciellt
-  nummer.
-
-- Har förbättrat dokumentationen för några ARexx-funktioner litegranna.
-
-@endnode
-@node News160beta1 "Nyheter i NiKom v1.60beta1!"
-
-Nya funktioner i NiKom v1.60beta1 som släpptes 960729:
-
-@{"StatusInfo" link StatusInfo}  - Ger info om olika statusnivåer.
-@{"SysSettings" link SysSettings} - Ta fram info om settings för logfiler etc.
-@{"Arearight" link Arearight}   - Kollar om en viss användare har rättigheter till en area.
-
-Ändrade funktioner:
-
-@{"SysInfo" link SysInfo}     - Räknar nu CONNECT-hastigheter för BBSen.
-@{"sendbinfile" link SendBinFile} - Uppdaterad med bättre stöd för Batch download
-@{"recbinfile" link RecBinFile}  - Uppdaterad med stöd för Batch upload
-@{"NodeInfo" link NodeInfo}   - Många nya subjekt tillagda.
-@{"FileInfo" link FileInfo}	  - Du kan nu få tag på filnamnet på den långa beskrivningen.
-@{"ChgFile" link ChgFile}   - Nu med möjlighet att ändra den långa beskrivningen.
-@{"GetString" link GetString}   - Nu kan man även ha en defaultsträng om man vill ha det!
-
 @endnode
 @node About "Om ARexxinterfacet..."
 
-NiKoms ARexxinterface består av två delar. Kommandointerfacet och Function
-Hosten. Kommandona i kommandointerfacet kan bara anropas i ett Arexx program
-som har startats från NiKom som ett rexx-macro. De kommandona innesluts
-alltid av två "'". Tex:
+NiKoms ARexxinterface består av två delar, kommandon och funktioner. Kommandon
+kan bara anropas i ett Arexx-program som har startats från NiKom som ett
+rexx-macro. De kommandona innesluts alltid av två "'". Tex:
 '@{"sendstring" link SendString} Hejsan på dejsan'
 
-Functionhosten kan användas närsomhelst som NiKServer är igång. Funktioner
+Funktioner kan användas närsomhelst som NiKServer är igång. Funktioner
 har alltid parenteser efter sig. Tex: @{"UserInfo" link UserInfo}(1,'n')
 
+Funktioner returnerar värden på det sätt man kan förvänta sig att en funktion
+gör. Tex "highuser = SysInfo('a')". (TODO: Utöka med hur felvärden hanteras.)
+
+Kommandon retunerar värden genom två speciella ARexx-variabler: RESULT
+och RC som kan avläsas efter att ett kommando har utförts. RC innehåller ett
+värde som indikerar om allt gick ok eller om något fel inträffade. Om RC är 0
+så är allt ok och kommandots normala returvärde finns i RESULT. Annars returneras
+följande:
+5   - Felaktiga eller otillräckliga argument.
+10  - Kommandot kunde inte utföras med de argument som givits. (Tex, en
+      specificerad användare finns inte.) Denna felkod används vanligtvis när
+      en mer specifik felkod inte kan returneras i RESULT. Se dokumentation för det
+      specifika kommandot.
+20  - Ett internt fel har inträffat. Mer information kan finnas i systemloggen.
+100 - Användarens uppkoppling är bruten. Se till att avsluta ARexx-programmet så
+      snart som möjligt.
 
 ARexx-program kan startas från NiKom på två olika sätt. Antingen vid ett
 visst tillfälle, som anges i System.cfg eller som ett definierat kommando i
@@ -210,9 +176,9 @@ ExtKom15.nik  Anropas när an användare ska raderas för att ta bort hans
 Alla program som startas av NiKom får även några argument medskickade.
 Dessa är i ordning:
 
-Vilken nod som startade programmet
-Vilken användare som är inloggad på den noden
-Vad användaren skrev som argument på kommandoraden (om det nu startades som
+- Vilken nod som startade programmet
+- Vilken användare som är inloggad på den noden
+- Vad användaren skrev som argument på kommandoraden (om det nu startades som
    ett kommando).
 
 Detta kan läggas i olika variabler på följande sätt:
@@ -450,6 +416,8 @@ Ex:
 'showtext 4564 12'
 'showtext 3546'
 
+Om det angivna mötet inte finns så sätts RC till 10.
+
 @endnode
 @node ShowLetter "Referens : showletter"
 
@@ -463,7 +431,7 @@ användares brevlåda som brevet finns.
 
 lasttext
 
-Ger vilken text som är den senast lästa. I result får man en ströng i
+Ger vilken text som är den senast lästa. I result får man en sträng i
 formatet "B <anv.nr> <text.nr>" eller "T <text.nr> <mötes.nr>" beroende på om
 det är ett brev eller en text som är den senast lästa.
 Ex:
@@ -485,6 +453,12 @@ gör att man måste köra de allra sist i ett ARexx-program.
 De aktuella kommandona är:
 Gå, Nästa Text, Nästa Kommentar, Nästa Möte, Sluta, Logout,
 Offdown, Börja Om
+
+Möjliga returvärden är:
+0 - Kommandot utfördes ok
+1 - Kommandot kunde inte tolkas.
+2 - Det angivna kommandot är tomt.
+3 - Användaren har inte rättigheter att utföra kommandot.
 
 Ex:
 'nikcommand ra te 4335'
@@ -509,6 +483,9 @@ klartediterat. Om filen inte finns så editeras den som ny fil och sparas
 sedan.
 Ex:
 'edit ram:hejhopp'
+
+Returnerar '1' i RESULT om användaren valde att spara filen och '0' om
+användaren avbröt editeringen.
 
 @endnode
 @node GetChar "Referens : getchar"
@@ -571,21 +548,22 @@ say result      --> 0
 @endnode
 @node SendBinFile "Referens : sendbinfile"
 
-sendbinfile <filnamn>
+sendbinfile <filnamn> [<filnamn> ...]
 
-Skickar den angivna filen med Zmodem. Returnerar 1 om överföringen lyckades
+Skickar de angivna filerna med Zmodem. Returnerar 1 om överföringen lyckades
 och 0 om den misslyckades för varje fil separerat med mellanslag.
 Ex:
-'sendbinfile ram:Foo.lzh'
+'sendbinfile ram:Foo.lzh dh0:Bar.lha'
+say result      --> 1 0
 
 @endnode
 @node RecBinFile "Referens : recbinfile"
 
 recbinfile <katalog>
 
-Tar emot en fil med ZModem till den angivna katalogen. Namnet på filerna
-som togs emot returneras (separerade med mellanslag) eller 0 om
-överföringen misslyckades.
+Tar emot en eller flera filer med ZModem till den angivna katalogen. Namnet på
+filerna som togs emot returneras (separerade med mellanslag). Om överföringen
+misslyckades är RC satt till 10.
 Ex:
 'recbinfile dh0:Filer/'
 say result      --> FooBar.lzh BarFoo.lha

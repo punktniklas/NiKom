@@ -13,7 +13,7 @@ const static char *logFileNames[] = {
 const static char *logLevelNames[] = {
   "DEBUG",
   "INFO",
-  "VERBOSE"
+  "VERBOSE",
   "WARN",
   "ERROR",
   "CRITICAL"

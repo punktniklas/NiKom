@@ -313,35 +313,6 @@ void grab(void);
 /* Prototypes for functions defined in NiKRexx.c */
 int sendrexx(int komnr);
 int sendautorexx(int komnr);
-void rexxgetstring(struct RexxMsg *tempmess);
-void senastread(struct RexxMsg *tempmess);
-void kommando(struct RexxMsg *tempmess);
-void niknrcommand(struct RexxMsg *tempmess);
-void rxedit(struct RexxMsg *mess);
-void rexxsendstring(struct RexxMsg *);
-void rexxsendserstring(struct RexxMsg *);
-void rexxgettekn(struct RexxMsg *mess);
-void rexxchkbuffer(struct RexxMsg *mess);
-void rexxyesno(struct RexxMsg *mess);
-void whicharea(struct RexxMsg *mess);
-void whichmeet(struct RexxMsg *mess);
-void rexxsendbinfile(struct RexxMsg *mess);
-void rexxrecbinfile(struct RexxMsg *mess);
-void rxlogout(struct RexxMsg *mess);
-void rexxvisabrev(struct RexxMsg *mess);
-void rxrunfifo(struct RexxMsg *mess);
-void rxrunrawfifo(struct RexxMsg *mess);
-void rxvisatext(struct RexxMsg *mess);
-void rxentermeet(struct RexxMsg *mess);
-void rxsetlinecount(struct RexxMsg *mess);
-void rxextratime(struct RexxMsg *mess);
-void rxgettime(struct RexxMsg *mess);
-void rxsendchar(struct RexxMsg *mess);
-void rxsendserchar(struct RexxMsg *mess);
-void rxsetnodeaction(struct RexxMsg *mess);
-void rxsendrawfile(struct RexxMsg *);
-void rxchglatestinfo(struct RexxMsg *);
-void rxgetnumber(struct RexxMsg *mess);
 
 /* Prototypes for functions defined in NiKVersion.c */
 void nikversion(void);
