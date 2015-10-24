@@ -1,10 +1,16 @@
-/* Program som markerar texter */
+/* Markera Text-kommandot
+$VER: Markera Text 1.0 (20.4.92)
+N=MARKERA TEXT
+O=2
+#=502
+A=#
+*/
+
 parse arg nod person argument
 
 options results
 
 filnamn='ram:NiKom/Mark'||nod
-'sendstring' argument
 if argument='' then do
 	'lasttext'
 	savestr=result
@@ -24,4 +30,3 @@ if ~open('fil',filnamn,'A') then do
 	exit 5
 end
 call writeln('fil',savestr)
-

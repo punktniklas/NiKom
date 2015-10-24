@@ -9,19 +9,18 @@ parse arg nod person .
 
 profile='NiKom:Users/'||person%100||'/'||person||'/Profile'
 
-Namn=UserInfo(person,'n')
-
 if ~open('fil',profile) then do
-	'sendstring' '0d0a0a'x'Du har ingen profile!' '0d0a'x
-	exit
+  'sendstring' '0d0a0a'x'Du har ingen profile!' '0d0a'x
+  exit
 end
 do until eof('fil')
-   foo=readln('fil')
-   legal=NikParse(foo,'k')
-   if legal ~= 506 then do
-      'nikcommand' foo
-     end
+  'nikcommand' readln('fil')
+  line = readln('fil')
+   cmdnr=NikParse(line,'k')
+   if cmdnr ~= 506 then do
+     'nikcommand' line
+   end
    else do
-      say namn' har Execute Profile i sin profile!'
+      'sendstring' '0d0a0a'x'Hoppar över kommandot "Exekvera Profile"...' '0d0a'x
    end
 end

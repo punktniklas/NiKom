@@ -3,25 +3,32 @@
 parse arg nod pers .
 
 options results
+signal on error
 
-address command 'lha a t:Kärkigrab'||nod||'.lha t:grab'||nod
+/* Här kan du fylla i namnet på din BBS så att NiKom skapar offdown-filer
+*  som inte krockar med andra basers.
+*  Observera att namnet ska kunna användas i ett filnamn. Det bör tex inte
+*  innehålla kolon, snedstreck, inte vara för långt etc. */
 
-nisse=1
-do while nisse=1
-	'sendbinfile t:Kärkigrab'||nod||'.lha'
-	pelle=result
-	if pelle=100 then exit
-	if pelle = 0 then do
-		'sendstring' '0d0a0a'x'Vill du försöka en gång till? (lämpligen Zmodem Resume) '
-		'yesno j n 1'
-		pelle=result
-		if pelle=100 then exit
-		if pelle=0 then nisse=0
-	end
-	else nisse=0
+bbsname='Offdown'
+
+address command 'rename t:Grab'||nod 't:' || bbsname ||nod
+address command 'lha a t:' || bbsname ||nod||'.lha t:' || bbsname ||nod
+
+going=1
+do while going=1
+  'sendbinfile t:' || bbsname ||nod||'.lha'
+  cmdres = RESULT
+  if cmdres = 0 then do
+    'sendstring' '0d0a0a'x'Vill du försöka en gång till? (lämpligen Zmodem Resume) '
+    'yesno j n 1'
+    cmdres = RESULT
+    if cmdres = 0 then going = 0
+  end
+  else going = 0
 end
 
-if exists('nikom:privat/'||pers) then do
-	address command 'copy t:Kärkigrab'||nod||'.lha nikom:privat/'||pers
-end
-address command 'delete >nil: t:Kärkigrab'||nod||'.lha t:grab'||nod
+address command delete 't:' || bbsname ||nod||'.lha t:' || bbsname ||nod
+
+ERROR:
+exit RC

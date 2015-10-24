@@ -1,32 +1,34 @@
-/* Manual-nikcommandt */
-parse arg nod person argument arg2 .
+/* Kommandot Manual
+$VER: Manual 1.0 (20.4.92)
+N=MANUAL
+O=1
+#=507
+A=.
+*/
+
+parse arg nod person argument
 
 if argument="" then do
-        'sendstring' '0d0a0a'x'Skriv: Manual <Kommando>' '0d0a'x
-        exit
+  'sendstring' '0d0a0a'x'Skriv: Manual <Kommando>' '0d0a'x
+  exit
 end
 
-if arg2~='' then do
-        argument=argument||' '||arg2
-end
-
+argument=strip(argument)
 kom=nikparse(argument,'k')
 if kom='-1' then do
-	'sendstring' '0d0a0a'x
-	sendstring 'Finns inget kommando som matchar' argument '0d0a'x
-	exit
+  'sendstring' '0d0a0a'x'Finns inget kommando som matchar' argument '0d0a'x
+  exit
 end
 
 if kom='-2' then do
-        'sendstring' '0d0a0a'x'Kommandot flertydigt' '0d0a'x
-        exit
+  'sendstring' '0d0a0a'x'Kommandot flertydigt' '0d0a'x
+  exit
 end
 
 if kom='-3' then do
-        'sendstring' '0d0a0a'x'Skriv: Manual <Kommando>' '0d0a'x
-        exit
+	'sendstring' '0d0a0a'x'Skriv: Manual <Kommando>' '0d0a'x
+	exit
 end
 
-'sendstring' '0d0a'x
 filnamn='NiKom:Manualer/'||kom||'.man'
 'sendtextfile' filnamn

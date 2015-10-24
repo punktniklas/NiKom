@@ -1,12 +1,16 @@
-/* Program för att visa profilen */
+/* Kommandot Visa Profile
+$VER: Visa Profile 1.0 (20.4.92)
+N=VISA PROFILE
+O=2
+#=505
+*/
 
-parse arg nod person argument .
+parse arg nod person .
+
+if ~exists('NiKom:Users/'||person%100||'/'||person||'/Profile') then do
+	'sendstring' '0d0a0a'x 'Du har ingen profile!' '0d0a'x
+	exit
+end
 
 'sendstring' '0d0a0a'x
-if argument='' then do
-	'sendtextfile' 'NiKom:Users/'||person%100||'/'||person||'/profile'
-end
-else do
-	'sendtextfile' 'NiKom:Users/'||argument%100||'/'||argument||'/profile'
-end
-
+'sendtextfile' 'NiKom:Users/'||person%100||'/'||person||'/Profile'

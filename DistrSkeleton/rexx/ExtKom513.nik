@@ -1,4 +1,9 @@
-/* Program för att lista privata filer */
+/* Kommandot Lista Privatfiler
+$VER: Lista Privatfiler 1.0 (20.4.92)
+N=LISTA PRIVATFILER
+O=2
+#=513
+*/
 
 parse arg nod pers .
 
@@ -7,7 +12,7 @@ if ~exists('NiKom:Privat/'||pers) then do
 	exit
 end
 
-address command 'list >t:Priv'||nod||' NiKom:Privat/'||pers||' nohead'
+address command 'list >t:Priv'||nod 'NiKom:Privat/'||pers 'NOHEAD'
 
 'sendstring' '0d0a0a'x
 'sendtextfile t:Priv'||nod

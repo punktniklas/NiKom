@@ -1,8 +1,12 @@
-/* Program för att ladda upp till en privat filarea */
+/* Kommandot Privat Upload
+$VER: Privat Upload 1.0 (20.4.92)
+N=PRIVAT UPLOAD
+O=2
+#=511
+A=.
+*/
 
 parse arg nod pers argument
-
-options results
 
 if argument = "" then do
 	'sendstring' '0d0a0a'x'Skriv: Privat Upload <användare>' '0d0a'x
@@ -22,4 +26,3 @@ if ~exists('NiKom:Privat/'||anvnr) then do
 	exit
 end
 'recbinfile NiKom:Privat/'||anvnr||'/'
-

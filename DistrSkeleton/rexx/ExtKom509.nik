@@ -1,72 +1,58 @@
-/*
-$VER: Lista_Innehåll 1.0 (27.4.92)
-
+/* Kommandot Lista Innehåll
+$VER: Lista Innehåll 1.47 (8.9.93)
 N=LISTA INNEHÅLL
 O=2
-#=2505
+#=509
 A=.
 */
+
 parse arg nod pers argument .
+
+options results
+
+/* Här kan du själv definiera vilka arkivformat ditt system klarar av att
+*  visa och vilket program som ska anropas med vilka argument. Glöm inte att
+*  uppdatera 'antalgormat' när du lägger till arkivformat. */
+
+ext.1 = '.LHA'; listprg.1 = 'LhA v'
+ext.2 = '.LZH'; listprg.2 = 'LhA v'
+ext.3 = '.ARC'; listprg.3 = 'pkax -v'
+ext.4 = '.ZIP'; listprg.4 = 'UnZip -v'
+
+antalformat = 4
+
+/* Tack, det var allt */
 
 if argument = "" then do
 	'sendstring' '0d0a0a'x'Skriv: Lista Innehåll: <arkivnamn>' '0d0a'x
 	exit
 	end
 
-options results
 'whicharea'
 area=result
-if area=-1 then do
-	'sendstring' '0d0d0a'x'Du befinner dig inte i någon area!' '0d0a'x
+
+filnamn=FileInfo(argument,'n',area)
+if filnamn=-1 then do
+	'sendstring' '0d0a0a'x'Finns ingen sådan fil!' '0d0a'x
 	exit
 end
 
-fil1=FileInfo(argument,'n',area)
-if fil1=-1 then do
-	'sendstring' '0d0a0a'x'Finns inte någon sådan fil.' '0d0a'x
+fil=AreaInfo(area,'d'||FileInfo(filnamn,'i',area))||filnamn
+
+do i=1 to antalformat
+	if upper(right(fil,length(ext.i))) = ext.i then leave
+end
+
+if i=antalformat+1 then do
+	'sendstring' '0d0a0a'x'Detta program supportrar inte formatet' right(fil,4) '0d0a'x
 	exit
 end
-i=FileInfo(fil1,'i',area)
-fil=AreaInfo(area,'d'||i)||fil1
 
-if upper(right(fil1,4))='.LZH' then do
-	call korcom('lha -N v '||fil)
-end
-if upper(right(fil1,4))='.LHA' then do
-	call korcom('lha -N v '||fil)
-end
-if upper(right(fil1,4))='.LZX' then do
-	call korcom('lzx v '||fil)
-end
-if upper(right(fil1,4))='.ZIP' then do
-	call korcom('unzip -v '||fil)
-end
+parse var listprg.i prgnamn resten
 
+cmdstring = prgnamn '>t:Liin'||nod resten fil
+address command cmdstring
+
+'sendtextfile t:Liin'||nod
+address command 'delete t:Liin'||nod
 exit
-
-korcom: procedure
-parse arg str
-address command str ' >t:LiIn.tmp'
-sendstring '0d0a0a'x
-sendtextfile 't:LiIn.tmp'
-address command 'delete t:LiIn.tmp >nil:'
-return
-
-visalzh: procedure
-arg filnamn,nodnr
-say 'lharc -N >t:Liin'||nodnr 'v' filnamn
-call korcom 'lharc -N >t:Liin'||nodnr 'v' filnamn
-exist=1
-return
-
-visazoo: procedure
-arg filnamn,nodnr
-call korcom 'zoo >t:Liin'||nodnr '-v' filnamn
-exits=1
-return
-
-visaarc: procedure
-arg filnamn,nodnr
-call korcom 'pkax >t:Liin'||nodnr '-v' filnamn
-exits=1
-return

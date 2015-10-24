@@ -1,22 +1,18 @@
-/* Program för att editera profilen */
+/* Kommandot: Ändra Profile
+$VER: Ändra Profile 1.0 (20.4.92)
+N=ÄNDRA PROFILE
+O=2
+#=504
+*/
 
-parse arg nod person argument .
-
-if argument~='' then do
-        if person=0 then do
-                person=NiKParse(argument,'n')
-                if person<0 then do
-                	'sendstring' '0d0a0a'x||'Finns ingen sån användare.' '0d0a'x
-                end
-        end
-end
+parse arg nod person argument
 
 signal on ERROR
-profile='NiKom:Users/'||person%100||'/'||person||'/profile'
+profile = 'NiKom:Users/'||person%100||'/'||person||'/Profile'
+
+'sendstring' '0d0a0a'x'Ok, går in i editorn..' '0d0a'x
 
 'edit' profile
-exit
 
 ERROR:
 exit rc
-

@@ -1,4 +1,10 @@
-/* Program för att radera privat fil */
+/* Kommandot Radera Privatfil
+$VER: Radera Privatfil 1.0 (20.4.92)
+N=RADERA PRIVATFIL
+O=2
+#=514
+A=.
+*/
 
 options results
 
@@ -14,14 +20,14 @@ if filer = "" then do
 	exit
 end
 
-if filer = "-a" then do
+if strip(filer) = "-a" then do
 	sendstring '0d0a0a'x
 	sendstring 'Är du verkligen säker att du vill radera alla filerna? '
 	'yesno j n 2'
 	svar = result
 	if svar then do
 		sendstring 'Ja!' '0d0a'x
-		runfifo 'delete NiKom:Privat/'||pers||'#?'
+		runfifo 'delete NiKom:Privat/'||pers||'/#?'
 	end
 	else do
 		sendstring 'Nej.'

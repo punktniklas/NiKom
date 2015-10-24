@@ -1,4 +1,10 @@
-/* Detta program visar markerade texter */
+/* Visa Markerade-kommandot
+$VER: Visa Markerade 1.0 (20.4.92)
+N=VISA MARKERADE
+O=2
+#=503
+*/
+
 parse arg nod person
 
 filnamn='ram:NiKom/Mark'||nod
@@ -13,4 +19,3 @@ do until eof('fil')
 	if typ='B' then 'showletter' nr
 	else if typ='T' then 'showtext' nr
 end
-
