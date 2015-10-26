@@ -269,5 +269,5 @@ void grab(void) {
   }
   fclose(fp);
   puttekn("\r\n\nPackar...",-1);
-  sendrexx(5);
+  sendautorexx(5);
 }

@@ -1100,7 +1100,7 @@ int connection(void)
         rexxlogout=FALSE;
         rxlinecount = TRUE;
         radcnt=0;
-        if(Servermem->cfg.ar.postinlogg) sendrexx(Servermem->cfg.ar.postinlogg);
+        if(Servermem->cfg.ar.postinlogg) sendautorexx(Servermem->cfg.ar.postinlogg);
         nikversion();
         var(mote2);
         for(;;) {

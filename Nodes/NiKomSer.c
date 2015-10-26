@@ -156,7 +156,7 @@ void main(int argc,char *argv[]) {
       LogEvent(USAGE_LOG, WARN, "%s släpper carriern (nod %d)",
                getusername(inloggad), nodnr);
     }
-    if(Servermem->cfg.ar.cardropped) sendrexx(Servermem->cfg.ar.cardropped);
+    if(Servermem->cfg.ar.cardropped) sendautorexx(Servermem->cfg.ar.cardropped);
   } else {
     if(nodestate & NIKSTATE_LOGOUT) {
       nodestate &= ~NIKSTATE_LOGOUT;

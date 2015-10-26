@@ -129,7 +129,7 @@ void main(int argc, char **argv) {
     memset(commandhistory,0,1024);
     Servermem->inne[nodnr].rader=0;
     sendfile("NiKom:Texter/Inlogg.txt");
-    if(Servermem->cfg.ar.preinlogg) sendrexx(Servermem->cfg.ar.preinlogg);
+    if(Servermem->cfg.ar.preinlogg) sendautorexx(Servermem->cfg.ar.preinlogg);
     going=TRUE;
     while(going) {
       puttekn("\r\nNamn: ",-1);
@@ -179,7 +179,7 @@ void main(int argc, char **argv) {
                getusername(inloggad), nodnr);
     }
     if(Servermem->say[nodnr]) displaysay();
-    if(Servermem->cfg.ar.utlogg) sendrexx(Servermem->cfg.ar.utlogg);
+    if(Servermem->cfg.ar.utlogg) sendautorexx(Servermem->cfg.ar.utlogg);
     sendfile("NiKom:Texter/Utlogg.txt");
     sprintf(titel,"Nod #%d CON: <Ingen inloggad>",nodnr);
     SetWindowTitles(NiKwind,titel,(UBYTE *)-1L);

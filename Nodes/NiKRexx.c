@@ -236,11 +236,11 @@ void rexxsendtextfile(struct RexxMsg *mess) {
 
   filename = hittaefter(mess->rm_Args[0]);
   if(filename[0] == '\0') {
-    SetRexxErrorResult(mess, 100);
+    SetRexxErrorResult(mess, 10);
     return;
   }
   sendfile(filename);
-  SetRexxErrorResult(mess, carrierdropped() ? 100 : 10);
+  SetRexxErrorResult(mess, carrierdropped() ? 100 : 0);
 }
 
 void senastread(struct RexxMsg *mess) {

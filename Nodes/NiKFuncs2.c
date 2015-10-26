@@ -223,7 +223,7 @@ int nyanv(void) {
 	inloggad=x;
 	sprintf(outbuffer,"\r\n\nDu får användarnumret %d\r\n",inloggad);
 	puttekn(outbuffer,-1);
-	if(Servermem->cfg.ar.nyanv) sendrexx(Servermem->cfg.ar.nyanv);
+	if(Servermem->cfg.ar.nyanv) sendautorexx(Servermem->cfg.ar.nyanv);
 	return(1);
 }
 

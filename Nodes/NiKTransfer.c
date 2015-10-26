@@ -432,7 +432,7 @@ int upload(void) {	/* Ändrad för nikfiles.data 960707 JÖ */
 	UBYTE tn;
 	struct TransferFiles *tf;
 
-	if(Servermem->cfg.ar.preup1) sendrexx(Servermem->cfg.ar.preup1);
+	if(Servermem->cfg.ar.preup1) sendautorexx(Servermem->cfg.ar.preup1);
 	if(area2==-1) {
 		puttekn("\r\nI vilken area? ",-1);
 	} else {
@@ -556,7 +556,7 @@ int upload(void) {	/* Ändrad för nikfiles.data 960707 JÖ */
                   LogEvent(USAGE_LOG, INFO, "%s laddar upp %s",
                            getusername(inloggad), allokpek->namn);
 		}
-		if(Servermem->cfg.ar.postup1) sendrexx(Servermem->cfg.ar.postup1);
+		if(Servermem->cfg.ar.postup1) sendautorexx(Servermem->cfg.ar.postup1);
 		puttekn("\r\n\nVill du skriva en längre beskrivning? (J/n) ",-1);
 		while((tn=gettekn())!='j' && tn!='J' && tn!='n' && tn!='N' && tn!=13);
 		if(tn=='j' || tn=='J') {
@@ -608,7 +608,7 @@ int recbinfile(char *dir) {
   }
 
   if(Servermem->cfg.ar.preup2) {
-    sendrexx(Servermem->cfg.ar.preup2);
+    sendautorexx(Servermem->cfg.ar.preup2);
   }
   sprintf(zmodeminit,"%s%s",zinitstring,dir);
   if(!(XProtocolBase = (struct Library *) OpenLibrary("xprzmodem.library", 0L))) {
@@ -657,7 +657,7 @@ int recbinfile(char *dir) {
   serreqtkn();
   updateinactive();
   if(Servermem->cfg.ar.postup2) {
-    sendrexx(Servermem->cfg.ar.postup2);
+    sendautorexx(Servermem->cfg.ar.postup2);
   }
 
   if(ulfiles > 0) {
