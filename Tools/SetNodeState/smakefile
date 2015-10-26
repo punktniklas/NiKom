@@ -1,0 +1,18 @@
+CPU   = 68020
+FLAGS = NMINC STRMERGE CPU=$(CPU) IDIR=//Include
+OBJS = SetNodeState.o
+
+all: SetNodeState
+
+clean:
+  delete *.o
+  delete SetNodeState
+
+SetNodeState: $(OBJS)
+  slink FROM lib:c.o $(OBJS) \
+        TO SetNodeState \
+        LIB lib:sc.lib+lib:amiga.lib \
+        NOALVS NOICONS NODEBUG
+
+SetNodeState.o: SetNodeState.c
+  sc $(FLAGS) SetNodeState.c
