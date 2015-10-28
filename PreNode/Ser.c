@@ -38,6 +38,8 @@ extern char commandhistory[], inmat[], outbuffer[];
 extern int hangupdelay, dtespeed, highbaud, nodnr, nodestate;
 extern struct System *Servermem;
 
+struct NodeType *selectNodeType(void);
+
 struct Window *openmywindow(char *screenname) {
 	static char titel[32];
 	sprintf(titel,"NiKom PreNode, nod #%d SER:",nodnr);
@@ -83,6 +85,68 @@ void cleanup(int kod,char *text)
 	if(IntuitionBase) CloseLibrary((struct Library *)IntuitionBase);
 	printf("%s",text);
 	exit(kod);
+}
+
+struct NodeType *selectNodeType(void) {
+  struct NodeType *nt;
+  int going, i;
+
+  if(Servermem->nodetypes[0].nummer == 0) {
+    LogEvent(SYSTEM_LOG, ERROR, "Can't login user, no valid node types found.");
+    putstring("\n\n\r*** System error ***\n\n\r", -1, 0);
+    return NULL;
+  }
+  if(Servermem->nodetypes[1].nummer == 0) {
+    if((nt = GetNodeType(Servermem->nodetypes[0].nummer)) == NULL) {
+      LogEvent(SYSTEM_LOG, ERROR,
+        "Can't login user, the only configured node type (%d) can not be found.",
+        Servermem->nodetypes[0].nummer);
+      putstring("\n\n\r*** System error ***\n\n\r", -1, 0);
+    }
+    return nt;
+  }
+
+  if(Servermem->inne[nodnr].shell) {
+    nt =  GetNodeType(Servermem->inne[nodnr].shell);
+    if(nt == NULL) {
+      Servermem->inne[nodnr].shell=0;
+    }
+  }
+  if(Servermem->inne[nodnr].shell == 0) {
+    putstring("\n\n\rDu har ingen förinställd nodtyp.\n\n\rVälj mellan:\n\n\r",-1,0);
+    for(i = 0; i < MAXNODETYPES; i++) {
+      if(Servermem->nodetypes[i].nummer == 0) {
+        break;
+      }
+      sprintf(outbuffer, "%2d: %s\n\r",
+              Servermem->nodetypes[i].nummer, Servermem->nodetypes[i].desc);
+      putstring(outbuffer, -1, 0);
+    }
+    going = TRUE;
+    while(going) {
+      putstring("\n\rVal: ",-1,0);
+      if(getstring(EKO, 2, NULL)) {
+        return NULL;
+      }
+      if(atoi(inmat) < 1) {
+        putstring("\n\rDu måste ange ett positivt heltal.\n\r",-1,0);
+      }
+      else if(!(nt = GetNodeType(atoi(inmat)))) {
+        putstring("\n\rFinns ingen sådan nodtyp.\n\r",-1,0);
+      }
+      else {
+        going=FALSE;
+      }
+    }
+    putstring("\n\n\rVill du använda denna nodtyp varje gång du loggar in?",-1,0);
+    if(jaellernej('j','n', 1)) {
+      putstring("Ja\n\r", -1, 0);
+      Servermem->inne[nodnr].shell = nt->nummer;
+    } else {
+      putstring("Nej\n\r",-1,0);
+    }
+  }
+  return nt;
 }
 
 void main(int argc,char *argv[]) {
@@ -198,30 +262,8 @@ void main(int argc,char *argv[]) {
     }
     Servermem->inloggad[nodnr]=inloggad;
     Servermem->idletime[nodnr] = time(NULL);
-    if(Servermem->inne[nodnr].shell) {
-      nt =  GetNodeType(Servermem->inne[nodnr].shell);
-      if(!nt) Servermem->inne[nodnr].shell=0;
-    }
-    if(!Servermem->inne[nodnr].shell) {
-      putstring("\n\n\rDu har ingen förinställd nodtyp.\n\n\rVälj mellan:\n\n\r",-1,0);
-      for(x=0; x<MAXNODETYPES; x++) {
-        if(Servermem->nodetypes[x].nummer==0) break;
-        sprintf(outbuffer,"%2d: %s\n\r",Servermem->nodetypes[x].nummer,Servermem->nodetypes[x].desc);
-        putstring(outbuffer,-1,0);
-      }
-      going=TRUE;
-      while(going) {
-        putstring("\n\rVal: ",-1,0);
-        if(getstring(EKO,2,NULL)) goto panik;
-        if(atoi(inmat)<1) putstring("\n\rDu måste ange ett positivt heltal.\n\r",-1,0);
-        else if(!(nt=GetNodeType(atoi(inmat)))) putstring("\n\rFinns ingen sådan nodtyp.\n\r",-1,0);
-        else going=FALSE;
-      }
-      putstring("\n\n\rVill du använda denna nodtyp varje gång du loggar in?",-1,0);
-      if(jaellernej('j','n',1)) {
-        putstring("Ja\n\r",-1,0);
-        Servermem->inne[nodnr].shell=nt->nummer;
-      } else putstring("Nej\n\r",-1,0);
+    if((nt = selectNodeType()) == NULL) {
+      goto panik;
     }
     abortinactive();
     abortserial();
