@@ -108,10 +108,6 @@ int nyanv(void);
 int parsenamn(char *skri);
 int matchar(char *skrivet,char *facit);
 char *hittaefter(char *strang);
-void status(void);
-int andraanv(void);
-void raderaanv(void);
-int listaanv(void);
 void listmed(void);
 void listratt(void);
 void listnyheter(void);
@@ -124,7 +120,6 @@ int ropa(void);
 void writemeet(struct Mote * );
 void addratt(void);
 void subratt(void);
-void ShowProgramDatacfg(int);
 
 /* Prototypes for functions defined in NiKFuncs3.c */
 int endast(void);

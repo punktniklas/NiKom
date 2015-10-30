@@ -15,6 +15,7 @@
 #include "NiKomLib.h"
 #include "Logging.h"
 #include "Terminal.h"
+#include "Cmd_Users.h"
 
 #define ERROR   10
 #define OK              0
@@ -142,7 +143,7 @@ int dokmd(int parseret,int kmd) {
         else if(parseret==222) return(-9);
         else if(parseret==301) return(-3);
         else if(parseret==101) listmot(argument);
-        else if(parseret==102) { if(listaanv()) return(-8); }
+        else if(parseret==102) { if(Cmd_ListUsers()) return(-8); }
         else if(parseret==103) listmed();
         else if(parseret==104) sendfile("NiKom:Texter/ListaKommandon.txt");
         else if(parseret==105) listratt();
@@ -187,13 +188,13 @@ int dokmd(int parseret,int kmd) {
         else if(parseret==233) hoppaarende();
         else if(parseret==234) flyttagren();
         else if(parseret==302) sendfile("NiKom:Texter/Help.txt");
-        else if(parseret==303) { if(andraanv()) return(-8); }
+        else if(parseret==303) { if(Cmd_ChangeUser()) return(-8); }
         else if(parseret==304) slaav();
         else if(parseret==305) slapa();
         else if(parseret==306) tiden();
         else if(parseret==307) { if(ropa()) return(-8); }
-        else if(parseret==308) status();
-        else if(parseret==309) raderaanv();
+        else if(parseret==308) Cmd_Status();
+        else if(parseret==309) Cmd_DeleteUser();
         else if(parseret==310) vilka();
         else if(parseret==311) visainfo();
         else if(parseret==312) getconfig();

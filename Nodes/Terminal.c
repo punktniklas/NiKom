@@ -42,8 +42,13 @@ void sendfile(char *filename) {
   fclose(fp);
 }
 
+// TODO: Phase out the use of this function in favor of Get(Secret)String
 int getstring(int echo, int maxchrs, char *defaultStr) {
   return GetStringX(echo, maxchrs, defaultStr, NULL, NULL, NULL);
+}
+
+int GetString(int maxchrs, char *defaultStr) {
+  return GetStringX(EKO, maxchrs, defaultStr, NULL, NULL, NULL);
 }
 
 int printableCharactersAccepted(unsigned char c) {
@@ -88,6 +93,11 @@ int GetNumber(int minvalue, int maxvalue, char *defaultStr) {
     return 0;
   }
   return atoi(inmat);
+}
+
+int GetSecretString(int maxchrs, char *defaultStr) {
+  return GetStringX(Servermem->inne[nodnr].flaggor & STAREKOFLAG ? STAREKO : EJEKO,
+                    maxchrs, defaultStr, NULL, NULL, NULL);
 }
 
 int GetStringX(int echo, int maxchrs, char *defaultStr,
@@ -412,4 +422,115 @@ int SendStringNoBrk(char *fmt, ...) {
   putstring(outbuffer, -1, 0);
   va_end(arglist);
   return 0;
+}
+
+void DisplayInternalError(void) {
+  SendString("\r\n\n*** Internal error ***\r\n\n");
+}
+
+/*
+ * Displays a yes/no question and waits for an answer. yesChar and
+ * noChar must be lowercase (but can be 8-bit non-ASCII). Result
+ * is returned in res. 1 if yesChar was selected, 0 otherwise.
+ * Function return 0 normally or 1 if carrier is dropped.
+ */
+int GetYesOrNo(char *label, char yesChar, char noChar, char *yesStr, char *noStr,
+               int yesIsDefault, int *res) {
+  char ch;
+
+  radcnt = 0;
+  SendString("%s (%c/%c) ", label,
+             yesIsDefault ? yesChar - 32 : yesChar,
+             yesIsDefault ? noChar : noChar - 32);
+  for(;;) {
+    ch = gettekn();
+    if(carrierdropped()) {
+      return 1;
+    }
+    if(ch == '\n' || ch == '\r') {
+      *res = yesIsDefault ? 1 : 0;
+    } else if(ch == yesChar || ch == yesChar - 32) {
+      *res = 1;
+    } else if(ch == noChar || ch == noChar - 32) {
+      *res = 0;
+    } else {
+      continue;
+    }
+    SendString(*res ? yesStr : noStr);
+    return 0;
+  }
+}
+
+/*
+ * Asks the user to edit the given string. str must be able to hold maxlen + 1
+ * characters (for the trailing '\0' character).
+ */
+int MaybeEditString(char *label, char *str, int maxlen) {
+  SendString("\r\n%s : (%s) ", label, str);
+  if(GetString(maxlen, NULL)) {
+    return 1;
+  }
+  if(inmat[0]) {
+    strncpy(str, inmat, maxlen + 1);
+  }
+  return 0;
+}
+
+/*
+ * Asks the user to input a password. If a password is entered and
+ * re-entered successfully it is written to pwd. If an empty password
+ * is given pwd is unchanged.
+ */
+int MaybeEditPassword(char *label1, char *label2, char *pwd, int maxlen) {
+  char tmpStr[50];
+  for(;;) {
+    SendString("\r\n%s : ", label1);
+    if(GetSecretString(maxlen, NULL)) {
+      return 1;
+    }
+    if(inmat[0] == '\0') {
+      return 0;
+    }
+    strcpy(tmpStr, inmat);
+    SendString("\r\n%s : ", label2);
+    if(GetSecretString(maxlen, NULL)) {
+      return 1;
+    }
+    if(strcmp(inmat, tmpStr) == 0) {
+      if(Servermem->cfg.cfgflags & NICFG_CRYPTEDPASSWORDS) {
+        CryptPassword(inmat, pwd);
+      } else {
+        strncpy(pwd, inmat, maxlen + 1);
+      }
+      return 0;
+    }
+    SendString("\r\nLösenordet matchar ej.");
+  }
+}
+
+int MaybeEditNumber(char *label, int *number, int maxlen, int minVal, int maxVal) {
+  int tmpVal;
+  for(;;) {
+    SendString("\r\n%s : (%d) ", label, *number);
+    if(GetStringX(EKO, maxlen, NULL, digitCharactersAccepted, NULL, NULL)) {
+      return 1;
+    }
+    if(inmat[0]) {
+      tmpVal = atoi(inmat);
+      if(tmpVal < minVal || tmpVal > maxVal) {
+        SendString("\r\nVärdet måste vara mellan %d och %d.", minVal, maxVal);
+        continue;
+      }
+      *number = tmpVal;
+    }
+    return 0;
+  }
+}
+
+int MaybeEditNumberChar(char *label, char *number, int maxlen, int minVal,
+                        int maxVal) {
+  int tmp = *number, ret;
+  ret = MaybeEditNumber(label, &tmp, maxlen, minVal, maxVal);
+  *number = tmp;
+  return ret;
 }
