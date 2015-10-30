@@ -1,3 +1,5 @@
+News 2015-10-25: The original BBS running NiKom, NiKom BBS, is up and running again! For general discussions and questions about NiKom please log in and post a question. http://www.nikom.org/nikombbs.html
+
 News 2015-08-25: After 17 years of beta testing NiKom v1.61 is released!
 
 Binary distributions can be found at http://www.nikom.org/
