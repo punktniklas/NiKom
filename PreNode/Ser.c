@@ -15,6 +15,8 @@
 #include "NiKomLib.h"
 #include "PreNodeFuncs.h"
 #include "Logging.h"
+#include "Terminal.h"
+#include "NewUser.h"
 
 #define ERROR	10
 #define OK	0
@@ -150,7 +152,7 @@ struct NodeType *selectNodeType(void) {
 }
 
 void main(int argc,char *argv[]) {
-  int going=TRUE,forsok=2,car=1,x,connectbps, i;
+  int going=TRUE,forsok=2,car=1,x,connectbps, i, tmp;
   struct NodeType *nt;
   char *tmppscreen,commandstring[100], configname[50] = "NiKom:DatoCfg/SerNode.cfg";
   FILE *fil;
@@ -219,7 +221,11 @@ void main(int argc,char *argv[]) {
       if(getstring(EKO,40,NULL)) { car=FALSE; break; }
       if(!stricmp(inmat,Servermem->cfg.ny)
          && !(Servermem->cfg.cfgflags & NICFG_CLOSEDBBS)) {
-        if((car=nyanv())==2) goto panik;
+        tmp = RegisterNewUser();
+        if(tmp == 2) {
+          goto panik;
+        }
+        car = tmp ? 0 : 1;
         going=FALSE;
       } else if((inloggad=parsenamn(inmat))>=0) {
         if(readuser(inloggad,&Servermem->inne[nodnr])) {

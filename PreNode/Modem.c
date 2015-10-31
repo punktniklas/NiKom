@@ -14,6 +14,7 @@
 #include "NiKomLib.h"
 #include "PreNodeFuncs.h"
 #include "Logging.h"
+#include "Terminal.h"
 
 #define ERROR	10
 #define OK	0

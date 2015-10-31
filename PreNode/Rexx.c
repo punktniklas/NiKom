@@ -12,6 +12,7 @@
 #include <time.h>
 #include "NiKomstr.h"
 #include "PreNodeFuncs.h"
+#include "Terminal.h"
 
 #define ERROR	10
 #define OK		0

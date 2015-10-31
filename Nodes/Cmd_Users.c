@@ -337,9 +337,9 @@ int Cmd_ChangeUser(void) {
       break;
     }
     if((tmp = parsenamn(inmat)) != -1 && tmp != userId) {
-      SendString("\r\n\nNamnet finns redan!\r\n");
+      SendString("\r\n\nDet finns redan en användare med det namnet.\r\n");
     } else {
-      strncpy(user.namn, inmat, 40);
+      strncpy(user.namn, inmat, 41);
       break;
     }
   }

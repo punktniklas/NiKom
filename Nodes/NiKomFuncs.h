@@ -1,3 +1,4 @@
+#include <stdio.h>
 /*
  * TODO: The long time goal is for this file to die. Every .c
  * file should be a module that should have a corresponding .h
@@ -104,7 +105,6 @@ int mail(void);
 void visabrev(int brev,int anv);
 int recisthere(char *str,int rec);
 int updatenextletter(int user);
-int nyanv(void);
 int parsenamn(char *skri);
 int matchar(char *skrivet,char *facit);
 char *hittaefter(char *strang);

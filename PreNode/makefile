@@ -1,6 +1,8 @@
 CPU=68020
-FLAGS = NMINC STRMERGE CPU=$(CPU) DEBUG=FULL IDIR=/Include IDIR=/UtilLib
-OBJS = Ser.o SerialIO.o Terminal.o ServerComm.o Modem.o Rexx.o Stuff.o Version.o
+FLAGS = NMINC STRMERGE CPU=$(CPU) DEBUG=FULL IDIR=/Include IDIR=/UtilLib \
+        IDIR=/Nodes
+OBJS = Ser.o SerialIO.o Terminal.o ServerComm.o Modem.o Rexx.o Stuff.o \
+       Version.o NewUser.o CharacterSets.o
 
 NIKVERSION   = `/GetNiKomVersion.rexx Version /NiKVersion.txt`
 NIKREVISION  = `/GetNiKomVersion.rexx PreNodeRevision /NiKVersion.txt`
@@ -44,3 +46,10 @@ Terminal.o: /Nodes/Terminal.c /Include/NiKomStr.h
 
 ServerComm.o: /Nodes/ServerComm.c /Include/NiKomStr.h
   sc $(FLAGS) OBJNAME=ServerComm.o /Nodes/ServerComm.c
+
+NewUser.o: /Nodes/NewUser.c /Include/NiKomStr.h
+  sc $(FLAGS) OBJNAME=NewUser.o /Nodes/NewUser.c
+
+CharacterSets.o: /Nodes/CharacterSets.c /Include/NiKomStr.h
+  sc $(FLAGS) OBJNAME=CharacterSets.o /Nodes/CharacterSets.c
+

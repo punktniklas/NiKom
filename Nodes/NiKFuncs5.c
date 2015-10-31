@@ -12,6 +12,7 @@
 #include "NiKomlib.h"
 #include "NiKomFuncs.h"
 #include "Terminal.h"
+#include "CharacterSets.h"
 
 #define EKO		1
 #define EJEKO	0
@@ -83,82 +84,32 @@ void dellostsay(void) {
 }
 
 void bytteckenset(void) {
-	char tkn;
-	int chrsetbup,going=TRUE;
-	if(argument[0]) {
-		puttekn("\n\n\rNytt teckenset: ",-1);
-		switch(argument[0]) {
-			case '1' :
-				Servermem->inne[nodnr].chrset = CHRS_LATIN1;
-				puttekn("ISO 8859-1\n\r",-1);
-				break;
-			case '2' :
-				Servermem->inne[nodnr].chrset = CHRS_CP437;
-				puttekn("IBM CodePage 437\n\r",-1);
-				break;
-			case '3' :
-				Servermem->inne[nodnr].chrset = CHRS_MAC;
-				puttekn("Macintosh\n\r",-1);
-				break;
-			case '4' :
-				Servermem->inne[nodnr].chrset = CHRS_SIS7;
-				puttekn("SIS-7\n\r",-1);
-				break;
-			default :
-				puttekn("\n\n\rFelaktig teckenuppsättning, ska vara mellan 1 och 4.\n\r",-1);
-				break;
-		}
-		return;
-	}
-	chrsetbup = Servermem->inne[nodnr].chrset;
-	if(Servermem->nodtyp[nodnr] == NODCON) puttekn("\n\n\r*** OBS! Du kör på en CON-nod, alla teckenset kommer se likadana ut!! ***",-1);
-	puttekn("\n\n\rDessa teckenset finns. Ta det alternativ vars svenska tecken ser bra ut.\n\r",-1);
-	puttekn("* markerar nuvarande val.\n\n\r",-1);
-	puttekn("  Nr Namn                              Exempel\n\r",-1);
-	puttekn("----------------------------------------------\n\r",-1);
-	Servermem->inne[nodnr].chrset = CHRS_LATIN1;
-	sprintf(outbuffer,"%c 1: ISO 8859-1 (ISO Latin 1)          åäö ÅÄÖ\n\r",chrsetbup == CHRS_LATIN1 ? '*' : ' ');
-	puttekn(outbuffer,-1);
-	Servermem->inne[nodnr].chrset = CHRS_CP437;
-	sprintf(outbuffer,"%c 2: IBM CodePage 437 (PC8)            åäö ÅÄÖ\n\r",chrsetbup == CHRS_CP437 ? '*' : ' ');
-	puttekn(outbuffer,-1);
-	Servermem->inne[nodnr].chrset = CHRS_MAC;
-	sprintf(outbuffer,"%c 3: Macintosh                         åäö ÅÄÖ\n\r",chrsetbup == CHRS_MAC ? '*' : ' ');
-	puttekn(outbuffer,-1);
-	Servermem->inne[nodnr].chrset = CHRS_SIS7;
-	sprintf(outbuffer,"%c 4: SIS-7 (SF7, måsvingar)            åäö ÅÄÖ\n\r",chrsetbup == CHRS_SIS7 ? '*' : ' ');
-	puttekn(outbuffer,-1);
-	Servermem->inne[nodnr].chrset = chrsetbup;
-	puttekn("\n\rOm du bara ser ett alternativ ovan beror det av att ditt terminalprogram\n\r",-1);
-	puttekn("strippar den 8:e biten i inkommande tecken. Om exemplet ser bra ut, ta SIS-7.\n\r",-1);
-	puttekn("\n\rVal (Return för inget): ",-1);
-	while(going) {
-		tkn = gettekn();
-		going = FALSE;
-		switch(tkn) {
-			case '1' :
-				Servermem->inne[nodnr].chrset = CHRS_LATIN1;
-				puttekn("ISO 8859-1\n\r",-1);
-				break;
-			case '2' :
-				Servermem->inne[nodnr].chrset = CHRS_CP437;
-				puttekn("IBM CodePage\n\r",-1);
-				break;
-			case '3' :
-				Servermem->inne[nodnr].chrset = CHRS_MAC;
-				puttekn("Macintosh\n\r",-1);
-				break;
-			case '4' :
-				Servermem->inne[nodnr].chrset = CHRS_SIS7;
-				puttekn("SIS-7\n\r",-1);
-				break;
-			case '\r' : case '\n' :
-				puttekn("Avbryter\n\r",-1);
-				break;
-			default :
-				going = TRUE;
-		}
-	}
+  if(argument[0]) {
+    puttekn("\n\n\rNytt teckenset: ",-1);
+    switch(argument[0]) {
+    case '1' :
+      Servermem->inne[nodnr].chrset = CHRS_LATIN1;
+      puttekn("ISO 8859-1\n\r",-1);
+      break;
+    case '2' :
+      Servermem->inne[nodnr].chrset = CHRS_CP437;
+      puttekn("IBM CodePage 437\n\r",-1);
+      break;
+    case '3' :
+      Servermem->inne[nodnr].chrset = CHRS_MAC;
+      puttekn("Macintosh\n\r",-1);
+      break;
+    case '4' :
+      Servermem->inne[nodnr].chrset = CHRS_SIS7;
+      puttekn("SIS-7\n\r",-1);
+      break;
+    default :
+      puttekn("\n\n\rFelaktig teckenuppsättning, ska vara mellan 1 och 4.\n\r",-1);
+      break;
+    }
+    return;
+  }
+  AskUserForCharacterSet(FALSE);
 }
 
 void SaveCurrentUser(int inloggad, int nodnr)

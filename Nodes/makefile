@@ -3,7 +3,7 @@ FLAGS   = NMINC STRMERGE CPU=$(CPU) DEBUG=FULL GST=Include:all.gst \
           IDIR=/Include IDIR=/UtilLib
 OBJS    = ServerComm.o Terminal.o NiKFuncs.o NiKFuncs2.o NiKFuncs3.o NiKFuncs4.o \
           NiKFuncs5.o NiKEditor.o NiKRexx.o NiKFiles.o NiKVersion.o Brev.o \
-          OrgMeet.o FidoMeet.o _tzset.o \
+          OrgMeet.o FidoMeet.o NewUser.o CharacterSets.o _tzset.o \
 	  Cmd_Users.o
 CONOBJS = NiKomCon.o ConsoleIO.o NiKConTrans.o NiKConOffline.o
 SEROBJS = NiKomSer.o SerialIO.o NiKTransfer.o NiKOffline.o
@@ -105,6 +105,12 @@ OrgMeet.o: OrgMeet.c /Include/NiKomStr.h
 
 FidoMeet.o: FidoMeet.c /Include/NiKomStr.h /Include/NiKomLib.h
   sc $(FLAGS) FidoMeet.c OBJNAME=FidoMeet.o
+
+NewUser.o: NewUser.c /Include/NiKomStr.h /Include/NiKomLib.h NewUser.h
+  sc $(FLAGS) NewUser.c OBJNAME=NewUser.o
+
+CharacterSets.o: CharacterSets.c /Include/NiKomStr.h /Include/NiKomLib.h CharacterSets.h
+  sc $(FLAGS) CharacterSets.c OBJNAME=CharacterSets.o
 
 Cmd_Users.o: Cmd_Users.c /Include/NiKomStr.h /Include/NiKomLib.h Cmd_Users.h
   sc $(FLAGS) Cmd_Users.c OBJNAME=Cmd_Users.o

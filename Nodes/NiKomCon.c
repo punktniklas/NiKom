@@ -15,6 +15,7 @@
 #include "NiKomLib.h"
 #include "Logging.h"
 #include "Terminal.h"
+#include "NewUser.h"
 
 #define ERROR	10
 #define OK	0
@@ -69,7 +70,7 @@ void cleanup(int kod,char *fel)
 }
 
 void main(int argc, char **argv) {
-  int going=TRUE,forsok=2,car=1;
+  int going=TRUE,forsok=2,car=1, tmp;
   long tid;
   char tellstr[100],*tmppscreen, titel[80];
   UBYTE tillftkn;
@@ -135,7 +136,11 @@ void main(int argc, char **argv) {
       puttekn("\r\nNamn: ",-1);
       getstring(EKO,40,NULL);
       if(!stricmp(inmat,Servermem->cfg.ny)) {
-        if((car=nyanv())==2) goto panik;
+        tmp = RegisterNewUser();
+        if(tmp == 2) {
+          goto panik;
+        }
+        car = tmp ? 0 : 1;
         going=FALSE;
       }
       else if((inloggad=parsenamn(inmat))>=0) {

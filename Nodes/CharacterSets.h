@@ -1,0 +1,1 @@
+int AskUserForCharacterSet(int forceChoice);
