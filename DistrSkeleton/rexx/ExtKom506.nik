@@ -14,8 +14,8 @@ if ~open('fil',profile) then do
   exit
 end
 do until eof('fil')
-  'nikcommand' readln('fil')
-  line = readln('fil')
+   line = readln('fil')
+   if trim(line) = '' then iterate
    cmdnr=NikParse(line,'k')
    if cmdnr ~= 506 then do
      'nikcommand' line
