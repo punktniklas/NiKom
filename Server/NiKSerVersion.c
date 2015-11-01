@@ -3,10 +3,8 @@
 
 extern struct System *Servermem;
 
-char dosversion[]="\0$VER: NiKServer " NIKSERVERVERSION "." NIKSERVERREVISION " " __AMIGADATE__;
+char dosversion[]="\0$VER: NiKServer " NIKRELEASE " " __AMIGADATE__;
 
-void GetServerversion(void)
-{
-	Servermem->serverversion = atoi(NIKSERVERVERSION);
-	Servermem->serverrevision = atoi(NIKSERVERREVISION);
+void GetServerversion(void) {
+  Servermem->serverBuildTime = __DATE__ " " __TIME__;
 }

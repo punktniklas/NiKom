@@ -309,9 +309,6 @@ void grab(void);
 int sendrexx(int komnr);
 int sendautorexx(int komnr);
 
-/* Prototypes for functions defined in NiKVersion.c */
-void nikversion(void);
-
 /* Prototypes for functions defined in NiKUUCico.c */
 void douucico(void);
 

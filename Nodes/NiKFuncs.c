@@ -16,6 +16,7 @@
 #include "Logging.h"
 #include "Terminal.h"
 #include "Cmd_Users.h"
+#include "NiKversion.h"
 
 #define ERROR   10
 #define OK              0
@@ -208,7 +209,7 @@ int dokmd(int parseret,int kmd) {
         else if(parseret==320) raderagrupp();
         else if(parseret==321) { if(adderagruppmedlem()) return(-8); }
         else if(parseret==322) { if(subtraheragruppmedlem()) return(-8); }
-        else if(parseret==323) nikversion();
+        else if(parseret==323) DisplayVersionInfo();
         else if(parseret==324) alias();
         else if(parseret==325) { nodestate |= NIKSTATE_RELOGIN; return(-3); }
         else if(parseret==326) { if(bytnodtyp()) return(-8); }
@@ -1102,7 +1103,7 @@ int connection(void)
         rxlinecount = TRUE;
         radcnt=0;
         if(Servermem->cfg.ar.postinlogg) sendautorexx(Servermem->cfg.ar.postinlogg);
-        nikversion();
+        DisplayVersionInfo();
         var(mote2);
         for(;;) {
                 if(unread(mote2)) {

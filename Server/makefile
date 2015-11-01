@@ -3,8 +3,7 @@ FLAGS = NMINC STRMERGE CPU=$(CPU) DEBUG=FULL IDIR=/Include IDIR=/UtilLib
 OBJS  = NiKServer.o NiKHost.o NiKHost2.o NiKHost3.o NiKSerVersion.o NodeComm.o \
 	Config.o
 
-NIKVERSION  = `/GetNiKomVersion.rexx Version /NiKVersion.txt`
-NIKREVISION = `/GetNiKomVersion.rexx ServerRevision /NiKVersion.txt`
+NIKRELEASE      = `/GetNiKomVersion.rexx Release /NiKVersion.txt`
 
 all: NiKServer
 
@@ -25,7 +24,7 @@ NiKServer: $(OBJS)
 
 
 NiKServer.o: NiKServer.c /Include/NiKomStr.h
-  sc $(FLAGS) NiKServer.c
+  sc $(FLAGS) DEFINE=NIKRELEASE=$(NIKRELEASE) NiKServer.c
 
 NiKHost.o: NiKHost.c /Include/NiKomStr.h
   sc $(FLAGS) NiKHost.c
@@ -37,7 +36,7 @@ NiKHost3.o: NiKHost3.c /Include/NiKomStr.h
   sc $(FLAGS) NiKHost3.c
 
 NiKSerVersion.o: NiKSerVersion.c NiKServer.o NiKHost.o NiKHost2.o NiKHost3.o NodeComm.o /NiKVersion.txt
-  sc $(FLAGS) DEFINE=NIKSERVERVERSION=$(NIKVERSION) DEFINE=NIKSERVERREVISION=$(NIKREVISION) NiKSerVersion.c
+  sc $(FLAGS) DEFINE=NIKRELEASE=$(NIKRELEASE) NiKSerVersion.c
 
 NodeComm.o: NodeComm.c /Include/NiKomStr.h
   sc $(FLAGS) NodeComm.c

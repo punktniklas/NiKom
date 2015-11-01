@@ -4,8 +4,7 @@ FLAGS = NMINC STRMERGE CPU=$(CPU) DEBUG=FULL IDIR=/Include IDIR=/UtilLib \
 OBJS = Ser.o SerialIO.o Terminal.o ServerComm.o Modem.o Rexx.o Stuff.o \
        Version.o NewUser.o CharacterSets.o
 
-NIKVERSION   = `/GetNiKomVersion.rexx Version /NiKVersion.txt`
-NIKREVISION  = `/GetNiKomVersion.rexx PreNodeRevision /NiKVersion.txt`
+NIKRELEASE      = `/GetNiKomVersion.rexx Release /NiKVersion.txt`
 
 all: PreNode
 
@@ -36,7 +35,7 @@ Stuff.o: Stuff.c /Include/NiKomStr.h
   sc $(FLAGS) Stuff.c
 
 Version.o: Version.c /NiKVersion.txt
-  sc $(FLAGS) DEFINE=NIKVERSION=$(NIKVERSION) DEFINE=NIKREVISION=$(NIKREVISION) Version.c
+  sc $(FLAGS) DEFINE=NIKRELEASE=$(NIKRELEASE) Version.c
 
 SerialIO.o: /Nodes/SerialIO.c /Include/NiKomStr.h
   sc $(FLAGS) OBJNAME=SerialIO.o /Nodes/SerialIO.c

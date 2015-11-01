@@ -49,6 +49,7 @@ Rexx.o         : Rexx.c         nikom.fd /Include/NiKomLib.h /Include/NiKomStr.h
 Lock.o         : Lock.c         nikom.fd /Include/NiKomLib.h /Include/NiKomStr.h
 
 ReadFidoText.o : ReadFidoText.c nikom.fd /Include/NiKomLib.h /Include/NiKomStr.h
+   sc $(SCFLAGS) $(DEBUG) DEFINE=NIKRELEASE=$(NIKRELEASE) ReadFidoText.c
 
 Echo.o         : Echo.c         nikom.fd /Include/NiKomLib.h /Include/NiKomStr.h
 

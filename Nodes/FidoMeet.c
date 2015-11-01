@@ -265,8 +265,7 @@ int fido_skriv(int komm,int komtill) {
 	fl = AllocMem(sizeof(struct FidoLine),MEMF_CLEAR);
 	AddTail((struct List *)&ft.text,(struct Node *)fl);
 	fl = AllocMem(sizeof(struct FidoLine),MEMF_CLEAR);
-	GetNiKomVersion(NULL,NULL,filnamn);
-	sprintf(fl->text,"--- NiKom %s",filnamn);
+	strcpy(fl->text,"--- NiKom " NIKRELEASE);
 	AddTail((struct List *)&ft.text,(struct Node *)fl);
 	fl = AllocMem(sizeof(struct FidoLine),MEMF_CLEAR);
 	sprintf(fl->text," * Origin: %s (%d:%d/%d.%d)",motpek->origin,ft.fromzone,ft.fromnet,ft.fromnode,ft.frompoint);

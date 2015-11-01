@@ -1,1 +1,1 @@
-char dosversion[] = "\0$VER: PreNode " NIKVERSION "." NIKREVISION " " __AMIGADATE__;
+char dosversion[] = "\0$VER: PreNode " NIKRELEASE " " __AMIGADATE__;

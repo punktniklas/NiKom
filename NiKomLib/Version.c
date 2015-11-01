@@ -7,12 +7,8 @@
 #include "NiKomBase.h"
 #include "funcs.h"
 
-const char dosversion[] = "$VER: nikom.library " NIKLIBVERSION "." NIKLIBREVISION " " __AMIGADATE__;
+const char dosversion[] = "$VER: nikom.library_" NIKRELEASE " " NIKLIBVERSION "." NIKLIBREVISION " " __AMIGADATE__;
 
-void __saveds __asm LIBGetNiKomVersion(register __a0 int *version, register __a1 int *revision,
-	register __a2 char *release) {
-
-	if(version) *version = atoi(NIKLIBVERSION);
-	if(revision) *revision = atoi(NIKLIBREVISION);
-	if(release) strcpy(release,NIKRELEASE);
+char * __saveds __asm LIBGetBuildTime(void) {
+  return __DATE__ " " __TIME__;
 }

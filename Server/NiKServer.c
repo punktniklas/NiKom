@@ -5,7 +5,6 @@
 #include <proto/exec.h>
 #include <proto/intuition.h>
 #include <proto/dos.h>
-#include <clib/alib_protos.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -1216,7 +1215,7 @@ void main() {
 	struct IntuiMessage *myintmess;
 	struct RexxMsg *rexxmess;
 	struct Screen *lockscreen;
-	char titel[100],*tmppscreen,nikomrel[20];
+	char titel[100],*tmppscreen,nikomrel[50];
 	Forbid();
 	port=(struct MsgPort *)FindPort("NiKomPort");
 	Permit();
@@ -1279,7 +1278,7 @@ void main() {
 /*		Servermem->UserCached[x].usernumber = -1;
 		Servermem->UserCached[x].LatestUsedUserCache = -1; */
 	}
-	GetNiKomVersion(NULL,NULL,nikomrel);
+        strcpy(nikomrel, NIKRELEASE " (" __DATE__ " " __TIME__ ")");
 	sprintf(titel,"NiKom %s,  0 noder aktiva", nikomrel);
 	if(pubscreen[0]=='-') tmppscreen=NULL;
 	else tmppscreen=pubscreen;

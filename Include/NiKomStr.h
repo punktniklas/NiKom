@@ -361,9 +361,9 @@ struct System {
   struct UnreadTexts unreadTexts[MAXNOD];
   long nodtyp[MAXNOD],inloggad[MAXNOD],action[MAXNOD],varmote[MAXNOD],
     xtratime[MAXNOD],connectbps[MAXNOD], idletime[MAXNOD],
-    maxinactivetime[MAXNOD], serverversion, serverrevision;
+    maxinactivetime[MAXNOD];
   char *vilkastr[MAXNOD], nodid[MAXNOD][20], watchserial[MAXNOD],
-    CallerID[MAXNOD][81];
+    CallerID[MAXNOD][81], *serverBuildTime;
   struct MinList mot_list;
   struct MinList user_list;
   struct MinList shell_list;

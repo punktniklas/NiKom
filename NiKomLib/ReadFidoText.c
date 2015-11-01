@@ -426,9 +426,7 @@ int __saveds __asm LIBWriteFidoText(register __a0 struct FidoText *fidotext, reg
 			FPuts(fh,ftshead);
 		}
 	}
-	LIBGetNiKomVersion(NULL,NULL,datebuf); /* Bara lånar datebuf.. */
-	sprintf(ftshead,"\001PID: NiKom %s\r",datebuf);
-	FPuts(fh,ftshead);
+	FPuts(fh, "\001PID: NiKom " NIKRELEASE "\r");
 	for(fl=(struct FidoLine *)fidotext->text.mlh_Head;fl->line_node.mln_Succ;fl=(struct FidoLine *)fl->line_node.mln_Succ) {
 		next=(struct FidoLine *)fl->line_node.mln_Succ;
 		strcpy(ftshead,fl->text);

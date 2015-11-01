@@ -36,7 +36,7 @@ int __saveds __asm LIBMayWriteConf(register __d0 int, register __d1 int, registe
 int __saveds __asm LIBMayReplyConf(register __d0 int, register __d1 int, register __a0 struct User *,register __a6 struct NiKomBase *);
 int __saveds __asm LIBMayAdminConf(register __d0 int, register __d1 int, register __a0 struct User *,register __a6 struct NiKomBase *);
 int __saveds __asm LIBIsMemberConf(register __d0 int, register __d1 int, register __a0 struct User *,register __a6 struct NiKomBase *);
-void __saveds __asm LIBGetNiKomVersion(register __a0 int *, register __a1 int *,	register __a2 char *);
+char * __saveds __asm LIBGetBuildTime();
 void __saveds __asm LIBConvChrsToAmiga(register __a0 char *, register __d0 int,
 	register __d1 int, register __a6 struct NiKomBase *);
 void __saveds __asm LIBConvChrsFromAmiga(register __a0 char *, register __d0 int,

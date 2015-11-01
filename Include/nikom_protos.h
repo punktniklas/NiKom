@@ -29,7 +29,7 @@ int MayWriteConf(int, int, struct User *);
 int MayReplyConf(int, int, struct User *);
 int MayAdminConf(int, int, struct User *);
 int IsMemberConf(int, int, struct User *);
-void GetNiKomVersion(int *, int *, char *);
+char *GetBuildTime(void);
 void ConvChrsToAmiga(char *, int, int);
 void ConvChrsFromAmiga(char *, int, int);
 void StripAnsiSequences(char *);

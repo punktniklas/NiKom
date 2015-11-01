@@ -1,6 +1,3 @@
 Release: v2.0.0dev
 Version: 21
-ServerRevision: 1
 LibraryRevision: 1
-KOMRevision: 1
-PreNodeRevision: 1

@@ -5,23 +5,18 @@
 #include "NiKomFuncs.h"
 #include "NiKomLib.h"
 #include "NiKomStr.h"
+#include "Terminal.h"
+#include "NiKVersion.h"
 
 extern char outbuffer[];
 extern struct System *Servermem;
 
-char dosversion[]="\0$VER: NiKomCon/Ser " NIKVERSION "." NIKREVISION " " __AMIGADATE__;
+char dosversion[]="\0$VER: NiKomCon/Ser " NIKRELEASE " " __AMIGADATE__;
 
-void nikversion(void)
-{
-	int libver, librev;
-	char rel[20];
-	GetNiKomVersion(&libver,&librev,rel);
-	sprintf(outbuffer,"\n\n\rNiKom %s © Niklas Lindholm 1990-1996, 2015 & Tomas Kärki 1996-1998\r\n",rel);
-	puttekn(outbuffer,-1);
-	sprintf(outbuffer,"KOM-nod v%d.%d\r\n",atoi(NIKVERSION),atoi(NIKREVISION));
-	puttekn(outbuffer,-1);
-	sprintf(outbuffer,"Server v%d.%d\r\n",Servermem->serverversion, Servermem->serverrevision);
-	puttekn(outbuffer,-1);
-	sprintf(outbuffer,"NiKom.library v%d.%d\r\n",libver,librev);
-	puttekn(outbuffer,-1);
+void DisplayVersionInfo(void) {
+  SendString("\n\n\rNiKom " NIKRELEASE
+             " © Niklas Lindholm 1990-1996, 2015 & Tomas Kärki 1996-1998\r\n");
+  SendString("  KOM node      built " __DATE__ " " __TIME__ "\r\n");
+  SendString("  Server        built %s\r\n",Servermem->serverBuildTime);
+  SendString("  nikom.library built %s\r\n", GetBuildTime());
 }
