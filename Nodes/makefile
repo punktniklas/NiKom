@@ -8,8 +8,6 @@ OBJS    = ServerComm.o Terminal.o NiKFuncs.o NiKFuncs2.o NiKFuncs3.o NiKFuncs4.o
 CONOBJS = NiKomCon.o ConsoleIO.o NiKConTrans.o NiKConOffline.o
 SEROBJS = NiKomSer.o SerialIO.o NiKTransfer.o NiKOffline.o
 
-NIKRELEASE      = `/GetNiKomVersion.rexx Release /NiKVersion.txt`
-
 all: NiKomCon NiKomSer
 
 setup:
@@ -86,8 +84,8 @@ NiKTransfer.o: NiKTransfer.c /Include/NiKomStr.h
 NiKConTrans.o: NiKConTrans.c
   sc $(FLAGS) NiKConTrans.c OBJNAME=NiKConTrans.o
 
-NiKVersion.o: NiKVersion.c /NiKVersion.txt
-  sc $(FLAGS) DEFINE=NIKRELEASE=$(NIKRELEASE) NiKVersion.c
+NiKVersion.o: NiKVersion.c /Include/VersionStrings.h
+  sc $(FLAGS) NiKVersion.c
 
 NiKOffline.o: NiKOffline.c /Include/NiKomStr.h
   sc $(FLAGS) NiKOffline.c OBJNAME=NiKOffline.o
@@ -102,7 +100,7 @@ OrgMeet.o: OrgMeet.c /Include/NiKomStr.h
   sc $(FLAGS) OrgMeet.c OBJNAME=OrgMeet.o
 
 FidoMeet.o: FidoMeet.c /Include/NiKomStr.h /Include/NiKomLib.h
-  sc $(FLAGS) DEFINE=NIKRELEASE=$(NIKRELEASE) FidoMeet.c OBJNAME=FidoMeet.o
+  sc $(FLAGS) FidoMeet.c OBJNAME=FidoMeet.o
 
 NewUser.o: NewUser.c /Include/NiKomStr.h /Include/NiKomLib.h NewUser.h
   sc $(FLAGS) NewUser.c OBJNAME=NewUser.o

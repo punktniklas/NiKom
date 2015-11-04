@@ -12,6 +12,7 @@
 #include "NiKomstr.h"
 #include "NiKomFuncs.h"
 #include "NiKomLib.h"
+#include "VersionStrings.h"
 #include "Logging.h"
 #include "Terminal.h"
 

@@ -29,6 +29,7 @@
 #include "/Include/NiKomLib.h"
 #include "NiKomBase.h"
 #include "funcs.h"
+#include "VersionStrings.h"
 
 int getfidoline(char *fidoline,char *buffer,int linelen, int chrs, BPTR fh,char *quotepre,struct NiKomBase *NiKomBase) {
 	int anttkn,foo,tmpret,hasquoted=FALSE,donotwordwrap=FALSE;

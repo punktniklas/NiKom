@@ -1,12 +1,8 @@
 OBJS    = LibInit.o UserLibInit.o Matrix.o Rexx.o Lock.o ReadFidoText.o Echo.o \
-          NodeTypes.o Conf.o Version.o Terminal.o ServerComm.o Hash.o \
+          NodeTypes.o Conf.o NiKVersion.o Terminal.o ServerComm.o Hash.o \
           PrgCat.o UnreadTexts.o Crypt.o FCrypt.o ConferenceTexts.o Util.o
 SCFLAGS = STREQ STRINGMERGE NOSTKCHK LIBCODE UNSIGNEDCHAR IDIR=/Include
 DEBUG   = DEBUG=LINE
-
-NIKRELEASE  = `/GetNiKomVersion.rexx Release /NiKVersion.txt`
-NIKVERSION  = `/GetNiKomVersion.rexx Version /NiKVersion.txt`
-NIKREVISION = `/GetNiKomVersion.rexx LibraryRevision /NiKVersion.txt`
 
 all :  nikom_pragmas.h nikom.library
 
@@ -23,7 +19,7 @@ clean :
 
 nikom_pragmas.h : nikom.fd
 		fd2pragma	nikom.fd nikom_pragmas.tmp
-		convpragma nikom_pragmas.tmp nikom_pragmas.h
+		rexx convpragma nikom_pragmas.tmp nikom_pragmas.h
 		copy nikom_pragmas.h /Include
 		delete nikom_pragmas.tmp
 
@@ -33,9 +29,9 @@ nikom.library : $(OBJS) nikom.fd
          LIBPREFIX _LIB LIBFD nikom.fd \
          LIB lib:sc.lib lib:amiga.lib \
          BATCH NOALVS SMALLCODE SMALLDATA \
-         LIBVERSION $(NIKVERSION) \
-         LIBREVISION $(NIKREVISION) \
-         LIBID "nikom.library $(NIKVERSION).$(NIKREVISION)"
+         LIBVERSION 21 \
+         LIBREVISION 1 \
+         LIBID "nikom.library 21.1"
 	slink Debug/nikom.library TO NoDebug/nikom.library NODEBUG NOICONS
 
 LibInit.o      : LibInit.c      nikom.fd
@@ -49,7 +45,6 @@ Rexx.o         : Rexx.c         nikom.fd /Include/NiKomLib.h /Include/NiKomStr.h
 Lock.o         : Lock.c         nikom.fd /Include/NiKomLib.h /Include/NiKomStr.h
 
 ReadFidoText.o : ReadFidoText.c nikom.fd /Include/NiKomLib.h /Include/NiKomStr.h
-   sc $(SCFLAGS) $(DEBUG) DEFINE=NIKRELEASE=$(NIKRELEASE) ReadFidoText.c
 
 Echo.o         : Echo.c         nikom.fd /Include/NiKomLib.h /Include/NiKomStr.h
 
@@ -57,11 +52,7 @@ NodeTypes.o    : NodeTypes.c    nikom.fd /Include/NiKomLib.h /Include/NiKomStr.h
 
 Conf.o         : Conf.c         nikom.fd /Include/NiKomLib.h /Include/NiKomStr.h
 
-Version.o      : Version.c /NiKVersion.txt
-   sc $(SCFLAGS) DEFINE=NIKRELEASE=$(NIKRELEASE) \
-               DEFINE=NIKLIBVERSION=$(NIKVERSION) \
-               DEFINE=NIKLIBREVISION=$(NIKREVISION) \
-               Version.c
+NiKVersion.o   : NiKVersion.c   /Include/VersionStrings.h
 
 Terminal.o     : Terminal.c     nikom.fd /Include/NiKomLib.h /Include/NiKomStr.h
 

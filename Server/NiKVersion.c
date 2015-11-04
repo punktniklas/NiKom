@@ -1,5 +1,6 @@
-#include "NiKomStr.h"
 #include <stdlib.h>
+#include "NiKomStr.h"
+#include "VersionStrings.h"
 
 extern struct System *Servermem;
 

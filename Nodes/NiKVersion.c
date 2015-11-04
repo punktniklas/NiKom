@@ -5,6 +5,7 @@
 #include "NiKomFuncs.h"
 #include "NiKomLib.h"
 #include "NiKomStr.h"
+#include "VersionStrings.h"
 #include "Terminal.h"
 #include "NiKVersion.h"
 
