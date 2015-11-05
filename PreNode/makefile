@@ -11,8 +11,8 @@ setup:
   makedir NoDebug NoDebug/$(CPU)
 
 clean:
-  delete *.o
-  delete Debug/$(CPU)/* NoDebug/$(CPU)/*
+  delete \#?.o
+  delete Debug/$(CPU)/\#? NoDebug/$(CPU)/\#?
 
 PreNode: $(OBJS)
   slink FROM lib:c.o $(OBJS) TO Debug/$(CPU)/PreNode \

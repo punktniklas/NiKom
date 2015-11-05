@@ -1,6 +1,6 @@
 CPU     = 68020
 FLAGS   = NMINC STRMERGE CPU=$(CPU) DEBUG=FULL GST=Include:all.gst \
-          IDIR=/Include IDIR=/UtilLib
+          IDIR=/Include IDIR=/ExtInclude IDIR=/UtilLib
 OBJS    = ServerComm.o Terminal.o NiKFuncs.o NiKFuncs2.o NiKFuncs3.o NiKFuncs4.o \
           NiKFuncs5.o NiKEditor.o NiKRexx.o NiKFiles.o NiKVersion.o Brev.o \
           OrgMeet.o FidoMeet.o NewUser.o CharacterSets.o _tzset.o \
@@ -18,9 +18,9 @@ setup:
 
 
 clean:
-  delete *.o
-  delete Debug/$(CPU)/*
-  delete NoDebug/$(CPU)/*
+  delete \#?.o
+  delete Debug/$(CPU)/\#?
+  delete NoDebug/$(CPU)/\#?
 
 NiKomCon: $(OBJS) $(CONOBJS)
   slink FROM lib:c.o $(CONOBJS) $(OBJS) \

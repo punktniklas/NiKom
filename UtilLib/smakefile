@@ -9,8 +9,8 @@ setup:
   makedir Debug Debug/$(CPU)
 
 clean:
-  delete *.o
-  delete Debug/$(CPU)/*
+  delete \#?.o
+  delete Debug/$(CPU)/\#?
 
 .c.o :
   sc $(SCFLAGS) $*

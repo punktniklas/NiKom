@@ -14,8 +14,8 @@ setup :
 	makedir NoDebug
 
 clean :
-   delete *.o nikom_pragmas.h
-   delete Debug/* NoDebug/*
+   delete \#?.o nikom_pragmas.h
+   delete Debug/\#? NoDebug/\#?
 
 nikom_pragmas.h : nikom.fd
 		fd2pragma	nikom.fd nikom_pragmas.tmp

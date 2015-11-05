@@ -10,8 +10,8 @@ setup:
   makedir NoDebug NoDebug/$(CPU)
 
 clean:
-  delete *.o
-  delete Debug/$(CPU)/* NoDebug/$(CPU)/*
+  delete \#?.o
+  delete Debug/$(CPU)/\#? NoDebug/$(CPU)/\#?
 
 NiKServer: $(OBJS)
   slink FROM lib:c.o $(OBJS) \

@@ -5,7 +5,7 @@ OBJS = NiKomFido.o
 all: NiKomFido
 
 clean:
-  delete *.o
+  delete \#?.o
   delete NiKomFido
 
 NiKomFido: $(OBJS)

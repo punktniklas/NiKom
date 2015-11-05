@@ -5,7 +5,7 @@ OBJS = CryptPasswords.o FCrypt.o
 all: CryptPasswords
 
 clean:
-  delete *.o
+  delete \#?.o
   delete CryptPasswords
 
 CryptPasswords: $(OBJS)
