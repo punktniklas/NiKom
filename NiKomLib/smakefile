@@ -19,7 +19,7 @@ clean :
 
 nikom_pragmas.h : nikom.fd
 		fd2pragma	nikom.fd nikom_pragmas.tmp
-		rexx convpragma nikom_pragmas.tmp nikom_pragmas.h
+		rx convpragma nikom_pragmas.tmp nikom_pragmas.h
 		copy nikom_pragmas.h /Include
 		delete nikom_pragmas.tmp
 
