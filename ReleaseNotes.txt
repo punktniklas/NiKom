@@ -31,6 +31,25 @@
   levels that should be logged but this is planned for the future. It's also
   currently not possible to configure the location of the log files.
 
+- With NiKom 2.0 there is no menu node anymore, only the KOM node.
+
+- Smaller changes to return codes in the command interface to make it
+  more consistent and so that RC is always set when needed. ARexx.doc
+  has been updated with some information about this.
+
+- When there is only one node type configured in NodeTypes.cfg NiKom
+  will now no ask about which node type to choose. It will just pick
+  the one available node type.
+
+- NiKom should now never print any passwords on the screen when they
+  are types by the user. This was happening when registering a new
+  user and when changing passwords. The user is now asked to type the
+  password again to verify it.
+
+- A new tool, NiKomFido, that replaces the separate tools UpdateFido,
+  ReScanConf, ReScanAllConf and RenumberConf.
+
+
 ---------------------------------------------------------------------------
                          NiKom v1.61, 2015-08-25
 ---------------------------------------------------------------------------
