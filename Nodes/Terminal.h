@@ -1,4 +1,6 @@
 void sendfile(char *filename);
+int GetChar(void);
+int IsPrintableCharacter(unsigned char c);
 int GetString(int maxchrs, char *defaultStr);
 int GetSecretString(int maxchrs, char *defaultStr);
 int getstring(int echo, int maxchrs, char *defaultStr);
@@ -18,3 +20,15 @@ int MaybeEditPassword(char *label1, char *label2, char *pwd, int maxlen);
 int MaybeEditNumber(char *label, int *number, int maxlen, int minVal, int maxVal);
 int MaybeEditNumberChar(char *label, char *number, int maxlen, int minVal,
                         int maxVal);
+
+#define GETCHAR_LOGOUT     -1
+#define GETCHAR_RETURN     -2
+#define GETCHAR_SOL        -3 // Start of line
+#define GETCHAR_EOL        -4 // End of line
+#define GETCHAR_BACKSPACE  -5
+#define GETCHAR_DELETE     -6
+#define GETCHAR_DELETELINE -7
+#define GETCHAR_UP         -8
+#define GETCHAR_DOWN       -9
+#define GETCHAR_RIGHT      -10
+#define GETCHAR_LEFT       -11

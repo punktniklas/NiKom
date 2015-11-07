@@ -203,49 +203,6 @@ void SaveCurrentUser(int, int);   /* Kommandot SPARA */
 
 /* Prototypes for functions defined in NiKEditor.c */
 int edittext(char *filnamn);
-void quote(void);
-void fidotextquote(struct Mote *);
-void orgtextquote(struct Mote *);
-void brevquote(void);
-int lineedit(char *filnamn);
-int linegetline(char *str,char *wrap,int linenr);
-void linerenumber(void);
-void lineloadfile(char *filnamn);
-void linedelline(char *arg);
-int lineinsert(int before);
-void lineread(void);
-void lineflyttatext(char *vart);
-void linearende(char *nytt);
-void lineaddera(char *vem);
-int linechange(int foorad);
-int linedump(void);
-void linequote(void);
-void linecrash(void);
-int fulledit(char *filnamn);
-void fullvanlgtkn(char tecken);
-void fullbackspace(void);
-void fulldelete(void);
-void fulltab(void);
-void fullctrla(void);
-void fullctrle(void);
-void fullctrlk(void);
-void fullctrll(void);
-void fullctrlx(void);
-void fullctrly(void);
-void fullansisekv(void);
-void fullshiftedcursor(void);
-void fullreturn(void);
-int doedkmd(void);
-void fulladdera(char *vem);
-void fullflyttatext(char *vart);
-void fullarende(char *nytt);
-int fulldumpa(void);
-int fullnewline(void);
-int fullloadtext(char *filnamn);
-void fulldisplaytext(void);
-void fullquote(void);
-void fullcrash(void);
-struct UserGroup *getgrouppek(int nummer);
 
 /* Prototypes for functions defined in NiKFiles.c */
 int skaparea(void);

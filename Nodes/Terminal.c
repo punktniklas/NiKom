@@ -22,6 +22,9 @@ int radcnt = 0;
 char commandhistory[10][1025];
 
 int checkvalue(char *buffer);
+int handle1bChar(void);
+int handleAnsiSequence(void);
+int handleShiftedAnsiSequence(void);
 
 void sendfile(char *filename) {
   FILE *fp;
@@ -42,6 +45,104 @@ void sendfile(char *filename) {
   fclose(fp);
 }
 
+int GetChar(void) {
+  unsigned char ch;
+  int ret;
+
+  for(;;) {
+    ch = gettekn();
+
+    if(carrierdropped()) {
+      return GETCHAR_LOGOUT;
+    }
+
+    switch(ch) {
+    case '\r': case '\n':
+      return GETCHAR_RETURN;
+    case 1: // Ctrl-A
+      return GETCHAR_SOL;
+    case 5: // Ctrl-E
+      return GETCHAR_EOL;
+    case '\b':
+      return GETCHAR_BACKSPACE;
+    case 4: // Ctrl-D
+    case 127: // Delete
+      return GETCHAR_DELETE;
+    case 24: // Ctrl-X
+      return GETCHAR_DELETELINE;
+    case 0x9b:
+      ret = handleAnsiSequence();
+      if(ret != 0) {
+        return ret;
+      }
+      break;
+    case 0x1b:
+      ret = handle1bChar();
+      if(ret != 0) {
+        return ret;
+      }
+      break;
+    default:
+      return ch;
+    }
+  }
+}
+
+int handle1bChar(void) {
+  unsigned char ch;
+
+  ch = gettekn();
+  if(carrierdropped()) {
+    return GETCHAR_LOGOUT;
+  }
+  if(ch == '[' || ch == 'Ä') {
+    return handleAnsiSequence();
+  }
+  return 0;
+}
+
+int handleAnsiSequence(void) {
+  unsigned char ch;
+
+  ch = gettekn();
+  if(carrierdropped()) {
+    return GETCHAR_LOGOUT;
+  }
+
+  switch(ch) {
+  case 0x41: // Arrow up
+    return GETCHAR_UP;
+  case 0x42: //Arrow down
+    return GETCHAR_DOWN;
+  case 0x43: // Arrow right
+    return GETCHAR_RIGHT;
+  case 0x44: // Arrow left
+    return GETCHAR_LEFT;
+  case 0x20: // Shift-<something>
+    return handleShiftedAnsiSequence();
+  default:
+    return 0;
+  }
+}
+
+int handleShiftedAnsiSequence(void) {
+  unsigned char ch;
+
+  ch = gettekn();
+  if(carrierdropped()) {
+    return GETCHAR_LOGOUT;
+  }
+  
+  switch(ch) {
+  case 0x40: // Shift Arrow Right
+    return GETCHAR_EOL;
+  case 0x41: // Shift Arrow Left
+    return GETCHAR_SOL;
+  default:
+    return 0;
+  }
+}
+
 // TODO: Phase out the use of this function in favor of Get(Secret)String
 int getstring(int echo, int maxchrs, char *defaultStr) {
   return GetStringX(echo, maxchrs, defaultStr, NULL, NULL, NULL);
@@ -51,7 +152,7 @@ int GetString(int maxchrs, char *defaultStr) {
   return GetStringX(EKO, maxchrs, defaultStr, NULL, NULL, NULL);
 }
 
-int printableCharactersAccepted(unsigned char c) {
+int IsPrintableCharacter(unsigned char c) {
   return (c > 31 && c < 127) || (c > 159 && c <= 255);
 }
 
@@ -104,8 +205,7 @@ int GetStringX(int echo, int maxchrs, char *defaultStr,
                int (*isCharacterAccepted)(unsigned char),
                int (*isStringAccepted)(char *, void *),
                void *customData) {
-  int size = 0, pos=0, i, modified = FALSE;
-  unsigned char inchr;
+  int size = 0, pos=0, i, modified = FALSE, ch;
   static int historycnt = -1;
   radcnt = 0;
 
@@ -116,47 +216,40 @@ int GetStringX(int echo, int maxchrs, char *defaultStr,
     strcpy(inmat, defaultStr);
   }
   if(isCharacterAccepted == NULL) {
-    isCharacterAccepted = &printableCharactersAccepted;
+    isCharacterAccepted = &IsPrintableCharacter;
   }
 
   for(;;) {
-    inchr = gettekn();
+    ch = GetChar();
 
-    if(inchr == '\r') {
+    if(ch == GETCHAR_LOGOUT) {
+      return 1;
+    }
+    if(ch == GETCHAR_RETURN) {
       inmat[size] = '\0';
       if(isStringAccepted == NULL || isStringAccepted(inmat, customData)) {
         break;
       }
     }
-    else if(inchr == 1 && pos > 0) { // CTRL-A
-      SendStringNoBrk("\x1b\x5b%d\x44", pos);
-      pos = 0;
-    }
-    else if(inchr == 5 && pos < size) { /* CTRL-E */
-      SendStringNoBrk("\x1b\x5b%d\x43", size - pos);
-      pos = size;
-    }
-    else if(isCharacterAccepted(inchr)) {
-      if(size >= maxchrs) {
-        eka('\a');
+    else if(ch == GETCHAR_SOL) {
+      if(pos == 0) {
         continue;
       }
       if(echo) {
-        if(Servermem->inne[nodnr].flaggor & SEKVENSANSI) {
-          SendStringNoBrk("\x1b\x5b\x31\x40");
-        }
-        if(echo != STAREKO) {
-          eka(inchr);
-        } else {
-          eka('*');
-        }
+        SendStringNoBrk("\x1b\x5b%d\x44", pos);
       }
-      movmem(&inmat[pos], &inmat[pos+1], size - pos);
-      inmat[pos++] = inchr;
-      size++;
-      modified = TRUE;
+      pos = 0;
     }
-    else if(inchr==8) {
+    else if(ch == GETCHAR_EOL) {
+      if(pos == size) {
+        continue;
+      }
+      if(echo) {
+        SendStringNoBrk("\x1b\x5b%d\x43", size - pos);
+      }
+      pos = size;
+    }
+    else if(ch == GETCHAR_BACKSPACE) {
       if(pos == 0) {
         continue;
       }
@@ -173,12 +266,18 @@ int GetStringX(int echo, int maxchrs, char *defaultStr,
       size--;
       modified = TRUE;
     }
-    else if(inchr == '\n') {
-      if(carrierdropped()) {
-        return 1;
+    else if(ch == GETCHAR_DELETE) {
+      if(pos == size) {
+        continue;
       }
+      if(echo) {
+        SendStringNoBrk("\x1b\x5b\x50");
+      }
+      movmem(&inmat[pos + 1], &inmat[pos], size - pos);
+      size--;
+      modified = TRUE;
     }
-    else if(inchr == 24 && (Servermem->inne[nodnr].flaggor & SEKVENSANSI)) { //Ctrl-X
+    else if(ch == GETCHAR_DELETELINE) {
       if(echo) {
         if(pos > 0) {
           SendStringNoBrk("\x1b\x5b%d\x44\x1b\x5b\x4a", pos);
@@ -189,86 +288,88 @@ int GetStringX(int echo, int maxchrs, char *defaultStr,
       memset(inmat, 0, 1023);
       pos = size = 0;
     }
-    else if(inchr == 127 && (Servermem->inne[nodnr].flaggor & SEKVENSANSI)) {
-      if(pos != size) {
-        if(echo) {
-          SendStringNoBrk("\x1b\x5b\x50");
-        }
-        movmem(&inmat[pos + 1], &inmat[pos], size - pos);
-        size--;
-        modified = TRUE;
+    else if(ch == GETCHAR_LEFT) {
+      if(pos == 0) {
+        continue;
       }
-    } else if(inchr == '\x9b' || inchr == '\x1b') {
-      if(inchr == '\x1b') {
-        inchr = gettekn();
-        if(inchr != '[' && inchr != 'Ä') {
-          continue;
-        }
+      if(echo) {
+        SendStringNoBrk("\x1b\x5b\x44",-1,0);
       }
+      pos--;
+    } else if(ch == GETCHAR_RIGHT) {
+      if(pos == size) {
+        continue;
+      }
+      if(echo) {
+        SendStringNoBrk("\x1b\x5b\x43",-1,0);
+      }
+      pos++;
+    } else if(ch == GETCHAR_UP) {
+      if(!echo || historycnt >= 9 || commandhistory[historycnt + 1][0] == '\0') {
+        continue;
+      }
+      historycnt++;
+      strncpy(inmat, commandhistory[historycnt], maxchrs);
+      inmat[maxchrs] = '\0';
+      if(pos > 0) {
+        SendStringNoBrk("\x1b\x5b%d\x44\x1b\x5b\x4a%s", pos, inmat);
+      } else {
+        SendStringNoBrk("\x1b\x5b\x4a%s", inmat);
+      }
+      pos = size = strlen(inmat);
+      modified=FALSE;
+    } else if(ch == GETCHAR_DOWN) {
       if(!echo) {
         continue;
       }
-
-      inchr = gettekn();
-      if(inchr == '\x44' && pos > 0) { // Arrow left
-        SendStringNoBrk("\x1b\x5b\x44",-1,0);
-        pos--;
-      } else if(inchr=='\x43' && pos < size) { // Arrow right
-        SendStringNoBrk("\x1b\x5b\x43",-1,0);
-        pos++;
-      } else if(inchr == '\x41') { // Arrow up
-        if(historycnt >= 9 || commandhistory[historycnt + 1][0] == '\0') {
-          continue;
-        }
-        historycnt++;
-        strncpy(inmat, commandhistory[historycnt], maxchrs);
-        inmat[maxchrs] = '\0';
-        if(pos > 0) {
-          SendStringNoBrk("\x1b\x5b%d\x44\x1b\x5b\x4a%s", pos, inmat);
-        } else {
-          SendStringNoBrk("\x1b\x5b\x4a%s", inmat);
-        }
-        pos = size = strlen(inmat);
-        modified=FALSE;
-      } else if(inchr=='\x42') { // Arrow down
-        if(historycnt == 0 || historycnt == -1) {
-          historycnt = -1;
-          if(echo == 1) {
-            if(pos > 0) {
-              SendStringNoBrk("\x1b\x5b%d\x44\x1b\x5b\x4a",pos);
-            } else {
-              SendStringNoBrk("\x1b\x5b\x4a");
-            }
+      if(historycnt == 0 || historycnt == -1) {
+        historycnt = -1;
+        if(echo == 1) {
+          if(pos > 0) {
+            SendStringNoBrk("\x1b\x5b%d\x44\x1b\x5b\x4a",pos);
+          } else {
+            SendStringNoBrk("\x1b\x5b\x4a");
           }
-          memset(inmat,0,1023);
-          pos=size=0;
-          continue;
         }
+        memset(inmat,0,1023);
+        pos=size=0;
+        continue;
+      }
         
-        if(historycnt == 0 || commandhistory[historycnt-1][0] == '\0') {
-          continue;
+      if(historycnt == 0 || commandhistory[historycnt-1][0] == '\0') {
+        continue;
+      }
+      
+      historycnt--;
+      strncpy(inmat, commandhistory[historycnt], maxchrs);
+      inmat[maxchrs] = '\0';
+      if(pos) {
+        SendStringNoBrk("\x1b\x5b%d\x44\x1b\x5b\x4a%s", pos, inmat);
+      } else {
+        SendStringNoBrk("\x1b\x5b\x4a%s", inmat);
+      }
+      pos = size = strlen(inmat);
+      modified=FALSE;
+    }
+    else if(isCharacterAccepted(ch)) {
+      if(size >= maxchrs) {
+        eka('\a');
+        continue;
+      }
+      if(echo) {
+        if(Servermem->inne[nodnr].flaggor & SEKVENSANSI) {
+          SendStringNoBrk("\x1b\x5b\x31\x40");
         }
-
-        historycnt--;
-        strncpy(inmat, commandhistory[historycnt], maxchrs);
-        inmat[maxchrs] = '\0';
-        if(pos) {
-          SendStringNoBrk("\x1b\x5b%d\x44\x1b\x5b\x4a%s", pos, inmat);
+        if(echo != STAREKO) {
+          eka(ch);
         } else {
-          SendStringNoBrk("\x1b\x5b\x4a%s", inmat);
-        }
-        pos = size = strlen(inmat);
-        modified=FALSE;
-      } else if(inchr==' ') { // Shift-something
-        inchr = gettekn();
-        if(inchr == 'A' && pos > 0) { // Shift left
-          SendStringNoBrk("\x1b\x5b%d\x44", pos);
-          pos = 0;
-        } else if(inchr == '@' && pos < size) { // Shift right
-          SendStringNoBrk("\x1b\x5b%d\x43", size - pos);
-          pos = size;
+          eka('*');
         }
       }
+      movmem(&inmat[pos], &inmat[pos+1], size - pos);
+      inmat[pos++] = ch;
+      size++;
+      modified = TRUE;
     }
   }
   inmat[size] = 0;

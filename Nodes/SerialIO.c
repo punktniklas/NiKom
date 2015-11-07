@@ -284,6 +284,11 @@ char gettekn(void)
 		serreadsig=1L << serreadport->mp_SigBit,inactivesig=1L << inactiveport->mp_SigBit,
 		nikomnodesig = 1L << nikomnodeport->mp_SigBit;
 	char tkn=0,tmp[51];
+
+        if(carrierdropped()) {
+          return '\n';
+        }
+        
 	if(typeaheadbuftkn) {
 		tkn=typeaheadbuf[0];
 		strcpy(tmp,&typeaheadbuf[1]);
