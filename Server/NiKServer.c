@@ -16,6 +16,7 @@
 #include "ServerFuncs.h"
 #include "NiKomLib.h"
 #include "Config.h"
+#include "VersionStrings.h"
 
 #define ERROR	10
 #define OK	0
