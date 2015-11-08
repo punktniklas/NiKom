@@ -74,21 +74,22 @@
 #define NODSER       2
 #define NODSPAWNED   3 /* En som körs från PreNoden */
 
-/* Flaggor */
-#define ANTFLAGG     13 /* Antalet flaggor */
-#define SKYDDAD      1
-#define STRECKRAD    2
-#define STAREKOFLAG	 4
-#define INGENHELP    8
-#define FULLSCREEN   16
-#define FILLISTA     32
-#define MELLANSLAG   64
-#define LAPPBREV     128
-#define SEKVENSANSI  256
-#define SHOWKLUDGE   512
-#define CLEARSCREEN  1024
-#define NOLOGNOTIFY  2048
-#define ANSICOLOURS  4096
+/* User flags */
+#define ANTFLAGG     14 /* Number of flags */
+#define SKYDDAD            1
+#define STRECKRAD          2
+#define STAREKOFLAG        4
+#define INGENHELP          8
+#define FULLSCREEN         16
+#define FILLISTA           32
+#define MELLANSLAG         64
+#define LAPPBREV           128
+#define SEKVENSANSI        256
+#define SHOWKLUDGE         512
+#define CLEARSCREEN        1024
+#define NOLOGNOTIFY        2048
+#define ANSICOLOURS        4096
+#define ASCII_7E_IS_DELETE 8192
 
 /* Status på texter */
 #define RADERAD      1

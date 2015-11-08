@@ -49,6 +49,13 @@
 - A new tool, NiKomFido, that replaces the separate tools UpdateFido,
   ReScanConf, ReScanAllConf and RenumberConf.
 
+- NiKom can now handle VT220 backspace and delete (where backspace is
+  sent as ASCII 0x7e (DEL) and delete is sent as "Esc[3~"). To resolve
+  the ambiguity with the old (VT100?) handling where delete is ASCII
+  0x7e a new user flag has been introduced. At the login prompt, before
+  NiKom knows which user it is, the default flags configured in System.cfg
+  are used. You probably want to make sure that the flag is set to off
+  here so backspace works for all users.
 
 ---------------------------------------------------------------------------
                          NiKom v1.61, 2015-08-25

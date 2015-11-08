@@ -25,6 +25,7 @@ int checkvalue(char *buffer);
 int handle1bChar(void);
 int handleAnsiSequence(void);
 int handleShiftedAnsiSequence(void);
+int handleCsi3(void);
 
 void sendfile(char *filename) {
   FILE *fp;
@@ -67,7 +68,9 @@ int GetChar(void) {
       return GETCHAR_BACKSPACE;
     case 4: // Ctrl-D
     case 127: // Delete
-      return GETCHAR_DELETE;
+      return Servermem->inne[nodnr].flaggor & ASCII_7E_IS_DELETE
+          || Servermem->nodtyp[nodnr] == NODCON
+        ? GETCHAR_DELETE : GETCHAR_BACKSPACE;
     case 24: // Ctrl-X
       return GETCHAR_DELETELINE;
     case 0x9b:
@@ -101,6 +104,9 @@ int handle1bChar(void) {
   return 0;
 }
 
+/*
+ * Handles characters after CSI (1b5b), i.e. ANSI escape sequences
+ */
 int handleAnsiSequence(void) {
   unsigned char ch;
 
@@ -110,6 +116,8 @@ int handleAnsiSequence(void) {
   }
 
   switch(ch) {
+  case 0x33:
+    return handleCsi3();
   case 0x41: // Arrow up
     return GETCHAR_UP;
   case 0x42: //Arrow down
@@ -120,6 +128,25 @@ int handleAnsiSequence(void) {
     return GETCHAR_LEFT;
   case 0x20: // Shift-<something>
     return handleShiftedAnsiSequence();
+  default:
+    return 0;
+  }
+}
+
+/*
+ * Handles the CSI (0x1b5b) follwed by '3' (0x33)
+ */
+int handleCsi3(void) {
+  unsigned char ch;
+
+  ch = gettekn();
+  if(carrierdropped()) {
+    return GETCHAR_LOGOUT;
+  }
+
+  switch(ch) {
+  case 0x7e:
+    return GETCHAR_DELETE;
   default:
     return 0;
   }
