@@ -289,7 +289,6 @@ void showProgramDatacfg(int person) {
 
 int Cmd_ChangeUser(void) {
   int userId, tmp, i, isCorrect;
-  char tmpPwd[16];
   struct User user;
   struct ShortUser *shortUser;
   if(argument[0]) {
