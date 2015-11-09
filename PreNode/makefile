@@ -6,18 +6,25 @@ OBJS = Ser.o SerialIO.o Terminal.o ServerComm.o Modem.o Rexx.o Stuff.o \
 
 all: PreNode
 
-setup:
-  makedir Debug Debug/$(CPU)
-  makedir NoDebug NoDebug/$(CPU)
+Debug:
+  makedir Debug
+
+Debug/$(CPU): Debug
+  makedir Debug/$(CPU)
+
+NoDebug:
+  makedir NoDebug
+
+NoDebug/$(CPU): NoDebug
+  makedir NoDebug/$(CPU)
 
 clean:
   delete \#?.o
-  delete Debug/$(CPU)/\#? NoDebug/$(CPU)/\#?
+  delete Debug NoDebug all
 
-PreNode: $(OBJS)
+PreNode: debug/$(CPU) nodebug/$(CPU) $(OBJS)
   slink FROM lib:c.o $(OBJS) TO Debug/$(CPU)/PreNode \
-        LIB lib:sc.lib lib:amiga.lib /UtilLib/Debug/$(CPU)/nikomutils.lib \
-        NOALVS
+        LIB lib:sc.lib lib:amiga.lib /UtilLib/Debug/$(CPU)/nikomutils.lib
   slink Debug/$(CPU)/PreNode TO NoDebug/$(CPU)/PreNode NODEBUG NOICONS
 
 Ser.o: Ser.c /Include/NiKomStr.h
@@ -49,4 +56,3 @@ NewUser.o: /Nodes/NewUser.c /Include/NiKomStr.h
 
 CharacterSets.o: /Nodes/CharacterSets.c /Include/NiKomStr.h
   sc $(FLAGS) OBJNAME=CharacterSets.o /Nodes/CharacterSets.c
-

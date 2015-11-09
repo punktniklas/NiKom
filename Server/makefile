@@ -5,24 +5,29 @@ OBJS  = NiKServer.o NiKHost.o NiKHost2.o NiKHost3.o NiKVersion.o NodeComm.o \
 
 all: NiKServer
 
-setup:
-  makedir Debug Debug/$(CPU)
-  makedir NoDebug NoDebug/$(CPU)
+Debug:
+  makedir Debug
+
+Debug/$(CPU): Debug
+  makedir Debug/$(CPU)
+
+NoDebug:
+  makedir NoDebug
+
+NoDebug/$(CPU): NoDebug
+  makedir NoDebug/$(CPU)
 
 clean:
   delete \#?.o
-  delete Debug/$(CPU)/\#? NoDebug/$(CPU)/\#?
+  delete Debug NoDebug all
 
-NiKServer: $(OBJS)
-  slink FROM lib:c.o $(OBJS) \
-        TO Debug/$(CPU)/NiKServer \
-        LIB lib:sc.lib+lib:amiga.lib+/UtilLib/Debug/$(CPU)/nikomutils.lib \
-        NOALVS NOICONS
+NiKServer: Debug/$(CPU) NoDebug/$(CPU) $(OBJS)
+  slink FROM lib:c.o $(OBJS) TO Debug/$(CPU)/NiKServer \
+        LIB lib:sc.lib+lib:amiga.lib+/UtilLib/Debug/$(CPU)/nikomutils.lib NOICONS
   slink FROM Debug/$(CPU)/NiKServer TO NoDebug/$(CPU)/NiKServer NODEBUG NOICONS
 
-
 NiKServer.o: NiKServer.c /Include/NiKomStr.h
-  sc $(FLAGS) NiKServer.c
+  sc $(FLAGS) DEFINE=NIKRELEASE=$(NIKRELEASE) NiKServer.c
 
 NiKHost.o: NiKHost.c /Include/NiKomStr.h
   sc $(FLAGS) NiKHost.c
