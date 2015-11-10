@@ -27,7 +27,7 @@ NiKServer: Debug/$(CPU) NoDebug/$(CPU) $(OBJS)
   slink FROM Debug/$(CPU)/NiKServer TO NoDebug/$(CPU)/NiKServer NODEBUG NOICONS
 
 NiKServer.o: NiKServer.c /Include/NiKomStr.h
-  sc $(FLAGS) DEFINE=NIKRELEASE=$(NIKRELEASE) NiKServer.c
+  sc $(FLAGS) NiKServer.c
 
 NiKHost.o: NiKHost.c /Include/NiKomStr.h
   sc $(FLAGS) NiKHost.c
