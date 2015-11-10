@@ -8,33 +8,37 @@ OBJS    = ServerComm.o Terminal.o NiKFuncs.o NiKFuncs2.o NiKFuncs3.o NiKFuncs4.o
 CONOBJS = NiKomCon.o ConsoleIO.o NiKConTrans.o NiKConOffline.o
 SEROBJS = NiKomSer.o SerialIO.o NiKTransfer.o NiKOffline.o
 
-all: NiKomCon NiKomSer
+all:	NiKomCon NiKomSer
 
-setup:
+Debug:
   makedir Debug
-  makedir Debug/$(CPU)
-  makedir NoDebug
-  makedir NoDebug/$(CPU)
 
+Debug/$(CPU): Debug
+  makedir Debug/$(CPU)
+
+NoDebug:
+  makedir NoDebug
+
+NoDebug/$(CPU): NoDebug
+  makedir NoDebug/$(CPU)
 
 clean:
   delete \#?.o
-  delete Debug/$(CPU)/\#?
-  delete NoDebug/$(CPU)/\#?
+  delete Debug NoDebug all
 
-NiKomCon: $(OBJS) $(CONOBJS)
+NiKomCon: Debug/$(CPU) NoDebug/$(CPU) $(OBJS) $(CONOBJS)
   slink FROM lib:c.o $(CONOBJS) $(OBJS) \
         TO Debug/$(CPU)/NiKomCon \
         LIB lib:sc.lib+lib:amiga.lib+/UtilLib/Debug/$(CPU)/nikomutils.lib \
-        NOALVS NOICONS
+        NOICONS
   slink debug/$(CPU)/NiKomCon TO nodebug/$(CPU)/NiKomCon NODEBUG NOICONS
 
-NiKomSer: $(OBJS) $(SEROBJS)
+NiKomSer: Debug/$(CPU) NoDebug/$(CPU) $(OBJS) $(SEROBJS)
   slink FROM lib:c.o $(SEROBJS) $(OBJS) \
         TO Debug/$(CPU)/NiKomSer \
         LIB lib:sc.lib+lib:amiga.lib+/UtilLib/Debug/$(CPU)/nikomutils.lib \
-        NOALVS NOICONS VERBOSE
-  slink debug/$(CPU)/NiKomSer TO noDebug/$(CPU)/NiKomSer NODEBUG NOICONS
+        NOICONS VERBOSE
+  slink Debug/$(CPU)/NiKomSer TO NoDebug/$(CPU)/NiKomSer NODEBUG NOICONS
 
 NiKomCon.o: NiKomCon.c /Include/NiKomStr.h
   sc $(FLAGS) NiKomCon.c OBJNAME=NiKomCon.o

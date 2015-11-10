@@ -5,17 +5,20 @@ OBJS    = DiskUtils.o FileAreaUtils.o Logging.o RexxUtils.o ExecUtils.o \
 
 all: nikomutils.lib
 
-setup:
-  makedir Debug Debug/$(CPU)
+Debug:
+  makedir Debug
+
+Debug/$(CPU): Debug
+  makedir Debug/$(CPU)
 
 clean:
   delete \#?.o
-  delete Debug/$(CPU)/\#?
+  delete Debug all
 
 .c.o :
   sc $(SCFLAGS) $*
 
-nikomutils.lib: $(OBJS)
+nikomutils.lib: Debug/$(CPU) $(OBJS)
   oml -v Debug/$(CPU)/nikomutils.lib r $(OBJS)
 
 DiskUtils.o: DiskUtils.c DiskUtils.h
