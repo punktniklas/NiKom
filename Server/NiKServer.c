@@ -351,13 +351,6 @@ void getconfig(void) {
 		if(buffer[0]=='J' || buffer[0]=='j') Servermem->cfg.cfgflags |= NICFG_VALIDATEFILES;
 		else Servermem->cfg.cfgflags &= ~NICFG_VALIDATEFILES;
 	}
-/*	if(getcfgfilestring("STARATNOECHO",fh,buffer)) {
-*		Close(fh);
-*		return;
-*	} else {
-*		if(buffer[0]=='J' || buffer[0]=='j') Servermem->cfg.cfgflags |= NICFG_STARATNOECHO;
-*		else Servermem->cfg.cfgflags &= ~NICFG_STARATNOECHO;
-*	} */
 	if(getcfgfilestring("LOGINTRIES",fh,buffer)) {
 		Close(fh);
 		return;
@@ -377,6 +370,10 @@ void getconfig(void) {
 		if(buffer[0]=='J' || buffer[0]=='j') Servermem->cfg.cfgflags |= NICFG_CRYPTEDPASSWORDS;
 		else Servermem->cfg.cfgflags &= ~NICFG_CRYPTEDPASSWORDS;
 	}
+	if(getcfgfilestring("NEWUSERCHARSET", fh, buffer)) {
+          Close(fh);
+          return;
+	} else Servermem->cfg.defaultcharset = atoi(buffer);
 	Close(fh);
 	printf("System.cfg inläst\n");
 }

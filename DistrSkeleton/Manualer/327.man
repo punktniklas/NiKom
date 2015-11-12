@@ -1,0 +1,19 @@
+
+
+Byt Teckenset
+-------------
+
+Syntax: Byt Teckenset 1 | 2 | 3 | 4 | -e
+
+Beskrivning:
+Ger möjlighet att ändra inställningen for teckenuppsättning. Om inget
+argument anges så visas en meny där man kan välja teckenuppsättning.
+I menyn finns fyra alternativ numrerade från 1 till 4. Om man anger en
+av dessa siffror som argument så väljs denna teckenuppsättning direkt
+utan att visa en meny.
+
+Om "-e" anges som argument så kommer det i menyn även att skrivas ut
+exempel på svenska tecken i varje teckenuppsättning för att underlätta
+att veta vilken man ska välja. Detta kan dock ställa till problem med
+vissa terminaler som kan reagera konstigt på svenska tecken i
+teckenuppsättningar som den inte är inställd för.

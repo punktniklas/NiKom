@@ -57,6 +57,18 @@
   are used. You probably want to make sure that the flag is set to off
   here so backspace works for all users.
 
+- Since the examples of different character sets causes problems with
+  some terminals when they are receiving Swedish characters in character
+  sets they are not set to handle NiKom no longer prints out these
+  examples by default. For new users the examples will never be printed
+  and when running the command "Byt Teckenset" they will only be printed
+  when the option "-e" is given as an argument.
+
+  Also, since character sets other than ISO 8859-1 have largely played
+  out their role there is now a new entry in System.cfg called
+  NEWUSERCHARSET where it can be defined what character set new users
+  should get by default so they don't have to choose anything.
+
 ---------------------------------------------------------------------------
                          NiKom v1.61, 2015-08-25
 ---------------------------------------------------------------------------
