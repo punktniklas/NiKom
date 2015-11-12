@@ -22,7 +22,7 @@ clean:
   delete \#?.o
   delete Debug NoDebug all
 
-PreNode: debug/$(CPU) nodebug/$(CPU) $(OBJS)
+PreNode: Debug/$(CPU) NoDebug/$(CPU) $(OBJS)
   slink FROM lib:c.o $(OBJS) TO Debug/$(CPU)/PreNode \
         LIB lib:sc.lib lib:amiga.lib /UtilLib/Debug/$(CPU)/nikomutils.lib
   slink Debug/$(CPU)/PreNode TO NoDebug/$(CPU)/PreNode NODEBUG NOICONS

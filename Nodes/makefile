@@ -31,7 +31,7 @@ NiKomCon: Debug/$(CPU) NoDebug/$(CPU) $(OBJS) $(CONOBJS)
         TO Debug/$(CPU)/NiKomCon \
         LIB lib:sc.lib+lib:amiga.lib+/UtilLib/Debug/$(CPU)/nikomutils.lib \
         NOICONS
-  slink debug/$(CPU)/NiKomCon TO nodebug/$(CPU)/NiKomCon NODEBUG NOICONS
+  slink Debug/$(CPU)/NiKomCon TO NoDebug/$(CPU)/NiKomCon NODEBUG NOICONS
 
 NiKomSer: Debug/$(CPU) NoDebug/$(CPU) $(OBJS) $(SEROBJS)
   slink FROM lib:c.o $(SEROBJS) $(OBJS) \
