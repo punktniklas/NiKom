@@ -67,6 +67,7 @@ int GetChar(void) {
     case '\b':
       return GETCHAR_BACKSPACE;
     case 4: // Ctrl-D
+      return GETCHAR_DELETE;
     case 127: // Delete
       return Servermem->inne[nodnr].flaggor & ASCII_7E_IS_DELETE
           || Servermem->nodtyp[nodnr] == NODCON
