@@ -32,7 +32,7 @@ void sendfile(char *filename) {
   char buff[1025];
   if(!(fp=fopen(filename, "r"))) {
     LogEvent(SYSTEM_LOG, ERROR, "Can't open file %s for reading.", filename);
-    SendString("Internal error.\r\n");
+    DisplayInternalError();
     return;
   }
   for(;;) {
