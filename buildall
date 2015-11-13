@@ -1,0 +1,47 @@
+; Build complete distribution
+; Builds 68000 and 68020 versions
+
+Failat 20
+Delete NiKom_complete.lha
+
+; Make the script abort if anything goes wrong during compilation
+Failat 1
+
+cd UtilLib
+smake -i clean
+smake
+smake -i clean
+smake CPU=68000
+
+cd /NiKomLib
+smake -i clean
+smake
+smake -i clean
+smake CPU=68000
+
+cd /InitNiKom
+smake -i clean
+smake
+smake -i clean
+smake CPU=68000
+
+cd /PreNode
+smake -i clean
+smake
+smake -i clean
+smake CPU=68000
+
+cd /Server
+smake -i clean
+smake
+smake -i clean
+smake CPU=68000
+
+cd /Nodes
+smake -i clean
+smake
+smake -i clean
+smake CPU=68000
+cd /
+
+lha a NiKomBinDistr.lha NiKomLib/NoDebug/#? InitNiKom/InitNiKom PreNode/NoDebug/68020/#? Server/NoDebug/68020/#? Nodes/NoDebug/68020/#?
