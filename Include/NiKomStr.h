@@ -179,20 +179,19 @@ struct AutoRexxCfg {
       nextmeet,nexttext,nextkom,setid,nextletter,cardropped;
 };
 
-#define NICFG_CLOSEDBBS			1
-#define NICFG_VALIDATEFILES		2
-#define NICFG_STARATNOECHO		4
-#define NICFG_LOCALCOLOURS		8
-#define NICFG_CRYPTEDPASSWORDS	16
+#define NICFG_CLOSEDBBS        1
+#define NICFG_VALIDATEFILES    2
+#define NICFG_LOCALCOLOURS     8
+#define NICFG_CRYPTEDPASSWORDS 16
 
 struct Config {
    struct Statuscfg st;
    struct AutoRexxCfg ar;
    long defaultflags, diskfree, logmask, cfgflags;
    short maxtid[101],logintries;
-   char uldlratio[101],inaktiv[101],defaultrader,
-      defaultprotokoll,defaultstatus,brevnamn[41],ny[21],ultmp[100],
-      logfile[100];
+   char uldlratio[101],inaktiv[101],
+     defaultrader, defaultprotokoll,defaultstatus, defaultcharset,
+     brevnamn[41],ny[21],ultmp[100], logfile[100];
 };
 
 struct ReadLetter {

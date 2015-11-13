@@ -26,9 +26,15 @@ if kom='-2' then do
 end
 
 if kom='-3' then do
-	'sendstring' '0d0a0a'x'Skriv: Manual <Kommando>' '0d0a'x
-	exit
+  'sendstring' '0d0a0a'x'Skriv: Manual <Kommando>' '0d0a'x
+  exit
 end
 
 filnamn='NiKom:Manualer/'||kom||'.man'
+
+if ~exists(filnamn) then do
+  'sendstring' '0d0a0a'x'Finns ingen manualfil för det kommandot.' '0d0a'x
+  exit
+end
+
 'sendtextfile' filnamn

@@ -84,32 +84,40 @@ void dellostsay(void) {
 }
 
 void bytteckenset(void) {
+  int showExample = FALSE;
+
   if(argument[0]) {
-    puttekn("\n\n\rNytt teckenset: ",-1);
     switch(argument[0]) {
     case '1' :
       Servermem->inne[nodnr].chrset = CHRS_LATIN1;
-      puttekn("ISO 8859-1\n\r",-1);
-      break;
+      SendString("\n\n\rNytt teckenset: ISO 8859-1\n\r");
+      return;
     case '2' :
       Servermem->inne[nodnr].chrset = CHRS_CP437;
-      puttekn("IBM CodePage 437\n\r",-1);
-      break;
+      SendString("\n\n\rNytt teckenset: IBM CodePage 437\n\r");
+      return;
     case '3' :
       Servermem->inne[nodnr].chrset = CHRS_MAC;
-      puttekn("Macintosh\n\r",-1);
-      break;
+      SendString("\n\n\rNytt teckenset: Mac OS Roman\n\r");
+      return;
     case '4' :
       Servermem->inne[nodnr].chrset = CHRS_SIS7;
-      puttekn("SIS-7\n\r",-1);
+      SendString("\n\n\rNytt teckenset: SIS-7\n\r");
+      return;
+    case '-':
+      if(argument[1] == 'e' || argument[1] == 'E') {
+        showExample = TRUE;
+      } else {
+        SendString("\n\n\rFelaktigt alternativ.\n\r");
+        return;
+      }
       break;
     default :
-      puttekn("\n\n\rFelaktig teckenuppsättning, ska vara mellan 1 och 4.\n\r",-1);
-      break;
+      SendString("\n\n\rFelaktig teckenuppsättning, ska vara mellan 1 och 4.\n\r");
+      return;
     }
-    return;
   }
-  AskUserForCharacterSet(FALSE);
+  AskUserForCharacterSet(FALSE, showExample);
 }
 
 void SaveCurrentUser(int inloggad, int nodnr)

@@ -32,7 +32,7 @@ void sendfile(char *filename) {
   char buff[1025];
   if(!(fp=fopen(filename, "r"))) {
     LogEvent(SYSTEM_LOG, ERROR, "Can't open file %s for reading.", filename);
-    SendString("Internal error.\r\n");
+    DisplayInternalError();
     return;
   }
   for(;;) {
@@ -67,6 +67,7 @@ int GetChar(void) {
     case '\b':
       return GETCHAR_BACKSPACE;
     case 4: // Ctrl-D
+      return GETCHAR_DELETE;
     case 127: // Delete
       return Servermem->inne[nodnr].flaggor & ASCII_7E_IS_DELETE
           || Servermem->nodtyp[nodnr] == NODCON

@@ -1,1 +1,1 @@
-int AskUserForCharacterSet(int forceChoice);
+int AskUserForCharacterSet(int forceChoice, int showExamples);

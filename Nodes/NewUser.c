@@ -27,9 +27,15 @@ int RegisterNewUser(void) {
   struct User *user = &Servermem->inne[nodnr];
 
   memset(user, 0, sizeof(struct User));
-  if(AskUserForCharacterSet(TRUE)) {
-    return 1;
+
+  if(Servermem->cfg.defaultcharset == 0) {
+    if(AskUserForCharacterSet(TRUE, FALSE)) {
+      return 1;
+    }
+  } else {
+    Servermem->inne[nodnr].chrset = Servermem->cfg.defaultcharset;
   }
+
   SendString("\r\n\n");
   user->rader = Servermem->cfg.defaultrader;
   sendfile("NiKom:Texter/NyAnv.txt");
