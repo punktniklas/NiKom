@@ -10,14 +10,14 @@ all:    nikom_pragmas.h nikom.library
         sc $(SCFLAGS) $(DEBUG) $*
 
 Debug:
-  makedir Debug
+  -makedir Debug
 
 NoDebug:
-  makedir NoDebug
+  -makedir NoDebug
 
 clean:
-  delete \#?.o nikom_pragmas.h
-  delete Debug NoDebug all
+  -delete \#?.o nikom_pragmas.h
+  -delete Debug NoDebug all
 
 nikom_pragmas.h: nikom.fd
   fd2pragma nikom.fd nikom_pragmas.tmp

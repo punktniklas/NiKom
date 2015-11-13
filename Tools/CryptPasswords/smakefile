@@ -5,8 +5,8 @@ OBJS = CryptPasswords.o FCrypt.o
 all: CryptPasswords
 
 clean:
-  delete \#?.o
-  delete CryptPasswords
+  -delete \#?.o
+  -delete CryptPasswords
 
 CryptPasswords: $(OBJS)
   slink FROM lib:c.o $(OBJS) \

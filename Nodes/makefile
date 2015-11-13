@@ -11,20 +11,20 @@ SEROBJS = NiKomSer.o SerialIO.o NiKTransfer.o NiKOffline.o
 all:	NiKomCon NiKomSer
 
 Debug:
-  makedir Debug
+  -makedir Debug
 
 Debug/$(CPU): Debug
-  makedir Debug/$(CPU)
+  -makedir Debug/$(CPU)
 
 NoDebug:
-  makedir NoDebug
+  -makedir NoDebug
 
 NoDebug/$(CPU): NoDebug
-  makedir NoDebug/$(CPU)
+  -makedir NoDebug/$(CPU)
 
 clean:
-  delete \#?.o
-  delete Debug NoDebug all
+  -delete \#?.o
+  -delete Debug NoDebug all
 
 NiKomCon: Debug/$(CPU) NoDebug/$(CPU) $(OBJS) $(CONOBJS)
   slink FROM lib:c.o $(CONOBJS) $(OBJS) \
