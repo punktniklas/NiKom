@@ -6,14 +6,14 @@ OBJS    = DiskUtils.o FileAreaUtils.o Logging.o RexxUtils.o ExecUtils.o \
 all: nikomutils.lib
 
 Debug:
-  makedir Debug
+  -makedir Debug
 
 Debug/$(CPU): Debug
-  makedir Debug/$(CPU)
+  -makedir Debug/$(CPU)
 
 clean:
-  delete \#?.o
-  delete Debug all
+  -delete \#?.o
+  -delete Debug all
 
 .c.o :
   sc $(SCFLAGS) $*

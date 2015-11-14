@@ -5,8 +5,8 @@ OBJS = SetNodeState.o
 all: SetNodeState
 
 clean:
-  delete \#?.o
-  delete SetNodeState
+  -delete \#?.o
+  -delete SetNodeState
 
 SetNodeState: $(OBJS)
   slink FROM lib:c.o $(OBJS) \
