@@ -64,7 +64,6 @@ int __saveds __asm LIBSaveProgramCategory( register __d0 int, register __a6 stru
 
 /* Matrix.c */
 int getlastmatrix(struct NiKomBase *);
-void debug_req(char *,APTR);
 int sprattmatchar(char *,char *);
 int fidoparsenamn(char *,struct System *);
 int updatenextletter(int);
@@ -79,8 +78,6 @@ int getnode(char *);
 int getpoint(char *);
 int gethwm(char *);
 int sethwm(char *,int);
-
-void rexxdebugreq(struct RexxMsg *);
 
 /* Echo.c */
 struct Mote *getmotpek(int, struct System *);

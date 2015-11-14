@@ -358,7 +358,6 @@ p - Default xpr protokoll (ignorera denna options för tillfället)
 s - Default status nya användare får.
 n - Nya användares inloggningsnamn
 u - Upload temporärbibliotek
-o - Namnet på NiKoms loggfil
 
 @endnode
 @node SendString "Referens : sendstring"

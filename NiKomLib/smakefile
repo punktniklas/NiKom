@@ -1,7 +1,8 @@
 OBJS    = LibInit.o UserLibInit.o Matrix.o Rexx.o Lock.o ReadFidoText.o Echo.o \
           NodeTypes.o Conf.o NiKVersion.o Terminal.o ServerComm.o Hash.o \
           PrgCat.o UnreadTexts.o Crypt.o FCrypt.o ConferenceTexts.o Util.o
-SCFLAGS = STREQ STRINGMERGE NOSTKCHK LIBCODE UNSIGNEDCHAR IDIR=/Include
+SCFLAGS = STREQ STRINGMERGE NOSTKCHK LIBCODE UNSIGNEDCHAR DEFINE=NIKOMLIB=1 \
+          IDIR=/Include IDIR=/UtilLib
 DEBUG   = DEBUG=LINE
 
 all:    nikom_pragmas.h nikom.library
@@ -10,10 +11,10 @@ all:    nikom_pragmas.h nikom.library
         sc $(SCFLAGS) $(DEBUG) $*
 
 debug:
-  makedir debug
+  -makedir debug
 
 nodebug:
-  makedir nodebug
+  -makedir nodebug
 
 clean:
   delete \#?.o nikom_pragmas.h
@@ -29,7 +30,7 @@ nikom.library : debug nodebug $(OBJS) nikom.fd
   slink TO Debug/nikom.library NOICONS \
         FROM lib:libent.o $(OBJS) \
         LIBPREFIX _LIB LIBFD nikom.fd \
-        LIB lib:sc.lib lib:amiga.lib \
+        LIB lib:sc.lib lib:amiga.lib /UtilLib/Debug/nikomutils_nlib.lib \
         BATCH SMALLCODE SMALLDATA \
         LIBVERSION 21 \
         LIBREVISION 1 \

@@ -324,10 +324,6 @@ void getconfig(void) {
 		tempnode->rexxprg=atoi(&buffer[1]);
 		AddTail((struct List *)&Servermem->special_login,(struct Node *)tempnode);
 	}
-	if(getcfgfilestring("LOGFILE",fh,buffer)) {
-		Close(fh);
-		return;
-	} else strcpy(Servermem->cfg.logfile,buffer);
 	if(getcfgfilestring("LOGMASK",fh,buffer)) {
 		Close(fh);
 		return;
@@ -955,7 +951,6 @@ void getfidocfg(void) {
 			else BAMSET((char *)&Servermem->fidodata.mailgroups,x);
 		}
 		else if(!strncmp(buffer,"MAILSTATUS",10)) Servermem->fidodata.mailstatus=atoi(&buffer[11]);
-		else if(!strncmp(buffer,"FIDOLOGFILE",11)) strncpy(Servermem->fidodata.fidologfile,&buffer[12],99);
 		else if(!strncmp(buffer,"DEFAULTORIGIN",13)) strncpy(Servermem->fidodata.defaultorigin,&buffer[14],69);
 		else if(!strncmp(buffer,"CRASHSTATUS",11)) Servermem->fidodata.crashstatus = atoi(&buffer[12]);
 	}

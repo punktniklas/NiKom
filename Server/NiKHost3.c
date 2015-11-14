@@ -152,9 +152,6 @@ void rexxsysteminfo(struct RexxMsg *mess)
 			strcpy(str,Servermem->cfg.ultmp);
 			break;
 
-		case 'o' : case 'O' :
-			strcpy(str,Servermem->cfg.logfile);
-			break;
 		default:
 			strcpy(str,"-2");
 			break;
