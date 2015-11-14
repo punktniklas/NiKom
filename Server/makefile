@@ -6,20 +6,20 @@ OBJS  = NiKServer.o NiKHost.o NiKHost2.o NiKHost3.o NiKVersion.o NodeComm.o \
 all: NiKServer
 
 Debug:
-  makedir Debug
+  -makedir Debug
 
 Debug/$(CPU): Debug
-  makedir Debug/$(CPU)
+  -makedir Debug/$(CPU)
 
 NoDebug:
-  makedir NoDebug
+  -makedir NoDebug
 
 NoDebug/$(CPU): NoDebug
-  makedir NoDebug/$(CPU)
+  -makedir NoDebug/$(CPU)
 
 clean:
-  delete \#?.o
-  delete Debug NoDebug all
+  -delete \#?.o
+  -delete Debug NoDebug all
 
 NiKServer: Debug/$(CPU) NoDebug/$(CPU) $(OBJS)
   slink FROM lib:c.o $(OBJS) TO Debug/$(CPU)/NiKServer \
