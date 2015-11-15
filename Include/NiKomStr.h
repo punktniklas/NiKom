@@ -191,7 +191,7 @@ struct Config {
    short maxtid[101],logintries;
    char uldlratio[101],inaktiv[101],
      defaultrader, defaultprotokoll,defaultstatus, defaultcharset,
-     brevnamn[41],ny[21],ultmp[100], logfile[100];
+     brevnamn[41],ny[21],ultmp[100];
 };
 
 struct ReadLetter {
@@ -327,7 +327,7 @@ struct FidoData {
 	struct FidoDomain fd[10];
 	struct FidoAlias fa[20];
 	long lastmatrix,mailgroups;
-	char mailstatus, bounce, crashstatus, fidologfile[100],matrixdir[100],defaultorigin[70];
+	char mailstatus, bounce, crashstatus, matrixdir[100],defaultorigin[70];
 };
 
 struct NodeType {

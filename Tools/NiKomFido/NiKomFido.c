@@ -17,8 +17,9 @@ void printUsage(void) {
 }
 
 void updateFido(void) {
-  printf("Updating Fido conferences and mail.\n");
+  printf("Updating Fido mail.\n");
   Matrix2NiKom();
+  printf("Updating Fido conferences.\n");
   UpdateAllFidoConf();
 }
 

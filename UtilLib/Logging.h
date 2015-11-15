@@ -1,6 +1,7 @@
 enum LogFiles {
   USAGE_LOG = 0,
-  SYSTEM_LOG = 1
+  SYSTEM_LOG = 1,
+  FIDO_LOG = 2
 };
 
 enum LogLevels {
@@ -12,4 +13,8 @@ enum LogLevels {
   CRITICAL = 5
 };
 
+#ifdef NIKOMLIB
+void LogEvent(struct System *Servermem, enum LogFiles logFile, enum LogLevels logLevel, char *fmt, ...);
+#else
 void LogEvent(enum LogFiles logFile, enum LogLevels logLevel, char *fmt, ...);
+#endif

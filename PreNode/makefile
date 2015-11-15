@@ -7,22 +7,22 @@ OBJS = Ser.o SerialIO.o Terminal.o ServerComm.o Modem.o Rexx.o Stuff.o \
 all: PreNode
 
 Debug:
-  makedir Debug
+  -makedir Debug
 
 Debug/$(CPU): Debug
-  makedir Debug/$(CPU)
+  -makedir Debug/$(CPU)
 
 NoDebug:
-  makedir NoDebug
+  -makedir NoDebug
 
 NoDebug/$(CPU): NoDebug
-  makedir NoDebug/$(CPU)
+  -makedir NoDebug/$(CPU)
 
 clean:
-  delete \#?.o
-  delete Debug NoDebug all
+  -delete \#?.o
+  -delete Debug NoDebug all
 
-PreNode: debug/$(CPU) nodebug/$(CPU) $(OBJS)
+PreNode: Debug/$(CPU) NoDebug/$(CPU) $(OBJS)
   slink FROM lib:c.o $(OBJS) TO Debug/$(CPU)/PreNode \
         LIB lib:sc.lib lib:amiga.lib /UtilLib/Debug/$(CPU)/nikomutils.lib
   slink Debug/$(CPU)/PreNode TO NoDebug/$(CPU)/PreNode NODEBUG NOICONS

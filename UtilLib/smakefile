@@ -1,19 +1,22 @@
-CPU     = 68020
-SCFLAGS = NMINC STRMERGE CPU=$(CPU) DEBUG=FULL IDIR=/Include
-OBJS    = DiskUtils.o FileAreaUtils.o Logging.o RexxUtils.o ExecUtils.o \
-	  ServerMemUtils.o
+CPU      = 68020
+SCFLAGS  = NMINC STRMERGE CPU=$(CPU) DEBUG=FULL IDIR=/Include
+NLFLAGS  = NMINC STRMERGE DEBUG=LINE NOSTKCHK LIBCODE DEFINE=NIKOMLIB=1 \
+           IDIR=/Include
+OBJS     = DiskUtils.o FileAreaUtils.o Logging.o RexxUtils.o ExecUtils.o \
+	   ServerMemUtils.o
+NLIBOBJS = Logging_nlib.o
 
-all: nikomutils.lib
+all: nikomutils.lib nikomutils_nlib.lib
 
 Debug:
-  makedir Debug
+  -makedir Debug
 
 Debug/$(CPU): Debug
-  makedir Debug/$(CPU)
+  -makedir Debug/$(CPU)
 
 clean:
-  delete \#?.o
-  delete Debug all
+  -delete \#?.o
+  -delete Debug all
 
 .c.o :
   sc $(SCFLAGS) $*
@@ -21,11 +24,17 @@ clean:
 nikomutils.lib: Debug/$(CPU) $(OBJS)
   oml -v Debug/$(CPU)/nikomutils.lib r $(OBJS)
 
+nikomutils_nlib.lib: Debug $(NLIBOBJS)
+  oml -v Debug/nikomutils_nlib.lib r $(NLIBOBJS)
+
 DiskUtils.o: DiskUtils.c DiskUtils.h
 
 FileAreaUtils.o: FileAreaUtils.c FileAreaUtils.h
 
 Logging.o: Logging.c Logging.h
+
+Logging_nlib.o: Logging.c Logging.h
+  sc $(NLFLAGS) OBJNAME=Logging_nlib.o Logging.c
 
 RexxUtils.o: RexxUtils.c RexxUtils.h
 

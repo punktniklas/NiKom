@@ -5,8 +5,8 @@ OBJS = NiKomFido.o
 all: NiKomFido
 
 clean:
-  delete \#?.o
-  delete NiKomFido
+  -delete \#?.o
+  -delete NiKomFido
 
 NiKomFido: $(OBJS)
   slink FROM lib:c.o $(OBJS) \
