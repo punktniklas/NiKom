@@ -2,14 +2,18 @@
 ; Builds 68000 and 68020 versions
 
 Failat 20
-Delete NiKom_complete.lha
+Delete Ram:NiKom_full.lha NiKom_full.lha
 Delete Ram:NiKomDistr all
 
 ; Make the script abort if anything goes wrong during compilation
 Failat 1
+
+; Create temporary directories in Ram:
 MakeDir Ram:NiKomDistr
 MakeDir Ram:NiKomDistr/libs
 MakeDir Ram:NiKomDistr/bin
+
+; Start of 68000 build
 
 cd UtilLib
 smake clean
@@ -36,13 +40,14 @@ smake -i clean
 smake CPU=68000
 
 cd /
-
 Copy NiKomLib/NoDebug/nikom.library Ram:NiKomDistr/libs/nikom.library_68000
 Copy InitNiKom/InitNiKom Ram:NiKomDistr/bin/InitNiKom_68000
 Copy PreNode/NoDebug/68000/PreNode Ram:NiKomDistr/bin/PreNode_68000
 Copy Server/NoDebug/68000/NiKServer Ram:NiKomDistr/bin/NiKServer_68000
 Copy Nodes/NoDebug/68000/NiKomCon Ram:NiKomDistr/bin/NiKomCon_68000
 Copy Nodes/NoDebug/68000/NiKomSer Ram:NiKomDistr/bin/NiKomSer_68000
+
+; Start of 68020-build
 
 cd UtilLib 
 smake clean
@@ -78,8 +83,13 @@ Copy Nodes/NoDebug/68020/NiKomSer Ram:NiKomDistr/bin/NiKomSer_68020
 
 Copy DistrSkeleton/#? Ram:NiKomDistr/ all
 
-setenv nikdir `cd`
+; Store current working directory in env-variable NIKDIR
+SetENV NIKDIR `cd`
 cd Ram:NiKomDistr
-lha a -r "$nikdir/NiKom_full.lha" #?
-cd "$nikdir"
-unset nikdir
+lha a -r Ram:NiKom_full.lha #?
+Copy Ram:NiKom_full.lha "$NIKDIR"
+cd "$NIKDIR"
+UnSetENV NIKDIR
+Delete Ram:NiKomDistr all
+
+Echo "Build complete!"
