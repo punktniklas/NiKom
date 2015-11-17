@@ -421,174 +421,174 @@ int download(void) {
 	else return(0);
 }
 
-int upload(void) {	/* Ändrad för nikfiles.data 960707 JÖ */
-	int area,ret,editret,dirnr;
-	long tid;
-	struct EditLine *el;
-	FILE *fp;
-	__aligned struct FileInfoBlock info;
-	struct Fil *allokpek;
-	char nikfilename[100],errbuff[100],filnamn[50],tmpfullname[100], outbuffer[81];
-	UBYTE tn;
-	struct TransferFiles *tf;
+int upload(void) {
+  int area, ret, editret, dirnr, ch, writeLong;
+  long tid;
+  struct EditLine *el;
+  FILE *fp;
+  __aligned struct FileInfoBlock info;
+  struct Fil *allokpek;
+  char nikfilename[100],errbuff[100],filnamn[50],tmpfullname[100], outbuffer[81];
+  struct TransferFiles *tf;
 
-	if(Servermem->cfg.ar.preup1) sendautorexx(Servermem->cfg.ar.preup1);
-	if(area2==-1) {
-		puttekn("\r\nI vilken area? ",-1);
-	} else {
-		sprintf(outbuffer,"\r\nI vilken area? (<RETURN> för %s)",Servermem->areor[area2].namn);
-		puttekn(outbuffer,-1);
-	}
-	if(getstring(EKO,40,NULL)) return(1);
-	if((area=parsearea(inmat))==-1) {
-		puttekn("\n\rFinns ingen sådan area!\n\r",-1);
-		return(0);
-	} else if(area==-3) {
-		if(area2==-1) return(0);
-		area=area2;
-	}
-	if(!arearatt(area, inloggad, &Servermem->inne[nodnr])) {
-		puttekn("\n\rFinns ingen sådan area!\n\r",-1);
-		return(0);
-	}
-	if((Servermem->areor[area].flaggor & AREA_NOUPLOAD) && (Servermem->inne[nodnr].status < Servermem->cfg.st.laddaner)) {
-		puttekn("\n\n\rDu har ingen rätt att ladda upp till den arean!\n\r",-1);
-		return(0);
-	}
-	Servermem->action[nodnr] = UPLOAD;
-	Servermem->varmote[nodnr] = area;
-	Servermem->vilkastr[nodnr] = NULL;
-	if(ret=recbinfile(Servermem->cfg.ultmp)) {
-		while(tf=(struct TransferFiles *)RemHead((struct List *)&tf_list))
-			FreeMem(tf,sizeof(struct TransferFiles));
-		if(carrierdropped()) return(1);
-		return(0);
-	}
+  if(Servermem->cfg.ar.preup1) sendautorexx(Servermem->cfg.ar.preup1);
+  if(area2==-1) {
+    puttekn("\r\nI vilken area? ",-1);
+  } else {
+    sprintf(outbuffer,"\r\nI vilken area? (<RETURN> för %s)",Servermem->areor[area2].namn);
+    puttekn(outbuffer,-1);
+  }
+  if(getstring(EKO,40,NULL)) return(1);
+  if((area=parsearea(inmat))==-1) {
+    puttekn("\n\rFinns ingen sådan area!\n\r",-1);
+    return(0);
+  } else if(area==-3) {
+    if(area2==-1) return(0);
+    area=area2;
+  }
+  if(!arearatt(area, inloggad, &Servermem->inne[nodnr])) {
+    puttekn("\n\rFinns ingen sådan area!\n\r",-1);
+    return(0);
+  }
+  if((Servermem->areor[area].flaggor & AREA_NOUPLOAD) && (Servermem->inne[nodnr].status < Servermem->cfg.st.laddaner)) {
+    puttekn("\n\n\rDu har ingen rätt att ladda upp till den arean!\n\r",-1);
+    return(0);
+  }
+  Servermem->action[nodnr] = UPLOAD;
+  Servermem->varmote[nodnr] = area;
+  Servermem->vilkastr[nodnr] = NULL;
+  if(ret=recbinfile(Servermem->cfg.ultmp)) {
+    while(tf=(struct TransferFiles *)RemHead((struct List *)&tf_list))
+      FreeMem(tf,sizeof(struct TransferFiles));
+    if(carrierdropped()) return(1);
+    return(0);
+  }
 
-	/* printf("Filnamn = %s\n",FilePart(tf->Filnamn));
-	printf("Cps = %d\n\n",tf->cps); */
+  for(tf=(struct TransferFiles *)tf_list.mlh_Head;tf->node.mln_Succ;tf=(struct TransferFiles *)tf->node.mln_Succ) {
+    strcpy(xprfilnamn,tf->Filnamn);
+    if(stcgfn(filnamn,xprfilnamn)>40) puttekn("\r\nVARNING! Filnamnet större än 40 tecken!\r\n",-1);
+    if(!filnamn[0]) {
+      puttekn("\r\n\nHmm... Filen har inget namn. Skriv ett brev till sysop.\r\n",-1);
+      continue;
+    }
+    if(!valnamn(filnamn,area,errbuff)) {
+      for(;;) {
+        puttekn(errbuff,-1);
+        puttekn("\r\nNytt namn: ",-1);
+        if(getstring(EKO,40,NULL)) { DeleteFile(xprfilnamn); return(1); }
+        if(!inmat[0]) continue;
+        if(valnamn(inmat,area,errbuff)) break;
+      }
+      strcpy(filnamn,inmat);
+      sprintf(tmpfullname,"%s%s",Servermem->cfg.ultmp,filnamn);
+      if(!Rename(xprfilnamn,tmpfullname)) {
+        sprintf(outbuffer,"\r\n\nKunde inte döpa om filen från '%s'\r\ntill '%s'.\r\n",xprfilnamn,tmpfullname);
+        puttekn(outbuffer,-1);
+        DeleteFile(xprfilnamn);
+        continue;
+      }
+    } else strcpy(tmpfullname,xprfilnamn);
+    if(!(allokpek=(struct Fil *)AllocMem(sizeof(struct Fil),MEMF_PUBLIC | MEMF_CLEAR))) {
+      puttekn("\r\n\nKunde inte allokera minne för filen!\r\n",-1);
+      continue;
+    }
+    time(&tid);
+    allokpek->tid=allokpek->validtime=tid;
+    allokpek->uppladdare=inloggad;
+    if(dfind(&info,tmpfullname,0)) {
+      sprintf(outbuffer,"\r\nHittar inte filen %s!\r\n",tmpfullname);
+      puttekn(outbuffer,-1);
+      FreeMem(allokpek,sizeof(struct Fil));
+      continue;
+    }
+    allokpek->size=info.fib_Size;
+    
+    sprintf(outbuffer,"\r\n\r\nFilnamn: %s", filnamn);
+    puttekn(outbuffer,-1);
+    puttekn("\r\nVilken status ska behövas för att ladda ner filen? (0)",-1);
+    if(getstring(EKO,3,NULL)) { FreeMem(allokpek,sizeof(struct Fil)); return(1); }
+    allokpek->status=atoi(inmat);
+    if(Servermem->inne[nodnr].status >= Servermem->cfg.st.filer) {
+      puttekn("\n\rSka filen valideras? ",-1);
+      if(jaellernej('j','n',1)) puttekn("Ja",-1);
+      else {
+        puttekn("Nej",-1);
+        allokpek->flaggor|=FILE_NOTVALID;
+      }
+      puttekn("\n\rSka filen ha fri download? ",-1);
+      if(jaellernej('j','n',2)) {
+        puttekn("Ja",-1);
+        allokpek->flaggor|=FILE_FREEDL;
+      } else puttekn("Nej",-1);
+    } else if(Servermem->cfg.cfgflags & NICFG_VALIDATEFILES) allokpek->flaggor|=FILE_NOTVALID;
+    sendfile("NiKom:Texter/Nyckelhjälp.txt");
+    puttekn("\r\nVilka söknycklar ska filen ha? (? för att få en lista)\r\n",-1);
+    if(editkey(allokpek->nycklar)) { FreeMem(allokpek,sizeof(struct Fil)); return(1); }
+    puttekn("\r\nBeskrivning:\r\n",-1);
+    if(getstring(EKO,70,NULL)) { FreeMem(allokpek,sizeof(struct Fil)); return(1); }
+    strcpy(allokpek->beskr,inmat);
+    dirnr = ChooseDirectoryInFileArea(
+                                      area, allokpek->nycklar, allokpek->size);
+    if(dirnr==-1) {
+      puttekn("\r\n\nKunde inte hitta något lämpligt directory för filen!\r\n",-1);
+      DeleteFile(tmpfullname);
+      FreeMem(allokpek,sizeof(struct Fil));
+      continue;
+    }
+    allokpek->dir=dirnr;
+    strcpy(allokpek->namn,filnamn);
+    sprintf(inmat,"%s %s",tmpfullname,Servermem->areor[area].dir[dirnr]);
+    argument=inmat;
+    sendrexx(10);
+    AddTail((struct List *)&Servermem->areor[area].ar_list,(struct Node *)allokpek);
+    if(writefiles(area)) {
+      puttekn("\r\n\nKunde inte skriva till datafilen\r\n",-1);
+      
+    }
+    
+    Servermem->inne[nodnr].upload++;
+    Statstr.ul++;
+    if(Servermem->cfg.logmask & LOG_UPLOAD) {
+      LogEvent(USAGE_LOG, INFO, "%s laddar upp %s",
+               getusername(inloggad), allokpek->namn);
+    }
+    if(Servermem->cfg.ar.postup1) sendautorexx(Servermem->cfg.ar.postup1);
 
-	for(tf=(struct TransferFiles *)tf_list.mlh_Head;tf->node.mln_Succ;tf=(struct TransferFiles *)tf->node.mln_Succ) {
-		strcpy(xprfilnamn,tf->Filnamn);
-		if(stcgfn(filnamn,xprfilnamn)>40) puttekn("\r\nVARNING! Filnamnet större än 40 tecken!\r\n",-1);
-		if(!filnamn[0]) {
-			puttekn("\r\n\nHmm... Filen har inget namn. Skriv ett brev till sysop.\r\n",-1);
-			continue;
-		}
-		if(!valnamn(filnamn,area,errbuff)) {
-			for(;;) {
-				puttekn(errbuff,-1);
-				puttekn("\r\nNytt namn: ",-1);
-				if(getstring(EKO,40,NULL)) { DeleteFile(xprfilnamn); return(1); }
-				if(!inmat[0]) continue;
-				if(valnamn(inmat,area,errbuff)) break;
-			}
-			strcpy(filnamn,inmat);
-			sprintf(tmpfullname,"%s%s",Servermem->cfg.ultmp,filnamn);
-			if(!Rename(xprfilnamn,tmpfullname)) {
-				sprintf(outbuffer,"\r\n\nKunde inte döpa om filen från '%s'\r\ntill '%s'.\r\n",xprfilnamn,tmpfullname);
-				puttekn(outbuffer,-1);
-				DeleteFile(xprfilnamn);
-				continue;
-			}
-		} else strcpy(tmpfullname,xprfilnamn);
-		if(!(allokpek=(struct Fil *)AllocMem(sizeof(struct Fil),MEMF_PUBLIC | MEMF_CLEAR))) {
-			puttekn("\r\n\nKunde inte allokera minne för filen!\r\n",-1);
-			continue;
-		}
-		time(&tid);
-		allokpek->tid=allokpek->validtime=tid;
-		allokpek->uppladdare=inloggad;
-		if(dfind(&info,tmpfullname,0)) {
-			sprintf(outbuffer,"\r\nHittar inte filen %s!\r\n",tmpfullname);
-			puttekn(outbuffer,-1);
-			FreeMem(allokpek,sizeof(struct Fil));
-			continue;
-		}
-		allokpek->size=info.fib_Size;
+    if(GetYesOrNo("\r\n\nVill du skriva en längre beskrivning?",
+                  'j', 'n', "\r\n\nOk, går in i editorn.\r\n", "Nej\r\n\n",
+                  TRUE, &writeLong)) {
+      return 1;
+    }
 
-		sprintf(outbuffer,"\r\n\r\nFilnamn: %s", filnamn);
-		puttekn(outbuffer,-1);
-		puttekn("\r\nVilken status ska behövas för att ladda ner filen? (0)",-1);
-		if(getstring(EKO,3,NULL)) { FreeMem(allokpek,sizeof(struct Fil)); return(1); }
-		allokpek->status=atoi(inmat);
-		if(Servermem->inne[nodnr].status >= Servermem->cfg.st.filer) {
-			puttekn("\n\rSka filen valideras? ",-1);
-			if(jaellernej('j','n',1)) puttekn("Ja",-1);
-			else {
-				puttekn("Nej",-1);
-				allokpek->flaggor|=FILE_NOTVALID;
-			}
-			puttekn("\n\rSka filen ha fri download? ",-1);
-			if(jaellernej('j','n',2)) {
-				puttekn("Ja",-1);
-				allokpek->flaggor|=FILE_FREEDL;
-			} else puttekn("Nej",-1);
-		} else if(Servermem->cfg.cfgflags & NICFG_VALIDATEFILES) allokpek->flaggor|=FILE_NOTVALID;
-		sendfile("NiKom:Texter/Nyckelhjälp.txt");
-		puttekn("\r\nVilka söknycklar ska filen ha? (? för att få en lista)\r\n",-1);
-		if(editkey(allokpek->nycklar)) { FreeMem(allokpek,sizeof(struct Fil)); return(1); }
-		puttekn("\r\nBeskrivning:\r\n",-1);
-		if(getstring(EKO,70,NULL)) { FreeMem(allokpek,sizeof(struct Fil)); return(1); }
-		strcpy(allokpek->beskr,inmat);
-		dirnr = ChooseDirectoryInFileArea(
-                  area, allokpek->nycklar, allokpek->size);
-		if(dirnr==-1) {
-			puttekn("\r\n\nKunde inte hitta något lämpligt directory för filen!\r\n",-1);
-			DeleteFile(tmpfullname);
-			FreeMem(allokpek,sizeof(struct Fil));
-			continue;
-		}
-		allokpek->dir=dirnr;
-		strcpy(allokpek->namn,filnamn);
-		sprintf(inmat,"%s %s",tmpfullname,Servermem->areor[area].dir[dirnr]);
-		argument=inmat;
-		sendrexx(10);
-		AddTail((struct List *)&Servermem->areor[area].ar_list,(struct Node *)allokpek);
-		if(writefiles(area)) {
-			puttekn("\r\n\nKunde inte skriva till datafilen\r\n",-1);
-
-		}
-
-		Servermem->inne[nodnr].upload++;
-		Statstr.ul++;
-		if(Servermem->cfg.logmask & LOG_UPLOAD) {
-                  LogEvent(USAGE_LOG, INFO, "%s laddar upp %s",
-                           getusername(inloggad), allokpek->namn);
-		}
-		if(Servermem->cfg.ar.postup1) sendautorexx(Servermem->cfg.ar.postup1);
-		puttekn("\r\n\nVill du skriva en längre beskrivning? (J/n) ",-1);
-		while((tn=gettekn())!='j' && tn!='J' && tn!='n' && tn!='N' && tn!=13);
-		if(tn=='j' || tn=='J') {
-			puttekn("\r\n\nOk, går in i editorn.\r\n",-1);
-			if((editret=edittext(NULL))==1) return(1);
-			else if(editret==2) continue;
-			sprintf(nikfilename,"%slongdesc/%s.long",Servermem->areor[area].dir[dirnr],filnamn);
-			if(!(fp=fopen(nikfilename,"w"))) {
-				puttekn("\r\n\nKunde inte öppna longdesc-filen\r\n",-1);
-				freeeditlist();
-				continue;
-			}
-			for(el=(struct EditLine *)edit_list.mlh_Head;el->line_node.mln_Succ;el=(struct EditLine *)el->line_node.mln_Succ) {
-				if(fputs(el->text,fp)) {
-					freeeditlist();
-					fclose(fp);
-					continue;
-				}
-				fputc('\n',fp);
-			}
-			freeeditlist();
-			fclose(fp);
-			puttekn("\r\n",-1);
-			allokpek->flaggor|=FILE_LONGDESC;
-			updatefile(area,allokpek);
-		}
-	}
-
-	while(tf=(struct TransferFiles *)RemHead((struct List *)&tf_list))
-		FreeMem(tf,sizeof(struct TransferFiles));
-
-	return(0);
+    if(writeLong) {
+      if((editret=edittext(NULL))==1) return(1);
+      else if(editret==2) continue;
+      sprintf(nikfilename,"%slongdesc/%s.long",Servermem->areor[area].dir[dirnr],filnamn);
+      if(!(fp=fopen(nikfilename,"w"))) {
+        puttekn("\r\n\nKunde inte öppna longdesc-filen\r\n",-1);
+        freeeditlist();
+        continue;
+      }
+      for(el=(struct EditLine *)edit_list.mlh_Head;el->line_node.mln_Succ;el=(struct EditLine *)el->line_node.mln_Succ) {
+        if(fputs(el->text,fp)) {
+          freeeditlist();
+          fclose(fp);
+          continue;
+        }
+        fputc('\n',fp);
+      }
+      freeeditlist();
+      fclose(fp);
+      puttekn("\r\n",-1);
+      allokpek->flaggor|=FILE_LONGDESC;
+      updatefile(area,allokpek);
+    }
+  }
+  
+  while(tf=(struct TransferFiles *)RemHead((struct List *)&tf_list))
+    FreeMem(tf,sizeof(struct TransferFiles));
+  
+  return(0);
 }
 
 int recbinfile(char *dir) {

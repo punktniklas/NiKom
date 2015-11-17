@@ -403,11 +403,11 @@ void sprattgok(char *str) {
 }
 
 int fido_brev(char *tillpers,char *adr,struct Mote *motpek) {
-	int length=0,x=0,editret,chrs;
+        int length = 0, x = 0, editret, chrs, inputch;
 	struct FidoDomain *fd;
 	struct FidoText *komft,ft;
 	struct MinNode *first, *last;
-	char *foo,tmpfrom[100],fullpath[100],filnamn[20],subject[80],msgid[50],tkn;
+	char *foo,tmpfrom[100],fullpath[100],filnamn[20],subject[80],msgid[50];
 	if(!(Servermem->inne[nodnr].grupper & Servermem->fidodata.mailgroups) &&
 		Servermem->inne[nodnr].status < Servermem->fidodata.mailstatus) {
 		puttekn("\n\n\rDu har ingen rätt att skicka FidoNet NetMail.\n\r",-1);
@@ -524,13 +524,18 @@ int fido_brev(char *tillpers,char *adr,struct Mote *motpek) {
 	puttekn("4: Svenska 7-bitars tecken\r\n\n",-1);
 	puttekn("Val: ",-1);
 	for(;;) {
-		tkn=gettekn();
-		if(tkn==13 || tkn==10) tkn='1';
-		if(tkn >= '1' && tkn <= '4') break;
+          inputch = GetChar();
+          if(inputch == GETCHAR_LOGOUT) {
+            return 1;
+          }
+          if(inputch == GETCHAR_RETURN) {
+            inputch = '1';
+          }
+          if(inputch >= '1' && inputch <= '4') break;
 	}
-	sprintf(outbuffer,"%c\r\n\n",tkn);
+	sprintf(outbuffer,"%c\r\n\n",inputch);
 	puttekn(outbuffer,-1);
-	switch(tkn) {
+	switch(inputch) {
 		case '1' : chrs=CHRS_LATIN1; break;
 		case '2' : chrs=CHRS_CP437; break;
 		case '3' : chrs=CHRS_MAC; break;

@@ -70,10 +70,10 @@ void cleanup(int kod,char *fel)
 }
 
 void main(int argc, char **argv) {
-  int going=TRUE,forsok=2,car=1, tmp;
+  int going = TRUE, forsok = 2,car = 1, tmp, ch;
   long tid;
   char tellstr[100],*tmppscreen, titel[80];
-  UBYTE tillftkn;
+
   NewList((struct List *)&aliaslist);
   NewList((struct List *)&edit_list);
   if(!(IntuitionBase=(struct IntuitionBase *)OpenLibrary("intuition.library",0)))
@@ -206,6 +206,6 @@ void main(int argc, char **argv) {
     tellallnodes(tellstr);
   panik:
     puttekn("\r\n\nEn inloggning till? (J/n)",-1);
-  } while((tillftkn=gettekn())!='n' && tillftkn!='N');
+  } while((ch = GetChar()) != 'n' && ch != 'N');
   cleanup(OK,"");
 }

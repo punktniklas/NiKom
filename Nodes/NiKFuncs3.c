@@ -201,270 +201,259 @@ int radmot(void) {
 }
 
 int andmot(void) {
-	int motnr,going=TRUE,tillf,chng=FALSE,y,mad,clearmed,setratt,changed,x;
-	struct ShortUser *userletpek;
-	struct FidoDomain *domain;
-	struct User skuser;
-	struct Mote tempmote,*motpek;
-	char tkn;
-	if((motnr=parsemot(argument))==-1) {
-		puttekn("\r\n\nFinns inget möte som heter så!\r\n\n",-1);
-		return(0);
-	} else if(motnr==-3) {
-		puttekn("\r\n\nSkriv: Ändra Möte <mötesnamn>\r\n\n",-1);
-		return(0);
-	}
-	motpek=getmotpek(motnr);
-	if(!MayAdminConf(motnr, inloggad, &Servermem->inne[nodnr])) {
-		puttekn("\r\n\nDu har ingen rätt att ändra på det mötet!\r\n\n",-1);
-		return(0);
-	}
-	memcpy(&tempmote,motpek,sizeof(struct Mote));
-	while(going) {
-		sprintf(outbuffer,"\r\nNamn : (%s) ",tempmote.namn);
-		puttekn(outbuffer,-1);
-		if(getstring(EKO,40,NULL)) return(1);
-		if(inmat[0]) {
-			if((tillf=parsemot(inmat))!=-1 && tillf!=motnr) puttekn("\r\n\nMötet finns redan!\r\n",-1);
-			else {
-				strncpy(tempmote.namn,inmat,40);
-				tempmote.namn[40] = 0;
-				going=FALSE;
-			}
-		} else going=FALSE;
-	}
-	sprintf(outbuffer,"\r\nMAD (%s) ",getusername(tempmote.mad));
-	puttekn(outbuffer,-1);
-	if(getstring(EKO,40,NULL)) return(1);
-	if(inmat[0]) {
-		if((mad=parsenamn(inmat))==-1) puttekn("\r\nFinns ingen sådan användare!",-1);
-		else tempmote.mad=mad;
-	}
-	sprintf(outbuffer,"\r\nSorteringsvärde : (%d) ",tempmote.sortpri);
-	puttekn(outbuffer,-1);
-	if(getstring(EKO,10,NULL)) return(1);
-	if(inmat[0]) {
-		tillf=atoi(inmat);
-		if(tillf<0 || tillf>LONG_MAX) {
-			sprintf(outbuffer,"\n\rVärdet måste ligga mellan 0 och %d",LONG_MAX);
-			puttekn(outbuffer,-1);
-		}
-		else tempmote.sortpri=tillf;
-	}
-	puttekn("\r\nSka mötet vara slutet? ",-1);
-	if(!jaellernej('j','n',tempmote.status & SLUTET ? 1 : 2)) {
-		puttekn("Öppet",-1);
-		if(tempmote.status & SLUTET) {
-			chng=TRUE;
-			tempmote.status &= ~SLUTET;
-		}
-	} else {
-		puttekn("Slutet",-1);
-		if(!(tempmote.status & SLUTET)) {
-			chng=TRUE;
-			tempmote.status |= SLUTET;
-		}
-		puttekn("\r\nVilka grupper ska ha tillgång till mötet? (? för lista)\r\n",-1);
-		if(editgrupp((char *)&tempmote.grupper)) return(1);
-	}
-	puttekn("\r\nSka mötet vara skrivskyddat? ",-1);
-	if(!jaellernej('j','n',tempmote.status & SKRIVSKYDD ? 1 : 2)) {
-		puttekn("Oskyddat",-1);
-		tempmote.status &= ~SKRIVSKYDD;
-	} else {
-		tempmote.status |= SKRIVSKYDD;
-		puttekn("Skyddat",-1);
-	}
-	puttekn("\r\nSka mötet vara kommentarsskyddat? ",-1);
-	if(!jaellernej('j','n',tempmote.status & KOMSKYDD ? 1 : 2)) {
-		puttekn("Oskyddat",-1);
-		tempmote.status &= ~KOMSKYDD;
-	} else {
-		tempmote.status |= KOMSKYDD;
-		puttekn("Skyddat",-1);
-	}
-	puttekn("\r\nSka mötet vara hemligt? ",-1);
-	if(!jaellernej('j','n',tempmote.status & HEMLIGT ? 1 : 2)) {
-		puttekn("Ej hemligt",-1);
-		tempmote.status &= ~HEMLIGT;
-	} else {
-		tempmote.status |= HEMLIGT;
-		puttekn("Hemligt",-1);
-	}
-	if(!(tempmote.status & SLUTET)) {
-		puttekn("\n\rSka alla användare bli medlemmar automagiskt? ",-1);
-		if(!jaellernej('j','n',tempmote.status & AUTOMEDLEM ? 1 : 2)) {
-			puttekn("Nej",-1);
-			if(tempmote.status & AUTOMEDLEM) {
-				chng=TRUE;
-				tempmote.status &= ~AUTOMEDLEM;
-			}
-		} else {
-			puttekn("Ja",-1);
-			tempmote.status |= AUTOMEDLEM;
-		}
-		puttekn("\r\nSka rättigheterna styra skrivmöjlighet? ",-1);
-		if(!jaellernej('j','n',tempmote.status & SKRIVSTYRT ? 1 : 2)) {
-			puttekn("Nej",-1);
-			if(tempmote.status & SKRIVSTYRT) chng=TRUE;
-			tempmote.status &= ~SKRIVSTYRT;
-		} else {
-			puttekn("Ja",-1);
-			if(!(tempmote.status & SKRIVSTYRT)) chng=TRUE;
-			tempmote.status |= SKRIVSTYRT;
-			puttekn("\r\nVilka grupper ska ha tillgång till mötet? (? för lista)\r\n",-1);
-			if(editgrupp((char *)&tempmote.grupper)) return(1);
-		}
-	} else tempmote.status &= ~(AUTOMEDLEM | SKRIVSTYRT);
-	puttekn("\r\nSka mötet bara vara åtkomligt från ARexx? ",-1);
-	if(!jaellernej('j','n',tempmote.status & SUPERHEMLIGT ? 1 : 2)) {
-		puttekn("Nej",-1);
-		tempmote.status &= ~SUPERHEMLIGT;
-	} else {
-		tempmote.status |= SUPERHEMLIGT;
-		puttekn("Ja",-1);
-	}
-	if(tempmote.type == MOTE_FIDO) {
-		sprintf(outbuffer,"\n\rKatalog: (%s) ",tempmote.dir);
-		puttekn(outbuffer,-1);
-		getstring(EKO,79,NULL);
-		if(inmat[0]) strcpy(tempmote.dir,inmat);
-		sprintf(outbuffer,"\n\rTag-namn: (%s) ",tempmote.tagnamn);
-		puttekn(outbuffer,-1);
-		getstring(EKO,49,NULL);
-		if(inmat[0]) strcpy(tempmote.tagnamn,inmat);
-		sprintf(outbuffer,"\n\rOrigin: (%s) ",tempmote.origin);
-		puttekn(outbuffer,-1);
-		getstring(EKO,69,NULL);
-		if(inmat[0]) strcpy(tempmote.origin,inmat);
-		sprintf(outbuffer,"\n\n\r%c1: ISO Latin 1 (ISO 8859-1)\n\r",tempmote.charset==CHRS_LATIN1 ? '*' : ' ');
-		puttekn(outbuffer,-1);
-		sprintf(outbuffer,"%c2: SIS-7 (SF7, 'Måsvingar')\n\r",tempmote.charset==CHRS_SIS7 ? '*' : ' ');
-		puttekn(outbuffer,-1);
-		sprintf(outbuffer,"%c3: IBM CodePage\n\r",tempmote.charset==CHRS_CP437 ? '*' : ' ');
-		puttekn(outbuffer,-1);
-		sprintf(outbuffer,"%c4: Mac\n\n\r",tempmote.charset==CHRS_MAC ? '*' : ' ');
-		puttekn(outbuffer,-1);
-		puttekn("Val: ",-1);
-		for(;;) {
-			tkn=gettekn();
-			if(tkn=='1' || tkn=='2' || tkn=='3' || tkn=='4' || tkn=='\r') break;
-		}
-		switch(tkn) {
-			case '1' : tempmote.charset = CHRS_LATIN1; break;
-			case '2' : tempmote.charset = CHRS_SIS7; break;
-			case '3' : tempmote.charset = CHRS_CP437; break;
-			case '4' : tempmote.charset = CHRS_MAC; break;
-			default: break;
-		}
-		puttekn("\n\n\r",-1);
-		for(x=0;x<10;x++) {
-			if(!Servermem->fidodata.fd[x].domain[0]) break;
-			sprintf(outbuffer,"%c%3d: %s (%d:%d/%d.%d)\n\r",tempmote.domain == Servermem->fidodata.fd[x].nummer ? '*' : ' ',
-			                                             Servermem->fidodata.fd[x].nummer,
-			                                             Servermem->fidodata.fd[x].domain,
-			                                             Servermem->fidodata.fd[x].zone,
-			                                             Servermem->fidodata.fd[x].net,
-			                                             Servermem->fidodata.fd[x].node,
-			                                             Servermem->fidodata.fd[x].point);
-			puttekn(outbuffer,-1);
-		}
-		if(!x) {
-			puttekn("\n\rDu måste definiera en domän i NiKomFido.cfg först!\n\r",-1);
-			return(0);
-		}
-		for(;;) {
-			if(getstring(EKO,10,NULL)) return(1);
-			if(!inmat[0]) break;
-			if(domain=getfidodomain(atoi(inmat),0)) {
-				tempmote.domain=domain->nummer;
-				break;
-			} else puttekn("\n\rFinns ingen sådan domän.\n\r",-1);
-		}
-	}
+  int motnr, going = TRUE, tillf, chng = FALSE, y, mad, clearmed, setratt,
+    changed, x, ch;
+  struct ShortUser *userletpek;
+  struct FidoDomain *domain;
+  struct User skuser;
+  struct Mote tempmote,*motpek;
 
+  if((motnr=parsemot(argument))==-1) {
+    puttekn("\r\n\nFinns inget möte som heter så!\r\n\n",-1);
+    return(0);
+  } else if(motnr==-3) {
+    puttekn("\r\n\nSkriv: Ändra Möte <mötesnamn>\r\n\n",-1);
+    return(0);
+  }
+  motpek=getmotpek(motnr);
+  if(!MayAdminConf(motnr, inloggad, &Servermem->inne[nodnr])) {
+    puttekn("\r\n\nDu har ingen rätt att ändra på det mötet!\r\n\n",-1);
+    return(0);
+  }
+  memcpy(&tempmote,motpek,sizeof(struct Mote));
+  while(going) {
+    sprintf(outbuffer,"\r\nNamn : (%s) ",tempmote.namn);
+    puttekn(outbuffer,-1);
+    if(getstring(EKO,40,NULL)) return(1);
+    if(inmat[0]) {
+      if((tillf=parsemot(inmat))!=-1 && tillf!=motnr) puttekn("\r\n\nMötet finns redan!\r\n",-1);
+      else {
+        strncpy(tempmote.namn,inmat,40);
+        tempmote.namn[40] = 0;
+        going=FALSE;
+      }
+    } else going=FALSE;
+  }
+  sprintf(outbuffer,"\r\nMAD (%s) ",getusername(tempmote.mad));
+  puttekn(outbuffer,-1);
+  if(getstring(EKO,40,NULL)) return(1);
+  if(inmat[0]) {
+    if((mad=parsenamn(inmat))==-1) puttekn("\r\nFinns ingen sådan användare!",-1);
+    else tempmote.mad=mad;
+  }
+  sprintf(outbuffer,"\r\nSorteringsvärde : (%d) ",tempmote.sortpri);
+  puttekn(outbuffer,-1);
+  if(getstring(EKO,10,NULL)) return(1);
+  if(inmat[0]) {
+    tillf=atoi(inmat);
+    if(tillf<0 || tillf>LONG_MAX) {
+      sprintf(outbuffer,"\n\rVärdet måste ligga mellan 0 och %d",LONG_MAX);
+      puttekn(outbuffer,-1);
+    }
+    else tempmote.sortpri=tillf;
+  }
+  puttekn("\r\nSka mötet vara slutet? ",-1);
+  if(!jaellernej('j','n',tempmote.status & SLUTET ? 1 : 2)) {
+    puttekn("Öppet",-1);
+    if(tempmote.status & SLUTET) {
+      chng=TRUE;
+      tempmote.status &= ~SLUTET;
+    }
+  } else {
+    puttekn("Slutet",-1);
+    if(!(tempmote.status & SLUTET)) {
+      chng=TRUE;
+      tempmote.status |= SLUTET;
+    }
+    puttekn("\r\nVilka grupper ska ha tillgång till mötet? (? för lista)\r\n",-1);
+    if(editgrupp((char *)&tempmote.grupper)) return(1);
+  }
+  puttekn("\r\nSka mötet vara skrivskyddat? ",-1);
+  if(!jaellernej('j','n',tempmote.status & SKRIVSKYDD ? 1 : 2)) {
+    puttekn("Oskyddat",-1);
+    tempmote.status &= ~SKRIVSKYDD;
+  } else {
+    tempmote.status |= SKRIVSKYDD;
+    puttekn("Skyddat",-1);
+  }
+  puttekn("\r\nSka mötet vara kommentarsskyddat? ",-1);
+  if(!jaellernej('j','n',tempmote.status & KOMSKYDD ? 1 : 2)) {
+    puttekn("Oskyddat",-1);
+    tempmote.status &= ~KOMSKYDD;
+  } else {
+    tempmote.status |= KOMSKYDD;
+    puttekn("Skyddat",-1);
+  }
+  puttekn("\r\nSka mötet vara hemligt? ",-1);
+  if(!jaellernej('j','n',tempmote.status & HEMLIGT ? 1 : 2)) {
+    puttekn("Ej hemligt",-1);
+    tempmote.status &= ~HEMLIGT;
+  } else {
+    tempmote.status |= HEMLIGT;
+    puttekn("Hemligt",-1);
+  }
+  if(!(tempmote.status & SLUTET)) {
+    puttekn("\n\rSka alla användare bli medlemmar automagiskt? ",-1);
+    if(!jaellernej('j','n',tempmote.status & AUTOMEDLEM ? 1 : 2)) {
+      puttekn("Nej",-1);
+      if(tempmote.status & AUTOMEDLEM) {
+        chng=TRUE;
+        tempmote.status &= ~AUTOMEDLEM;
+      }
+    } else {
+      puttekn("Ja",-1);
+      tempmote.status |= AUTOMEDLEM;
+    }
+    puttekn("\r\nSka rättigheterna styra skrivmöjlighet? ",-1);
+    if(!jaellernej('j','n',tempmote.status & SKRIVSTYRT ? 1 : 2)) {
+      puttekn("Nej",-1);
+      if(tempmote.status & SKRIVSTYRT) chng=TRUE;
+      tempmote.status &= ~SKRIVSTYRT;
+    } else {
+      puttekn("Ja",-1);
+      if(!(tempmote.status & SKRIVSTYRT)) chng=TRUE;
+      tempmote.status |= SKRIVSTYRT;
+      puttekn("\r\nVilka grupper ska ha tillgång till mötet? (? för lista)\r\n",-1);
+      if(editgrupp((char *)&tempmote.grupper)) return(1);
+    }
+  } else tempmote.status &= ~(AUTOMEDLEM | SKRIVSTYRT);
+  puttekn("\r\nSka mötet bara vara åtkomligt från ARexx? ",-1);
+  if(!jaellernej('j','n',tempmote.status & SUPERHEMLIGT ? 1 : 2)) {
+    puttekn("Nej",-1);
+    tempmote.status &= ~SUPERHEMLIGT;
+  } else {
+    tempmote.status |= SUPERHEMLIGT;
+    puttekn("Ja",-1);
+  }
+  if(tempmote.type == MOTE_FIDO) {
+    sprintf(outbuffer,"\n\rKatalog: (%s) ",tempmote.dir);
+    puttekn(outbuffer,-1);
+    getstring(EKO,79,NULL);
+    if(inmat[0]) strcpy(tempmote.dir,inmat);
+    sprintf(outbuffer,"\n\rTag-namn: (%s) ",tempmote.tagnamn);
+    puttekn(outbuffer,-1);
+    getstring(EKO,49,NULL);
+    if(inmat[0]) strcpy(tempmote.tagnamn,inmat);
+    sprintf(outbuffer,"\n\rOrigin: (%s) ",tempmote.origin);
+    puttekn(outbuffer,-1);
+    getstring(EKO,69,NULL);
+    if(inmat[0]) strcpy(tempmote.origin,inmat);
+    
+    
+    SendString("\n\n\r%c1: ISO Latin 1 (ISO 8859-1)\n\r",
+               tempmote.charset == CHRS_LATIN1 ? '*' : ' ');
+    SendString("%c2: SIS-7 (SF7, 'Måsvingar')\n\r",
+               tempmote.charset == CHRS_SIS7 ? '*' : ' ');
+    SendString("%c3: IBM CodePage\n\r", tempmote.charset == CHRS_CP437 ? '*' : ' ');
+    SendString("%c4: Mac\n\n\r", tempmote.charset == CHRS_MAC ? '*' : ' ');
+    SendString("Val: ");
+    for(;;) {
+      ch = GetChar();
+      if(ch == GETCHAR_LOGOUT) {
+        return 1;
+      }
+      if(ch == '1' || ch == '2' || ch == '3' || ch == '4' || ch == GETCHAR_RETURN) {
+        break;
+      }
+    }
+    switch(ch) {
+    case '1' : tempmote.charset = CHRS_LATIN1; break;
+    case '2' : tempmote.charset = CHRS_SIS7; break;
+    case '3' : tempmote.charset = CHRS_CP437; break;
+    case '4' : tempmote.charset = CHRS_MAC; break;
+    default: break;
+    }
+    SendString("\n\n\r");
 
-	puttekn("\r\n\nÄr allt korrekt? ",-1);
-	if(jaellernej('j','n',1)) puttekn("Ja\n\n\r",-1);
-	else {
-		puttekn("Nej\r\n\n",-1);
-		return(0);
-	}
-	if(chng) {
-		puttekn("Users.dat kommer nu att gås igenom för att nollställa medlemskap\n\r",-1);
-		puttekn("och rättigheter som om mötet var nyskapat.\n\n\r",-1);
-		puttekn("Är ändringarna fortfarande korrekta? ",-1);
-		if(!jaellernej('j','n',1)) {
-			puttekn("Nej\n\r",-1);
-			return(0);
-		}
-		puttekn("Ja\n\r",-1);
-	}
-	memcpy(motpek,&tempmote,sizeof(struct Mote));
-	writemeet(motpek);
-	if(!chng) return(0);
-	if((tempmote.status & AUTOMEDLEM) && !(tempmote.status & SKRIVSTYRT)) return(0);
-	if(tempmote.status & SUPERHEMLIGT) return(0);
-	if(tempmote.status & AUTOMEDLEM) clearmed=FALSE;
-	else clearmed=TRUE;
-	if(tempmote.status & (SLUTET | SKRIVSTYRT)) setratt=FALSE;
-	else setratt=TRUE;
-	for(y=0;y<MAXNOD;y++) {
-		BAMCLEAR(Servermem->inne[y].motmed,tempmote.nummer);
-		if(setratt) BAMSET(Servermem->inne[y].motratt,tempmote.nummer);
-		else BAMCLEAR(Servermem->inne[y].motratt,tempmote.nummer);
-	}
-	puttekn("\r\nÄndrar i Users.dat..\r\n",-1);
-	for(userletpek=(struct ShortUser *)Servermem->user_list.mlh_Head;userletpek->user_node.mln_Succ;userletpek=(struct ShortUser *)userletpek->user_node.mln_Succ) {
-		if(!(userletpek->nummer%10)) {
-			sprintf(outbuffer,"\r%d",userletpek->nummer);
-			puttekn(outbuffer,-1);
-		}
-		if(readuser(userletpek->nummer,&skuser)) return(0);
-		changed=FALSE;
-		if(setratt!=BAMTEST(skuser.motratt,tempmote.nummer)) {
-			if(setratt) BAMSET(skuser.motratt,tempmote.nummer);
-			else BAMCLEAR(skuser.motratt,tempmote.nummer);
-			changed=TRUE;
-		}
-		if(clearmed && BAMTEST(skuser.motmed,tempmote.nummer)) {
-			BAMCLEAR(skuser.motmed,tempmote.nummer);
-			changed=TRUE;
-		}
-		if(changed && writeuser(userletpek->nummer,&skuser)) return(0);
-
-	}
-	for(y=0;y<MAXNOD;y++) {
-		BAMCLEAR(Servermem->inne[y].motmed,tempmote.nummer);
-		if(setratt) BAMSET(Servermem->inne[y].motratt,tempmote.nummer);
-		else BAMCLEAR(Servermem->inne[y].motratt,tempmote.nummer);
-	}
-	BAMSET(Servermem->inne[nodnr].motratt,tempmote.nummer);
-	BAMSET(Servermem->inne[nodnr].motmed,tempmote.nummer);
-	return(0);
+    for(x=0;x<10;x++) {
+      if(!Servermem->fidodata.fd[x].domain[0]) break;
+      sprintf(outbuffer,"%c%3d: %s (%d:%d/%d.%d)\n\r",tempmote.domain == Servermem->fidodata.fd[x].nummer ? '*' : ' ',
+              Servermem->fidodata.fd[x].nummer,
+              Servermem->fidodata.fd[x].domain,
+              Servermem->fidodata.fd[x].zone,
+              Servermem->fidodata.fd[x].net,
+              Servermem->fidodata.fd[x].node,
+              Servermem->fidodata.fd[x].point);
+      puttekn(outbuffer,-1);
+    }
+    if(!x) {
+      puttekn("\n\rDu måste definiera en domän i NiKomFido.cfg först!\n\r",-1);
+      return(0);
+    }
+    for(;;) {
+      if(getstring(EKO,10,NULL)) return(1);
+      if(!inmat[0]) break;
+      if(domain=getfidodomain(atoi(inmat),0)) {
+        tempmote.domain=domain->nummer;
+        break;
+      } else puttekn("\n\rFinns ingen sådan domän.\n\r",-1);
+    }
+  }
+  
+  
+  puttekn("\r\n\nÄr allt korrekt? ",-1);
+  if(jaellernej('j','n',1)) puttekn("Ja\n\n\r",-1);
+  else {
+    puttekn("Nej\r\n\n",-1);
+    return(0);
+  }
+  if(chng) {
+    puttekn("Users.dat kommer nu att gås igenom för att nollställa medlemskap\n\r",-1);
+    puttekn("och rättigheter som om mötet var nyskapat.\n\n\r",-1);
+    puttekn("Är ändringarna fortfarande korrekta? ",-1);
+    if(!jaellernej('j','n',1)) {
+      puttekn("Nej\n\r",-1);
+      return(0);
+    }
+    puttekn("Ja\n\r",-1);
+  }
+  memcpy(motpek,&tempmote,sizeof(struct Mote));
+  writemeet(motpek);
+  if(!chng) return(0);
+  if((tempmote.status & AUTOMEDLEM) && !(tempmote.status & SKRIVSTYRT)) return(0);
+  if(tempmote.status & SUPERHEMLIGT) return(0);
+  if(tempmote.status & AUTOMEDLEM) clearmed=FALSE;
+  else clearmed=TRUE;
+  if(tempmote.status & (SLUTET | SKRIVSTYRT)) setratt=FALSE;
+  else setratt=TRUE;
+  for(y=0;y<MAXNOD;y++) {
+    BAMCLEAR(Servermem->inne[y].motmed,tempmote.nummer);
+    if(setratt) BAMSET(Servermem->inne[y].motratt,tempmote.nummer);
+    else BAMCLEAR(Servermem->inne[y].motratt,tempmote.nummer);
+  }
+  puttekn("\r\nÄndrar i Users.dat..\r\n",-1);
+  for(userletpek=(struct ShortUser *)Servermem->user_list.mlh_Head;userletpek->user_node.mln_Succ;userletpek=(struct ShortUser *)userletpek->user_node.mln_Succ) {
+    if(!(userletpek->nummer%10)) {
+      sprintf(outbuffer,"\r%d",userletpek->nummer);
+      puttekn(outbuffer,-1);
+    }
+    if(readuser(userletpek->nummer,&skuser)) return(0);
+    changed=FALSE;
+    if(setratt!=BAMTEST(skuser.motratt,tempmote.nummer)) {
+      if(setratt) BAMSET(skuser.motratt,tempmote.nummer);
+      else BAMCLEAR(skuser.motratt,tempmote.nummer);
+      changed=TRUE;
+    }
+    if(clearmed && BAMTEST(skuser.motmed,tempmote.nummer)) {
+      BAMCLEAR(skuser.motmed,tempmote.nummer);
+      changed=TRUE;
+    }
+    if(changed && writeuser(userletpek->nummer,&skuser)) return(0);
+    
+  }
+  for(y=0;y<MAXNOD;y++) {
+    BAMCLEAR(Servermem->inne[y].motmed,tempmote.nummer);
+    if(setratt) BAMSET(Servermem->inne[y].motratt,tempmote.nummer);
+    else BAMCLEAR(Servermem->inne[y].motratt,tempmote.nummer);
+  }
+  BAMSET(Servermem->inne[nodnr].motratt,tempmote.nummer);
+  BAMSET(Servermem->inne[nodnr].motmed,tempmote.nummer);
+  return(0);
 }
 
 void radbrev(void) {
 	puttekn("\n\n\rRadera brev är tillfälligt ur funktion!\n\r",-1);
 }
-/*
-	struct BrevHeader radhead;
-	int nummer;
-	if(!isdigit(argument[0])) {
-		puttekn("\r\n\nSkriv : Radera brev <brevnummer>\r\n\n",-1);
-		return;
-	}
-	nummer=atoi(argument);
-	if(nummer<Servermem->info.lowbrev || nummer>Servermem->info.highbrev) {
-		puttekn("\r\n\nBrevet finns inte!\r\n\n",-1);
-		return;
-	}
-	if(readbrevhead(nummer,&radhead)) return;
-	radhead.mottagare=-1;
-	if(writebrevhead(nummer,&radhead)) return;
-	writebrevmot(nummer,-1);
-}
-*/
 
 void vilka(void) {
 	int x,verbose=FALSE;
