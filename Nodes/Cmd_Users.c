@@ -408,34 +408,36 @@ int Cmd_ChangeUser(void) {
 }
 
 void Cmd_DeleteUser(void) {
-  struct ShortUser *letpek;
-  char kor;
-  int nummer;
+  struct ShortUser *shortUser;
+  int userId, isCorrect;
   if(!argument[0]) {
-    puttekn("\r\n\nSkriv: Radera Användare <användare>\r\n\n",-1);
+    SendString("\r\n\nSkriv: Radera Användare <användare>\r\n\n");
     return;
   }
-  if((nummer=parsenamn(argument))==-1) {
-    puttekn("\r\n\nFinns ingen som heter så eller har det numret\r\n\n",-1);
+  if((userId = parsenamn(argument)) == -1) {
+    SendString("\r\n\nFinns ingen som heter så eller har det numret\r\n\n");
     return;
   }
-  sprintf(outbuffer,"\r\n\nÄr du säker på att du vill radera %s? (j/N) ",getusername(nummer));
-  puttekn(outbuffer,-1);
-  while((kor=gettekn())!='j' && kor!='J' && kor!='n' && kor!='N' && kor!='\r');
-  if(kor=='n' || kor=='N' || kor=='\r') {
-    puttekn("Nej\r\n\n",-1);
+  SendString("\r\n\nÄr du säker på att du vill radera %s?",
+             getusername(userId));
+  if(GetYesOrNo(NULL, 'j', 'n', "Ja\r\n\n", "Nej\r\n\n", FALSE, &isCorrect)) {
     return;
   }
-  puttekn("Ja\r\n\n",-1);
-  for(letpek=(struct ShortUser *)Servermem->user_list.mlh_Head;letpek->user_node.mln_Succ;letpek=(struct ShortUser *)letpek->user_node.mln_Succ)
-    if(letpek->nummer==nummer) break;
-  if(letpek->user_node.mln_Succ) Remove((struct Node *)letpek);
-  else {
-    puttekn("\r\n\nKunde inte hitta ShortUser-strukturen!\r\n",-1);
+  if(!isCorrect) {
     return;
   }
-  sprintf(inmat,"%d",nummer);
-  argument=inmat;
+
+  if((shortUser = FindShortUser(userId)) == NULL) {
+    LogEvent(SYSTEM_LOG, ERROR,
+             "Error finding ShortUser entry for user %d in Cmd_DeleteUser()",
+             userId);
+    DisplayInternalError();
+    return;
+  }
+
+  Remove((struct Node *)shortUser);
+  sprintf(inmat, "%d", userId);
+  argument = inmat;
   sendrexx(15);
 }
 

@@ -532,10 +532,9 @@ int andraarea(void) {
 int skapafil(void) {
 	struct Fil *allokpek;
 	struct EditLine *el;
-	int area,editret,y;
+	int area, editret, y, isCorrect;
 	long tid;
 	BPTR fh;
-	UBYTE tn;
 	__aligned struct FileInfoBlock info;
 	char filnamn[41],fullpath[100],nikfilename[109];
 	if(!argument[0]) {
@@ -618,10 +617,16 @@ int skapafil(void) {
 	}
 	Servermem->inne[nodnr].upload++;
 	Statstr.ul++;
-	puttekn("\r\n\nVill du skriva en längre beskrivning? (J/n) ",-1);
-	while((tn=gettekn())!='j' && tn!='J' && tn!='n' && tn!='N' && tn!=13);
-	if(tn=='n' || tn=='N') return(0);
-	puttekn("\r\n\nOk, går in i editorn.\r\n",-1);
+
+        if(GetYesOrNo("\r\n\nVill du skriva en längre beskrivning?",
+                      'j', 'n', "Ja\r\n\n", "Nej\r\n\n", TRUE, &isCorrect)) {
+          return 1;
+        }
+        if(!isCorrect) {
+          return 0;
+        }
+        SendString("\r\n\nOk, går in i editorn.\r\n");
+
 	if((editret=edittext(NULL))==1) return(1);
 	else if(editret==2) return(0);
 	sprintf(nikfilename,"%slongdesc/%s.long",Servermem->areor[area].dir[allokpek->dir],allokpek->namn);
@@ -648,8 +653,9 @@ int skapafil(void) {
 void radfil(void) {
 	struct Fil *letpek;
 	char filnamn[100],x;
-	UBYTE tn;
 	struct User tempuser;
+        int isCorrect;
+
 	if(area2==-1) {
 		puttekn("\r\n\nDu befinner dig inte i någon area!\r\n",-1);
 		return;
@@ -666,13 +672,15 @@ void radfil(void) {
 		puttekn("\r\n\nDu kan bara radera filer som du själv har laddat upp!\r\n",-1);
 		return;
 	}
-	sprintf(outbuffer,"\r\n\nRadera filen %s? (j/N) ",letpek->namn);
-	puttekn(outbuffer,-1);
-	while((tn=gettekn())!='j' && tn!='J' && tn!='n' && tn!='N' && tn!=13);
-	if(tn!='j' && tn!='J') {
-		puttekn("Nej\r\n",-1);
-		return;
-	} else puttekn("Ja\r\n",-1);
+
+        SendString("\r\n\nRadera filen %s?");
+        if(GetYesOrNo(NULL, 'j', 'n', "Ja\r\n", "Nej\r\n", FALSE, &isCorrect)) {
+          return;
+        }
+        if(!isCorrect) {
+          return;
+        }
+
 	Remove((struct Node *)letpek);
 
 	if(writefiles(area2)) {
@@ -684,33 +692,32 @@ void radfil(void) {
 	sprintf(filnamn,"%slongdesc/%s.long",Servermem->areor[area2].dir[letpek->dir],letpek->namn);
 	if((letpek->flaggor & FILE_LONGDESC) && remove(filnamn)) puttekn("\r\nKunde inte radera långa beskrivningen!",-1);
 	if(Servermem->inne[nodnr].status>=Servermem->cfg.st.filer && userexists(letpek->uppladdare)) {
-		sprintf(outbuffer,"\r\nSka %s diskrediteras? (j/N) ",getusername(letpek->uppladdare));
-		puttekn(outbuffer,-1);
-		while((tn=gettekn())!='j' && tn!='J' && tn!='n' && tn!='N' && tn!=13);
-		if(tn=='j' || tn=='J') {
-			puttekn("Ja\r\n",-1);
-			for(x=0;x<MAXNOD;x++) if(letpek->uppladdare==Servermem->inloggad[x]) break;
-			if(x<MAXNOD) {
-				Servermem->inne[x].upload--;
-			} else {
-				if(readuser(letpek->uppladdare,&tempuser)) return;
-				tempuser.upload--;
-				if(writeuser(letpek->uppladdare,&tempuser)) return;
-			}
-		} else puttekn("Nej\r\n",-1);
-	} else Servermem->inne[nodnr].upload--;
+          SendString("\r\nSka %s diskrediteras?", getusername(letpek->uppladdare));
+          if(GetYesOrNo(NULL, 'j', 'n', "Ja\r\n", "Nej\r\n", FALSE, &isCorrect)) {
+            return;
+          }
+          if(isCorrect) {
+            for(x=0;x<MAXNOD;x++) if(letpek->uppladdare==Servermem->inloggad[x]) break;
+            if(x<MAXNOD) {
+              Servermem->inne[x].upload--;
+            } else {
+              if(readuser(letpek->uppladdare,&tempuser)) return;
+              tempuser.upload--;
+              if(writeuser(letpek->uppladdare,&tempuser)) return;
+            }
+          }
+	} else {
+          Servermem->inne[nodnr].upload--;
+        }
 	FreeMem(letpek,sizeof(struct Fil));
 }
 
 int andrafil(void) {
-	BPTR fh;
-	struct EditLine *el;
-	int editret;
 	struct Fil *filpek;
 	long tmpflaggor,tmpvalidtime;
 	char nikfilename[100],newname[40],oldfullname[100],
 		tmpnycklar[MAXNYCKLAR/8],tmpbeskr[71], errbuff[100];
-	int x,tmpstatus,tmpuppl,tmpdls;
+	int x, tmpstatus, tmpuppl, tmpdls, isCorrect;
 	UBYTE tn;
 	if(area2==-1) {
 		puttekn("\r\n\nDu befinner dig inte i någon area!\r\n",-1);
@@ -797,107 +804,41 @@ int andrafil(void) {
 		tmpvalidtime=filpek->validtime;
 	}
 
-/*
-	if(tmpflaggor & FILE_LONGDESC)
-	{
-		puttekn("\n\rVill du editera den långa beskrivningen? ",-1);
-		if(jaellernej('j','n',2))
-		{
-			puttekn("Ja\n\r",-1);
-	if((editret=edittext(NULL))==1) return(1);
-	else if(editret==2) return(0);
-	sprintf(nikfilename,"%slongdesc/%s.long",Servermem->areor[area2].dir[filpek->dir],filpek->namn);
-	if(!(fh=Open(nikfilename,MODE_NEWFILE))) {
-		puttekn("\r\n\nKunde inte öppna longdesc-filen\r\n",-1);
-		freeeditlist();
-		return(0);
-	}
-	for(el=(struct EditLine *)edit_list.mlh_Head;el->line_node.mln_Succ;el=(struct EditLine *)el->line_node.mln_Succ) {
-		if(FPuts(fh,el->text)==-1) {
-			freeeditlist();
-			Close(fh);
-			return(0);
-		}
-		FPutC(fh,'\n');
-	}
-	freeeditlist();
-	Close(fh);
-		}
-		else
-			puttekn("Nej",-1);
-	}
-	else
-	{
-		puttekn("\n\rVill du lägga till en lång beskrivning? ",-1);
-		if(jaellernej('j','n',2))
-		{
-			puttekn("Ja\n\r",-1);
-	if((editret=edittext(NULL))==1) return(1);
-	else if(editret==2) return(0);
-	sprintf(nikfilename,"%slongdesc/%s.long",Servermem->areor[area2].dir[filpek->dir],filpek->namn);
-	if(!(fh=Open(nikfilename,MODE_NEWFILE))) {
-		puttekn("\r\n\nKunde inte öppna longdesc-filen\r\n",-1);
-		freeeditlist();
-		return(0);
-	}
-	for(el=(struct EditLine *)edit_list.mlh_Head;el->line_node.mln_Succ;el=(struct EditLine *)el->line_node.mln_Succ) {
-		if(FPuts(fh,el->text)==-1) {
-			freeeditlist();
-			Close(fh);
-			return(0);
-		}
-		FPutC(fh,'\n');
-	}
-	freeeditlist();
-	Close(fh);
-			tmpflaggor |= FILE_LONGDESC;
-		}
-		else
-			puttekn("Nej",-1);
-	}
-*/
+        if(GetYesOrNo("\r\n\nÄr allt korrekt?", 'j', 'n', "Ja\r\n\n", "Nej\r\n\n",
+                      TRUE, &isCorrect)) {
+          return 1;
+        }
+        if(!isCorrect) {
+          return 0;
+        }
 
-	puttekn("\r\n\nAllt korrekt? (J/n) ",-1);
-	while((tn=gettekn())!='j' && tn!='J' && tn!='n' && tn!='N' && tn!=13);
-	if(tn=='j' || tn=='J' || tn==13) {
-		strcpy(filpek->beskr,tmpbeskr);
-		memcpy(filpek->nycklar,tmpnycklar,MAXNYCKLAR/8);
-		filpek->status=tmpstatus;
-		filpek->downloads=tmpdls;
-		filpek->uppladdare=tmpuppl;
-		filpek->flaggor=tmpflaggor;
-		filpek->validtime=tmpvalidtime;
-		if(newname[0]) {
-			sprintf(oldfullname,"%s%s",Servermem->areor[area2].dir[filpek->dir],filpek->namn);
-			sprintf(nikfilename,"%s%s",Servermem->areor[area2].dir[filpek->dir],newname);
-			rename(oldfullname,nikfilename);
-			strcpy(filpek->namn,newname);
-		}
-		if(updatefile(area2,filpek)) {
-			puttekn("\r\n\nKunde inte skriva filen!\r\n",-1);
-			return(0);
-		}
-	}
-	return(0);
+        strcpy(filpek->beskr,tmpbeskr);
+        memcpy(filpek->nycklar,tmpnycklar,MAXNYCKLAR/8);
+        filpek->status=tmpstatus;
+        filpek->downloads=tmpdls;
+        filpek->uppladdare=tmpuppl;
+        filpek->flaggor=tmpflaggor;
+        filpek->validtime=tmpvalidtime;
+        if(newname[0]) {
+          sprintf(oldfullname,"%s%s",Servermem->areor[area2].dir[filpek->dir],filpek->namn);
+          sprintf(nikfilename,"%s%s",Servermem->areor[area2].dir[filpek->dir],newname);
+          rename(oldfullname,nikfilename);
+          strcpy(filpek->namn,newname);
+        }
+        if(updatefile(area2,filpek)) {
+          puttekn("\r\n\nKunde inte skriva filen!\r\n",-1);
+        }
 }
 
 int lagrafil(void) { return(0); }
 
 int flyttafil(void) { return(0); }
 
-/*
-int incsearch(char *string,char *patt) {
-	int x,len=strlen(patt);
-	for(x=0;x<=(strlen(string)-len);x++)
-		if(!strnicmp(&string[x],patt,len)) return(1);
-	return(0);
-}
-*/
-
 int sokfil(void) {
 	char sokstring[50],soknyckel[MAXNYCKLAR/8], token[150],upper[80],
-		found=FALSE, globalt, foundfiles, tn, areatmp, i;
+		found=FALSE, foundfiles, areatmp, i;
 	long uppl,storlek=0,storre=TRUE,going=TRUE,foo,x,pat,fil,keys=FALSE,len;
+        int globalSearch;
 	struct Fil *filpek;
 	struct tm *ts;
 	if(area2==-1) {
@@ -922,13 +863,10 @@ int sokfil(void) {
 		else puttekn("Beskrivning",-1);
 	}
 
-	sprintf(outbuffer,"\r\nVill du söka globalt? (j/N) ");
-	puttekn(outbuffer,-1);
-	while((tn=gettekn())!='j' && tn!='J' && tn!='n' && tn!='N' && tn!=13);
-	if(tn!='j' && tn!='J') {
-		puttekn("Nej\r\n",-1);
-		globalt = 0;
-	} else puttekn("Ja\r\n",-1);
+        if(GetYesOrNo("\r\nVill du söka globalt?", 'j', 'n', "Ja\r\n", "Nej\r\n",
+                      FALSE, &globalSearch)) {
+          return 1;
+        }
 
 	puttekn("Nycklar att söka på: (? för att få en lista)\r\n",-1);
 	if(editkey(soknyckel)) return(1);
@@ -963,7 +901,7 @@ int sokfil(void) {
 
 	for(i=0;i<Servermem->info.areor;i++)
 	{
-		if(globalt)
+		if(globalSearch)
 			areatmp = i;
 		else
 			areatmp = area2;
@@ -1004,10 +942,6 @@ int sokfil(void) {
 				}
 				if(!foo) continue;
 			}
-/*
-			if(efter && filpek->tid<sokdatum) continue;
-			else if(filpek->tid>sokdatum) continue;
-*/
 			if(uppl!=-1 && uppl!=filpek->uppladdare) continue;
 			if(storre && filpek->size<storlek) continue;
 			else if(!storre && filpek->size>storlek) continue;
@@ -1035,7 +969,7 @@ int sokfil(void) {
 			else sprintf(outbuffer,"    %s\n",filpek->beskr);
 			if(puttekn(outbuffer,-1)) return(0);
 		}
-		if(!globalt) break;
+		if(!globalSearch) break;
 	}
 	if(!found) puttekn("\n\n\rInga filer hittade\n\r",-1);
 	return(0);

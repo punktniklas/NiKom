@@ -337,14 +337,51 @@ void rxedit(struct RexxMsg *mess) {
 }
 
 void rexxgetchar(struct RexxMsg *mess) {
-  char res[2];
-  res[0] = gettekn();
-  res[1] = '\0';
-  if(carrierdropped()) {
-    SetRexxErrorResult(mess, 100);
+  char singleCharStr[2] = " ", *res;
+  int ch;
+
+  ch = GetChar();
+  if(ch > 0) {
+    singleCharStr[0] = ch;
+    res = singleCharStr;
   } else {
-    SetRexxResultString(mess, res);
+    switch(ch) {
+    case GETCHAR_LOGOUT:
+      SetRexxErrorResult(mess, 100);
+      return;
+    case GETCHAR_RETURN:
+      res = "\r";
+      break;
+    case GETCHAR_SOL:
+      res = "SOL";
+      break;
+    case GETCHAR_EOL:
+      res = "EOL";
+      break;
+    case GETCHAR_BACKSPACE:
+      res = "\b";
+      break;
+    case GETCHAR_DELETE:
+      res = "DELETE";
+      break;
+    case GETCHAR_DELETELINE:
+      res = "DELETELINE";
+      break;
+    case GETCHAR_UP:
+      res = "UP";
+      break;
+    case GETCHAR_DOWN:
+      res = "DOWN";
+      break;
+    case GETCHAR_RIGHT:
+      res = "RIGHT";
+      break;
+    case GETCHAR_LEFT:
+      res = "LEFT";
+      break;
+    }
   }
+  SetRexxResultString(mess, res);
 }
 
 void rexxchkbuffer(struct RexxMsg *mess) {

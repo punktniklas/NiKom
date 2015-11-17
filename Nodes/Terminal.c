@@ -429,26 +429,29 @@ int GetStringX(int echo, int maxchrs, char *defaultStr,
   return 0;
 }
 
-int incantrader(void)
-{
-	char tecken, aborted = FALSE;
-
-	radcnt++;
-	if(Servermem->inne[nodnr].rader && radcnt >= Servermem->inne[nodnr].rader && rxlinecount)
-	{
-		putstring("\r<RETURN>",-1,0);
-		while((tecken=gettekn())!=3 && tecken!='\r' && !aborted)
-		{
-			if(carrierdropped()) aborted=TRUE;
-		}
-		if(tecken==3)
-			aborted=TRUE;
-
-		radcnt=0;
-		putstring("\r        \r",-1,0);
-	}
-
-	return aborted;
+int incantrader(void) {
+  char aborted = FALSE;
+  int ch;
+  
+  radcnt++;
+  if(Servermem->inne[nodnr].rader
+     && radcnt >= Servermem->inne[nodnr].rader
+     && rxlinecount) {
+    SendStringNoBrk("\r<RETURN>");
+    for(;;) {
+      ch = GetChar();
+      if(ch == GETCHAR_LOGOUT || ch == 3) { // Ctrl-C
+        aborted = TRUE;
+        break;
+      }
+      if(ch == GETCHAR_RETURN) {
+        break;
+      }
+    }
+    radcnt=0;
+    putstring("\r        \r",-1,0);
+  }
+  return aborted;
 }
 
 int conputtekn(char *pekare,int size)
@@ -565,18 +568,18 @@ void DisplayInternalError(void) {
  */
 int GetYesOrNo(char *label, char yesChar, char noChar, char *yesStr, char *noStr,
                int yesIsDefault, int *res) {
-  char ch;
+  int ch;
 
   radcnt = 0;
-  SendString("%s (%c/%c) ", label,
+  SendString("%s (%c/%c) ", label != NULL ? label : "",
              yesIsDefault ? yesChar - 32 : yesChar,
              yesIsDefault ? noChar : noChar - 32);
   for(;;) {
-    ch = gettekn();
-    if(carrierdropped()) {
+    ch = GetChar();
+    if(ch == GETCHAR_LOGOUT) {
       return 1;
     }
-    if(ch == '\n' || ch == '\r') {
+    if(ch == GETCHAR_RETURN) {
       *res = yesIsDefault ? 1 : 0;
     } else if(ch == yesChar || ch == yesChar - 32) {
       *res = 1;

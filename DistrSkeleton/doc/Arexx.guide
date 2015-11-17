@@ -492,8 +492,25 @@ användaren avbröt editeringen.
 getchar
 
 Läser in ett tecken antingen från NiKoms interna buffer eller, om den är
-tom, väntar på ett tecken.
-Returnerar det tecknet.
+tom, väntar på ett tecken. Om ett vanligt tecken har mottagits så returneras
+en sträng med längd 1 som innehåller det tecknet. För vissa specialtecken,
+eller sekvenser av kontrolltecken, så returnas istället en längre sträng. Möjliga
+returvärden då är:
+
+SOL        - Gå till början av raden.
+EOL        - Gå till slutet av raden
+DELETE     - Radera tecknet till höger om markören.
+DELETELINE - Radera hela raden.
+UP         - Uppåtpil
+DOWN       - Neråtpil
+RIGHT      - Högerpil
+LEFT       - Vänsterpil
+
+Return och backspace har också en viss specialhantering. Oavsett om
+return (ASCII 13) eller linefeed (ASCII 10) har mottagits så returneras
+ASCII 13. Backspace (ASCII 8) returneras när det som användarens terminal
+är inställt på att tolka som backspace har mottagits.
+
 Ex:
 'getchar'
 say result    --> q

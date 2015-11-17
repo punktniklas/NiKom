@@ -380,50 +380,51 @@ void varmote(int mote) {
         }
 }
 
-int ga(char *foo) {
+int ga(char *confName) {
   struct UnreadTexts *unreadTexts = &Servermem->unreadTexts[nodnr];
-  int motnr;
-  char buffer[121], kor;
-  struct Mote *motpek;
+  int confId, becomeMember;
+  char buffer[121];
+  struct Mote *conf;
 
-  if(matchar(foo,Servermem->cfg.brevnamn)) return(-9);
-  motnr=parsemot(foo);
-  if(motnr==-3) {
-    puttekn("\r\n\nSkriv: Gå <mötesnamn>\r\n\n",-1);
-    return(-5);
+  if(matchar(confName, Servermem->cfg.brevnamn)) {
+    return -9;
   }
-  if(motnr==-1) {
-    puttekn("\r\n\nFinns inget sådant möte!\r\n\n", -1);
-    return(-5);
+  confId = parsemot(confName);
+  if(confId == -3) {
+    SendString("\r\n\nSkriv: Gå <mötesnamn>\r\n\n");
+    return -5;
+  }
+  if(confId == -1) {
+    SendString("\r\n\nFinns inget sådant möte!\r\n\n");
+    return -5;
   }
 
-  if(!IsMemberConf(motnr, inloggad, &Servermem->inne[nodnr])) {
-    motpek=getmotpek(motnr);
-    if(MayBeMemberConf(motpek->nummer, inloggad, &Servermem->inne[nodnr])) {
-      sprintf(buffer,
-        "\r\n\nDu är inte medlem i mötet %s, vill du bli medlem? (J/n) ",
-        motpek->namn);
-      puttekn(buffer , -1);
-      while((kor=gettekn())!='j' && kor!='J' && kor!='n' && kor!='N' && kor!='\r');
-      if(kor=='j' || kor=='J' || kor=='\r') {
-        puttekn("Ja!",-1);
-        BAMSET(Servermem->inne[nodnr].motmed, motnr);
-        if(motpek->type == MOTE_ORGINAL) {
-          unreadTexts->lowestPossibleUnreadText[motnr] = 0;
-        }
-        else if(motpek->type == MOTE_FIDO) {
-          unreadTexts->lowestPossibleUnreadText[motnr] = motpek->lowtext;
-        }
+  if(!IsMemberConf(confId, inloggad, &Servermem->inne[nodnr])) {
+    conf = getmotpek(confId);
+    if(MayBeMemberConf(conf->nummer, inloggad, &Servermem->inne[nodnr])) {
+
+      sprintf(buffer, "\r\n\nDu är inte medlem i mötet %s, vill du bli medlem?",
+              conf->namn);
+      if(GetYesOrNo(buffer, 'j', 'n', "Ja\r\n", "Nej\r\n", TRUE, &becomeMember)) {
+        return -8;
       }
-      else {
-        puttekn("Nej!\r\n", -1);
-        return(-5);
+
+      if(becomeMember) {
+        BAMSET(Servermem->inne[nodnr].motmed, confId);
+        if(conf->type == MOTE_ORGINAL) {
+          unreadTexts->lowestPossibleUnreadText[confId] = 0;
+        }
+        else if(conf->type == MOTE_FIDO) {
+          unreadTexts->lowestPossibleUnreadText[confId] = conf->lowtext;
+        }
+      } else {
+        return -5;
       }
+    } else {
+      return -5;
     }
-    else
-      return(-5);
   }
-  return(motnr);
+  return confId;
 }
 
 void tiden(void)
@@ -445,12 +446,11 @@ void tiden(void)
 
 int skapmot(void) {
         struct ShortUser *userletpek;
-        int going=TRUE,x=0,y,mad,clearmed,setratt,changed;
+        int going = TRUE, x = 0, y, mad, clearmed, setratt, changed, ch;
         struct FidoDomain *domainpek;
         BPTR lock;
         struct User skuser;
         struct Mote tempmote,*motletpek,*allok;
-        char tkn;
         memset(&tempmote,0,sizeof(struct Mote));
         if(argument[0]==0) {
                 puttekn("\r\n\nNamn på mötet: ",-1);
@@ -463,11 +463,6 @@ int skapmot(void) {
         }
         tempmote.skapat_tid=time(NULL);;
         tempmote.skapat_av=inloggad;
-/*      while(going) {
-*               puttekn("\n\rMaximalt antal texter i mötet: ",-1);
-*               if(getstring(EKO,5,NULL)) return(1);
-*               if(tempmote.max_texter=atoi(inmat)) going=FALSE;
-*       } */
         going=TRUE;
         while(going)
         {
@@ -553,10 +548,15 @@ int skapmot(void) {
         puttekn("2: Fido-möte\n\n\r",-1);
         puttekn("Val: ",-1);
         for(;;) {
-                tkn=gettekn();
-                if(tkn=='1' || tkn=='2') break;
+          ch = GetChar();
+          if(ch == GETCHAR_LOGOUT) {
+            return 1;
+          }
+          if(ch == '1' || ch == '2') {
+            break;
+          }
         }
-        if(tkn=='1') {
+        if(ch == '1') {
                 puttekn("Lokalt möte\n\n\r",-1);
                 tempmote.type=MOTE_ORGINAL;
         } else {
@@ -583,21 +583,31 @@ int skapmot(void) {
                 puttekn("4: Mac\n\n\r",-1);
                 puttekn("Val: ",-1);
                 for(;;) {
-                        tkn=gettekn();
-                        if(tkn=='1' || tkn=='2' || tkn=='3' || tkn=='4') break;
+                  ch = GetChar();
+                  if(ch == GETCHAR_LOGOUT) {
+                    return 1;
+                  }
+                  if(ch == '1' || ch == '2' || ch == '3' || ch == '4') {
+                    break;
+                  }
                 }
-                if(tkn=='1') {
-                        puttekn("ISO Latin 1\n\n\r",-1);
-                        tempmote.charset = CHRS_LATIN1;
-                } else if(tkn=='2') {
-                        puttekn("SIS-7\n\n\r",-1);
-                        tempmote.charset = CHRS_SIS7;
-                } else if(tkn=='3') {
-                        puttekn("IBM CodePage\n\n\r",-1);
-                        tempmote.charset = CHRS_CP437;
-                } else if(tkn=='4') {
-                        puttekn("Mac\n\n\r",-1);
-                        tempmote.charset = CHRS_MAC;
+                switch(ch) {
+                case '1':
+                  puttekn("ISO Latin 1\n\n\r",-1);
+                  tempmote.charset = CHRS_LATIN1;
+                  break;
+                case '2':
+                  puttekn("SIS-7\n\n\r",-1);
+                  tempmote.charset = CHRS_SIS7;
+                  break;
+                case '3':
+                  puttekn("IBM CodePage\n\n\r",-1);
+                  tempmote.charset = CHRS_CP437;
+                  break;
+                case '4':
+                  puttekn("Mac\n\n\r",-1);
+                  tempmote.charset = CHRS_MAC;
+                  break;
                 }
                 puttekn("Vilken domän är mötet i?\n\r",-1);
                 for(x=0;x<10;x++) {

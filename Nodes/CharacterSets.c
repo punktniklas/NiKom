@@ -2,10 +2,6 @@
 #include "NiKomLib.h"
 #include "Terminal.h"
 
-// Temporary hack to avoid including NiKomFuncs.h
-char gettekn(void);
-int carrierdropped(void);
-
 extern struct System *Servermem;
 extern int nodnr;
 

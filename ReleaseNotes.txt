@@ -69,6 +69,10 @@
   NEWUSERCHARSET where it can be defined what character set new users
   should get by default so they don't have to choose anything.
 
+- The ARexx command "GetChar" is now using the improved internal
+  terminal handling and is returning various special codes for
+  input that is not normal characters.
+
 ---------------------------------------------------------------------------
                          NiKom v1.61, 2015-08-25
 ---------------------------------------------------------------------------

@@ -26,7 +26,7 @@
 extern struct System *Servermem;
 extern int nodnr,inloggad,senast_text_typ,rad,mote2,buftkn,senast_brev_nr,senast_brev_anv;
 extern char outbuffer[],inmat[],backspace[],*argument,vilkabuf[];
-extern struct MsgPort *timerport,*conreadport,*serreadport;
+extern struct MsgPort *timerport,*conreadport;
 extern struct Inloggning Statstr;
 extern struct timerequest *timerreq;
 extern char coninput;
@@ -100,91 +100,85 @@ char *strang;
 	} while(*(strang) != 0 && *(++strang) == ' ');
 
 	return strang;
-
-/*	int test=TRUE;
-	while(test) {
-		test=FALSE;
-		while(*(++strang)!=' ' && *strang!=0);
-		if(*(strang+1)==' ') test=TRUE;
-	}
-	return(*strang==0 ? strang : ++strang); */
 }
 
 void listmed(void) {
-	char kor;
-	int med;
-	struct ShortUser *letpek;
-	struct Mote *motpek;
-	struct User listuser;
-	if(argument[0]=='-' && (argument[1]=='g' || argument[1]=='G')) {
-		argument=hittaefter(argument);
-		listgruppmed();
-		return;
-	}
-	if(mote2==-1) {
-		sprintf(outbuffer,"\r\n\nAlla är medlemmar i %s\r\n\n",Servermem->cfg.brevnamn);
-		puttekn(outbuffer,-1);
-		return;
-	}
-	puttekn("\r\n\nLista medlemmar eller icke medlemmar? (M/i) ",-1);
-	while((kor=gettekn())!='m' && kor!='M' && kor!='i' && kor!='I' && kor!='\r');
-	if(kor=='m' || kor=='M' || kor=='\r') {
-		puttekn("Medlemmar\r\n\n",-1);
-		med=TRUE;
-	} else {
-		puttekn("Icke medlemmar\r\n\n",-1);
-		med=FALSE;
-	}
-	motpek=getmotpek(mote2);
-	sprintf(outbuffer,"%sedlemmar i mötet %s\n\n\r",med ? "M" : "Icke m",motpek->namn);
-	puttekn(outbuffer,-1);
-	for(letpek=(struct ShortUser *)Servermem->user_list.mlh_Head;letpek->user_node.mln_Succ;letpek=(struct ShortUser *)letpek->user_node.mln_Succ) {
-		if(readuser(letpek->nummer,&listuser)) return;
-		if((med && IsMemberConf(mote2, letpek->nummer, &listuser)) || (!med && !IsMemberConf(mote2, letpek->nummer, &listuser))) {
-			sprintf(outbuffer,"%s #%d\r\n",listuser.namn,letpek->nummer);
-			if(puttekn(outbuffer,-1)) return;
-		}
-	}
+  int listMembers;
+  struct ShortUser *shortUser;
+  struct Mote *conf;
+  struct User listuser;
+
+  if(argument[0] == '-' && (argument[1] == 'g' || argument[1] == 'G')) {
+    argument = hittaefter(argument);
+    listgruppmed();
+    return;
+  }
+  if(mote2 == -1) {
+    SendString("\r\n\nAlla är medlemmar i %s\r\n\n", Servermem->cfg.brevnamn);
+    return;
+  }
+  
+  if(GetYesOrNo("\r\n\nLista medlemmar eller icke medlemmar?",
+                'm', 'i', "Medlemmar\r\n\n", "Icke medlemmar\r\n\n",
+                TRUE, &listMembers)) {
+    return;
+  }
+
+  conf = getmotpek(mote2);
+  SendString("%sedlemmar i mötet %s\n\n\r", listMembers ? "M" : "Icke m", conf->namn);
+  ITER_EL(shortUser, Servermem->user_list, user_node, struct ShortUser *) {
+    if(readuser(shortUser->nummer, &listuser)) {
+      return;
+    }
+    if((listMembers && IsMemberConf(mote2, shortUser->nummer, &listuser))
+       || (!listMembers && !IsMemberConf(mote2, shortUser->nummer, &listuser))) {
+      if(SendString("%s #%d\r\n", listuser.namn, shortUser->nummer)) {
+        return;
+      }
+    }
+  }
 }
 
 void listratt(void) {
-	char kor;
-	int ratt;
-	struct ShortUser *letpek;
-	struct Mote *motpek;
-	struct User listuser;
-	if(mote2==-1) {
-		sprintf(outbuffer,"\r\n\nAlla har fullständiga rättigheter i %s\r\n\n",Servermem->cfg.brevnamn);
-		puttekn(outbuffer,-1);
-		return;
-	}
-	motpek=getmotpek(mote2);
-	if(motpek->status & AUTOMEDLEM) {
-		puttekn("\n\n\rAlla har rättigheter i auto-möten.\n\r",-1);
-		return;
-	}
-	if(motpek->status & SUPERHEMLIGT) {
-		puttekn("\n\n\rIngen, men samtidigt alla, har rättigheter i ARexx-styrda möten.\n\r",-1);
-		return;
-	}
-	puttekn("\r\n\nLista rättigheter eller icke rättigheter? (R/i) ",-1);
-	while((kor=gettekn())!='r' && kor!='R' && kor!='i' && kor!='I' && kor!='\r');
-	if(kor=='r' || kor=='R' || kor=='\r') {
-		puttekn("Rättigheter\r\n\n",-1);
-		ratt=TRUE;
-	} else {
-		puttekn("Icke rättigheter\r\n\n",-1);
-		ratt=FALSE;
-	}
-	sprintf(outbuffer,"%sättigheter i mötet %s\n\n\r",ratt ? "R" : "Icke r",motpek->namn);
-	puttekn(outbuffer,-1);
-	for(letpek=(struct ShortUser *)Servermem->user_list.mlh_Head;letpek->user_node.mln_Succ;letpek=(struct ShortUser *)letpek->user_node.mln_Succ) {
-		if(readuser(letpek->nummer,&listuser)) return;
-		if((ratt && BAMTEST(listuser.motratt,mote2)) || (!ratt && !BAMTEST(listuser.motratt,mote2))) {
-			sprintf(outbuffer,"%s #%d\r\n",listuser.namn,letpek->nummer);
-			if(puttekn(outbuffer,-1)) return;
-		}
-	}
+  int listPerm;
+  struct ShortUser *shortUser;
+  struct Mote *conf;
+  struct User listuser;
+
+  if(mote2 == -1) {
+    SendString("\r\n\nAlla har fullständiga rättigheter i %s\r\n\n",
+               Servermem->cfg.brevnamn);
+    return;
+  }
+  conf = getmotpek(mote2);
+  if(conf->status & AUTOMEDLEM) {
+    SendString("\n\n\rAlla har rättigheter i auto-möten.\n\r");
+    return;
+  }
+  if(conf->status & SUPERHEMLIGT) {
+    SendString("\n\n\rIngen, men samtidigt alla, har rättigheter i "
+               "ARexx-styrda möten.\n\r");
+    return;
+  }
+
+  if(GetYesOrNo("\r\n\nLista rättigheter eller icke rättigheter?",
+                'r', 'i', "Rättigheter\r\n\n", "Icke rättigheter\r\n\n",
+                TRUE, &listPerm)) {
+    return;
+  }
+
+  SendString("%sättigheter i mötet %s\n\n\r", listPerm ? "R" : "Icke r", conf->namn);
+  ITER_EL(shortUser, Servermem->user_list, user_node, struct ShortUser *) {
+    if(readuser(shortUser->nummer, &listuser)) {
+      return;
+    }
+    if((listPerm && BAMTEST(listuser.motratt, mote2))
+       || (!listPerm && !BAMTEST(listuser.motratt, mote2))) {
+      if(SendString("%s #%d\r\n",listuser.namn, shortUser->nummer)) {
+        return;
+      }
+    }
+  }
 }
 
 void listnyheter(void) {
@@ -328,83 +322,66 @@ void slapa(void) {
 }
 
 int ropa(void) {
-	long signals, timesig=1L <<timerport->mp_SigBit, consig=1L<<conreadport->mp_SigBit;
-	int going=TRUE,x,flagga=FALSE;
-	UBYTE tecken;
-	puttekn("\r\n\n",-1);
-	for(x=0;x<10;x++) {
-		sprintf(outbuffer,"\rSYSOP!! %s vill dig något!! (%d)",Servermem->inne[nodnr].namn,x);
-		putstring(outbuffer,-1,0);
-		DisplayBeep(NULL);
-		timerreq->tr_node.io_Command=TR_ADDREQUEST;
-		timerreq->tr_node.io_Message.mn_ReplyPort=timerport;
-		timerreq->tr_time.tv_secs=1;
-		timerreq->tr_time.tv_micro=0;
-		SendIO((struct IORequest *)timerreq);
-		signals=Wait(timesig | consig);
-		if(signals & timesig) {
-			WaitIO((struct IORequest *)timerreq);
-		}
-		if(signals & consig) {
-			congettkn();
-			if(!CheckIO((struct IORequest *)timerreq)) {
-				AbortIO((struct IORequest *)timerreq);
-				WaitIO((struct IORequest *)timerreq);
-			}
-			break;
-		}
-	}
-	if(x==10) {
-		puttekn("\r\n\nTyvärr, sysop verkar inte vara tillgänglig för tillfället\r\n\n",-1);
-		return(0);
-	}
-	puttekn("\r\nSysop här! (Tryck Ctrl-Z för att avsluta samtalet.)\r\n",-1);
-	strcpy(vilkabuf,"pratar med sysop");
-	Servermem->vilkastr[nodnr]=vilkabuf;
-	Servermem->action[nodnr]=GORNGTANNAT;
-	while(going) {
-		tecken=gettekn();
-		if((tecken>31 && tecken <127) || (tecken>159 && tecken<=255)) {
-			putstring("\x1b\x5b\x31\x40",-1,0);
-			eka(tecken);
-		} else if(tecken==13) {
-			eka((char)13);
-			eka((char)10);
-		} else if(tecken==10) {
-			if(carrierdropped()) return(1);
-			else {
-				eka((char)10);
-				eka((char)13);
-			}
-		} else if(tecken==8) {
-			putstring("\x1b\x5b\x44\x1b\x5b\x50",-1,0);
-		} else if(tecken==127) {
-			putstring("\x1b\x5b\x50",-1,0);
-		} else if(tecken==26) {
-			going=FALSE;
-		} else if(tecken==3) {
-			going=FALSE;
-			flagga=TRUE;
-		} else if(tecken==7) eka(7);
-		else if(tecken=='\x9b' || (tecken=='\x1b' && gettekn()=='[')) {
-			if((tecken=gettekn())=='\x44') putstring("\x1b\x5b\x44",-1,0);
-			else if(tecken=='\x43') putstring("\x1b\x5b\x43",-1,0);
-		}
-	}
-	if(flagga) {
-		puttekn("\r\nTar bort filtret.\r\n",-1);
-		going=TRUE;
-		while(going) {
-			if((tecken=gettekn())==10) {
-				if(carrierdropped()) return(1);
-				else {
-					eka((char)10);
-				}
-			} else if(tecken==26) going=FALSE;
-			else eka(tecken);
-		}
-	}
-	return(0);
+  long signals, timesig = 1L << timerport->mp_SigBit,
+    consig =1L << conreadport->mp_SigBit;
+  int ch, i;
+  SendString("\r\n\n");
+  for(i = 0; i < 10; i++) {
+    SendStringNoBrk("\rSYSOP!! %s vill dig något!! (%d)",
+                    Servermem->inne[nodnr].namn, i);
+    DisplayBeep(NULL);
+    timerreq->tr_node.io_Command = TR_ADDREQUEST;
+    timerreq->tr_node.io_Message.mn_ReplyPort = timerport;
+    timerreq->tr_time.tv_secs = 1;
+    timerreq->tr_time.tv_micro = 0;
+    SendIO((struct IORequest *)timerreq);
+    signals = Wait(timesig | consig);
+    if(signals & timesig) {
+      WaitIO((struct IORequest *)timerreq);
+    }
+    if(signals & consig) {
+      congettkn();
+      if(!CheckIO((struct IORequest *)timerreq)) {
+        AbortIO((struct IORequest *)timerreq);
+        WaitIO((struct IORequest *)timerreq);
+      }
+      break;
+    }
+  }
+  if(i == 10) {
+    SendString("\r\n\nTyvärr, sysop verkar inte vara tillgänglig för "
+               "tillfället\r\n\n");
+    return 0;
+  }
+  SendString("\r\nSysop här! (Tryck Ctrl-Z för att avsluta samtalet.)\r\n");
+  strcpy(vilkabuf,"pratar med sysop");
+  Servermem->vilkastr[nodnr] = vilkabuf;
+  Servermem->action[nodnr] = GORNGTANNAT;
+  for(;;) {
+    ch = GetChar();
+    if(ch == GETCHAR_LOGOUT) {
+      return 1;
+    }
+    if(ch > 0 && IsPrintableCharacter(ch)) {
+      SendStringNoBrk("\x1b\x5b\x31\x40");
+      eka(ch);
+    } else if(ch == GETCHAR_RETURN) {
+      SendStringNoBrk("\r\n");
+    } else if(ch == GETCHAR_BACKSPACE) {
+      SendStringNoBrk("\x1b\x5b\x44\x1b\x5b\x50");
+    } else if(ch == GETCHAR_DELETE) {
+      SendStringNoBrk("\x1b\x5b\x50");
+    } else if(ch == GETCHAR_RIGHT) {
+      SendStringNoBrk("\x1b\x5b\x43");
+    } else if(ch == GETCHAR_LEFT) {
+      SendStringNoBrk("\x1b\x5b\x44");
+    } else if(ch == 26) { // Ctrl-Z
+      return 0;
+    } else if(ch == 7) {
+      eka(7);
+    }
+  }
+  return 0;
 }
 
 void writemeet(struct Mote *motpek) {
