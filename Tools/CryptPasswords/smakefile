@@ -1,5 +1,4 @@
-CPU   = 68020
-FLAGS = NMINC STRMERGE CPU=$(CPU) IDIR=//NiKomLib
+FLAGS = NMINC STRMERGE IDIR=//NiKomLib
 OBJS = CryptPasswords.o FCrypt.o
 
 all: CryptPasswords
