@@ -56,7 +56,7 @@ smake clean
 smake CPU=68000
 
 cd //
-Copy NiKomLib/NoDebug/nikom.library Ram:NiKomDistr/libs/68000/
+Copy NiKomLib/NoDebug/68000/nikom.library Ram:NiKomDistr/libs/68000/nikom.library
 Copy InitNiKom/InitNiKom Ram:NiKomDistr/bin/68000/
 Copy PreNode/NoDebug/68000/PreNode Ram:NiKomDistr/bin/68000/
 Copy Server/NoDebug/68000/NiKServer Ram:NiKomDistr/bin/68000/
@@ -92,20 +92,8 @@ cd /Nodes
 smake clean 
 smake
 
-cd /tools/CryptPasswords
-smake clean
-smake
-
-cd /SetNodeState
-smake clean
-smake
-
-cd /NiKomFido
-smake clean  
-smake
-
-cd //
-Copy NiKomLib/NoDebug/nikom.library Ram:NiKomDistr/libs/68020/nikom.library
+cd /
+Copy NiKomLib/NoDebug/68020/nikom.library Ram:NiKomDistr/libs/68020/nikom.library
 Copy InitNiKom/InitNiKom Ram:NiKomDistr/bin/68020/InitNiKom
 Copy PreNode/NoDebug/68020/PreNode Ram:NiKomDistr/bin/68020/PreNode   
 Copy Server/NoDebug/68020/NiKServer Ram:NiKomDistr/bin/68020/NiKServer
@@ -117,7 +105,7 @@ Copy tools/NiKomFido/NiKomFido Ram:NiKomDistr/bin/68020/NiKomFido
 
 Copy DistrSkeleton/#? Ram:NiKomDistr/ all
 
-; Store current working directory in env-variable NIKDIR
+; Store current working directory in $NIKDIR
 Set NIKDIR `cd`
 cd Ram:NiKomDistr
 lha a -r Ram:NiKom_full.lha #?
