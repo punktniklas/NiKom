@@ -1,6 +1,6 @@
 CPU      = 68020
 SCFLAGS  = NMINC STRMERGE CPU=$(CPU) DEBUG=FULL IDIR=/Include
-NLFLAGS  = NMINC STRMERGE DEBUG=LINE NOSTKCHK LIBCODE DEFINE=NIKOMLIB=1 \
+NLFLAGS  = NMINC STRMERGE CPU=$(CPU) DEBUG=LINE NOSTKCHK LIBCODE DEFINE=NIKOMLIB=1 \
            IDIR=/Include
 OBJS     = DiskUtils.o FileAreaUtils.o Logging.o RexxUtils.o ExecUtils.o \
 	   ServerMemUtils.o
@@ -24,8 +24,8 @@ clean:
 nikomutils.lib: Debug/$(CPU) $(OBJS)
   oml -v Debug/$(CPU)/nikomutils.lib r $(OBJS)
 
-nikomutils_nlib.lib: Debug $(NLIBOBJS)
-  oml -v Debug/nikomutils_nlib.lib r $(NLIBOBJS)
+nikomutils_nlib.lib: Debug/$(CPU) $(NLIBOBJS)
+  oml -v Debug/$(CPU)/nikomutils_nlib.lib r $(NLIBOBJS)
 
 DiskUtils.o: DiskUtils.c DiskUtils.h
 

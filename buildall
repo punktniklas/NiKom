@@ -11,7 +11,11 @@ Failat 1
 ; Create temporary directories in Ram:
 MakeDir Ram:NiKomDistr
 MakeDir Ram:NiKomDistr/libs
+MakeDir Ram:NiKomDistr/libs/68000
+MakeDir Ram:NiKomDistr/libs/68020
 MakeDir Ram:NiKomDistr/bin
+MakeDir Ram:NiKomDistr/bin/68000
+MakeDir Ram:NiKomDistr/bin/68020
 
 ; Start of 68000 build
 
@@ -52,15 +56,15 @@ smake clean
 smake CPU=68000
 
 cd //
-Copy NiKomLib/NoDebug/nikom.library Ram:NiKomDistr/libs/nikom.library_68000
-Copy InitNiKom/InitNiKom Ram:NiKomDistr/bin/InitNiKom_68000
-Copy PreNode/NoDebug/68000/PreNode Ram:NiKomDistr/bin/PreNode_68000
-Copy Server/NoDebug/68000/NiKServer Ram:NiKomDistr/bin/NiKServer_68000
-Copy Nodes/NoDebug/68000/NiKomCon Ram:NiKomDistr/bin/NiKomCon_68000
-Copy Nodes/NoDebug/68000/NiKomSer Ram:NiKomDistr/bin/NiKomSer_68000
-Copy tools/CryptPasswords/CryptPasswords Ram:NiKomDistr/bin/CryptPasswords_68000
-Copy tools/SetNodeState/SetNodeState Ram:NiKomDistr/bin/SetNodeState_68000
-Copy tools/NiKomFido/NiKomFido Ram:NiKomDistr/bin/NiKomFido_68000
+Copy NiKomLib/NoDebug/nikom.library Ram:NiKomDistr/libs/68000/
+Copy InitNiKom/InitNiKom Ram:NiKomDistr/bin/68000/
+Copy PreNode/NoDebug/68000/PreNode Ram:NiKomDistr/bin/68000/
+Copy Server/NoDebug/68000/NiKServer Ram:NiKomDistr/bin/68000/
+Copy Nodes/NoDebug/68000/NiKomCon Ram:NiKomDistr/bin/68000/
+Copy Nodes/NoDebug/68000/NiKomSer Ram:NiKomDistr/bin/68000/
+Copy tools/CryptPasswords/CryptPasswords Ram:NiKomDistr/bin/68000/
+Copy tools/SetNodeState/SetNodeState Ram:NiKomDistr/bin/68000/
+Copy tools/NiKomFido/NiKomFido Ram:NiKomDistr/bin/68000/
 
 ; Start of 68020-build
 
@@ -101,15 +105,15 @@ smake clean
 smake
 
 cd //
-Copy NiKomLib/NoDebug/nikom.library Ram:NiKomDistr/libs/nikom.library_68020
-Copy InitNiKom/InitNiKom Ram:NiKomDistr/bin/InitNiKom_68020
-Copy PreNode/NoDebug/68020/PreNode Ram:NiKomDistr/bin/PreNode_68020   
-Copy Server/NoDebug/68020/NiKServer Ram:NiKomDistr/bin/NiKServer_68020
-Copy Nodes/NoDebug/68020/NiKomCon Ram:NiKomDistr/bin/NiKomCon_68020
-Copy Nodes/NoDebug/68020/NiKomSer Ram:NiKomDistr/bin/NiKomSer_68020
-Copy tools/CryptPasswords/CryptPasswords Ram:NiKomDistr/bin/CryptPasswords_68020
-Copy tools/SetNodeState/SetNodeState Ram:NiKomDistr/bin/SetNodeState_68020
-Copy tools/NiKomFido/NiKomFido Ram:NiKomDistr/bin/NiKomFido_68020
+Copy NiKomLib/NoDebug/nikom.library Ram:NiKomDistr/libs/68020/nikom.library
+Copy InitNiKom/InitNiKom Ram:NiKomDistr/bin/68020/InitNiKom
+Copy PreNode/NoDebug/68020/PreNode Ram:NiKomDistr/bin/68020/PreNode   
+Copy Server/NoDebug/68020/NiKServer Ram:NiKomDistr/bin/68020/NiKServer
+Copy Nodes/NoDebug/68020/NiKomCon Ram:NiKomDistr/bin/68020/NiKomCon
+Copy Nodes/NoDebug/68020/NiKomSer Ram:NiKomDistr/bin/68020/NiKomSer
+Copy tools/CryptPasswords/CryptPasswords Ram:NiKomDistr/bin/68020/CryptPasswords
+Copy tools/SetNodeState/SetNodeState Ram:NiKomDistr/bin/68020/SetNodeState
+Copy tools/NiKomFido/NiKomFido Ram:NiKomDistr/bin/68020/NiKomFido
 
 Copy DistrSkeleton/#? Ram:NiKomDistr/ all
 
@@ -120,6 +124,7 @@ lha a -r Ram:NiKom_full.lha #?
 Copy Ram:NiKom_full.lha "$NIKDIR"
 cd "$NIKDIR"
 UnSet NIKDIR
+Delete Ram:NiKom_full.lha
 Delete Ram:NiKomDistr all
 
 Echo "Build complete!"

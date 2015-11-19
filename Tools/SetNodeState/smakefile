@@ -1,5 +1,4 @@
-CPU   = 68020
-FLAGS = NMINC STRMERGE CPU=$(CPU) IDIR=//Include
+FLAGS = NMINC STRMERGE IDIR=//Include
 OBJS = SetNodeState.o
 
 all: SetNodeState

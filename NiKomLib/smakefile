@@ -1,8 +1,9 @@
+CPU     = 68020
 OBJS    = LibInit.o UserLibInit.o Matrix.o Rexx.o Lock.o ReadFidoText.o Echo.o \
           NodeTypes.o Conf.o NiKVersion.o Terminal.o ServerComm.o Hash.o \
           PrgCat.o UnreadTexts.o Crypt.o FCrypt.o ConferenceTexts.o Util.o
-SCFLAGS = STREQ STRINGMERGE NOSTKCHK LIBCODE UNSIGNEDCHAR DEFINE=NIKOMLIB=1 \
-          IDIR=/Include IDIR=/UtilLib
+SCFLAGS = STREQ STRINGMERGE CPU=$(CPU)  NOSTKCHK LIBCODE UNSIGNEDCHAR \
+	  DEFINE=NIKOMLIB=1 IDIR=/Include IDIR=/UtilLib
 DEBUG   = DEBUG=LINE
 
 all:    nikom_pragmas.h nikom.library
@@ -12,6 +13,12 @@ all:    nikom_pragmas.h nikom.library
 
 Debug:
   -makedir Debug
+
+Debug/$(CPU): Debug
+  -makedir Debug/$(CPU)
+
+NoDebug/$(CPU): NoDebug
+  -makedir NoDebug/$(CPU)
 
 NoDebug:
   -makedir NoDebug
@@ -26,16 +33,16 @@ nikom_pragmas.h: nikom.fd
   copy nikom_pragmas.h /Include
   delete nikom_pragmas.tmp
 
-nikom.library : Debug NoDebug $(OBJS) nikom.fd
-  slink TO Debug/nikom.library NOICONS \
+nikom.library : Debug/$(CPU) NoDebug/$(CPU) $(OBJS) nikom.fd
+  slink TO Debug/$(CPU)/nikom.library NOICONS \
         FROM lib:libent.o $(OBJS) \
         LIBPREFIX _LIB LIBFD nikom.fd \
-        LIB lib:sc.lib lib:amiga.lib /UtilLib/Debug/nikomutils_nlib.lib \
+        LIB lib:sc.lib lib:amiga.lib /UtilLib/Debug/$(CPU)/nikomutils_nlib.lib \
         BATCH SMALLCODE SMALLDATA \
         LIBVERSION 21 \
         LIBREVISION 1 \
         LIBID "nikom.library 21.1"
-  slink Debug/nikom.library TO NoDebug/nikom.library NODEBUG NOICONS
+  slink Debug/$(CPU)/nikom.library TO NoDebug/$(CPU)/nikom.library NODEBUG NOICONS
 
 LibInit.o:      LibInit.c       nikom.fd
 
