@@ -71,7 +71,6 @@ int fullloadtext(char *filename);
 void fulldisplaytext(void);
 void fullquote(void);
 void fullcrash(void);
-struct UserGroup *getgrouppek(int nummer);
 
 int edittext(char *filename) {
   int ret;

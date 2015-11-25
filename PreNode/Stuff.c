@@ -13,14 +13,6 @@
 #include "NiKomLib.h"
 #include "PreNodeFuncs.h"
 
-#define ERROR	10
-
-#define OK		0
-#define EKO		1
-#define EJEKO	0
-#define KOM		1
-#define EJKOM	0
-
 extern struct System *Servermem;
 extern int radcnt,nodnr,inloggad;
 extern char outbuffer[],inmat[];
@@ -37,26 +29,6 @@ char *strang;
 		if(*(strang+1)==' ') test=TRUE;
 	}
 	return(*strang==0 ? strang : ++strang);
-}
-
-int jaellernej(char val1,char val2,int defulle) {
-	UBYTE tk;
-	radcnt=0;
-	if(defulle==1) {
-		if((val1>='a' && val1<='z') || val1=='å' || val1=='ä' || val1=='ö') val1-=32;
-		if((val2>='A' && val2<='Z') || val2=='Å' || val2=='Ä' || val2=='Ö') val2+=32;
-	} else {
-		if((val1>='A' && val1<='Z') || val1=='Å' || val1=='Ä' || val1=='Ö') val1+=32;
-		if((val2>='a' && val2<='z') || val2=='å' || val2=='ä' || val2=='ö') val2-=32;
-	}
-	sprintf(outbuffer,"(%c/%c) ",val1,val2);
-	puttekn(outbuffer,-1);
-	for(;;) {
-		tk=gettekn();
-		if(tk!=val1 && tk!=val1-32 && tk!=val1+32 && tk!=val2 && tk!=val2-32 && tk!=val2+32 && tk!=13 && tk!=10) continue;
-		if(tk==val1 || tk==val1-32 || tk==val1+32 || ((tk==13 || tk==10) && defulle==1)) return(TRUE);
-		if(tk==val2 || tk==val2-32 || tk==val2+32 || ((tk==13 || tk==10) && defulle==2)) return(FALSE);
-	}
 }
 
 int speciallogin(char bokstav) {

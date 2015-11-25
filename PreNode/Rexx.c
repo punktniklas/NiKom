@@ -13,13 +13,10 @@
 #include "NiKomstr.h"
 #include "PreNodeFuncs.h"
 #include "Terminal.h"
+#include "RexxUtils.h"
 
-#define ERROR	10
-#define OK		0
 #define EKO		1
 #define EJEKO	0
-#define KOM		1
-#define EJKOM	0
 
 extern struct System *Servermem;
 extern int nodnr,inloggad,rxlinecount;
@@ -196,33 +193,29 @@ void rexxchkbuffer(struct RexxMsg *mess) {
 }
 
 void rexxyesno(struct RexxMsg *mess) {
-	char foo[2],ja,nej,def,*pek;
-	pek=hittaefter(mess->rm_Args[0]);
-	if(!pek[0]) {
-		ja='j'; nej='n'; def=1;
-	} else {
-		ja=pek[0];
-		pek=hittaefter(pek);
-		if(!pek[0]) {
-			nej='n'; def=1;
-		} else {
-			nej=pek[0];
-			pek=hittaefter(pek);
-			if(!pek[0]) def=1;
-			else def=pek[0]-'0';
-		}
-	}
-	foo[0]=jaellernej(ja,nej,def)+'0';
-	foo[1]=0;
-	if(carrierdropped()) {
-		mess->rm_Result1=100;
-		return;
-	}
-	mess->rm_Result1=0;
-	if(mess->rm_Action & 1L<<RXFB_RESULT) {
-		if(!(mess->rm_Result2=(long)CreateArgstring(foo,1)))
-			puttekn("\r\n\nKunde inte allokera en Argstring!\r\n\n",-1);
-	}
+  int isYes;
+  char ja,nej,def,*pek;
+  pek=hittaefter(mess->rm_Args[0]);
+  if(!pek[0]) {
+    ja='j'; nej='n'; def=1;
+  } else {
+    ja=pek[0];
+    pek=hittaefter(pek);
+    if(!pek[0]) {
+      nej='n'; def=1;
+    } else {
+      nej=pek[0];
+      pek=hittaefter(pek);
+      if(!pek[0]) def=1;
+      else def=pek[0]-'0';
+    }
+  }
+
+  if(GetYesOrNo(NULL, ja, nej, NULL, NULL, def == 1, &isYes)) {
+    SetRexxErrorResult(mess, 100);
+    return;
+  }
+  SetRexxResultString(mess, isYes ? "1" : "0");
 }
 
 void rxsetlinecount(struct RexxMsg *mess) {

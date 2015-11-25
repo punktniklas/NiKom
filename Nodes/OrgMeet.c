@@ -40,7 +40,7 @@ int org_skriv(void) {
 }
 
 int org_kommentera(void) {
-  int nummer, editret, confId;
+  int nummer, editret, confId, isCorrect;
   struct Mote *motpek;
   nummer=atoi(argument);
   if(argument[0]) {
@@ -63,8 +63,14 @@ int org_kommentera(void) {
         puttekn("\r\n\nDu får inte kommentera i kommentarsskyddade möten!\r\n\n",-1);
         return(0);
       } else {
-        puttekn("\r\n\nVill du verkligen kommentera i ett kommentarsskyddat möte? ",-1);
-        if(!jaellernej('j','n',2)) return(0);
+        if(GetYesOrNo(
+           "\r\n\nVill du verkligen kommentera i ett kommentarsskyddat möte? ",
+           'j', 'n', "Ja\r\n", "Nej\r\n", FALSE, &isCorrect)) {
+          return 1;
+        }
+        if(!isCorrect) {
+          return 0;
+        }
       }
     }
     if(readtexthead(nummer,&readhead)) return(0);

@@ -393,7 +393,8 @@ void rexxchkbuffer(struct RexxMsg *mess) {
 }
 
 void rexxyesno(struct RexxMsg *mess) {
-  char res[2], yes, no, def,*argstr;
+  int isYes;
+  char yes, no, def,*argstr;
   argstr = hittaefter(mess->rm_Args[0]);
   if(argstr[0] == '\0') {
     yes = 'j'; no = 'n'; def = 1;
@@ -415,13 +416,12 @@ void rexxyesno(struct RexxMsg *mess) {
       }
     }
   }
-  res[0] = jaellernej(yes, no, def) + '0';
-  res[1] = '\0';
-  if(carrierdropped()) {
+
+  if(GetYesOrNo(NULL, yes, no, NULL, NULL, def == 1, &isYes)) {
     SetRexxErrorResult(mess, 100);
     return;
   }
-  SetRexxResultString(mess, res);
+  SetRexxResultString(mess, isYes ? "1" : "0");
 }
 
 void whicharea(struct RexxMsg *mess) {

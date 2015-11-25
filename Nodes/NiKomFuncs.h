@@ -161,7 +161,6 @@ int userexists(int nummer);
 int movetext(void);
 char *getusername(int nummer);
 int namematch(char *pat,char *fac);
-int jaellernej(char val1,char val2,int defulle);
 int skapagrupp(void);
 int writegrupp(int nummer,struct UserGroup *pek);
 void listagrupper(void);

@@ -403,7 +403,7 @@ void sprattgok(char *str) {
 }
 
 int fido_brev(char *tillpers,char *adr,struct Mote *motpek) {
-        int length = 0, x = 0, editret, chrs, inputch;
+  int length = 0, x = 0, editret, chrs, inputch, wantCopy;
 	struct FidoDomain *fd;
 	struct FidoText *komft,ft;
 	struct MinNode *first, *last;
@@ -564,8 +564,16 @@ int fido_brev(char *tillpers,char *adr,struct Mote *motpek) {
                    getusername(inloggad), x,
                    ft.touser, ft.tozone, ft.tonet, ft.tonode, ft.topoint);
 	}
-	puttekn("Vill du ha en kopia av brevet i din egen brevlåda? ",-1);
-	if(jaellernej('j','n',2)) savefidocopy(&ft,inloggad);
+
+        if(GetYesOrNo("Vill du ha en kopia av brevet i din egen brevlåda?",
+                      'j', 'n', "Ja\r\n\n", "Nej\r\n\n",
+                      FALSE, &wantCopy)) {
+          return 1;
+        }
+        if(wantCopy) {
+          savefidocopy(&ft,inloggad);
+        }
+
 	while(first=(struct MinNode *)RemHead((struct List *)&ft.text)) FreeMem(first,sizeof(struct EditLine));
 	NewList((struct List *)&edit_list);
 	return(0);

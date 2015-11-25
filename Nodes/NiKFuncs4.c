@@ -16,13 +16,10 @@
 #include "NiKomFuncs.h"
 #include "NiKomLib.h"
 #include "Terminal.h"
+#include "Logging.h"
+#include "ServerMemUtils.h"
 
-#define ERROR	10
-#define OK		0
 #define EKO		1
-#define EJEKO	0
-#define KOM		1
-#define EJKOM	0
 
 extern struct System *Servermem;
 extern int nodnr,inloggad,mote2,senast_text_typ,radcnt;
@@ -116,108 +113,90 @@ int namematch(char *pat,char *fac) {
 	return(TRUE);
 }
 
-int jaellernej(char val1,char val2,int defulle) {
-	UBYTE tk;
-	radcnt=0;
-	if(defulle==1) {
-		if((val1>='a' && val1<='z') || val1=='å' || val1=='ä' || val1=='ö') val1-=32;
-		if((val2>='A' && val2<='Z') || val2=='Å' || val2=='Ä' || val2=='Ö') val2+=32;
-	} else {
-		if((val1>='A' && val1<='Z') || val1=='Å' || val1=='Ä' || val1=='Ö') val1+=32;
-		if((val2>='a' && val2<='z') || val2=='å' || val2=='ä' || val2=='ö') val2-=32;
-	}
-	sprintf(outbuffer,"(%c/%c) ",val1,val2);
-	puttekn(outbuffer,-1);
-	for(;;) {
-		tk=gettekn();
-		if(tk!=val1 && tk!=val1-32 && tk!=val1+32 && tk!=val2 && tk!=val2-32 && tk!=val2+32 && tk!=13 && tk!=10) continue;
-		if(tk==val1 || tk==val1-32 || tk==val1+32 || ((tk==13 || tk==10) && defulle==1)) return(TRUE);
-		if(tk==val2 || tk==val2-32 || tk==val2+32 || ((tk==13 || tk==10) && defulle==2)) return(FALSE);
-	}
-}
-
 int skapagrupp(void) {
-	struct UserGroup *allok,*letpek;
-	int x=0, groupadmin, going;
-	char buff[9];
+  struct UserGroup *newUserGroup,*userGroup;
+  int groupadmin, groupId;
+  char buff[9];
+  
+  if(Servermem->inne[nodnr].status < Servermem->cfg.st.grupper) {
+    SendString("\r\n\nDu har inte rättigheter att skapa grupper!\r\n");
+    return 0;
+  }
 
-	if(Servermem->inne[nodnr].status < Servermem->cfg.st.grupper)
-	{
-		puttekn("\r\n\nDu har inte rättigheter att skapa grupper!\r\n",-1);
-		return(0);
-	}
+  groupId = 0;
+  ITER_EL(userGroup, Servermem->grupp_list, grupp_node, struct UserGroup *) {
+    if(userGroup->nummer > groupId) {
+      break;
+    }
+    groupId++;
+  }
+  if(groupId >= 32) {
+    SendString("\r\n\nSorry, det finns redan maximalt med användargrupper.\r\n");
+    return 0;
+  }
+  if(!(newUserGroup = AllocMem(sizeof(struct UserGroup),
+                               MEMF_CLEAR | MEMF_PUBLIC))) {
+    LogEvent(SYSTEM_LOG, ERROR, "Could not allocate %d bytes.",
+             sizeof(struct UserGroup));
+    DisplayInternalError();
+    return 0;
+  }
+  newUserGroup->nummer = groupId;
 
-		for(letpek=(struct UserGroup *)Servermem->grupp_list.mlh_Head;letpek->grupp_node.mln_Succ;letpek=(struct UserGroup *)letpek->grupp_node.mln_Succ) {
-		if(letpek->nummer>x) {
-			break;
-		}
-		x++;
-	}
-	if(x>=32) {
-		puttekn("\r\n\nSorry, det finns redan maximalt med användargrupper.\r\n",-1);
-		return(0);
-	}
-	if(!(allok=AllocMem(sizeof(struct UserGroup),MEMF_CLEAR | MEMF_PUBLIC))) {
-		puttekn("\r\n\nKunde inte allokera en UserGroup-struktur.\r\n",-1);
-		return(0);
-	}
-	allok->nummer = x;
-	if(!argument[0]) {
-		puttekn("\r\n\nNamn: ",-1);
-		if(getstring(EKO,40,NULL)) {
-			FreeMem(allok,sizeof(struct UserGroup));
-			return(1);
-		}
-		if(!inmat[0]) {
-			FreeMem(allok,sizeof(struct UserGroup));
-			return(0);
-		}
-		strcpy(allok->namn,inmat);
-	} else strcpy(allok->namn,argument);
-	if(parsegrupp(allok->namn) != -1) {
-		puttekn("\n\n\rFinns redan en grupp med det namnet.\n\r",-1);
-		FreeMem(allok,sizeof(struct UserGroup));
-		return(0);
-	}
-	puttekn("\r\n\nVid vilken statusnivå ska man bli automatiskt medlem i gruppen?\r\n",-1);
-	puttekn("0  = alla blir automatiskt medlemmar.\r\n",-1);
-	puttekn("-1 = ingen blir automatiskt medlem.\r\n",-1);
-	if(getstring(EKO,3,NULL)) {
-		FreeMem(allok,sizeof(struct UserGroup));
-		return(1);
-	}
-	allok->autostatus=atoi(inmat);
-	puttekn("\r\nSka gruppen vara hemlig? ",-1);
-	if(jaellernej('j','n',2)) {
-		allok->flaggor |= HEMLIGT;
-		puttekn("Ja, hemligt\r\n",-1);
-	} else puttekn("Nej, inte hemligt\r\n",-1);
+  if(!argument[0]) {
+    SendString("\r\n\nNamn: ");
+    if(GetString(40, NULL)) {
+      FreeMem(newUserGroup, sizeof(struct UserGroup));
+      return 1;
+    }
+    if(!inmat[0]) {
+      FreeMem(newUserGroup, sizeof(struct UserGroup));
+      return 0;
+    }
+    strcpy(newUserGroup->namn, inmat);
+  } else {
+    strcpy(newUserGroup->namn, argument);
+  }
+  if(parsegrupp(newUserGroup->namn) != -1) {
+    SendString("\n\n\rFinns redan en grupp med det namnet.\n\r");
+    FreeMem(newUserGroup, sizeof(struct UserGroup));
+    return 0;
+  }
+  SendString("\r\n\nVid vilken statusnivå ska man bli automatiskt medlem i gruppen?\r\n");
+  SendString("0  = alla blir automatiskt medlemmar.\r\n");
+  SendString("-1 = ingen blir automatiskt medlem.\r\n");
+  newUserGroup->autostatus = GetNumber(-1, 100, NULL);
 
-	going = TRUE;
-	while(going)
-	{
-		puttekn("\r\nVilken användare ska vara administratör för denna grupp: ",-1);
-		sprintf(buff,"%d",inloggad);
-		if(getstring(EKO,40,buff)) return(1);
-		if(inmat[0])
-		{
-			if((groupadmin=parsenamn(inmat))==-1) puttekn("\r\nFinns ingen sådan användare!",-1);
-			else
-			{
-				allok->groupadmin = groupadmin;
-				going = FALSE;
-			}
-		}
-	}
+  if(EditBitFlagChar("\r\nSka gruppen vara hemlig?", 'j', 'n', "Ja\r\n", "Nej\r\n",
+                     &newUserGroup->flaggor, HEMLIGT)) {
+    return 1;
+  }
 
-	if(writegrupp(x,allok)) {
-		FreeMem(allok,sizeof(struct UserGroup));
-		return(0);
-	}
+  for(;;) {
+    SendString("\r\nVilken användare ska vara administratör för denna grupp: ");
+    sprintf(buff,"%d",inloggad);
+    if(GetString(40 ,buff)) {
+      return 1;
+    }
+    if(inmat[0]) {
+      if((groupadmin = parsenamn(inmat)) == -1) {
+        SendString("\r\nFinns ingen sådan användare!",-1);
+      } else {
+        newUserGroup->groupadmin = groupadmin;
+        break;
+      }
+    }
+  }
 
-	Insert((struct List *)&Servermem->grupp_list,(struct Node *)allok,(struct Node *)letpek->grupp_node.mln_Pred);
-	BAMSET((char *)&Servermem->inne[nodnr].grupper,x);
-	return(0);
+  if(writegrupp(groupId, newUserGroup)) {
+    FreeMem(newUserGroup, sizeof(struct UserGroup));
+    return 0;
+  }
+  
+  Insert((struct List *)&Servermem->grupp_list, (struct Node *)newUserGroup,
+         (struct Node *)userGroup->grupp_node.mln_Pred);
+  BAMSET((char *)&Servermem->inne[nodnr].grupper, groupId);
+  return 0;
 }
 
 int writegrupp(int nummer,struct UserGroup *pek) {
@@ -252,23 +231,6 @@ void listagrupper(void) {
 	}
 }
 
-struct UserGroup *getgrouppek(int nummer)
-{
-	int going=TRUE;
-	struct UserGroup *letpek;
-
-	letpek=(struct UserGroup *)Servermem->grupp_list.mlh_Head;
-	while(letpek->grupp_node.mln_Succ && going)
-	{
-		if(letpek->nummer == nummer)
-			going = FALSE;
-		else
-			letpek=(struct UserGroup *)letpek->grupp_node.mln_Succ;
-	}
-
-	return(letpek);
-}
-
 int adderagruppmedlem(void) {
 	int x,vem,grupp;
 	struct User anv;
@@ -292,7 +254,7 @@ int adderagruppmedlem(void) {
 		puttekn("\r\n\nFinns ingen sådan grupp!\r\n",-1);
 		return(0);
 	}
-	grouppek = getgrouppek(grupp);
+	grouppek = FindUserGroup(grupp);
 	if(inloggad != grouppek->groupadmin && Servermem->inne[nodnr].status < Servermem->cfg.st.grupper)
 	{
 		puttekn("\r\n\nDu har inte rättigheter att addera gruppmedlemmar till denna grupp!\r\n",-1);
@@ -339,7 +301,7 @@ int subtraheragruppmedlem(void) {
 		puttekn("\r\n\nFinns ingen sådan grupp!\r\n",-1);
 		return(0);
 	}
-	grouppek = getgrouppek(grupp);
+	grouppek = FindUserGroup(grupp);
 	if(inloggad != grouppek->groupadmin && Servermem->inne[nodnr].status < Servermem->cfg.st.grupper)
 	{
 		puttekn("\r\n\nDu har inte rättigheter att subtrahera gruppmedlemmar från denna grupp!\r\n",-1);
@@ -394,112 +356,105 @@ int parsegrupp(char *skri) {
 }
 
 int andragrupp(void) {
-	struct UserGroup *pek,tmp;
-	int nummer, heml, going, groupadmin;
-	char buff[9];
+  struct UserGroup *userGroup, tmpUserGroup;
+  int groupId, groupadmin, isCorrect;
+  char buff[9];
+  
+  if(!argument[0]) {
+    SendString("\r\n\nSkriv: Ändra Grupp <gruppnamn>\r\n");
+    return 0;
+  }
+  if((groupId = parsegrupp(argument)) == -1) {
+    SendString("\r\n\nFinns ingen sådan grupp!\r\n");
+    return 0;
+  }
 
-	if(!argument[0]) {
-		puttekn("\r\n\nSkriv: Ändra Grupp <gruppnamn>\r\n",-1);
-		return(0);
-	}
-	if((nummer=parsegrupp(argument))==-1) {
-		puttekn("\r\n\nFinns ingen sådan grupp!\r\n",-1);
-		return(0);
-	}
-	for(pek=(struct UserGroup *)Servermem->grupp_list.mlh_Head;pek->grupp_node.mln_Succ;pek=(struct UserGroup *)pek->grupp_node.mln_Succ)
-		if(pek->nummer==nummer) break;
-	if(!pek->grupp_node.mln_Succ) {
-		puttekn("\r\n\nHmm, det var skumt det här..Rapportera tack.\r\n",-1);
-		return(0);
-	}
-	if(inloggad != pek->groupadmin && Servermem->inne[nodnr].status < Servermem->cfg.st.grupper)
-	{
-		puttekn("\r\n\nDu har inte rättigheter att ändra denna grupp!\r\n",-1);
-		return(0);
-	}
-	memcpy(&tmp,pek,sizeof(struct UserGroup));
-	sprintf(outbuffer,"\r\n\nNamn (%s) : ",tmp.namn);
-	puttekn(outbuffer,-1);
-	if(getstring(EKO,40,NULL)) return(1);
-	if(inmat[0]) strcpy(tmp.namn,inmat);
-	puttekn("\r\n\nVid vilken statusnivå ska man bli automatiskt medlem i gruppen?\r\n",-1);
-	puttekn("0  = alla blir automatiskt medlemmar.\r\n",-1);
-	puttekn("-1 = ingen blir automatiskt medlem.\r\n",-1);
-	sprintf(outbuffer,"(%d) : ",tmp.autostatus);
-	puttekn(outbuffer,-1);
-	if(getstring(EKO,3,NULL)) return(1);
-	if(inmat[0]) tmp.autostatus=atoi(inmat);
-	puttekn("\r\nSka gruppen vara hemlig? ",-1);
-	if(tmp.flaggor & HEMLIGT) heml=jaellernej('j','n',1);
-	else heml=jaellernej('j','n',2);
-	if(heml) {
-		tmp.flaggor |= HEMLIGT;
-		puttekn("Ja, hemligt\r\n",-1);
-	} else {
-		tmp.flaggor &= ~HEMLIGT;
-		puttekn("Nej, inte hemligt\r\n",-1);
-	}
-	going = TRUE;
-	while(going)
-	{
-		puttekn("\r\nVilken användare ska vara administratör för denna grupp: ",-1);
-		sprintf(buff,"%d",pek->groupadmin);
-		if(getstring(EKO,40,buff)) return(1);
-		if(inmat[0])
-		{
-			if((groupadmin=parsenamn(inmat))==-1) puttekn("\r\nFinns ingen sådan användare!",-1);
-			else
-			{
-				tmp.groupadmin = groupadmin;
-				going = FALSE;
-			}
-		}
-	}
-	puttekn("\r\nÄr allt korrekt? ",-1);
-	if(!jaellernej('j','n',1)) {
-		puttekn("Nej\r\n",-1);
-		return(0);
-	}
-	puttekn("Ja\r\n",-1);
-	memcpy(pek,&tmp,sizeof(struct UserGroup));
-	writegrupp(nummer,pek);
-	return(0);
+  if((userGroup = FindUserGroup(groupId)) == NULL) {
+    LogEvent(SYSTEM_LOG, ERROR, "Can't find group %d in memory.", groupId);
+    DisplayInternalError();
+    return 0;
+  }
+  if(inloggad != userGroup->groupadmin
+     && Servermem->inne[nodnr].status < Servermem->cfg.st.grupper) {
+    SendString("\r\n\nDu har inte rättigheter att ändra denna grupp!\r\n");
+    return 0;
+  }
+  memcpy(&tmpUserGroup, userGroup, sizeof(struct UserGroup));
+
+  MaybeEditString("Namn", tmpUserGroup.namn, 40);
+
+  SendString("\r\nVid vilken statusnivå ska man bli automatiskt medlem i gruppen?\r\n");
+  SendString("0  = alla blir automatiskt medlemmar.\r\n");
+  SendString("-1 = ingen blir automatiskt medlem.\r\n");
+  MaybeEditNumberChar("Status", &tmpUserGroup.autostatus, 3, -1, 100);
+
+  if(EditBitFlagChar("\r\nSka gruppen vara hemlig?", 'j', 'n', "Ja", "Nej",
+                     &tmpUserGroup.flaggor, HEMLIGT)) {
+    return 1;
+  }
+
+  for(;;) {
+    SendString("\r\nVilken användare ska vara administratör för denna grupp: ");
+    sprintf(buff, "%d", userGroup->groupadmin);
+    if(GetString(40, buff)) {
+      return 1;
+    }
+    if(inmat[0]) {
+      if((groupadmin = parsenamn(inmat)) == -1) {
+        SendString("\r\nFinns ingen sådan användare!");
+      } else {
+        tmpUserGroup.groupadmin = groupadmin;
+        break;
+      }
+    }
+  }
+
+  if(GetYesOrNo("\r\n\nÄr allt korrekt?", 'j', 'n', "Ja\r\n", "Nej\r\n",
+                TRUE, &isCorrect)) {
+    return 1;
+  }
+  if(!isCorrect) {
+    return 0;
+  }
+
+  memcpy(userGroup, &tmpUserGroup, sizeof(struct UserGroup));
+  writegrupp(groupId, userGroup);
+  return 0;
 }
 
 void raderagrupp(void) {
-	struct UserGroup *pek;
-	int nummer;
-	if(!argument[0]) {
-		puttekn("\r\n\nSkriv: Radera Grupp <grupp>\r\n",-1);
-		return;
-	}
-	if((nummer=parsegrupp(argument))==-1) {
-		puttekn("\r\n\nFinns ingen sådan grupp!\r\n",-1);
-		return;
-	}
-	for(pek=(struct UserGroup *)Servermem->grupp_list.mlh_Head;pek->grupp_node.mln_Succ;pek=(struct UserGroup *)pek->grupp_node.mln_Succ)
-		if(pek->nummer==nummer) break;
-	if(!pek->grupp_node.mln_Succ) {
-		puttekn("\r\n\nHmm, det var skumt det här..Rapportera tack.\r\n",-1);
-		return;
-	}
-	if(inloggad != pek->groupadmin && Servermem->inne[nodnr].status < Servermem->cfg.st.grupper)
-	{
-		puttekn("\r\n\nDu har inte rättigheter att radera denna grupp!\r\n",-1);
-		return;
-	}
-	sprintf(outbuffer,"\r\n\nRadera gruppen %s? ",pek->namn);
-	puttekn(outbuffer,-1);
-	if(!jaellernej('j','n',2)) {
-		puttekn("Nej\r\n",-1);
-		return;
-	}
-	puttekn("Ja\r\n",-1);
-	Remove((struct Node *)pek);
-	pek->namn[0]=0;
-	writegrupp(pek->nummer,pek);
-	FreeMem(pek,sizeof(struct UserGroup));
-	return;
+  struct UserGroup *userGroup;
+  int groupId, isCorrect;
+
+  if(!argument[0]) {
+    SendString("\r\n\nSkriv: Radera Grupp <grupp>\r\n");
+    return;
+  }
+  if((groupId = parsegrupp(argument)) == -1) {
+    SendString("\r\n\nFinns ingen sådan grupp!\r\n");
+    return;
+  }
+  if((userGroup = FindUserGroup(groupId)) == NULL) {
+    LogEvent(SYSTEM_LOG, ERROR, "Can't find group %d in memory.", groupId);
+    DisplayInternalError();
+    return;
+  }
+  if(inloggad != userGroup->groupadmin
+     && Servermem->inne[nodnr].status < Servermem->cfg.st.grupper) {
+    SendString("\r\n\nDu har inte rättigheter att radera denna grupp!\r\n");
+    return;
+  }
+  SendString("\r\n\nRadera gruppen %s?",userGroup->namn);
+  if(GetYesOrNo(NULL, 'j', 'n', "Ja\r\n", "Nej\r\n", FALSE, &isCorrect)) {
+    return;
+  }
+  if(!isCorrect) {
+    return;
+  }
+  Remove((struct Node *)userGroup);
+  userGroup->namn[0] = 0;
+  writegrupp(userGroup->nummer, userGroup);
+  FreeMem(userGroup, sizeof(struct UserGroup));
 }
 
 void initgrupp(void) {
@@ -962,7 +917,7 @@ else printf("Ajajajaj!\n");
 			CloseFifo(fiforead,FIFOF_EOF);
 			DeleteMsgPort(fifoport);
 			CloseLibrary(FifoBase);
-			cleanup(OK,"");
+			cleanup(0, "");
 		}
 		if(event & FIFOEVENT_NOCARRIER) going = FALSE;
 		if(carrierdropped()) going=FALSE;

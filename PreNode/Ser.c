@@ -91,7 +91,7 @@ void cleanup(int kod,char *text)
 
 struct NodeType *selectNodeType(void) {
   struct NodeType *nt;
-  int going, i;
+  int going, i, isCorrect;
 
   if(Servermem->nodetypes[0].nummer == 0) {
     LogEvent(SYSTEM_LOG, ERROR, "Can't login user, no valid node types found.");
@@ -140,12 +140,12 @@ struct NodeType *selectNodeType(void) {
         going=FALSE;
       }
     }
-    putstring("\n\n\rVill du använda denna nodtyp varje gång du loggar in?",-1,0);
-    if(jaellernej('j','n', 1)) {
-      putstring("Ja\n\r", -1, 0);
+    if(GetYesOrNo("\n\n\rVill du använda denna nodtyp varje gång du loggar in?",
+                  'j', 'n', "Ja\r\n", "Nej\r\n", TRUE, &isCorrect)) {
+      return NULL;
+    }
+    if(isCorrect) {
       Servermem->inne[nodnr].shell = nt->nummer;
-    } else {
-      putstring("Nej\n\r",-1,0);
     }
   }
   return nt;

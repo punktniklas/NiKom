@@ -15,6 +15,7 @@
 #include "NiKomFuncs.h"
 #include "DiskUtils.h"
 #include "Terminal.h"
+#include "Logging.h"
 
 #define ERROR	10
 #define OK		0
@@ -104,7 +105,7 @@ int skaparea(void) {
 	BPTR fh;
 	long tid;
 	char tempdir[101];
-	int going=TRUE,x,old=Servermem->info.areor,ret=0,y;
+	int going = TRUE, x, old = Servermem->info.areor, ret = 0, y, isCorrect;
 	for(x=0;x<MAXAREA;x++) {
 		if(!Servermem->areor[x].namn[0]) break;
 	}
@@ -139,16 +140,25 @@ int skaparea(void) {
 			going=FALSE;
 		} else puttekn("\r\nFinns inget sådant möte!",-1);
 	}
-	puttekn("\n\rSka uploads till arean tillåtas? ",-1);
-	if(!jaellernej('j','n',1)) {
-		Servermem->areor[x].flaggor |= AREA_NOUPLOAD;
-		puttekn("Nej",-1);
-	} else puttekn("Ja",-1);
-	puttekn("\n\rSka downloads från arean tillåtas? ",-1);
-	if(!jaellernej('j','n',1)) {
-		Servermem->areor[x].flaggor |= AREA_NODOWNLOAD;
-		puttekn("Nej",-1);
-	} else puttekn("Ja",-1);
+
+        if(GetYesOrNo("\n\rSka uploads till arean tillåtas?", 'j', 'n', "Ja", "Nej",
+                      TRUE, &isCorrect)) {
+          return 1;
+        }
+
+	if(!isCorrect) {
+          Servermem->areor[x].flaggor |= AREA_NOUPLOAD;
+	}
+
+        if(GetYesOrNo("\n\rSka downloads från arean tillåtas?", 'j', 'n',
+                      "Ja", "Nej", TRUE, &isCorrect)) {
+          return 1;
+        }
+
+	if(!isCorrect) {
+          Servermem->areor[x].flaggor |= AREA_NODOWNLOAD;
+	}
+
 	puttekn("\r\nVilka grupper ska ha tillgång till arean? (? för lista)\r\n",-1);
 	Servermem->areor[x].grupper=0L;
 	if(editgrupp((char *)&Servermem->areor[x].grupper)) { Servermem->info.areor=old; Servermem->areor[x].namn[0]=0; return(1); }
@@ -376,39 +386,52 @@ void filinfo(void) {
 }
 
 void radarea(void) {
-	int arnr;
-	BPTR fh;
-	if(!argument[0]) {
-		puttekn("\r\n\nSkriv: Radera Area <areanamn>\r\n",-1);
-		return;
-	}
-	if((arnr=parsearea(argument))==-1) {
-		puttekn("\r\n\nFinns ingen sådan area!\r\n",-1);
-		return;
-	}
-	sprintf(outbuffer,"\n\n\rÄr du säker på att du vill radera arean %s? ",Servermem->areor[arnr].namn);
-	puttekn(outbuffer,-1);
-	if(!jaellernej('j','n',2)) return;
-	Servermem->areor[arnr].namn[0]=0;
-	NiKForbid();
-	if(!(fh=Open("NiKom:DatoCfg/Areor.dat",MODE_OLDFILE))) {
-		puttekn("\r\n\nKunde inte öppna Areor.dat\r\n",-1);
-		NiKPermit();
-		return;
-	}
-	if(Seek(fh,arnr*sizeof(struct Area),OFFSET_BEGINNING)==-1) {
-		puttekn("\r\nKunde inte söka i Areor.dat!\r\n",-1);
-		Close(fh);
-		NiKPermit();
-		return;
-	}
-	if(Write(fh,(void *)&Servermem->areor[arnr],sizeof(struct Area))==-1) puttekn("\r\n\nFel vid skrivandet av Möten.dat\r\n",-1);
-	Close(fh);
-	NiKPermit();
+  int areaId, isCorrect;
+  BPTR fh;
+  if(!argument[0]) {
+    SendString("\r\n\nSkriv: Radera Area <areanamn>\r\n");
+    return;
+  }
+  if((areaId = parsearea(argument)) == -1) {
+    SendString("\r\n\nFinns ingen sådan area!\r\n");
+    return;
+  }
+
+  SendString("\n\n\rÄr du säker på att du vill radera arean %s?",
+             Servermem->areor[areaId].namn);
+  if(GetYesOrNo(NULL, 'j', 'n', "Ja\r\n", "Nej\r\n",
+                FALSE, &isCorrect)) {
+    return;
+  }
+  if(!isCorrect) {
+    return;
+  }
+
+  Servermem->areor[areaId].namn[0] = 0;
+  NiKForbid();
+  if(!(fh = Open("NiKom:DatoCfg/Areor.dat", MODE_OLDFILE))) {
+    LogEvent(SYSTEM_LOG, ERROR, "Couldn't open Areor.dat");
+    DisplayInternalError();
+    NiKPermit();
+    return;
+  }
+  if(Seek(fh, areaId * sizeof(struct Area), OFFSET_BEGINNING) == -1) {
+    LogEvent(SYSTEM_LOG, ERROR, "Couldn't change position in Areor.dat");
+    DisplayInternalError();
+    Close(fh);
+    NiKPermit();
+    return;
+  }
+  if(Write(fh, (void *)&Servermem->areor[areaId], sizeof(struct Area)) == -1) {
+    LogEvent(SYSTEM_LOG, ERROR, "Error writing Areor.dat");
+    DisplayInternalError();
+  }
+  Close(fh);
+  NiKPermit();
 }
 
 int andraarea(void) {
-	int arnr,foo,ret,y,dir;
+        int arnr, foo, ret, y, dir, isCorrect;
 	struct Area tempar;
 	char tempdir[101];
 	BPTR fh;
@@ -453,22 +476,16 @@ int andraarea(void) {
 		tempar.mote=foo;
 		break;
 	}
-	puttekn("\n\rSka uploads till arean tillåtas? ",-1);
-	if(!jaellernej('j','n',(tempar.flaggor & AREA_NOUPLOAD) ? 2 : 1)) {
-		tempar.flaggor |= AREA_NOUPLOAD;
-		puttekn("Nej",-1);
-	} else {
-		puttekn("Ja",-1);
-		tempar.flaggor &= ~AREA_NOUPLOAD;
-	}
-	puttekn("\n\rSka downloads från arean tillåtas? ",-1);
-	if(!jaellernej('j','n',(tempar.flaggor & AREA_NODOWNLOAD) ? 2 : 1)) {
-		tempar.flaggor |= AREA_NODOWNLOAD;
-		puttekn("Nej",-1);
-	} else {
-		puttekn("Ja",-1);
-		tempar.flaggor &= ~AREA_NODOWNLOAD;
-	}
+        
+        if(EditBitFlag("\n\rSka uploads till arean förbjudas?",
+                       'j', 'n', "Ja", "Nej", &tempar.flaggor, AREA_NOUPLOAD)) {
+          return 1;
+        }
+        if(EditBitFlag("\n\rSka downloads från arean förbjudas?",
+                       'j', 'n', "Ja", "Nej", &tempar.flaggor, AREA_NODOWNLOAD)) {
+          return 1;
+        }
+
 	puttekn("\r\nVilka grupper ska ha tillgång till arean?\r\n! för att se hur det är nu, ? för lista\r\n",-1);
 	if(editgrupp((char *)&tempar.grupper)) return(0);
 	puttekn("\r\nDirectoryn\r\n",-1);
@@ -508,8 +525,16 @@ int andraarea(void) {
 		puttekn("\r\nOch nycklarna till det directoryt...\r\n",-1);
 		editkey(tempar.nycklar[dir]);
 	}
-	puttekn("\r\n\nÄr allt korrekt? ",-1);
-	if(!jaellernej('j','n',1)) return(0);
+
+        if(GetYesOrNo("\r\n\nÄr allt korrekt?",
+                      'j', 'n', "Ja\r\n", "Nej\r\n",
+                      TRUE, &isCorrect)) {
+          return 1;
+        }
+        if(!isCorrect) {
+          return 0;
+        }
+
 	memcpy(&Servermem->areor[arnr],&tempar,sizeof(struct Area));
 	NiKForbid();
 	if(!(fh=Open("NiKom:DatoCfg/Areor.dat",MODE_OLDFILE))) {
@@ -592,18 +617,20 @@ int skapafil(void) {
 	if(getstring(EKO,3,NULL)) { FreeMem(allokpek,sizeof(struct Fil)); return(1); }
 	allokpek->status=atoi(inmat);
 	if(Servermem->inne[nodnr].status >= Servermem->cfg.st.filer) {
-		puttekn("\n\rSka filen valideras? ",-1);
-		if(jaellernej('j','n',1)) puttekn("Ja",-1);
-		else {
-			puttekn("Nej",-1);
-			allokpek->flaggor|=FILE_NOTVALID;
-		}
-		puttekn("\n\rSka filen ha fri download? ",-1);
-		if(jaellernej('j','n',2)) {
-			puttekn("Ja",-1);
-			allokpek->flaggor|=FILE_FREEDL;
-		}
-		else 	puttekn("Nej",-1);
+            if(GetYesOrNo("\n\rSka filen valideras?", 'j', 'n', "Ja", "Nej",
+                          TRUE, &isCorrect)) {
+              return 1;
+            }
+            if(!isCorrect) {
+              allokpek->flaggor|=FILE_NOTVALID;
+            }
+            if(GetYesOrNo("\n\rSka filen ha fri download?", 'j', 'n', "Ja", "Nej",
+                          FALSE, &isCorrect)) {
+              return 1;
+            }
+            if(isCorrect) {
+              allokpek->flaggor|=FILE_FREEDL;
+            }
 	}
 	puttekn("\r\nVilka söknycklar ska filen ha? (? för att få en lista)\r\n",-1);
 	if(editkey(allokpek->nycklar)) { FreeMem(allokpek,sizeof(struct Fil)); return(1); }
@@ -718,7 +745,7 @@ int andrafil(void) {
 	char nikfilename[100],newname[40],oldfullname[100],
 		tmpnycklar[MAXNYCKLAR/8],tmpbeskr[71], errbuff[100];
 	int x, tmpstatus, tmpuppl, tmpdls, isCorrect;
-	UBYTE tn;
+
 	if(area2==-1) {
 		puttekn("\r\n\nDu befinner dig inte i någon area!\r\n",-1);
 		return(0);
@@ -780,23 +807,18 @@ int andrafil(void) {
 		else tmpuppl=filpek->uppladdare;
 		tmpflaggor=filpek->flaggor;
 		tmpvalidtime=filpek->validtime;
-		puttekn("\n\rSka filen vara validerad? ",-1);
-		if(jaellernej('j','n',(tmpflaggor & FILE_NOTVALID) ? 2 : 1)) {
-			puttekn("Ja",-1);
-			if(tmpflaggor & FILE_NOTVALID) tmpvalidtime=time(NULL);
-			tmpflaggor &= ~FILE_NOTVALID;
-		} else {
-			puttekn("Nej",-1);
-			tmpflaggor|=FILE_NOTVALID;
-		}
-		puttekn("\n\rSka filen ha fri download? ",-1);
-		if(jaellernej('j','n',(tmpflaggor & FILE_FREEDL) ? 1 : 2)) {
-			puttekn("Ja",-1);
-			tmpflaggor|=FILE_FREEDL;
-		} else {
-			puttekn("Nej",-1);
-			tmpflaggor &= ~FILE_FREEDL;
-		}
+
+                if(EditBitFlag("\n\rSka filen vara ovaliderad?",
+                               'j', 'n', "Ja", "Nej", &tmpflaggor, FILE_NOTVALID)) {
+                  return 1;
+                }
+                if(filpek->flaggor & FILE_NOTVALID && !(tmpflaggor& FILE_NOTVALID)) {
+                  tmpvalidtime = time(NULL);
+                }
+                if(EditBitFlag("\n\rSka filen ha fri download?",
+                               'j', 'n', "Ja", "Nej", &tmpflaggor, FILE_FREEDL)) {
+                  return 1;
+                }
 	} else {
 		tmpdls=filpek->downloads;
 		tmpuppl=filpek->uppladdare;
@@ -837,8 +859,8 @@ int flyttafil(void) { return(0); }
 int sokfil(void) {
 	char sokstring[50],soknyckel[MAXNYCKLAR/8], token[150],upper[80],
 		found=FALSE, foundfiles, areatmp, i;
-	long uppl,storlek=0,storre=TRUE,going=TRUE,foo,x,pat,fil,keys=FALSE,len;
-        int globalSearch;
+	long uppl,storlek=0,storre=TRUE,going=TRUE,foo,x,pat, keys=FALSE,len;
+        int globalSearch, searchOnFilename;
 	struct Fil *filpek;
 	struct tm *ts;
 	if(area2==-1) {
@@ -857,10 +879,11 @@ int sokfil(void) {
 	}
 	pat=ParsePatternNoCase(sokstring,token,150);
 	if(pat) {
-		puttekn("\n\rSöka på filnamn eller beskrivning? ",-1);
-		fil=jaellernej('f','b',1);
-		if(fil) puttekn("Fil",-1);
-		else puttekn("Beskrivning",-1);
+          if(GetYesOrNo("\r\nSöka på filnamn eller beskrivning?",
+                        'f', 'b', "Filnamn", "Beskrivning",
+                        TRUE, &searchOnFilename)) {
+            return 1;
+          }
 	}
 
         if(GetYesOrNo("\r\nVill du söka globalt?", 'j', 'n', "Ja\r\n", "Nej\r\n",
@@ -914,7 +937,7 @@ int sokfil(void) {
 			if((filpek->flaggor & FILE_NOTVALID) && Servermem->inne[nodnr].status < Servermem->cfg.st.filer && filpek->uppladdare != inloggad) continue;
 			if(sokstring[0]) {
 				if(pat) {
-					if(fil) {
+					if(searchOnFilename) {
 						if(!MatchPatternNoCase(token,filpek->namn)) continue;
 					} else {
 						if(!MatchPatternNoCase(token,filpek->beskr)) continue;

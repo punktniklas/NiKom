@@ -422,7 +422,7 @@ int download(void) {
 }
 
 int upload(void) {
-  int area, ret, editret, dirnr, ch, writeLong;
+  int area, ret, editret, dirnr, writeLong, isCorrect;
   long tid;
   struct EditLine *el;
   FILE *fp;
@@ -509,17 +509,20 @@ int upload(void) {
     if(getstring(EKO,3,NULL)) { FreeMem(allokpek,sizeof(struct Fil)); return(1); }
     allokpek->status=atoi(inmat);
     if(Servermem->inne[nodnr].status >= Servermem->cfg.st.filer) {
-      puttekn("\n\rSka filen valideras? ",-1);
-      if(jaellernej('j','n',1)) puttekn("Ja",-1);
-      else {
-        puttekn("Nej",-1);
+      if(GetYesOrNo("\n\rSka filen valideras?", 'j', 'n', "Ja", "Nej",
+                    TRUE, &isCorrect)) {
+        return 1;
+      }
+      if(!isCorrect) {
         allokpek->flaggor|=FILE_NOTVALID;
       }
-      puttekn("\n\rSka filen ha fri download? ",-1);
-      if(jaellernej('j','n',2)) {
-        puttekn("Ja",-1);
+      if(GetYesOrNo("\n\rSka filen ha fri download?", 'j', 'n', "Ja", "Nej",
+                    FALSE, &isCorrect)) {
+        return 1;
+      }
+      if(isCorrect) {
         allokpek->flaggor|=FILE_FREEDL;
-      } else puttekn("Nej",-1);
+      }
     } else if(Servermem->cfg.cfgflags & NICFG_VALIDATEFILES) allokpek->flaggor|=FILE_NOTVALID;
     sendfile("NiKom:Texter/Nyckelhjälp.txt");
     puttekn("\r\nVilka söknycklar ska filen ha? (? för att få en lista)\r\n",-1);
