@@ -14,6 +14,7 @@
 #include "PreNodeFuncs.h"
 #include "Terminal.h"
 #include "RexxUtils.h"
+#include "BasicIO.h"
 
 #define EKO		1
 #define EJEKO	0
@@ -80,7 +81,7 @@ int sendrexx(int komnr) {
 		}
 		ReplyMsg((struct Message *)tempmess);
 	}
-	if(carrierdropped()) return(-8);
+	if(ImmediateLogout()) return(-8);
 	return(sendrexxrc);
 }
 
@@ -170,7 +171,7 @@ void rexxgettekn(struct RexxMsg *mess) {
 	UBYTE foo[2];
 	foo[0]=gettekn();
 	foo[1]=0;
-	if(foo[0]==10 && carrierdropped()) {
+	if(ImmediateLogout()) {
 		mess->rm_Result1=100;
 		mess->rm_Result2=NULL;
 	} else {

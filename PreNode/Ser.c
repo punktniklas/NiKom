@@ -17,6 +17,7 @@
 #include "Logging.h"
 #include "Terminal.h"
 #include "NewUser.h"
+#include "BasicIO.h"
 
 #define ERROR	10
 #define OK	0
@@ -197,6 +198,7 @@ void main(int argc,char *argv[]) {
   serreqtkn();
   Delay(50);
   for(;;) {
+    AbortInactive();
     inloggad=-1;
     Servermem->idletime[nodnr] = time(NULL);
     Servermem->inloggad[nodnr]=-1;
@@ -205,7 +207,7 @@ void main(int argc,char *argv[]) {
     Servermem->idletime[nodnr] = time(NULL);
     Servermem->inloggad[nodnr]=-2; /* Sätt till <Uppringd> för att även hantera -getty-fallet */
   reloginspec:
-    updateinactive();
+    UpdateInactive();
     Servermem->inne[nodnr].flaggor = Servermem->cfg.defaultflags;
     if(!getty) Delay(100);
     Servermem->inne[nodnr].rader=0;
@@ -271,7 +273,7 @@ void main(int argc,char *argv[]) {
     if((nt = selectNodeType()) == NULL) {
       goto panik;
     }
-    abortinactive();
+    AbortInactive();
     abortserial();
     
     sprintf(commandstring,"%s -N%d -B%d %s",nt->path,nodnr,dtespeed,configname);

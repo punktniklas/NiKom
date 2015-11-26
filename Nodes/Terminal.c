@@ -11,6 +11,7 @@
 #include "NiKomLib.h"
 #include "Logging.h"
 #include "Terminal.h"
+#include "BasicIO.h"
 
 extern int nodnr, rxlinecount;
 extern char outbuffer[];
@@ -53,7 +54,7 @@ int GetChar(void) {
   for(;;) {
     ch = gettekn();
 
-    if(carrierdropped()) {
+    if(ImmediateLogout()) {
       return GETCHAR_LOGOUT;
     }
 
@@ -96,7 +97,7 @@ int handle1bChar(void) {
   unsigned char ch;
 
   ch = gettekn();
-  if(carrierdropped()) {
+  if(ImmediateLogout()) {
     return GETCHAR_LOGOUT;
   }
   if(ch == '[' || ch == 'Ä') {
@@ -112,7 +113,7 @@ int handleAnsiSequence(void) {
   unsigned char ch;
 
   ch = gettekn();
-  if(carrierdropped()) {
+  if(ImmediateLogout()) {
     return GETCHAR_LOGOUT;
   }
 
@@ -141,7 +142,7 @@ int handleCsi3(void) {
   unsigned char ch;
 
   ch = gettekn();
-  if(carrierdropped()) {
+  if(ImmediateLogout()) {
     return GETCHAR_LOGOUT;
   }
 
@@ -157,7 +158,7 @@ int handleShiftedAnsiSequence(void) {
   unsigned char ch;
 
   ch = gettekn();
-  if(carrierdropped()) {
+  if(ImmediateLogout()) {
     return GETCHAR_LOGOUT;
   }
   
@@ -389,6 +390,9 @@ int GetStringX(int echo, int maxchrs, char *defaultStr,
           SendStringNoBrk("\x1b\x5b\x31\x40");
         }
         if(echo != STAREKO) {
+          if(ch == '+') {
+            SendStringNoBrk(" \b");
+          }
           eka(ch);
         } else {
           eka('*');

@@ -16,19 +16,16 @@ int puttekn(char *pekare,int size);
 void modemcmd(char *pekare,int size);
 void sendfile(char *filnamn);
 struct MsgPort *SafePutToPort(struct NiKMess *message,char *portname);
-int carrierdropped(void);
 void getnodeconfig(char *);
 char convseventoeight(char foo);
 char conveighttoseven(char foo);
 void convstring(char *string);
 void sendat(char *atstring);
 void sendplus(void);
-int updateinactive(void);
 void freealiasmem(void);
 void waitconnect(void);
 void cleanup(int kod,char *text);
 void main(int argc,char **argv);
-void abortinactive(void);
 void disconnect(void);
 
 /* SerialIO.c */

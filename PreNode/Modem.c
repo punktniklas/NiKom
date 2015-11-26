@@ -15,13 +15,11 @@
 #include "PreNodeFuncs.h"
 #include "Logging.h"
 #include "Terminal.h"
+#include "BasicIO.h"
 
 #define ERROR	10
 #define OK	0
 #define RELOGIN 1
-#define EKO	1
-#define EJEKO	0
-#define NOCARRIER	32
 
 extern struct IOExtSer *serwritereq;
 extern struct MsgPort *serwriteport;
@@ -51,7 +49,7 @@ void modemcmd(char *pekare,int size) {
 }
 
 void disconnect() {
-	if(!plussa || carrierdropped()) {
+	if(!plussa || ConnectionLost()) {
 		CloseSerial(serwritereq);
 		Delay(100);
 		dtespeed = highbaud;
@@ -168,7 +166,10 @@ void sendplus(void) {
 			}
 			if((signals & timersig) && CheckIO((struct IORequest *)timerreq)) {
 				WaitIO((struct IORequest *)timerreq);
-				if(carrierdropped()) return;
+                                QueryCarrierDropped();
+				if(ConnectionLost()) {
+                                  return;
+                                }
 				break;
 			}
 		}

@@ -18,6 +18,7 @@
 #include "Terminal.h"
 #include "Logging.h"
 #include "ServerMemUtils.h"
+#include "BasicIO.h"
 
 #define EKO		1
 
@@ -867,7 +868,7 @@ int execfifo(char *command,int cooked) {
 		return(0);
 	}
 	puttekn("\n\n\r",-1);
-	abortinactive();
+	AbortInactive();
 	RequestFifo(fiforead,&fiforeadmess,FREQ_RPEND);
 	while(going) {
 		event=getfifoevent(fifoport,&userchar);
@@ -919,8 +920,9 @@ else printf("Ajajajaj!\n");
 			CloseLibrary(FifoBase);
 			cleanup(0, "");
 		}
-		if(event & FIFOEVENT_NOCARRIER) going = FALSE;
-		if(carrierdropped()) going=FALSE;
+		if(event & FIFOEVENT_NOCARRIER || ImmediateLogout()) {
+                  going = FALSE;
+                }
 	}
 	RequestFifo(fiforead,&fiforeadmess,FREQ_ABORT);
 	WaitPort(fifoport);
@@ -932,18 +934,19 @@ else printf("Ajajajaj!\n");
 *	sprintf(fifonamn,"FIFO:NiKomFifo%d/C",nodnr);
 *	if(fh=Open(fifonamn,MODE_OLDFILE)) Close(fh); */
 
-	if(carrierdropped())
-	{
-		WriteFifo(fifowrite, " ", 1);
-		sprintf(fifonamn,"FIFO:NiKomFifo%d/C",nodnr);
-		if(fh=Open(fifonamn,MODE_OLDFILE)) Close(fh);
+	if(ImmediateLogout()) {
+          WriteFifo(fifowrite, " ", 1);
+          sprintf(fifonamn,"FIFO:NiKomFifo%d/C",nodnr);
+          if(fh=Open(fifonamn,MODE_OLDFILE)) Close(fh);
 	}
 	CloseFifo(fifowrite,FIFOF_EOF);
 	/* Changed FIFOF_EOF --> FALSE */
 	CloseFifo(fiforead,FALSE);
 	DeleteMsgPort(fifoport);
 	CloseLibrary(FifoBase);
-	if(carrierdropped()) return(1);
-	updateinactive();
+	if(ImmediateLogout()) {
+          return 1;
+        }
+	UpdateInactive();
 	return(0);
 }

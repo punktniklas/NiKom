@@ -17,6 +17,7 @@
 #include "RexxUtils.h"
 #include "ExecUtils.h"
 #include "Logging.h"
+#include "BasicIO.h"
 
 #define ERROR   10
 #define OK              0
@@ -120,7 +121,7 @@ int commonsendrexx(int komnr,int hasarg) {
       ReplyMsg((struct Message *)mess);
     }
   }
-  if(carrierdropped()) return(-8);
+  if(ImmediateLogout()) return(-8);
   return(sendrexxrc);
 }
 
@@ -177,7 +178,7 @@ void rexxsendstring(struct RexxMsg *mess) {
 
   str = hittaefter(mess->rm_Args[0]);
   res = puttekn(str, -1);
-  if(carrierdropped()) {
+  if(ImmediateLogout()) {
     SetRexxErrorResult(mess, 100);
   } else {    
     SetRexxResultString(mess, res ? "1" : "0");
@@ -192,7 +193,7 @@ void rexxsendserstring(struct RexxMsg *mess) {
   } else {
     res = conputtekn(str, -1);
   }
-  if(carrierdropped()) {
+  if(ImmediateLogout()) {
     SetRexxErrorResult(mess, 100);
   } else {    
     SetRexxResultString(mess, res ? "1" : "0");
@@ -240,7 +241,7 @@ void rexxsendtextfile(struct RexxMsg *mess) {
     return;
   }
   sendfile(filename);
-  SetRexxErrorResult(mess, carrierdropped() ? 100 : 0);
+  SetRexxErrorResult(mess, ImmediateLogout() ? 100 : 0);
 }
 
 void senastread(struct RexxMsg *mess) {
@@ -486,7 +487,7 @@ void rexxsendbinfile(struct RexxMsg *mess) {
   while(tf=(struct TransferFiles *)RemHead((struct List *)&tf_list))
     FreeMem(tf,sizeof(struct TransferFiles));
 
-  if(carrierdropped()) {
+  if(ImmediateLogout()) {
     SetRexxErrorResult(mess, 100);
   }
   SetRexxResultString(mess, buf);
@@ -501,7 +502,7 @@ void rexxrecbinfile(struct RexxMsg *mess) {
   Servermem->vilkastr[nodnr] = NULL;
 
   if(recbinfile(hittaefter(mess->rm_Args[0]))) {
-    SetRexxErrorResult(mess, carrierdropped() ? 100 : 10);
+    SetRexxErrorResult(mess, ImmediateLogout() ? 100 : 10);
     return;
   }
   buf[0] = '\0';
@@ -634,7 +635,7 @@ void rxsendchar(struct RexxMsg *mess) {
     return;
   }
   eka(arg[1]);
-  SetRexxErrorResult(mess, carrierdropped() ? 100 : 0);
+  SetRexxErrorResult(mess, ImmediateLogout() ? 100 : 0);
 }
 
 void rxsendserchar(struct RexxMsg *mess) {
@@ -645,7 +646,7 @@ void rxsendserchar(struct RexxMsg *mess) {
     return;
   }
   sereka(arg[1]);
-  SetRexxErrorResult(mess, carrierdropped() ? 100 : 0);
+  SetRexxErrorResult(mess, ImmediateLogout() ? 100 : 0);
 }
 
 void rxsetnodeaction(struct RexxMsg *mess) {
@@ -673,7 +674,7 @@ void rxsendrawfile(struct RexxMsg *mess) {
     Close(fh);
     retstr = "1";
   }
-  if(carrierdropped()) {
+  if(ImmediateLogout()) {
     SetRexxErrorResult(mess, 100);
   } else {
     SetRexxResultString(mess, retstr);
@@ -731,7 +732,7 @@ void rxgetnumber(struct RexxMsg *mess) {
   }
 
   sprintf(retstr, "%d", GetNumber(minvalue, maxvalue, defaultvaluestr));
-  if(carrierdropped()) {
+  if(ImmediateLogout()) {
     SetRexxErrorResult(mess, 100);
   } else {
     SetRexxResultString(mess, retstr);

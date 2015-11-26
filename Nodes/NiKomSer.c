@@ -15,6 +15,7 @@
 #include "NiKomLib.h"
 #include "Logging.h"
 #include "Terminal.h"
+#include "BasicIO.h"
 
 #define ERROR	128
 #define OK	0
@@ -136,6 +137,7 @@ void main(int argc,char *argv[]) {
   inloggad=Servermem->inloggad[nodnr];
   conreqtkn();
   serreqtkn();
+  UpdateInactive();
   sprintf(titel,"Nod #%d SER: %s #%d",nodnr,Servermem->inne[nodnr].namn,inloggad);
   SetWindowTitles(NiKwind,titel,(char *)-1L);
   if(!ReadUnreadTexts(&Servermem->unreadTexts[nodnr], inloggad)) {
@@ -159,10 +161,8 @@ void main(int argc,char *argv[]) {
     if(Servermem->cfg.ar.cardropped) sendautorexx(Servermem->cfg.ar.cardropped);
   } else {
     if(nodestate & NIKSTATE_LOGOUT) {
-      nodestate &= ~NIKSTATE_LOGOUT;
       puttekn("\n\n\r*** Automagisk utloggning ***\n\n\r",-1);
     } else if(nodestate & NIKSTATE_INACTIVITY) {
-      nodestate &= ~NIKSTATE_INACTIVITY;
       puttekn("\n\n\r*** Utloggning p.g.a inaktivitet ***\n\n\r",-1);
     }
     radcnt=-174711;
@@ -186,10 +186,15 @@ void main(int argc,char *argv[]) {
   writeuser(inloggad,&Servermem->inne[nodnr]);
   WriteUnreadTexts(&Servermem->unreadTexts[nodnr], inloggad);
   writesenaste();
-  abortinactive();
+  AbortInactive();
   freealiasmem();
   sprintf(tellstr,"loggade just ut från nod %d",nodnr);
   tellallnodes(tellstr);
+
+  nodestate &= ~(NIKSTATE_LOGOUT | NIKSTATE_INACTIVITY);
+  if(nodestate & NIKSTATE_NOCARRIER) {
+    nodestate &= ~NIKSTATE_RELOGIN;
+  }
   cleanup(nodestate,"");
 }
 
