@@ -1006,7 +1006,10 @@ void sparatext(struct NiKMess *message) {
 	int cnt,len;
 	char filnamn[40];
 	listpek=(struct MinList *)headpek->textoffset;
-	headpek->nummer=Servermem->info.hightext+1;
+	headpek->nummer = Servermem->info.hightext + 1;
+        if(headpek->root_text == 0) {
+          headpek->root_text = headpek->nummer;
+        }
 	sprintf(filnamn,"NiKom:Moten/Text%d.dat",headpek->nummer/512);
 	if(!(fh=Open(filnamn,MODE_OLDFILE))) {
 		if(!(fh=Open(filnamn,MODE_NEWFILE))) {

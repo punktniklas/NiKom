@@ -14,13 +14,9 @@
 #include "Logging.h"
 #include "Terminal.h"
 
-#define ERROR	10
-#define OK		0
 #define EKO		1
-#define EJEKO	0
 #define KOM		1
 #define EJKOM	0
-#define BREVKOM	-1
 
 extern struct System *Servermem;
 extern char outbuffer[],*argument,inmat[];
@@ -294,13 +290,15 @@ int org_initheader(int komm) {
 	struct tm *ts;
 	sparhead.person=inloggad;
 	if(komm) {
-		sparhead.kom_till_nr=readhead.nummer;
-		sparhead.kom_till_per=readhead.person;
-		sparhead.mote=readhead.mote;
+          sparhead.kom_till_nr = readhead.nummer;
+          sparhead.kom_till_per = readhead.person;
+          sparhead.mote = readhead.mote;
+          sparhead.root_text = readhead.root_text;
 	} else {
-		sparhead.kom_till_nr=-1;
-		sparhead.kom_till_per=-1;
-		sparhead.mote=mote2;
+          sparhead.kom_till_nr = -1;
+          sparhead.kom_till_per = -1;
+          sparhead.mote = mote2;
+          sparhead.root_text = 0;
 	}
 	Servermem->action[nodnr] = SKRIVER;
 	Servermem->varmote[nodnr] = sparhead.mote;
