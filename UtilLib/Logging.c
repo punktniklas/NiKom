@@ -36,7 +36,7 @@ void LogEvent(enum LogFiles logFile, enum LogLevels logLevel, char *fmt, ...) {
 
   BPTR fh;
   struct DateTime dt;
-  char datebuf[14],timebuf[10],logbuf[100];
+  char datebuf[14],timebuf[10],logbuf[500];
   va_list arglist;
 
   va_start(arglist, fmt);
