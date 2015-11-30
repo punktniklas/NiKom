@@ -1,12 +1,21 @@
                            Systemet NiKom
                            ==============
 
-Det är fyra körbara filer som hanterar systemet. Dessa är
+I katalogen bin finns de körbara filer som ett NiKom-system består av.
+Dessa är
 
-  NiKServer
-  NiKomCon
-  Prenode
-  GetRelLine
+  NiKServer      - Spindeln i nätet som måste startas först.
+  NiKomCon       - Startar en nod för lokal inloggning
+  PreNode        - Startar en nod som lyssnar på seriella anslutningar
+                   och kan starta riktigt noder när en användare loggar in.
+  NiKomSer       - Den seriella noden. Denna startas av PreNode, du kan inte
+                   starta den själv.
+  InitNiKom      - Initierar en ny installation av NiKom.
+  SetNodeState   - Ändrar vilket läge en seriell nod är i. Tex för att hindra
+                   den från att acceptera uppkopplingar eller logga ut
+                   användare omedelbart.
+  CryptPasswords - Verktyg för att hantera krypterade lösenord.
+  NiKomFido      - Hanterar automatiska saker för FidoNet-möten och brev.
 
 
 NiKServer
@@ -49,8 +58,8 @@ en annan fil som detta har angivits som argument. Modemet initieras sedan
 och Prenode kommer att vänta på att någon ska ringa.
 
 För att ha flera noder med olika modem så skapar man alltså flera
-SerNode.cfg och anger på kommandoraden vilken konfigurationsfil varje nod
-ska använda.
+versioner av SerNode.cfg och anger på kommandoraden vilken konfigurationsfil
+varje nod ska använda.
 
 Om -Getty anges om argument så förväntar sig Prenode att någon redan har
 ringt och att modemet redan är uppkopplat. Den kommer då direkt att visa
@@ -61,18 +70,61 @@ När man anger -Getty kan man även ange -Bxxxx som då talar om vilken
 hastighet som ska användas mellan dator och modem.
 
 
-GetRelLine
-----------
-SYNTAX: GetRelLine <nodnr>
+SetNodeState
+------------
+SYNTAX: SetNodeState <nodnr> SERCLOSED | NOANSWER | LOGOUT
 
-Får den angivna noden (som lämpligen bör vara en Prenode-nod) att stänga
-sitt device så att man exempelvis kan ringa ut själv. För att öppna devicet
-igen kör man GetRelLine igen.
+Försätter den angivna noden i ett visst läge. De olika lägena är:
+SERCLOSED - Den serialla enheten ska vara stängd när PreNode väntar på
+            en ny uppkoppling. (Någon ny uppkoppling kommer då naturligtvis
+            inte att kunna ske förrän detta läge slås av.)
+NOANSWER  - När PreNode upptäcker "RING" eller "CONNECT" från den seriella
+            enheten så kommer detta att ignoreras. Ingen kommer att kunna
+            logga in förrän detta läge slås av.
+LOGOUT    - Om en användare är inloggad så kommer denna att omedelbart
+            loggas ut. Användaren kommer inte att ges möjligthet att avsluta
+            det han håller på med (tex skrivande av en text).
 
-Detta program är mest tänkt för de som tex pollar UseNet eller FidoNet mitt
-i natten. Innan man kör programmet bör man med ett ARexx-program kolla att
-ingen är inloggad, då GetRelLine inte tar hänsyn till detta.
+Som argument til SetNodeState kan 0 eller flera av dessa lägen anges. De lägen
+som inte anges kommer att slås av igen. Om tex PreNode väntar på en ny
+uppkoppling och man kör "SetNodeState 0 SERCLOSED" så kommer den seriella
+enheten att stängas. Om man sedan kör "SetNodeState 0 NOANSWER" så kommer
+den seriella enheten att öppnas igen (eftersom SERCLOSED inte angavs), men
+uppkopplingar kommer ignoreras.
 
+Om en användare är inloggad och man kör "SetNodeState 0 SERCLOSED NOANSWER LOGOUT"
+så kommer användaren först att loggas ut och PreNode kommer sedan att stänga
+den seriella enheten. Ett enkelt "SetNodeState 0" (utan några lägen angivna)
+kommer öppna den seriella enheten igen och börja vänta på en ny uppkoppling.
+
+CryptPasswords
+--------------
+SYNTAX: CryptPasswords -s <string> | -u <user id>
+
+CryptPasswords är ett verktyg för att hantera övergången till krypterade
+lösenord (som skedde i NiKom v1.60). De olika flaggorna är:
+-s - Krypterar den angivna strängen och skriver ut resultatet på skärmen.
+     Observera att om du krypterar samma sträng flera gånger så kommer
+     du med största sannolikhet få olika resultat. Detta beror på att
+     det krypterade resultetat innehåller ett slumpmässigt "salt" som gör
+     det svårare att knäcka lösenord med hjälp av fördefinierade tabeller.
+     (Det kommer ta betydligt längre tid att knäcka lösenord "brute force")
+
+-u - Läser in användaren med det angivna numret och krypterar dess lösenord.
+     VARNING! Gör inte detta för en användare som redan har ett krypterat
+     lösenord. Användaren kommer då inte att kunna logga in förrän ett nytt
+     lösen har satts.
+
+
+NiKomFido
+---------
+SYNTAX: NiKomFido UpdateFido
+        NiKomFido RescanConf <conf number>
+        NiKomFido RescanAllConf
+        NiKomFido RenumberConf <conf number> <new lowest text number>
+
+NiKomFido används för att utföra underhåll i FidoNet-systemet. Se Fido.doc
+för mer information.
 
 
                              Starta systemet

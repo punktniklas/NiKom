@@ -1,92 +1,47 @@
-                     NiKom 1.60 © Tomas Kärki 1996-1998
-                     ==================================
+                                   NiKom 
+         © Niklas Lindholm 1990-1996, 2015 & Tomas Kärki 1996-1998
+         =========================================================
 
 
 NiKom levereras "as is". Med det menas att upphovsmannen inte tar på sig
 något ansvar för vad som kan hända under användande av NiKom.
 
+NiKom är fri programvara med öppen källkod licensierad under MIT License:
 
+-------------------------------------------------------------------------
+The MIT License (MIT)
 
-Denna version får spridas fritt under följande villkor:
+Copyright (c) 1990-1996,2015 Niklas Lindholm & 1996-1998 Tomas Kärki
 
-1) Arkivet måste vara komplett och alla filer helt omodifierade.
-2) Ingen betalning får tas för att sprida det bortsett från en RIMLIG
-   distributionskostnad.
-3) NiKom får inte användas tillsammans med en illegal nyckelfil, kopierad
-   eller hemmatillverkad.
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
-NiKom med alla medföljande körbara filer är © Tomas Kärki 1996-1998
-Medföljande ARexx-program betraktas som PD och får modifieras och spridas
-fritt. Dock inte tillsammans med filerna i detta arkiv.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+-------------------------------------------------------------------------
 
-Installationsprogrammet Installer är skrivet av Commodore-Amiga Inc.
-De filer som följer med NiKom är en del av ett större Installer-arkiv.
-Enskilda filer i detta arkiv får inte distribueras för sig. För att få
-distribuera de filer som följer med NiKom måste man skriva på och skicka in
-ett Licens-avtal, något jag har gjort. Enligt detta licensavtal måste även
-följande stycken inkluderas i dokumentationen:
-
-     Installer and Installer project icon
-     (c) Copyright 1991-93 Commodore-Amiga, Inc.  All Rights Reserved.
-     Reproduced and distributed under license from Commodore.
-
-     INSTALLER SOFTWARE IS PROVIDED "AS-IS" AND SUBJECT TO CHANGE;
-     NO WARRANTIES ARE MADE.  ALL USE IS AT YOUR OWN RISK.  NO LIABILITY
-     OR RESPONSIBILITY IS ASSUMED.
-
-Systemkrav NiKom 1.60
-----------------------------
+Systemkrav NiKom
+----------------
 
 AmigaOS v2.0 eller senare
 1Mb minne, minst 3Mb rekommenderas
 Hårddisk på minst 20MB
-Hayeskompatibelt modem
 
 
-Hur man kommer i kontakt med Tomas Kärki
-----------------------------------------
+För mer information om NiKom, kontaktinformation, lista över aktiva BBS:er
+etc se http://www.nikom.org
 
-Tomas Kärki kommer man i kontakt med på följande sätt:
-
-Kärkis BBS, 08-57035041 eller telnet till karkis.trio.se!
-Internet: tkarki@canit.se
-
-Tomas Kärki
-Nelsonstigen 2, 2tr
-13436 GUSTAVSBERG
-
-För eventuella ändringar i adressuppgifterna, titta på vår WWW-sida,
-http://www.canit.se/nikom (under uppbyggnad!)
-
-"Tack till" och sånt
---------------------
-Daniel Widerström - Har hjälp till att beta-testa NiKom och bidraget
-					med ikoner för att NiKom programmen.
-
-Fabian Norlin     - Som beta testat NiKom och givit mycket feedback och
-                    sprutar ur sig användbara ARexx-program.
-                    Titta in Fabbes BBS på Internet! Telnet
-                    till fabbes.rydnet.lysator.liu.se
-
-Gateway 2000      - För att en förhoppningsvis ljusare Amiga framtid
-
-Phase 5           - För att sent om sider äntligen skapat en SNABB Amiga!
-
-Bill Hawes        - som har skrivit ARexx och WShell
-
-Martin Taillefer  - som har skrivit TurboText. Äntligen en bra editor med
-                    bra ARexx-interface.
-
-Fredrik Prüzelius - som skrivit NT, den stora idégrunden för NiKom.
-
-De personer som varit med och utvecklat XPR-standarden och speciellt
-                    xprzmodem.library.
-
-
-Alla de som jag av någon anledning glömt bort att ta med i denna lista.
-
-
-Tomas Kärki vill ge ett STORT tack till Niklas Lindholm som
-utvecklat NiKom till det bästa BBS-programmet och jag ska göra mitt
-bästa för att det förblir det bästa BBS-programmet även i fortsättningen!
+NiKom utvecklas som ett öppen källkods-projekt på
+https://github.com/punktniklas/NiKom
