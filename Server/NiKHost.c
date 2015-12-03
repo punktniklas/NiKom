@@ -1,9 +1,6 @@
 #include <exec/types.h>
 #include <exec/memory.h>
 #include <dos/dos.h>
-#include "NiKomStr.h"
-#include "ServerFuncs.h"
-#include "NiKomLib.h"
 #include <rexx/storage.h>
 #include <proto/exec.h>
 #include <proto/dos.h>
@@ -14,6 +11,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include "NiKomStr.h"
+#include "ServerFuncs.h"
+#include "NiKomLib.h"
+#include "Config.h"
+#include "RexxUtils.h"
 
 extern struct System *Servermem;
 
@@ -739,16 +741,13 @@ void swapbps(long *bps, long *bps2)
 }
 
 void rexxreadcfg(struct RexxMsg *mess) {
-	getconfig();
-	freecommandmem();
-	getkmd();
-	getnycklar();
-	getstatus();
-	getnodetypescfg();
-	getfidocfg();
-	mess->rm_Result1=0;
-	if(!(mess->rm_Result2=(long)CreateArgstring("",strlen(""))))
-		printf("Kunde inte allokera en ArgString\n");
+  ReadSystemConfig();
+  ReadCommandConfig();
+  ReadFileKeyConfig();
+  ReadStatusConfig();
+  ReadNodeTypesConfig();
+  ReadFidoConfig();
+  SetRexxResultString(mess, "");
 }
 
 int parsenamn(skri)

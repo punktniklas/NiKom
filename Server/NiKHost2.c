@@ -18,7 +18,10 @@
 #include "FileAreaUtils.h"
 #include "RexxUtils.h"
 
+// TODO: Get rid of these prototypes
 struct Fil *parsefil(char *,int);
+void purgeOldTexts(int numberOfTexts);
+void sparatext(struct NiKMess *);
 
 extern struct System *Servermem;
 

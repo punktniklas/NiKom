@@ -1,7 +1,7 @@
 CPU   = 68020
 FLAGS = NMINC STRMERGE CPU=$(CPU) DEBUG=FULL IDIR=/Include IDIR=/UtilLib
 OBJS  = NiKServer.o NiKHost.o NiKHost2.o NiKHost3.o NiKVersion.o NodeComm.o \
-	Config.o
+	Config.o Startup.o Shutdown.o
 
 all: NiKServer
 
@@ -28,6 +28,12 @@ NiKServer: Debug/$(CPU) NoDebug/$(CPU) $(OBJS)
 
 NiKServer.o: NiKServer.c /Include/NiKomStr.h
   sc $(FLAGS) NiKServer.c
+
+Startup.o: Startup.c /Include/NiKomStr.h
+  sc $(FLAGS) Startup.c
+
+Shutdown.o: Shutdown.c /Include/NiKomStr.h
+  sc $(FLAGS) Shutdown.c
 
 NiKHost.o: NiKHost.c /Include/NiKomStr.h
   sc $(FLAGS) NiKHost.c
