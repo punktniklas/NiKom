@@ -24,19 +24,16 @@ void putstring(char *pekare,int size, long flags);
 int puttekn(char *pekare,int size);
 void modemcmd(char *pekare,int size);
 void paus(ULONG tid);
-int carrierdropped(void);
 void getnodeconfig(char *);
 char convseventoeight(char foo);
 char conveighttoseven(char foo);
 void convstring(char *string);
 void sendat(char *atstring);
 void sendplus(void);
-int updateinactive(void);
 void freealiasmem(void);
 void waitconnect(void);
 void cleanup(int kod,char *text);
 void main(int argc,char **argv);
-void abortinactive(void);
 int getfifoevent(struct MsgPort *fifoport,char *puthere);
 
 /* Lite temporärt såhär.. Egentligen SerialIO.c.. */
@@ -161,7 +158,6 @@ int userexists(int nummer);
 int movetext(void);
 char *getusername(int nummer);
 int namematch(char *pat,char *fac);
-int jaellernej(char val1,char val2,int defulle);
 int skapagrupp(void);
 int writegrupp(int nummer,struct UserGroup *pek);
 void listagrupper(void);

@@ -8,7 +8,7 @@ bildar roten för systemet.
 
            assign NiKom: <enhet:katalog>
 
-tex        assign NiKom: dh0:NiKomBBS
+tex        assign NiKom: dh0:MinBBS
 
 I denna katalog bör sedan det uppackade NiKom-arkivet ligga med bibehållen
 katalogstruktur.
@@ -47,31 +47,40 @@ Users     - Innehåller all användardata.
 
 Kontrollera att dessa kataloger finns. Om inte, skapa dem.
 
-Övriga filer och kataloger
---------------------------
-Det krävs att det finns en katalog i Ram: som heter NiKom. Se
-till att detta skapas varje gång datorn startas.
+Det krävs även att det finns en katalog i Ram: som heter NiKom. Se
+till att denna skapas varje gång datorn startas.
 
-För överföringar med ZModem krävs det att xprzmodem.library ligger i libs:.
-Med i arkivet hittar du xprzmodem.library version 2.52.
 
-I ExtKom10.nik används ett DOS-kommando som heter Move för att flytta filer
-från temporärkatalogen till den katalog i filarean där det ska ligga.
-Move är inte en del av Amigans standardkommandon. Ett Move-kommando följer
-med detta arkiv.
+Externa program och bibliotek
+-----------------------------
 
-För att kunna köra externa program via Fifo (se ARexx-kommandot 'runfifo')
-så krävs det att Fifo är installerat i systemet. Mer om detta står i
-manualen till Fifo som följer med det här arkivet.
+NiKom kräver ett antal externa program och bibliotek som måste
+installeras i systemet. Versioner av dessa som är testade med
+NiKom finns att ladda ner från http://www.nikom.org men det står
+dig naturligtvis fritt att använda andra versioner tex från AmiNet.
+
+- Xprzmodem.library - Detta krävs för att kunna göra filöverföringar
+  med ZModem.
+
+- Fifo.library - Detta krävs för att kunna köra externa program via
+  Fifo. (se ARexx-kommandot 'runfifo')
+
+- Move - Detta är ett kommando som fungerar ungefär som rename, det kan
+  döpa om eller flytta filer. Skillnaden mot rename är att det kan flytta
+  en fil även om destinationskatalogen är på en annan volym. Detta används
+  i ExtKom10.nik för att flytta filer från temporärkatalogen till den
+  katalog i filarean där det ska ligga.
+
 
 Skräddarsy systemet
 -------------------
 Nu kan man börja skräddarsy systemet.
 
 Först av allt bör man bestämma sig för vilka statusnivåer man vill använda
-sig av. Möjliga statusnivåer är från 0 till 100. Den högsta (100) är tänkt
-för sysop. Man behöver inte använda alla statusnivåer utan man definierar
-bara så många som man vill använda.
+sig av. Möjliga statusnivåer är från 0 till 100. Den högsta (100) är
+reserverad för sysop. Det finns vissa saker i NiKom som bara kan utföras
+av en användare med status 100. Man behöver inte använda alla statusnivåer
+utan man definierar bara så många som man vill använda.
 Ha gärna lite utrymme mellan nivåerna så det senare finns möjlighet att
 klämma in statusnivåer emellan.
 
@@ -166,18 +175,25 @@ L=10
 
 Nycklar.cfg
 -----------
-Filerna i filarean i systemet är förknippade med nycklar. En fil kan ha
-flera nycklar. Sätt upp vad för nycklar som skall finnas.
-Detta görs i filen "nycklar.cfg". När man sedan har definierat detta och
-startat basen så ska man inte ändra på ordningen på dem. Vill man lägga
-till flera nycklar måste dessa läggas till på slutet.
+Filerna i filarean i systemet är förknippade med nycklar som används för
+att markera vad för typ av fil det är. Ett spel för barn skulle tex kunna
+markeras med nycklarna "Spel" och "Barn". En fil kan ha noll eller flera
+nycklar.
+
+I filen "Nycklar.cfg" definieras vilka nycklar som ska finnas tillgängliga
+i systemet. När man har definierat detta och startat basen så ska man inte
+ändra på ordningen på dem. Vill man lägga till flera nycklar måste dessa
+läggas till på slutet. Du kan inte ta bort redan existerande nycklar. (De
+kan döpas om dock.)
 
 
 SerNode.cfg
 -----------
-I denna fil ska man bla ange modemets olika kommandon och vilken serieport
-system ska använda sig av (vanligen serial.device).
-Den medföljande definieringen är gjord för de flesta vanliga 2400-modem.
+I denna fil ska man bla ange modemets olika kommandon och vilken seriell
+enhet systemet ska använda sig av. Detta är vanligen serial.device för ett
+modem som är inkopplat på den interna serieporten eller telnetd.device
+för åtkomst via telnet.
+Den medföljande exemplet är gjord för de flesta vanliga 2400-modem.
 Detta görs i filen "SerNode.cfg". Alla fält består av ett namn, ett
 likamed-tecken och sist själva definitionen. Namnet måste vara i stora
 bokstäver och det får inte förekomma något mellanslag på någon sida om
@@ -205,13 +221,18 @@ INITSTRING=   Den sträng som skickas till modemet vid uppstart och efter
               &D2 - Gör så att modemet lägger på när DTR (Data Terminal
                     Ready) släpps.
 
-ANSWERSTRING= Den sträng som får modemet att svara. Om denna sträng börjar
-              med '-' (ett streck) så används modemets autosvar och alla
+              För telnetd.device behövs egentligen inga speciella kommandon
+              alls för att det ska fungera på ett grundläggande sätt. Bara
+              "AT" duger fint.
+
+ANSWERSTRING= Den sträng som får modemet att svara. Om denna sträng består
+              av '-' (ett streck) så används modemets autosvar och alla
               RING som modemet skickar ignoreras.
 
-HANGUPSTRING= Den sträng som får modemet att lägga på. Om denna strängs
-              börjar med '-' (ett streck) så lägger NiKom på genom att
+HANGUPSTRING= Den sträng som får modemet att lägga på. Om denna sträng
+              består av '-' (ett streck) så lägger NiKom på genom att
               släppa DTR-signalen, annars används '+++' och HANGUPSTRING.
+              Vanligtvis är '-' det som rekomenderas.
 
 HIGHBAUDRATE= Den hastighet som ska användas för att initialisera modemet.
               Detta bör vara den högsta hastigheten modemet klarar av för
@@ -224,9 +245,12 @@ FIXED=        YES eller NO. Vid YES så hålls alltid HIGHBAUDRATE mellan
 
 DEVICE=       Vilket device som ska användas. Är serial.device för den
               vanliga serieporten. För Supra2400zi (internmodem) så används
-              modem0.device.
+              modem0.device. För telnetd.device så är det just "telnetd.device".
 
-UNIT=         Vilken unit som ska användas. Vanligtvis 0.
+UNIT=         Vilken unit som ska användas. Vanligtvis 0 för tex den interna
+              serieporten. Använder man telnetd.device så måste varje nod
+              som använder det ha ett eget unit-nummer. Börja förslagsvis med
+              0, sedan 1 etc.
 
 ZINIT=        vilken initstring som ska skickas till xprzmodem.library.
               Måste sluta på P och inga mellanslag efter det. I övrigt
@@ -250,6 +274,16 @@ XSIZE=        Hur brett fönstret ska vara i antal pixels.
 NODEID=       Vilken id-sträng noden ska ha. Detta för att via NodeInfo()
               kunna hitta en specifik nod oavsett vilket nodnummer den har
               fått.
+INACTIVETIME  Hur många minuter som en användare kan vara inaktiv på denna
+              noden innan NiKom loggar ut användaren automagiskt. Om detta
+              inte anges så används 5 minuter.
+HANDSKAKNING  Anger de handskakningsflaggor som ska användas för den seriella
+              enheten.
+              0 - Xon-Xoff är avslaget, ingen hårdvaruhandskakning
+              1 - Xon-Xoff är påslaget, ingen hårdvaruhandskakning
+              2 - Xon-Xoff är avslaget, hårdvaruhandskakning används.
+              Om detta inte anges så används alternativ "2", vilket också
+              normalt sätt är det rekomenderade.
 
 Höghastighetsmodem
 ------------------
@@ -281,8 +315,8 @@ handskakning och du måste ställa in modemet på att använda samma sak.
 ConNode.cfg
 -----------
 
-Även de lokala noderna har en konfigurationsfil. Denna består av de sex
-sista fälten i SerNode.cfg. Dvs: SCREEN, YPOS, XPOS, YSIZE, XSIZE, NODEID.
+Även de lokala noderna har en konfigurationsfil. Denna består av en delmängd
+av fälten i SerNode.cfg.  Närmare bestämt SCREEN, YPOS, XPOS, YSIZE, XSIZE, NODEID.
 
 
 
@@ -353,7 +387,5 @@ Rexx/ExtKom509.nik Detta program visar innehållet i arkiv som ligger i
 När man har skapat alla nödvändiga kataloger och konfigurerat systemet som
 man vill ha det så är det dags att köra programmet InitNiKom. Detta program
 skapar en användare som har användarnumret 0 och som heter Sysop. Lösenord
-är 'sysop' (med små bokstäver). Skulle man någon gång vilja starta om hela
-systemet på nytt så kan man ta bort alla filer i katalogen Moten och sedan
-köra InitNiKom igen.
+är 'sysop' (med små bokstäver).
 @endnode

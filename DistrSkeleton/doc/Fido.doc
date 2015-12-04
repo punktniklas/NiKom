@@ -197,9 +197,14 @@ inte bör flödas om)
 Underhåll
 ---------
 
+För att utföra underhåll i FidoNet-systemet så använder man programmet
+"NiKomFido". Denna tar som första argument ett kommando som talar
+om vad som ska göras. Vissa kommandon tar även andra argument.
+
 När mailern har pollat och fått in ny post så packar tossern upp det hela
 och lägger det på rätt ställe. Detta är dock inget som NiKom kan veta om.
-Därför måste programmet "UpdateFido" köras efter varje imort av nya texter.
+Därför måste programmet "NiKomFido UpdateFido" köras efter varje import av
+nya texter.
 UpdateFido kollar upp för varje möte om det kommit några nya texter och gör
 dessa tillgängliga i basen. Den kollar även om det kommit några nya brev
 och importerar i så fall dessa till rätt användare.
@@ -213,19 +218,21 @@ lägsta till högsta texten är en obruten serie. Den får inte finnas luckor
 där det saknas texter.
 
 Skulle man av någon anledning vilja scanna om ett möte helt och hållet så
-finns programmet ReScanConf. Detta tar ett mötesnummer som argument och
-scannar om det mötet. Vill man scanna om samtliga möten så finns
-ReScanAllConf.
+finns kan man använda "NiKomFido RescanConf". Detta tar ett mötesnummer som
+argument och scannar om det mötet. Vill man scanna om samtliga möten så
+använder man "NiKomFido RescanAllConf".
 
 Fido-standarden har den nackdelen av den inte gillar textnummer högre än ca
 32000. För att lösa detta så kan man numrera om ett möte med hjälp av
-programmet RenumberConf. Detta gör att filernas namn numreras om. Inuti
-basen behålls dock samma nummer som förut så att NiKom kan hålla reda på
+programmet "NiKomFido RenumberConf". Detta gör att filernas namn numreras om.
+Inuti basen behålls dock samma nummer som förut så att NiKom kan hålla reda på
 vilka användare som har vilka texter olästa. Detta gör att samma text har
 olika nummer i filnamnet och i basen.
 Om ett möte ska numreras om _måste_ RenumberConf användas. Inget annat
 program får numrera om mötet. Då kommer NiKom helt tappa kollen över vilken
-text som är vad.
+text som är vad. RenumberConf tar två argument. Först vilket mötesnummer
+det är som ska numreras om och sedan vilken det nya lägsta textnumret ska
+vara.
 
 
 Flaggor

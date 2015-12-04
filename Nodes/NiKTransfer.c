@@ -19,6 +19,7 @@
 #include "FileAreaUtils.h"
 #include "Logging.h"
 #include "Terminal.h"
+#include "BasicIO.h"
 
 #define EKO		1
 #define EJEKO	0
@@ -26,7 +27,7 @@
 extern struct System *Servermem;
 extern int area2,inloggad,nodnr,rad;
 extern struct IOExtSer *serwritereq,*serreadreq,*serchangereq;
-extern struct timerequest *timerreq,*inactivereq;
+extern struct timerequest *timerreq;
 extern struct MsgPort *serwriteport,*serreadport,*serchangeport,*timerport;
 extern char outbuffer[],inmat[],*argument,zinitstring[],serinput;
 extern struct Inloggning Statstr;
@@ -106,55 +107,63 @@ long __saveds __regargs nik_fseek(LONG *fh,long offset,long origin) {
 }
 
 long __saveds __regargs nik_sread(char *databuffer,long size,long timeout) {
-	ULONG signals,sersig=1L << serreadport->mp_SigBit,
-		timersig=1L << timerport->mp_SigBit;
-	if(timeout) {
-		serreadreq->IOSer.io_Command=CMD_READ;
-		serreadreq->IOSer.io_Length=size;
-		serreadreq->IOSer.io_Data=(APTR)databuffer;
-		SendIO((struct IORequest *)serreadreq);
-		timerreq->tr_node.io_Command=TR_ADDREQUEST;
-		timerreq->tr_time.tv_secs=timeout/1000000;
-		timerreq->tr_time.tv_micro=timeout%1000000;
-		timerreq->tr_node.io_Message.mn_ReplyPort=timerport;
-		SendIO((struct IORequest *)timerreq);
-		for(;;) {
-			signals=Wait(sersig | timersig);
-			if((signals & sersig) && CheckIO((struct IORequest *)serreadreq)) {
-				WaitIO((struct IORequest *)serreadreq);
-				AbortIO((struct IORequest *)timerreq);
-				WaitIO((struct IORequest *)timerreq);
-				if(serreadreq->IOSer.io_Error || carrierdropped()) return(-1L);
-				return((long)serreadreq->IOSer.io_Actual);
-			}
-			if((signals & timersig) && CheckIO((struct IORequest *)timerreq)) {
-				WaitIO((struct IORequest *)timerreq);
-				AbortIO((struct IORequest *)serreadreq);
-				WaitIO((struct IORequest *)serreadreq);
-/* printf("Timeout! Size=%d Timeout=%d Actual=%d",size,timeout,serreadreq->IOSer.io_Actual); */
-				return((long)serreadreq->IOSer.io_Actual);
-			}
-		}
-	} else {
-		serreadreq->IOSer.io_Command=SDCMD_QUERY;
-		DoIO((struct IORequest *)serreadreq);
-		serreadreq->IOSer.io_Command=CMD_READ;
-		if(serreadreq->IOSer.io_Actual > size) serreadreq->IOSer.io_Length=size;
-		else serreadreq->IOSer.io_Length=serreadreq->IOSer.io_Actual;
-		serreadreq->IOSer.io_Data=(APTR)databuffer;
-		DoIO((struct IORequest *)serreadreq);
-		return((long)serreadreq->IOSer.io_Actual);
-	}
+  ULONG signals, sersig = 1L << serreadport->mp_SigBit,
+    timersig = 1L << timerport->mp_SigBit;
+  if(timeout) {
+    serreadreq->IOSer.io_Command = CMD_READ;
+    serreadreq->IOSer.io_Length = size;
+    serreadreq->IOSer.io_Data = (APTR)databuffer;
+    SendIO((struct IORequest *)serreadreq);
+    timerreq->tr_node.io_Command = TR_ADDREQUEST;
+    timerreq->tr_time.tv_secs = timeout / 1000000;
+    timerreq->tr_time.tv_micro = timeout % 1000000;
+    timerreq->tr_node.io_Message.mn_ReplyPort = timerport;
+    SendIO((struct IORequest *)timerreq);
+    for(;;) {
+      signals = Wait(sersig | timersig);
+      if((signals & sersig) && CheckIO((struct IORequest *)serreadreq)) {
+        WaitIO((struct IORequest *)serreadreq);
+        AbortIO((struct IORequest *)timerreq);
+        WaitIO((struct IORequest *)timerreq);
+        QueryCarrierDropped();
+        if(serreadreq->IOSer.io_Error || ImmediateLogout()) {
+          return(-1L);
+        }
+        return((long)serreadreq->IOSer.io_Actual);
+      }
+      if((signals & timersig) && CheckIO((struct IORequest *)timerreq)) {
+        WaitIO((struct IORequest *)timerreq);
+        AbortIO((struct IORequest *)serreadreq);
+        WaitIO((struct IORequest *)serreadreq);
+        QueryCarrierDropped();
+        /* printf("Timeout! Size=%d Timeout=%d Actual=%d",size,timeout,serreadreq->IOSer.io_Actual); */
+        return((long)serreadreq->IOSer.io_Actual);
+      }
+    }
+  } else {
+    serreadreq->IOSer.io_Command=SDCMD_QUERY;
+    DoIO((struct IORequest *)serreadreq);
+    serreadreq->IOSer.io_Command=CMD_READ;
+    if(serreadreq->IOSer.io_Actual > size) serreadreq->IOSer.io_Length=size;
+    else serreadreq->IOSer.io_Length=serreadreq->IOSer.io_Actual;
+    serreadreq->IOSer.io_Data=(APTR)databuffer;
+    DoIO((struct IORequest *)serreadreq);
+    QueryCarrierDropped();
+    return((long)serreadreq->IOSer.io_Actual);
+  }
 }
 
 long __saveds __regargs nik_swrite(char *databuffer,long size) {
-	serwritereq->IOSer.io_Command=CMD_WRITE;
-	serwritereq->IOSer.io_Length=size;
-	serwritereq->IOSer.io_Data=(APTR)databuffer;
-	if(DoIO((struct IORequest *)serwritereq) || carrierdropped()) {
-		return(-1L);
-	}
-	return(0L);
+  if(ConnectionLost()) {
+    return -1L;
+  }
+  serwritereq->IOSer.io_Command = CMD_WRITE;
+  serwritereq->IOSer.io_Length = size;
+  serwritereq->IOSer.io_Data = (APTR)databuffer;
+  if(DoIO((struct IORequest *)serwritereq) || ConnectionLost()) {
+    return(-1L);
+  }
+  return(0L);
 }
 
 long __saveds __regargs nik_update(struct XPR_UPDATE *update) {
@@ -220,8 +229,10 @@ long __saveds __regargs nik_sflush(void) {
 }
 
 long __saveds __regargs nik_chkabort(void) {
-	if(carrierdropped()) return(-1L);
-	return(0L);
+  if(ImmediateLogout()) {
+    return -1L;
+  }
+  return 0L;
 }
 
 long __saveds __regargs nik_gets(char *prompt,char *buffer) {
@@ -417,12 +428,15 @@ int download(void) {
 	while(tf=(struct TransferFiles *)RemHead((struct List *)&tf_list))
 		FreeMem(tf,sizeof(struct TransferFiles));
 
-	if(carrierdropped()) return(1);
-	else return(0);
+	if(ImmediateLogout()) {
+          return 1;
+        } else {
+          return 0;
+        }
 }
 
 int upload(void) {
-  int area, ret, editret, dirnr, ch, writeLong;
+  int area, ret, editret, dirnr, writeLong, isCorrect;
   long tid;
   struct EditLine *el;
   FILE *fp;
@@ -460,8 +474,10 @@ int upload(void) {
   if(ret=recbinfile(Servermem->cfg.ultmp)) {
     while(tf=(struct TransferFiles *)RemHead((struct List *)&tf_list))
       FreeMem(tf,sizeof(struct TransferFiles));
-    if(carrierdropped()) return(1);
-    return(0);
+    if(ImmediateLogout()) {
+      return 1;
+    }
+    return 0;
   }
 
   for(tf=(struct TransferFiles *)tf_list.mlh_Head;tf->node.mln_Succ;tf=(struct TransferFiles *)tf->node.mln_Succ) {
@@ -509,17 +525,20 @@ int upload(void) {
     if(getstring(EKO,3,NULL)) { FreeMem(allokpek,sizeof(struct Fil)); return(1); }
     allokpek->status=atoi(inmat);
     if(Servermem->inne[nodnr].status >= Servermem->cfg.st.filer) {
-      puttekn("\n\rSka filen valideras? ",-1);
-      if(jaellernej('j','n',1)) puttekn("Ja",-1);
-      else {
-        puttekn("Nej",-1);
+      if(GetYesOrNo("\n\rSka filen valideras?", 'j', 'n', "Ja", "Nej",
+                    TRUE, &isCorrect)) {
+        return 1;
+      }
+      if(!isCorrect) {
         allokpek->flaggor|=FILE_NOTVALID;
       }
-      puttekn("\n\rSka filen ha fri download? ",-1);
-      if(jaellernej('j','n',2)) {
-        puttekn("Ja",-1);
+      if(GetYesOrNo("\n\rSka filen ha fri download?", 'j', 'n', "Ja", "Nej",
+                    FALSE, &isCorrect)) {
+        return 1;
+      }
+      if(isCorrect) {
         allokpek->flaggor|=FILE_FREEDL;
-      } else puttekn("Nej",-1);
+      }
     } else if(Servermem->cfg.cfgflags & NICFG_VALIDATEFILES) allokpek->flaggor|=FILE_NOTVALID;
     sendfile("NiKom:Texter/Nyckelhjälp.txt");
     puttekn("\r\nVilka söknycklar ska filen ha? (? för att få en lista)\r\n",-1);
@@ -627,10 +646,7 @@ int recbinfile(char *dir) {
   puttekn("\r\nTryck Ctrl-X några gånger för att avbryta.\r\n",-1);
   AbortIO((struct IORequest *)serreadreq);
   WaitIO((struct IORequest *)serreadreq);
-  if(!CheckIO((struct IORequest *)inactivereq)) {
-    AbortIO((struct IORequest *)inactivereq);
-    WaitIO((struct IORequest *)inactivereq);
-  }
+  AbortInactive();
   xpr_setup(xio);
   xio->xpr_filename = zmodeminit;
   XProtocolSetup(xio);
@@ -655,7 +671,7 @@ int recbinfile(char *dir) {
   serchangereq->IOSer.io_Command=CMD_FLUSH;
   DoIO((struct IORequest *)serchangereq);
   serreqtkn();
-  updateinactive();
+  UpdateInactive();
   if(Servermem->cfg.ar.postup2) {
     sendautorexx(Servermem->cfg.ar.postup2);
   }
@@ -687,10 +703,7 @@ int sendbinfile(void) {
 	puttekn("Tryck Ctrl-X några gånger för att avbryta.\r\n",-1);
 	AbortIO((struct IORequest *)serreadreq);
 	WaitIO((struct IORequest *)serreadreq);
-	if(!CheckIO((struct IORequest *)inactivereq)) {
-		AbortIO((struct IORequest *)inactivereq);
-		WaitIO((struct IORequest *)inactivereq);
-	}
+        AbortInactive();
 
 	xpr_setup(xio);
 	xio->xpr_filename=zinitstring;
@@ -717,7 +730,7 @@ int sendbinfile(void) {
 	serchangereq->IOSer.io_Command=CMD_FLUSH;
 	DoIO((struct IORequest *)serchangereq);
 	serreqtkn();
-	updateinactive();
+	UpdateInactive();
 	if(Servermem->cfg.logmask & LOG_SENDFILE) {
 		for(tf=(struct TransferFiles *)tf_list.mlh_Head;tf->node.mln_Succ;tf=(struct TransferFiles *)tf->node.mln_Succ)
 			if(tf->sucess) {

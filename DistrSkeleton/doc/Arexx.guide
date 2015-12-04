@@ -1,5 +1,4 @@
 @database ARexx.guide
-@rem Konverterad till .guide-format av Daniel Hutmacher och Tomas Kärki.
 @node Main "Innehållsförteckning:"
 
                   @{"     Om ARexx-interfacet     " link About}

@@ -203,7 +203,7 @@ struct ReadLetter {
 struct Header {
    short rader,mote,status;
    long person,kom_av[MAXKOM],kom_till_per,nummer,textoffset,
-      tid,kom_i[MAXKOM],kom_till_nr,reserv1,reserv2;
+      tid,kom_i[MAXKOM],kom_till_nr,root_text,reserv2;
    char arende[41];
 };
 

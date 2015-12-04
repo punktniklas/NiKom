@@ -17,6 +17,7 @@
 #include "Logging.h"
 #include "Terminal.h"
 #include "NewUser.h"
+#include "BasicIO.h"
 
 #define ERROR	10
 #define OK	0
@@ -91,7 +92,7 @@ void cleanup(int kod,char *text)
 
 struct NodeType *selectNodeType(void) {
   struct NodeType *nt;
-  int going, i;
+  int going, i, isCorrect;
 
   if(Servermem->nodetypes[0].nummer == 0) {
     LogEvent(SYSTEM_LOG, ERROR, "Can't login user, no valid node types found.");
@@ -140,12 +141,12 @@ struct NodeType *selectNodeType(void) {
         going=FALSE;
       }
     }
-    putstring("\n\n\rVill du använda denna nodtyp varje gång du loggar in?",-1,0);
-    if(jaellernej('j','n', 1)) {
-      putstring("Ja\n\r", -1, 0);
+    if(GetYesOrNo("\n\n\rVill du använda denna nodtyp varje gång du loggar in?",
+                  'j', 'n', "Ja\r\n", "Nej\r\n", TRUE, &isCorrect)) {
+      return NULL;
+    }
+    if(isCorrect) {
       Servermem->inne[nodnr].shell = nt->nummer;
-    } else {
-      putstring("Nej\n\r",-1,0);
     }
   }
   return nt;
@@ -197,6 +198,7 @@ void main(int argc,char *argv[]) {
   serreqtkn();
   Delay(50);
   for(;;) {
+    AbortInactive();
     inloggad=-1;
     Servermem->idletime[nodnr] = time(NULL);
     Servermem->inloggad[nodnr]=-1;
@@ -205,7 +207,7 @@ void main(int argc,char *argv[]) {
     Servermem->idletime[nodnr] = time(NULL);
     Servermem->inloggad[nodnr]=-2; /* Sätt till <Uppringd> för att även hantera -getty-fallet */
   reloginspec:
-    updateinactive();
+    UpdateInactive();
     Servermem->inne[nodnr].flaggor = Servermem->cfg.defaultflags;
     if(!getty) Delay(100);
     Servermem->inne[nodnr].rader=0;
@@ -271,7 +273,7 @@ void main(int argc,char *argv[]) {
     if((nt = selectNodeType()) == NULL) {
       goto panik;
     }
-    abortinactive();
+    AbortInactive();
     abortserial();
     
     sprintf(commandstring,"%s -N%d -B%d %s",nt->path,nodnr,dtespeed,configname);

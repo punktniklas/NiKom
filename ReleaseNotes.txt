@@ -73,6 +73,10 @@
   terminal handling and is returning various special codes for
   input that is not normal characters.
 
+- Detection of when connection is lost and when a user should be logged
+  out because of inactivity has been overhauled. Hopefully there is now
+  no state that a node can get stuck in because of this.
+
 ---------------------------------------------------------------------------
                          NiKom v1.61, 2015-08-25
 ---------------------------------------------------------------------------

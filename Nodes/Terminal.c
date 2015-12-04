@@ -11,6 +11,7 @@
 #include "NiKomLib.h"
 #include "Logging.h"
 #include "Terminal.h"
+#include "BasicIO.h"
 
 extern int nodnr, rxlinecount;
 extern char outbuffer[];
@@ -53,7 +54,7 @@ int GetChar(void) {
   for(;;) {
     ch = gettekn();
 
-    if(carrierdropped()) {
+    if(ImmediateLogout()) {
       return GETCHAR_LOGOUT;
     }
 
@@ -96,7 +97,7 @@ int handle1bChar(void) {
   unsigned char ch;
 
   ch = gettekn();
-  if(carrierdropped()) {
+  if(ImmediateLogout()) {
     return GETCHAR_LOGOUT;
   }
   if(ch == '[' || ch == 'Ä') {
@@ -112,7 +113,7 @@ int handleAnsiSequence(void) {
   unsigned char ch;
 
   ch = gettekn();
-  if(carrierdropped()) {
+  if(ImmediateLogout()) {
     return GETCHAR_LOGOUT;
   }
 
@@ -141,7 +142,7 @@ int handleCsi3(void) {
   unsigned char ch;
 
   ch = gettekn();
-  if(carrierdropped()) {
+  if(ImmediateLogout()) {
     return GETCHAR_LOGOUT;
   }
 
@@ -157,7 +158,7 @@ int handleShiftedAnsiSequence(void) {
   unsigned char ch;
 
   ch = gettekn();
-  if(carrierdropped()) {
+  if(ImmediateLogout()) {
     return GETCHAR_LOGOUT;
   }
   
@@ -389,6 +390,9 @@ int GetStringX(int echo, int maxchrs, char *defaultStr,
           SendStringNoBrk("\x1b\x5b\x31\x40");
         }
         if(echo != STAREKO) {
+          if(ch == '+') {
+            SendStringNoBrk(" \b");
+          }
           eka(ch);
         } else {
           eka('*');
@@ -569,6 +573,7 @@ void DisplayInternalError(void) {
 int GetYesOrNo(char *label, char yesChar, char noChar, char *yesStr, char *noStr,
                int yesIsDefault, int *res) {
   int ch;
+  char *response;
 
   radcnt = 0;
   SendString("%s (%c/%c) ", label != NULL ? label : "",
@@ -588,7 +593,10 @@ int GetYesOrNo(char *label, char yesChar, char noChar, char *yesStr, char *noStr
     } else {
       continue;
     }
-    SendString(*res ? yesStr : noStr);
+    response = *res ? yesStr : noStr;
+    if(response != NULL)  {
+      SendString(response);
+    }
     return 0;
   }
 }
@@ -664,5 +672,35 @@ int MaybeEditNumberChar(char *label, char *number, int maxlen, int minVal,
   int tmp = *number, ret;
   ret = MaybeEditNumber(label, &tmp, maxlen, minVal, maxVal);
   *number = tmp;
+  return ret;
+}
+
+int EditBitFlag(char *label, char yesChar, char noChar, char *yesStr, char *noStr,
+                long *value, long bitmask) {
+  int setFlag;
+  if(GetYesOrNo(label, yesChar, noChar, yesStr, noStr, *value & bitmask, &setFlag)) {
+    return 1;
+  }
+  if(setFlag) {
+    *value |= bitmask;
+  } else {
+    *value &= ~bitmask;
+  }
+  return 0;
+}
+
+int EditBitFlagShort(char *label, char yesChar, char noChar,
+                     char *yesStr, char *noStr, short *value, long bitmask) {
+  long tmpValue = *value, ret;
+  ret = EditBitFlag(label, yesChar, noChar, yesStr, noStr, &tmpValue, bitmask);
+  *value = tmpValue;
+  return ret;
+}
+
+int EditBitFlagChar(char *label, char yesChar, char noChar,
+                    char *yesStr, char *noStr, char *value, long bitmask) {
+  long tmpValue = *value, ret;
+  ret = EditBitFlag(label, yesChar, noChar, yesStr, noStr, &tmpValue, bitmask);
+  *value = tmpValue;
   return ret;
 }

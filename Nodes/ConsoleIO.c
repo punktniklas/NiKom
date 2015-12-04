@@ -11,12 +11,10 @@
 #include "NiKomstr.h"
 #include "NiKomFuncs.h"
 #include "NiKomLib.h"
+#include "BasicIO.h"
 
 #define ERROR	128
 #define OK	0
-#define EKO	1
-#define EJEKO	0
-#define NOCARRIER	32
 
 struct IOStdReq *conwritereq=NULL;
 struct MsgPort *conwriteport=NULL;
@@ -120,55 +118,57 @@ void CloseTimer(struct timerequest *treq) {
 	CloseDevice((struct IORequest *)treq);
 }
 
-char gettekn(void)
-{
-	struct IntuiMessage *mymess;
-	struct NiKMess *nikmess;
-	ULONG signals,conreadsig=1L << conreadport->mp_SigBit,windsig=1L << NiKwind->UserPort->mp_SigBit,
-		nikomnodesig = 1L << nikomnodeport->mp_SigBit;
-	char tkn=0,tmp[51];
-	if(typeaheadbuftkn)
-	{
-		tkn=typeaheadbuf[0];
-		strcpy(tmp,&typeaheadbuf[1]);
-		strcpy(typeaheadbuf,tmp);
-		typeaheadbuftkn--;
-	}
-	else
-	{
-		while(!tkn)
-		{
-			signals=Wait(conreadsig | windsig | nikomnodesig);
-			if(signals & conreadsig)
-				tkn=congettkn();
+char gettekn(void) {
+  struct IntuiMessage *mymess;
+  struct NiKMess *nikmess;
+  ULONG signals,
+    conreadsig = 1L << conreadport->mp_SigBit,
+    windsig = 1L << NiKwind->UserPort->mp_SigBit,
+    nikomnodesig = 1L << nikomnodeport->mp_SigBit;
+  char ch = 0, tmp[51];
 
-			if(signals & windsig)
-			{
-				mymess=(struct IntuiMessage *)GetMsg(NiKwind->UserPort);
-				ReplyMsg((struct Message *)mymess);
-				cleanup(OK,"");
-			}
-			if(signals & nikomnodesig)
-			{
-				while(nikmess = (struct NiKMess *) GetMsg(nikomnodeport))
-				{
-					handleservermess(nikmess);
-					ReplyMsg((struct Message *)nikmess);
-				}
-				if(carrierdropped()) tkn = '\n';
-			}
-		}
-	}
-	return(tkn);
+  if(ImmediateLogout()) {
+    return 0;
+  }
+
+  if(typeaheadbuftkn) {
+    ch=typeaheadbuf[0];
+    strcpy(tmp,&typeaheadbuf[1]);
+    strcpy(typeaheadbuf,tmp);
+    typeaheadbuftkn--;
+    return ch;
+  }
+
+  while(!ch) {
+    signals=Wait(conreadsig | windsig | nikomnodesig);
+    if(signals & conreadsig)
+      ch=congettkn();
+    
+    if(signals & windsig) {
+      mymess=(struct IntuiMessage *)GetMsg(NiKwind->UserPort);
+      ReplyMsg((struct Message *)mymess);
+      cleanup(OK,"");
+    }
+    if(signals & nikomnodesig) {
+      while(nikmess = (struct NiKMess *) GetMsg(nikomnodeport)) {
+        handleservermess(nikmess);
+        ReplyMsg((struct Message *)nikmess);
+      }
+    }
+
+    if(ImmediateLogout()) {
+      return 0;
+    }
+  }
+  return(ch);
 }
 
-char congettkn(void)
-{
-	char temp;
-	WaitIO((struct IORequest *)conreadreq);
-	temp=coninput;
-	conreqtkn();
-	return((char)temp);
+char congettkn(void) {
+  char temp;
+  WaitIO((struct IORequest *)conreadreq);
+  temp = coninput;
+  conreqtkn();
+  return((char)temp);
 }
 
 void eka(char tecken) {
@@ -232,7 +232,7 @@ void putstring(char *pekare,int size, long flags)
 }
 
 int puttekn(char *pekare,int size) {
-	int aborted=FALSE,x, abort;
+	int aborted=FALSE,x;
 	char *tmppek, buffer[1201], constring[1201];
 
 	strncpy(constring,pekare,1199);
@@ -359,7 +359,6 @@ int sendtocon(char *pekare, int size)
 				handleservermess(nikmess);
 				ReplyMsg((struct Message *)nikmess);
 			}
-			if(carrierdropped()) aborted = TRUE;
 		}
 	}
 	if(paused && gettekn()==3)
@@ -371,11 +370,13 @@ int sendtocon(char *pekare, int size)
 	return(aborted);
 }
 
-int carrierdropped(void) {
-	if(nodestate & (NIKSTATE_NOCARRIER | NIKSTATE_LOGOUT)) return(TRUE);
-	return(FALSE);
+int ImmediateLogout(void) {
+  return nodestate & NIKSTATE_LOGOUT;
 }
 
+int ConnectionLost(void) {
+  return FALSE;
+}
 
 void getnodeconfig(char *configname) {
 	FILE *fp;
@@ -404,55 +405,61 @@ void getnodeconfig(char *configname) {
 	fclose(fp);
 }
 
-void abortinactive(void) {
-}
+void AbortInactive(void) { }
 
-int updateinactive(void) {
-	return(0);
-}
+void UpdateInactive(void) { }
 
 #define FIFOEVENT_FROMUSER  1
 #define FIFOEVENT_FROMFIFO  2
 #define FIFOEVENT_CLOSEW    4
 #define FIFOEVENT_NOCARRIER 8
 
-int getfifoevent(struct MsgPort *fifoport, char *puthere)
-{
-	struct IntuiMessage *mymess;
-	struct NiKMess *nikmess;
-	ULONG signals,conreadsig=1L << conreadport->mp_SigBit,windsig=1L << NiKwind->UserPort->mp_SigBit,
-		fifosig=1L << fifoport->mp_SigBit, nikomnodesig = 1L << nikomnodeport->mp_SigBit;
-	int event=0;
-	while(!event) {
-		signals = Wait(conreadsig | windsig | fifosig | nikomnodesig | SIGBREAKF_CTRL_C);
-		if((signals & conreadsig) && CheckIO((struct IORequest *)conreadreq)) {
-			*puthere=congettkn();
-			event|=FIFOEVENT_FROMUSER;
-		}
-		if(signals & windsig) {
-			mymess=(struct IntuiMessage *)GetMsg(NiKwind->UserPort);
-			ReplyMsg((struct Message *)mymess);
-			AbortIO((struct IORequest *)conreadreq);
-			WaitIO((struct IORequest *)conreadreq);
-			event|=FIFOEVENT_CLOSEW;
-		}
-		if(signals & SIGBREAKF_CTRL_C) {
-			AbortIO((struct IORequest *)conreadreq);
-			WaitIO((struct IORequest *)conreadreq);
-			event|=FIFOEVENT_CLOSEW;
-		}
-		if(signals & fifosig) {
-			event|=FIFOEVENT_FROMFIFO;
-		}
-		if(signals & nikomnodesig) {
-			while(nikmess = (struct NiKMess *) GetMsg(nikomnodeport)) {
-				handleservermess(nikmess);
-				ReplyMsg((struct Message *)nikmess);
-			}
-			if(carrierdropped()) event |= FIFOEVENT_NOCARRIER;
-		}
-	}
-	return(event);
+int getfifoevent(struct MsgPort *fifoport, char *puthere) {
+  struct IntuiMessage *mymess;
+  struct NiKMess *nikmess;
+  ULONG signals,
+    conreadsig = 1L << conreadport->mp_SigBit,
+    windsig = 1L << NiKwind->UserPort->mp_SigBit,
+    fifosig = 1L << fifoport->mp_SigBit,
+    nikomnodesig = 1L << nikomnodeport->mp_SigBit;
+  int event = 0;
+
+  if(ImmediateLogout()) {
+    return FIFOEVENT_NOCARRIER;
+  }
+
+  while(!event) {
+    signals = Wait(conreadsig | windsig | fifosig | nikomnodesig | SIGBREAKF_CTRL_C);
+    if((signals & conreadsig) && CheckIO((struct IORequest *)conreadreq)) {
+      *puthere=congettkn();
+      event|=FIFOEVENT_FROMUSER;
+    }
+    if(signals & windsig) {
+      mymess=(struct IntuiMessage *)GetMsg(NiKwind->UserPort);
+      ReplyMsg((struct Message *)mymess);
+      AbortIO((struct IORequest *)conreadreq);
+      WaitIO((struct IORequest *)conreadreq);
+      event |= FIFOEVENT_CLOSEW;
+    }
+    if(signals & SIGBREAKF_CTRL_C) {
+      AbortIO((struct IORequest *)conreadreq);
+      WaitIO((struct IORequest *)conreadreq);
+      event |= FIFOEVENT_CLOSEW;
+    }
+    if(signals & fifosig) {
+      event |= FIFOEVENT_FROMFIFO;
+    }
+    if(signals & nikomnodesig) {
+      while(nikmess = (struct NiKMess *) GetMsg(nikomnodeport)) {
+        handleservermess(nikmess);
+        ReplyMsg((struct Message *)nikmess);
+      }
+      if(ImmediateLogout()) {
+        event |= FIFOEVENT_NOCARRIER;
+      }
+    }
+  }
+  return(event);
 }
 
 int serputtekn(char *pekare,int size)

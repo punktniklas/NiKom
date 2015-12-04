@@ -12,11 +12,10 @@
 #include "NiKomstr.h"
 #include "NiKomFuncs.h"
 #include "NiKomLib.h"
+#include "BasicIO.h"
 
 #define ERROR	128
 #define OK	0
-#define EKO	1
-#define EJEKO	0
 #define NOCARRIER	32
 
 struct IOStdReq *conwritereq=NULL;
@@ -276,89 +275,97 @@ void writesererr(int errcode) {
 	printf("Serial error on node %d (%s, unit %d): %s\n",nodnr,device,unit,errstr);
 }
 
-char gettekn(void)
-{
-	struct IntuiMessage *mymess;
-	struct NiKMess *nikmess;
-	ULONG signals,conreadsig=1L << conreadport->mp_SigBit,windsig=1L << NiKwind->UserPort->mp_SigBit,
-		serreadsig=1L << serreadport->mp_SigBit,inactivesig=1L << inactiveport->mp_SigBit,
-		nikomnodesig = 1L << nikomnodeport->mp_SigBit;
-	char tkn=0,tmp[51];
+char gettekn(void) {
+  struct IntuiMessage *mymess;
+  struct NiKMess *nikmess;
+  ULONG signals,
+    conreadsig = 1L << conreadport->mp_SigBit,
+    windsig = 1L << NiKwind->UserPort->mp_SigBit,
+    serreadsig = 1L << serreadport->mp_SigBit,
+    inactivesig=1L << inactiveport->mp_SigBit,
+    nikomnodesig = 1L << nikomnodeport->mp_SigBit;
+  char ch = '\0', tmp[51];
 
-	if(typeaheadbuftkn) {
-		tkn=typeaheadbuf[0];
-		strcpy(tmp,&typeaheadbuf[1]);
-		strcpy(typeaheadbuf,tmp);
-		typeaheadbuftkn--;
-	}
-	else {
-		while(!tkn) {
-		signals = Wait(conreadsig | windsig | serreadsig | inactivesig | nikomnodesig | SIGBREAKF_CTRL_C);
-		if((signals & conreadsig) && CheckIO((struct IORequest *)conreadreq)) {
-			tkn=congettkn();
-			if(updateinactive()) return(10);
-		}
-		if((signals & serreadsig) && CheckIO((struct IORequest *)serreadreq)) {
-			tkn=sergettkn();
-			ConvChrsToAmiga(&tkn,1,Servermem->inne[nodnr].chrset);
-			if(updateinactive()) return(10);
-		}
-		if(signals & windsig) {
-			mymess=(struct IntuiMessage *)GetMsg(NiKwind->UserPort);
-			ReplyMsg((struct Message *)mymess);
-			AbortIO((struct IORequest *)conreadreq);
-			WaitIO((struct IORequest *)conreadreq);
-			AbortIO((struct IORequest *)serreadreq);
-			WaitIO((struct IORequest *)serreadreq);
-			AbortIO((struct IORequest *)inactivereq);
-			WaitIO((struct IORequest *)inactivereq);
-			cleanup(OK,"");
-		}
-		if(signals & SIGBREAKF_CTRL_C) {
-			AbortIO((struct IORequest *)conreadreq);
-			WaitIO((struct IORequest *)conreadreq);
-			AbortIO((struct IORequest *)serreadreq);
-			WaitIO((struct IORequest *)serreadreq);
-			AbortIO((struct IORequest *)inactivereq);
-			WaitIO((struct IORequest *)inactivereq);
-			cleanup(OK,"");
-		}
-		if((signals & inactivesig) && CheckIO((struct IORequest *)inactivereq)) {
-      	WaitIO((struct IORequest *)inactivereq);
-      	if(!carrierdropped()) {
-      		nodestate |= NIKSTATE_INACTIVITY;
-      		return(10);
-      	}
+  if(ImmediateLogout()) {
+    return 0;
+  }
+
+  if(typeaheadbuftkn > 0) {
+    ch = typeaheadbuf[0];
+    strcpy(tmp, &typeaheadbuf[1]);
+    strcpy(typeaheadbuf, tmp);
+    typeaheadbuftkn--;
+    return ch;
+  }
+
+  while(!ch) {
+    signals = Wait(conreadsig | windsig | serreadsig | inactivesig | nikomnodesig
+                   | SIGBREAKF_CTRL_C);
+    if((signals & conreadsig) && CheckIO((struct IORequest *)conreadreq)) {
+      ch = congettkn();
+      UpdateInactive();
+    }
+    if((signals & serreadsig) && CheckIO((struct IORequest *)serreadreq)) {
+      ch = sergettkn();
+      ConvChrsToAmiga(&ch,1,Servermem->inne[nodnr].chrset);
+      UpdateInactive();
+      QueryCarrierDropped();
+    }
+    if(signals & windsig) {
+      mymess=(struct IntuiMessage *)GetMsg(NiKwind->UserPort);
+      ReplyMsg((struct Message *)mymess);
+      AbortIO((struct IORequest *)conreadreq);
+      WaitIO((struct IORequest *)conreadreq);
+      AbortIO((struct IORequest *)serreadreq);
+      WaitIO((struct IORequest *)serreadreq);
+      AbortIO((struct IORequest *)inactivereq);
+      WaitIO((struct IORequest *)inactivereq);
+      cleanup(OK,"");
+    }
+    if(signals & SIGBREAKF_CTRL_C) {
+      AbortIO((struct IORequest *)conreadreq);
+      WaitIO((struct IORequest *)conreadreq);
+      AbortIO((struct IORequest *)serreadreq);
+      WaitIO((struct IORequest *)serreadreq);
+      AbortIO((struct IORequest *)inactivereq);
+      WaitIO((struct IORequest *)inactivereq);
+      cleanup(OK,"");
+    }
+    if((signals & inactivesig) && CheckIO((struct IORequest *)inactivereq)) {
+      WaitIO((struct IORequest *)inactivereq);
+      nodestate |= NIKSTATE_INACTIVITY;
+    }
+    if(signals & nikomnodesig) {
+      while(nikmess = (struct NiKMess *) GetMsg(nikomnodeport)) {
+        handleservermess(nikmess);
+        ReplyMsg((struct Message *)nikmess);
       }
-      if(signals & nikomnodesig) {
-			while(nikmess = (struct NiKMess *) GetMsg(nikomnodeport)) {
-				handleservermess(nikmess);
-				ReplyMsg((struct Message *)nikmess);
-			}
-			if(carrierdropped()) tkn = '\n';
-		}
-		}
-	}
-	if(tkn=='+') putstring(" \b",-1,0);
-	return(tkn);
+    }
+
+    if(ImmediateLogout()) {
+      return 0;
+    }
+  }
+  return(ch);
 }
 
-char congettkn(void)
-{
-	char temp;
-	WaitIO((struct IORequest *)conreadreq);
-	temp=coninput;
-	conreqtkn();
-	return(temp);
+char congettkn(void) {
+  char temp;
+  WaitIO((struct IORequest *)conreadreq);
+  temp = coninput;
+  conreqtkn();
+  return temp ;
 }
 
 char sergettkn(void) {
-	char temp;
-	int err;
-	if(err=WaitIO((struct IORequest *)serreadreq)) writesererr(err);
-	temp=serinput;
-	serreqtkn();
-	return(temp);
+  char temp;
+  int err;
+  if(err = WaitIO((struct IORequest *)serreadreq)) {
+    writesererr(err);
+  }
+  temp = serinput;
+  serreqtkn();
+  return temp;
 }
 
 void eka(char tecken) {
@@ -448,17 +455,23 @@ void serputstring(char *pekare,int size, long flags)
 	DoIO((struct IORequest *)serwritereq);
 }
 
-int carrierdropped(void) {
-	int err;
-	if(nodestate & (NIKSTATE_NOCARRIER | NIKSTATE_LOGOUT | NIKSTATE_INACTIVITY)) return(TRUE);
-	serchangereq->IOSer.io_Command=SDCMD_QUERY;
-	if(err=DoIO((struct IORequest *)serchangereq)) writesererr(err);
-	if(serchangereq->io_Status & NOCARRIER)
-	{
-		nodestate |= NIKSTATE_NOCARRIER;
-		return(1);
-	}
-	return(0);
+int ImmediateLogout(void) {
+  return nodestate & (NIKSTATE_NOCARRIER | NIKSTATE_LOGOUT | NIKSTATE_INACTIVITY);
+}
+
+int ConnectionLost(void) {
+  return nodestate & NIKSTATE_NOCARRIER;
+}
+
+void QueryCarrierDropped(void) {
+  int err;
+  serchangereq->IOSer.io_Command=SDCMD_QUERY;
+  if(err = DoIO((struct IORequest *)serchangereq)) {
+    writesererr(err);
+  }
+  if(serchangereq->io_Status & NOCARRIER) {
+    nodestate |= NIKSTATE_NOCARRIER;
+  }
 }
 
 int tknwaiting(void) {
@@ -529,27 +542,22 @@ void getnodeconfig(char *configname) {
 	if(getty) highbaud=gettybps;
 }
 
-int updateinactive(void) {
-	nodestate &= ~NIKSTATE_INACTIVITY;
-	if(!CheckIO((struct IORequest *)inactivereq)) {
-		AbortIO((struct IORequest *)inactivereq);
-		WaitIO((struct IORequest *)inactivereq);
-	}
-	if(!carrierdropped()) {
-		inactivereq->tr_node.io_Command=TR_ADDREQUEST;
-		inactivereq->tr_node.io_Message.mn_ReplyPort=inactiveport;
-		inactivereq->tr_time.tv_secs=Servermem->maxinactivetime[nodnr]*60;
-		inactivereq->tr_time.tv_micro=0;
-		SendIO((struct IORequest *)inactivereq);
-	} else if(inloggad!=-1) return(1);
-	return(0);
+void UpdateInactive(void) {
+  nodestate &= ~NIKSTATE_INACTIVITY;
+  AbortInactive();
+
+  inactivereq->tr_node.io_Command = TR_ADDREQUEST;
+  inactivereq->tr_node.io_Message.mn_ReplyPort = inactiveport;
+  inactivereq->tr_time.tv_secs = Servermem->maxinactivetime[nodnr] * 60;
+  inactivereq->tr_time.tv_micro = 0;
+  SendIO((struct IORequest *)inactivereq);
 }
 
-void abortinactive(void) {
-	if(!CheckIO((struct IORequest *)inactivereq)) {
-		AbortIO((struct IORequest *)inactivereq);
-		WaitIO((struct IORequest *)inactivereq);
-	}
+void AbortInactive(void) {
+  if(!CheckIO((struct IORequest *)inactivereq)) {
+    AbortIO((struct IORequest *)inactivereq);
+    WaitIO((struct IORequest *)inactivereq);
+  }
 }
 
 #define FIFOEVENT_FROMUSER  1
@@ -557,54 +565,64 @@ void abortinactive(void) {
 #define FIFOEVENT_CLOSEW    4
 #define FIFOEVENT_NOCARRIER 8
 
-int getfifoevent(struct MsgPort *fifoport, char *puthere)
-{
-	struct IntuiMessage *mymess;
-	struct NiKMess *nikmess;
-	ULONG signals,conreadsig=1L << conreadport->mp_SigBit,windsig=1L << NiKwind->UserPort->mp_SigBit,
-		serreadsig=1L << serreadport->mp_SigBit,fifosig=1L << fifoport->mp_SigBit,
-		nikomnodesig = 1L << nikomnodeport->mp_SigBit;
-	int event=0;
-	while(!event) {
-		signals = Wait(conreadsig | windsig | serreadsig | fifosig | nikomnodesig | SIGBREAKF_CTRL_C);
-		if((signals & conreadsig) && CheckIO((struct IORequest *)conreadreq)) {
-			*puthere=congettkn();
-			event|=FIFOEVENT_FROMUSER;
-		}
-		if((signals & serreadsig) && CheckIO((struct IORequest *)serreadreq)) {
-			*puthere=sergettkn();
-/*			ConvChrsToAmiga(puthere,1,Servermem->inne[nodnr].chrset); */
-			event|=FIFOEVENT_FROMUSER;
-		}
-		if(signals & windsig) {
-			mymess=(struct IntuiMessage *)GetMsg(NiKwind->UserPort);
-			ReplyMsg((struct Message *)mymess);
-			AbortIO((struct IORequest *)conreadreq);
-			WaitIO((struct IORequest *)conreadreq);
-			AbortIO((struct IORequest *)serreadreq);
-			WaitIO((struct IORequest *)serreadreq);
-			event|=FIFOEVENT_CLOSEW;
-		}
-		if(signals & SIGBREAKF_CTRL_C) {
-			AbortIO((struct IORequest *)conreadreq);
-			WaitIO((struct IORequest *)conreadreq);
-			AbortIO((struct IORequest *)serreadreq);
-			WaitIO((struct IORequest *)serreadreq);
-			event|=FIFOEVENT_CLOSEW;
-		}
-		if(signals & fifosig) {
-			event|=FIFOEVENT_FROMFIFO;
-		}
-		if(signals & nikomnodesig) {
-			while(nikmess = (struct NiKMess *) GetMsg(nikomnodeport)) {
-				handleservermess(nikmess);
-				ReplyMsg((struct Message *)nikmess);
-			}
-			if(carrierdropped()) event |= FIFOEVENT_NOCARRIER;
-		}
-	}
-	if(*puthere=='+') putstring(" \b",-1,0);
-	return(event);
+int getfifoevent(struct MsgPort *fifoport, char *puthere) {
+  struct IntuiMessage *mymess;
+  struct NiKMess *nikmess;
+  ULONG signals,
+    conreadsig = 1L << conreadport->mp_SigBit,
+    windsig = 1L << NiKwind->UserPort->mp_SigBit,
+    serreadsig = 1L << serreadport->mp_SigBit,
+    fifosig = 1L << fifoport->mp_SigBit,
+    nikomnodesig = 1L << nikomnodeport->mp_SigBit;
+  int event = 0;
+
+  if(ImmediateLogout()) {
+    return FIFOEVENT_NOCARRIER;
+  }
+
+  while(!event) {
+    signals = Wait(conreadsig | windsig | serreadsig | fifosig
+                   | nikomnodesig | SIGBREAKF_CTRL_C);
+    if((signals & conreadsig) && CheckIO((struct IORequest *)conreadreq)) {
+      *puthere = congettkn();
+      event |= FIFOEVENT_FROMUSER;
+    }
+    if((signals & serreadsig) && CheckIO((struct IORequest *)serreadreq)) {
+      *puthere = sergettkn();
+      QueryCarrierDropped();
+      event |= FIFOEVENT_FROMUSER;
+    }
+    if(signals & windsig) {
+      mymess=(struct IntuiMessage *)GetMsg(NiKwind->UserPort);
+      ReplyMsg((struct Message *)mymess);
+      AbortIO((struct IORequest *)conreadreq);
+      WaitIO((struct IORequest *)conreadreq);
+      AbortIO((struct IORequest *)serreadreq);
+      WaitIO((struct IORequest *)serreadreq);
+      event |= FIFOEVENT_CLOSEW;
+    }
+    if(signals & SIGBREAKF_CTRL_C) {
+      AbortIO((struct IORequest *)conreadreq);
+      WaitIO((struct IORequest *)conreadreq);
+      AbortIO((struct IORequest *)serreadreq);
+      WaitIO((struct IORequest *)serreadreq);
+      event |= FIFOEVENT_CLOSEW;
+    }
+    if(signals & fifosig) {
+      event |= FIFOEVENT_FROMFIFO;
+    }
+    if(signals & nikomnodesig) {
+      while(nikmess = (struct NiKMess *) GetMsg(nikomnodeport)) {
+        handleservermess(nikmess);
+        ReplyMsg((struct Message *)nikmess);
+      }
+    }
+    if(ImmediateLogout()) {
+      event |= FIFOEVENT_NOCARRIER;
+    }
+  }
+  if(*puthere=='+') putstring(" \b",-1,0);
+  return(event);
 }
 
 void abortserial(void) {
@@ -654,7 +672,9 @@ int puttekn(char *pekare,int size)
 	char serbuf[1200], conbuf[1200], *concurpek, *sercurpek, *constartpek, *serstartpek;
 	char conready, serready, conlineready, serlineready;
 
-	if(carrierdropped()) return(TRUE);
+	if(ConnectionLost()) {
+          return TRUE;
+        }
 
 	if(size == -1 && pekare[0] == 0)
 		return(0);
@@ -679,12 +699,6 @@ int puttekn(char *pekare,int size)
 
 	concurpek = constartpek = &localconstring[0];
 	sercurpek = serstartpek = &serpekare[0];
-/*	if(size != -1)
-	{
-		consize = strlen(concurpek);
-		sersize = strlen(sercurpek);
-	}
-	else */
 	consize = sersize = -1;
 
 	x1 = 0;
@@ -786,155 +800,158 @@ int puttekn(char *pekare,int size)
 				nyrad = 1;
 				sercurpek = serstartpek - 1;
 				serlineready = 1;
-
-/*				printf("%d. %d. %s", radcnt + 1, Servermem->inne[nodnr].rader, serbuf); */
 			}
 
 			sercurpek++;
 		}
 		/* Serial end */
 
-		if(sendtosercon(conbuf, serbuf, -1, -1)) aborted = TRUE;
-		if(nyrad && incantrader()) aborted = TRUE;
+		if(sendtosercon(conbuf, serbuf, -1, -1)) {
+                  aborted = TRUE;
+                }
+		if(nyrad && incantrader()) {
+                  aborted = TRUE;
+                }
 	}
 
-	if(carrierdropped()) return(TRUE);
-	return(aborted);
+	return(aborted || ConnectionLost());
 }
 
-int sendtosercon(char *conpek, char *serpek, int consize, int sersize)
-{
-	struct IntuiMessage *mymess;
-	struct NiKMess *nikmess;
+int sendtosercon(char *conpek, char *serpek, int consize, int sersize) {
+  struct IntuiMessage *mymess;
+  struct NiKMess *nikmess;
 
-	char tecken;
-	int aborted = FALSE, paused=FALSE;
-	int console=1,serial=1,err;
-	ULONG signals,conwritesig = 1L << conwriteport->mp_SigBit,
-		conreadsig = 1L << conreadport->mp_SigBit,windsig = 1L << NiKwind->UserPort->mp_SigBit,
-		serwritesig = 1L << serwriteport->mp_SigBit,
-		serreadsig = 1L << serreadport->mp_SigBit,
-		nikomnodesig = 1L << nikomnodeport->mp_SigBit;
+  char tecken;
+  int aborted = FALSE, paused=FALSE;
+  int console=1,serial=1,err;
+  ULONG signals,
+    conwritesig = 1L << conwriteport->mp_SigBit,
+    conreadsig = 1L << conreadport->mp_SigBit,
+    windsig = 1L << NiKwind->UserPort->mp_SigBit,
+    serwritesig = 1L << serwriteport->mp_SigBit,
+    serreadsig = 1L << serreadport->mp_SigBit,
+    nikomnodesig = 1L << nikomnodeport->mp_SigBit;
 
-	if(CheckIO((struct IORequest *)serreadreq))
-	{
-		AbortIO((struct IORequest *)serreadreq);
-		WaitIO((struct IORequest *)serreadreq);
-	}
-	if(CheckIO((struct IORequest *)serwritereq))
-	{
-		AbortIO((struct IORequest *)serwritereq);
-		WaitIO((struct IORequest *)serwritereq);
-	}
+  if(CheckIO((struct IORequest *)serreadreq)) {
+    AbortIO((struct IORequest *)serreadreq);
+    WaitIO((struct IORequest *)serreadreq);
+  }
+  if(CheckIO((struct IORequest *)serwritereq)) {
+    AbortIO((struct IORequest *)serwritereq);
+    WaitIO((struct IORequest *)serwritereq);
+  }
 
-	if(serpek[0] != 0)
-	{
-		serwritereq->IOSer.io_Command=CMD_WRITE;
-		serwritereq->IOSer.io_Data=(APTR)serpek;
-		serwritereq->IOSer.io_Length=sersize;
-		SendIO((struct IORequest *)serwritereq);
-	}
-	else
-		serial = 0;
+  if(serpek[0] != 0) {
+    serwritereq->IOSer.io_Command=CMD_WRITE;
+    serwritereq->IOSer.io_Data=(APTR)serpek;
+    serwritereq->IOSer.io_Length=sersize;
+    SendIO((struct IORequest *)serwritereq);
+  } else {
+    serial = 0;
+  }
 
-	if(conpek[0] != 0)
-	{
-		conwritereq->io_Command=CMD_WRITE;
-		conwritereq->io_Data=(APTR)conpek;
-		conwritereq->io_Length=consize;
-		SendIO((struct IORequest *)conwritereq);
-	}
-	else
-		console = 0;
+  if(conpek[0] != 0) {
+    conwritereq->io_Command=CMD_WRITE;
+    conwritereq->io_Data=(APTR)conpek;
+    conwritereq->io_Length=consize;
+    SendIO((struct IORequest *)conwritereq);
+  } else {
+    console = 0;
+  }
 
-	while(console || serial)
-	{
-		signals = Wait(conwritesig | conreadsig | windsig | serwritesig | serreadsig | nikomnodesig);
-		if(signals & conwritesig) {
-			console=0;
-			if(WaitIO((struct IORequest *)conwritereq)) printf("Error console\n");
-		}
-		if((signals & serwritesig) && CheckIO((struct IORequest *)serwritereq)) {
-			serial=0;
-			if(err=WaitIO((struct IORequest *)serwritereq)) writesererr(err);
-		}
-		if((signals & conreadsig) && CheckIO((struct IORequest *)conreadreq)) {
-			if((tecken=congettkn()) == 3) {
-				if(serial) {
-					AbortIO((struct IORequest *)serwritereq);
-					WaitIO((struct IORequest *)serwritereq);
-				}
-				if(console) {
-					AbortIO((struct IORequest *)conwritereq);
-					WaitIO((struct IORequest *)conwritereq);
-				}
-				aborted=TRUE;
-				console=serial=0;
-				putstring("^C\n\r",-1,0);
-			} else if((tecken==' ' && (Servermem->inne[nodnr].flaggor & MELLANSLAG)) || tecken==19) paused=TRUE;
-			else if(tecken && typeaheadbuftkn<50) {
-				typeaheadbuf[typeaheadbuftkn++]=tecken;
-				typeaheadbuf[typeaheadbuftkn]=0;
-			}
-			updateinactive();
-		}
-		if((signals & serreadsig) && CheckIO((struct IORequest *)serreadreq))
-		{
-			if((tecken=sergettkn()) == 3)
-			{
-				if(serial) {
-					AbortIO((struct IORequest *)serwritereq);
-					WaitIO((struct IORequest *)serwritereq);
-				}
-				if(console) {
-					AbortIO((struct IORequest *)conwritereq);
-					WaitIO((struct IORequest *)conwritereq);
-				}
-				aborted=TRUE;
-				console=serial=0;
-				putstring("^C\n\r",-1,0);
-			} else if((tecken==' ' && (Servermem->inne[nodnr].flaggor & MELLANSLAG)) || tecken==19) paused=TRUE;
-			else if(tecken && typeaheadbuftkn<50) {
-				typeaheadbuf[typeaheadbuftkn++]=tecken;
-				typeaheadbuf[typeaheadbuftkn]=0;
-			}
-			updateinactive();
-		}
-		if(signals & windsig)
-		{
-			mymess=(struct IntuiMessage *)GetMsg(NiKwind->UserPort);
-			ReplyMsg((struct Message *)mymess);
-			AbortIO((struct IORequest *)conreadreq);
-			WaitIO((struct IORequest *)conreadreq);
-			AbortIO((struct IORequest *)serreadreq);
-			WaitIO((struct IORequest *)serreadreq);
-			AbortIO((struct IORequest *)inactivereq);
-			WaitIO((struct IORequest *)inactivereq);
-			if(!CheckIO((struct IORequest *)conwritereq)) {
-				AbortIO((struct IORequest *)conwritereq);
-				WaitIO((struct IORequest *)conwritereq);
-			}
-			if(!CheckIO((struct IORequest *)serwritereq)) {
-				AbortIO((struct IORequest *)serwritereq);
-				WaitIO((struct IORequest *)serwritereq);
-			}
-			cleanup(OK,"");
-		}
-		if(signals & nikomnodesig) {
-			while(nikmess = (struct NiKMess *) GetMsg(nikomnodeport)) {
-				handleservermess(nikmess);
-				ReplyMsg((struct Message *)nikmess);
-			}
-			if(carrierdropped()) aborted = TRUE;
-		}
-	}
+  while(console || serial) {
+    signals = Wait(conwritesig | conreadsig | windsig | serwritesig
+                   | serreadsig | nikomnodesig);
+    if(signals & conwritesig) {
+      console = 0;
+      if(WaitIO((struct IORequest *)conwritereq)) {
+        printf("Error console\n");
+      }
+    }
+    if((signals & serwritesig) && CheckIO((struct IORequest *)serwritereq)) {
+      serial = 0;
+      if(err=WaitIO((struct IORequest *)serwritereq)) {
+        writesererr(err);
+      }
+    }
+    if((signals & conreadsig) && CheckIO((struct IORequest *)conreadreq)) {
+      if((tecken = congettkn()) == 3) {
+        if(serial) {
+          AbortIO((struct IORequest *)serwritereq);
+          WaitIO((struct IORequest *)serwritereq);
+        }
+        if(console) {
+          AbortIO((struct IORequest *)conwritereq);
+          WaitIO((struct IORequest *)conwritereq);
+        }
+        aborted = TRUE;
+        console = serial = 0;
+        putstring("^C\n\r",-1,0);
+      } else if((tecken==' ' && (Servermem->inne[nodnr].flaggor & MELLANSLAG))
+                || tecken==19) {
+        paused=TRUE;
+      } else if(tecken && typeaheadbuftkn < 50) {
+        typeaheadbuf[typeaheadbuftkn++]=tecken;
+        typeaheadbuf[typeaheadbuftkn]=0;
+      }
+      UpdateInactive();
+    }
+    if((signals & serreadsig) && CheckIO((struct IORequest *)serreadreq)) {
+      if((tecken = sergettkn()) == 3) {
+        if(serial) {
+          AbortIO((struct IORequest *)serwritereq);
+          WaitIO((struct IORequest *)serwritereq);
+        }
+        if(console) {
+          AbortIO((struct IORequest *)conwritereq);
+          WaitIO((struct IORequest *)conwritereq);
+        }
+        aborted = TRUE;
+        console = serial = 0;
+        putstring("^C\n\r",-1,0);
+      } else if((tecken==' ' && (Servermem->inne[nodnr].flaggor & MELLANSLAG))
+                || tecken==19) {
+        paused=TRUE;
+      } else if(tecken && typeaheadbuftkn<50) {
+        typeaheadbuf[typeaheadbuftkn++]=tecken;
+        typeaheadbuf[typeaheadbuftkn]=0;
+      }
+      UpdateInactive();
+      QueryCarrierDropped();
+    }
+    if(signals & windsig) {
+      mymess=(struct IntuiMessage *)GetMsg(NiKwind->UserPort);
+      ReplyMsg((struct Message *)mymess);
+      AbortIO((struct IORequest *)conreadreq);
+      WaitIO((struct IORequest *)conreadreq);
+      AbortIO((struct IORequest *)serreadreq);
+      WaitIO((struct IORequest *)serreadreq);
+      AbortIO((struct IORequest *)inactivereq);
+      WaitIO((struct IORequest *)inactivereq);
+      if(!CheckIO((struct IORequest *)conwritereq)) {
+        AbortIO((struct IORequest *)conwritereq);
+        WaitIO((struct IORequest *)conwritereq);
+      }
+      if(!CheckIO((struct IORequest *)serwritereq)) {
+        AbortIO((struct IORequest *)serwritereq);
+        WaitIO((struct IORequest *)serwritereq);
+      }
+      cleanup(OK,"");
+    }
+    if(signals & nikomnodesig) {
+      while(nikmess = (struct NiKMess *) GetMsg(nikomnodeport)) {
+        handleservermess(nikmess);
+        ReplyMsg((struct Message *)nikmess);
+      }
+    }
+  }
 
-	if(paused && gettekn()==3) {
-		putstring("^C\n\r",-1,0);
-		aborted = TRUE;
-	}
+  if(paused && gettekn()==3) {
+    putstring("^C\n\r",-1,0);
+    aborted = TRUE;
+  }
 
-	return(aborted);
+  return(aborted);
 }
 
 int sendtocon(char *pekare, int size)
@@ -983,7 +1000,6 @@ int sendtocon(char *pekare, int size)
 				handleservermess(nikmess);
 				ReplyMsg((struct Message *)nikmess);
 			}
-			if(carrierdropped()) aborted = TRUE;
 		}
 	}
 	if(paused && gettekn()==3)
@@ -1054,63 +1070,66 @@ int serputtekn(char *pekare,int size)
 		tmppek++;
 	}
 
-	return(aborted);
+	return(aborted || ConnectionLost());
 }
 
-int sendtoser(char *pekare, int size)
-{
-	struct IntuiMessage *mymess;
-	struct NiKMess *nikmess;
-	int aborted = FALSE, paused=FALSE;
-	ULONG signals,serwritesig = 1L << serwriteport->mp_SigBit,
-		serreadsig = 1L << serreadport->mp_SigBit,windsig = 1L << NiKwind->UserPort->mp_SigBit,
-		nikomnodesig = 1L << nikomnodeport->mp_SigBit;
-	char serial = 1, tecken;
+int sendtoser(char *pekare, int size) {
+  struct IntuiMessage *mymess;
+  struct NiKMess *nikmess;
+  int aborted = FALSE, paused=FALSE;
+  ULONG signals,
+    serwritesig = 1L << serwriteport->mp_SigBit,
+    serreadsig = 1L << serreadport->mp_SigBit,
+    windsig = 1L << NiKwind->UserPort->mp_SigBit,
+    nikomnodesig = 1L << nikomnodeport->mp_SigBit;
+  char serial = 1, tecken;
 
-	serwritereq->IOSer.io_Command=CMD_WRITE;
-	serwritereq->IOSer.io_Data=(APTR)pekare;
-	serwritereq->IOSer.io_Length=size;
-	SendIO((struct IORequest *)serwritereq);
-	while(serial)
-	{
-		signals = Wait(serwritesig | serreadsig | windsig | nikomnodesig);
-		if(signals & serwritesig) {
-			serial=0;
-			if(WaitIO((struct IORequest *)serwritereq)) printf("Error serial\n");
-		}
-		if(signals & serreadsig) {
-			if((tecken=sergettkn()) == 3) {
-				if(serial) {
-					AbortIO((struct IORequest *)serwritereq);
-					WaitIO((struct IORequest *)serwritereq);
-				}
-				aborted=TRUE;
-				serial=0;
-				serputstring("^C\n\r",-1,0);
-			} else if((tecken==' ' && (Servermem->inne[nodnr].flaggor & MELLANSLAG)) || tecken==19) paused=TRUE;
-			else if(tecken && typeaheadbuftkn<50) {
-				typeaheadbuf[typeaheadbuftkn++]=tecken;
-				typeaheadbuf[typeaheadbuftkn]=0;
-			}
-		}
-		if(signals & windsig) {
-			mymess=(struct IntuiMessage *)GetMsg(NiKwind->UserPort);
-			ReplyMsg((struct Message *)mymess);
-			cleanup(OK,"");
-		}
-		if(signals & nikomnodesig) {
-			while(nikmess = (struct NiKMess *) GetMsg(nikomnodeport)) {
-				handleservermess(nikmess);
-				ReplyMsg((struct Message *)nikmess);
-			}
-			if(carrierdropped()) aborted = TRUE;
-		}
-	}
-	if(paused && sergettkn()==3)
-	{
-		serputstring("^C\n\r",-1,0);
-		return(TRUE);
-	}
-
-	return(aborted);
+  serwritereq->IOSer.io_Command=CMD_WRITE;
+  serwritereq->IOSer.io_Data=(APTR)pekare;
+  serwritereq->IOSer.io_Length=size;
+  SendIO((struct IORequest *)serwritereq);
+  while(serial) {
+    signals = Wait(serwritesig | serreadsig | windsig | nikomnodesig);
+    if(signals & serwritesig) {
+      serial = 0;
+      if(WaitIO((struct IORequest *)serwritereq)) {
+        printf("Error serial\n");
+      }
+    }
+    if(signals & serreadsig) {
+      if((tecken = sergettkn()) == 3) {
+        if(serial) {
+          AbortIO((struct IORequest *)serwritereq);
+          WaitIO((struct IORequest *)serwritereq);
+        }
+        aborted = TRUE;
+        serial = 0;
+        serputstring("^C\n\r",-1,0);
+      } else if((tecken == ' ' && (Servermem->inne[nodnr].flaggor & MELLANSLAG))
+                || tecken == 19) {
+        paused = TRUE;
+      } else if(tecken && typeaheadbuftkn<50) {
+        typeaheadbuf[typeaheadbuftkn++] = tecken;
+        typeaheadbuf[typeaheadbuftkn] = 0;
+      }
+      UpdateInactive();
+      QueryCarrierDropped();
+    }
+    if(signals & windsig) {
+      mymess=(struct IntuiMessage *)GetMsg(NiKwind->UserPort);
+      ReplyMsg((struct Message *)mymess);
+      cleanup(OK,"");
+    }
+    if(signals & nikomnodesig) {
+      while(nikmess = (struct NiKMess *) GetMsg(nikomnodeport)) {
+        handleservermess(nikmess);
+        ReplyMsg((struct Message *)nikmess);
+      }
+    }
+  }
+  if(paused && sergettkn()==3) {
+    serputstring("^C\n\r",-1,0);
+    return(TRUE);
+  }
+  return(aborted);
 }

@@ -13,3 +13,14 @@ struct ShortUser *FindShortUser(int userId) {
   }
   return NULL;
 }
+
+struct UserGroup *FindUserGroup(int groupId) {
+  struct UserGroup *ug;
+
+  ITER_EL(ug, Servermem->grupp_list, grupp_node, struct UserGroup *) {
+    if(ug->nummer == groupId) {
+      return ug;
+    }
+  }
+  return NULL;
+}
