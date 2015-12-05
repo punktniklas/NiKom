@@ -1,33 +1,30 @@
-del NiKomBinDistr.lha
+; Make 68020 binaries
+
+delete NiKomBinDistr.lha
 
 cd UtilLib
 smake clean
 smake
-cd /
 
-cd NiKomLib
+cd /NiKomLib
 smake clean
 smake
-cd /
 
-cd InitNiKom
+cd /InitNiKom
 smake clean
 smake
-cd /
 
-cd PreNode
+cd /PreNode
 smake clean
 smake
-cd /
 
-cd Server
+cd /Server
 smake clean
 smake
-cd /
 
-cd Nodes
+cd /Nodes
 smake clean
 smake
-cd /
 
+cd /
 lha a NiKomBinDistr.lha NiKomLib/NoDebug/68020/#? InitNiKom/InitNiKom PreNode/NoDebug/68020/#? Server/NoDebug/68020/#? Nodes/NoDebug/68020/#?
