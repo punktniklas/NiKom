@@ -1,7 +1,16 @@
 
 
-NiKom är ett KOM-system som när man väl lärt sig det är klart mycket
-smidigare att använda än meny-baserade system typ Paragon.
+NiKom är ett KOM-system som huvudsakligen styrs genom att ge olika
+kommandon. Dessa kommandon kan bestå antingen av ett eller två ord. För
+att få upp en lista på alla kommandon så ger man kommandot
+'LISTA KOMMANDON'
+
+Alla kommandon går att förkorta till sin minsta unika del. Så stället för
+att skriva 'LISTA KOMMANDON' så hade det gått alldeles utmärkt med 'LI KO'.
+Om det man skriver passar in på flera kommadon så kommer en lista upp på de
+kommandon man kunde ha menat.
+
+
 
 Alla diskussioner sker i något som kallas för möten. Det finns flera olika
 möten för olika intressen. För att få upp en lista på alla möten så ger man

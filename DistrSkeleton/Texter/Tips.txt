@@ -5,7 +5,7 @@ texter mellan möten om tex om diskussionen spårar ur. Man ger då kommandot
 '!flytta <mötesnamn>' i radeditorn. (Qtrl-Q, Flytta <möte> i
 fullskärmseditorn. Kommentarslänkningen behålls dock fortfarande och man
 får läsa kommentarer även om de är flyttade förutsatt att man är medlem i
-det mötet som texten är flyttad till. UTNYTTJA DETTA!!
+det mötet som texten är flyttad till.
 
 Om man vill kan man pausa utskriften med mellanslag, för att kunna göra
 detta ska man slå på flaggan 'Mellanslag som paustangent'. Man kan dock

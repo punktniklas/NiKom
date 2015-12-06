@@ -4,7 +4,6 @@ Följande info-filer finns:
 
 Tips             - En del tips över finesser som gör livet lättare
 Fullskärmseditor - Text om fullskärmseditorn.
-Changes          - Ändringar i olika versioner av NiKom
 ----------------------------------------------------------------------------
                 Följande texter kommer fram när
 2fel            -  man har skrivit två fel i rad

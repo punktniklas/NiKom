@@ -51,6 +51,18 @@ Det krävs även att det finns en katalog i Ram: som heter NiKom. Se
 till att denna skapas varje gång datorn startas.
 
 
+Körbara filer
+-------------
+I katalogen "bin" ligger de körbara filer som ett NiKom-system
+huvidsakligen använder. Dessa finns i två varianter för olika
+CPU:er och ligger i två olika underkataloger, 68000 och 68020.
+Om du har en 68020 eller bättre rekomenderas 68020-versionerna.
+Annars måste du använda 68000-versionerna. Du vill förmodligen
+kopiera de versioner du vill använda till roten av bin-katalogen.
+(Om inte måste du uppdatera NodeTypes.cfg, se nedan.) Den version
+du inte använder kan du radera från din installation.
+
+
 Externa program och bibliotek
 -----------------------------
 

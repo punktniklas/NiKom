@@ -1,6 +1,6 @@
 
 
-Följande kommandon finns att tillgå i editorn:
+Följande kommandon finns att tillgå i radeditorn:
 
 !radera <radnr>      Raderar den angivna raden
 !infoga <radnr>      Infogar en rad före den angivna raden

@@ -5,85 +5,85 @@ som behövs för att utföra kommandot.
 
 Kommandon i mötessystemet:
 --------------------------
-Addera Rättigheter     (4) - Adderar rättigheter till ett slutet möte
-Brev                   (1) - Skickar ett personligt brev
-Endast                 (1) - Minskar/ökar antalet olästa texter i ett möte
-Flytta Text            (2) - Flyttar en text till ett annat möte
-Gå                     (1) - Går till ett annat möte
-Hoppa Över             (1) - Hoppar över kommentarer till en text
-Igen                   (1) - Visar den senast lästa texten igen
-Inlägg                 (2) - Skriver ett nytt inlägg
-Kommentera             (2) - Kommenterar den senast lästa texten
-Lista Medlemmar        (1) - Listar alla medlemmar i ett möte
-Lista Möten            (1) - Listar alla möten
-Lista Nyheter          (1) - Visar i vilka möten det finns olästa texter
-Lista Rättigheter      (1) - Listar vilka som får vara med i ett slutet möte
-Lista Ärende           (1) - Listar texterna i ett möte
-Läsa                   (1) - Läser en text
-Markera Text           (2) - Markerar en text för senare läsning
-Medlem                 (2) - Gör användaren till medlem i ett möte
-Nästa Kommentar        (1) - Läser nästa kommantar
-Nästa Möte             (1) - Går till nästa möte med olästa texter
-Nästa Text             (1) - Läser nästa text
-Personlig              (2) - Skickar en kommentar som ett brev
-Radera Brev            (1) - Raderar ett brev
-Radera Möte            (4) - Raderar ett möte
-Radera Text            (1) - Raderar en text
-Skapa Möte             (4) - Skapar ett nytt möte
-Skriv                  (2) - Skriver en ny text
-Subtrahera Rättigheter (4) - Subtraherar rättigheter i ett slutet möte
-Utträd                 (2) - Går ur ett möte
-Var                    (1) - Visar vilket möte man befinner sig i
-Visa Markerade         (2) - Visar texter markerade med 'Markera Text'
-Återse Kommentar       (1) - Visar texten som senaste texten är kommentar till
-Ändra Möte             (4) - Ändrar uppgifter om ett möte
+Addera Rättigheter     - Adderar rättigheter till ett slutet möte
+Brev                   - Skickar ett personligt brev
+Endast                 - Minskar/ökar antalet olästa texter i ett möte
+Flytta Text            - Flyttar en text till ett annat möte
+Gå                     - Går till ett annat möte
+Hoppa Över             - Hoppar över kommentarer till en text
+Igen                   - Visar den senast lästa texten igen
+Inlägg                 - Skriver ett nytt inlägg
+Kommentera             - Kommenterar den senast lästa texten
+Lista Medlemmar        - Listar alla medlemmar i ett möte
+Lista Möten            - Listar alla möten
+Lista Nyheter          - Visar i vilka möten det finns olästa texter
+Lista Rättigheter      - Listar vilka som får vara med i ett slutet möte
+Lista Ärende           - Listar texterna i ett möte
+Läsa                   - Läser en text
+Markera Text           - Markerar en text för senare läsning
+Medlem                 - Gör användaren till medlem i ett möte
+Nästa Kommentar        - Läser nästa kommantar
+Nästa Möte             - Går till nästa möte med olästa texter
+Nästa Text             - Läser nästa text
+Personlig              - Skickar en kommentar som ett brev
+Radera Brev            - Raderar ett brev
+Radera Möte            - Raderar ett möte
+Radera Text            - Raderar en text
+Skapa Möte             - Skapar ett nytt möte
+Skriv                  - Skriver en ny text
+Subtrahera Rättigheter - Subtraherar rättigheter i ett slutet möte
+Utträd                 - Går ur ett möte
+Var                    - Visar vilket möte man befinner sig i
+Visa Markerade         - Visar texter markerade med 'Markera Text'
+Återse Kommentar       - Visar texten som senaste texten är kommentar till
+Ändra Möte             - Ändrar uppgifter om ett möte
 
 
 Filkommandon
 ------------
-Areor                  (2) - Listar alla filareor
-Byt Area               (2) - Byter aktuell area
-Download               (3) - Laddar ner en fil från filarean
-Filer                  (2) - Listar alla filer i aktuell area
-Filstatus              (2) - Visar detaljerad information om en fil
-Ladda Ner              (3) - Laddar ner en fil från filarean
-Ladda Upp              (3) - Laddar upp en fil till filarean
-Lista Areor            (2) - Listar alla filareor
-Lista Filer            (2) - Listar alla filer i aktuell area
-Lista Nycklar          (2) - Listar alla söknycklar
-Lista Privatfiler      (2) - Listar alla filer i den privata filarean
-Nya Filer              (2) - Listar alla nya filer sedan förra inloggningen
-Privat Download        (2) - Laddar ner en fil från den privata filarean
-Privat Upload          (2) - Laddar upp en fil till en privat filarea
-Radera Fil             (2) - Raderar en fil ur filarean
-Radera Privatfil       (2) - Raderar en fil ur den privata filarean
-Sök                    (2) - Söker efter filer med angett attribut
-Upload                 (3) - Laddar upp en fil till filarean
-Ändra Fil              (2) - Ändrar uppgifter om en fil
+Areor                  - Listar alla filareor
+Byt Area               - Byter aktuell area
+Download               - Laddar ner en fil från filarean
+Filer                  - Listar alla filer i aktuell area
+Filstatus              - Visar detaljerad information om en fil
+Ladda Ner              - Laddar ner en fil från filarean
+Ladda Upp              - Laddar upp en fil till filarean
+Lista Areor            - Listar alla filareor
+Lista Filer            - Listar alla filer i aktuell area
+Lista Nycklar          - Listar alla söknycklar
+Lista Privatfiler      - Listar alla filer i den privata filarean
+Nya Filer              - Listar alla nya filer sedan förra inloggningen
+Privat Download        - Laddar ner en fil från den privata filarean
+Privat Upload          - Laddar upp en fil till en privat filarea
+Radera Fil             - Raderar en fil ur filarean
+Radera Privatfil       - Raderar en fil ur den privata filarean
+Sök                    - Söker efter filer med angett attribut
+Upload                 - Laddar upp en fil till filarean
+Ändra Fil              - Ändrar uppgifter om en fil
 
 Övriga kommandon:
 -----------------
-?                      (1) - Visar en hjälptext
-Exekvera Profile       (2) - Kör den personliga profilen
-Hjälp                  (1) - Visar en hjälptext
-Info                   (1) - Ger information om olika saker
-Lista Användare        (1) - Listar alla registrerade användare
-Lista Flaggor          (1) - Listar alla personliga flaggor
-Lista Kommandon        (1) - Listar alla kommandon
-Lista Senaste          (1) - Listar de senast inloggade
-Logout                 (0) - Loggar ut ur basen och kopplar ned modemet
-Manual                 (1) - Visar detaljerad information om ett kommando
-Radera Lapp            (2) - Raderar den personliga lappen
-Ropa                   (1) - Ropar på sysop för ett samtal
-Sluta                  (0) - Loggar ut ur basen och kopplar ned modemet
-Slå Av                 (1) - Slår av en personlig flagga
-Slå På                 (1) - Slår på en personlig flagga
-Status                 (1) - Visar detaljerad information om en användare
-SysInfo                (3) - Ger information om systemet
-Säg                    (2) - Skickar ett meddelande till en annan nod
-Tiden                  (1) - Visar datum, klockslag och återstående tid
-Vilka                  (2) - Visar vilka som är inloggade på olika noder
-Visa Profile           (2) - Visar den personliga profilen
-Ändra Användare        (1) - Ändrar uppgifter om en användare
-Ändra Lapp             (2) - Ändrar den personliga lappen
-Ändra Profile          (2) - Ändrar den personliga profilen
+?                      - Visar en hjälptext
+Exekvera Profile       - Kör den personliga profilen
+Hjälp                  - Visar en hjälptext
+Info                   - Ger information om olika saker
+Lista Användare        - Listar alla registrerade användare
+Lista Flaggor          - Listar alla personliga flaggor
+Lista Kommandon        - Listar alla kommandon
+Lista Senaste          - Listar de senast inloggade
+Logout                 - Loggar ut ur basen och kopplar ned modemet
+Manual                 - Visar detaljerad information om ett kommando
+Radera Lapp            - Raderar den personliga lappen
+Ropa                   - Ropar på sysop för ett samtal
+Sluta                  - Loggar ut ur basen och kopplar ned modemet
+Slå Av                 - Slår av en personlig flagga
+Slå På                 - Slår på en personlig flagga
+Status                 - Visar detaljerad information om en användare
+SysInfo                - Ger information om systemet
+Säg                    - Skickar ett meddelande till en annan nod
+Tiden                  - Visar datum, klockslag och återstående tid
+Vilka                  - Visar vilka som är inloggade på olika noder
+Visa Profile           - Visar den personliga profilen
+Ändra Användare        - Ändrar uppgifter om en användare
+Ändra Lapp             - Ändrar den personliga lappen
+Ändra Profile          - Ändrar den personliga profilen
