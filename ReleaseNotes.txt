@@ -1,5 +1,5 @@
 ---------------------------------------------------------------------------
-                         NiKom v2.0.0, 201x-yy-zz
+                         NiKom v2.0.0, 2015-12-06
 ---------------------------------------------------------------------------
 - The handling of texts in conferences and how the system remembers what
   texts that are read vs unread for each user has been completely reworked.
