@@ -1,8 +1,23 @@
-; Build complete distribution
-; Builds 68000 and 68020 versions
+.KEY mode
+.DEF mode "dev"
+
+IF <mode> EQ "dev"
+   SET DESTFILE "NiKomDev.lha"
+ELSE
+IF <mode> EQ "bin"
+   SET DESTFILE "NiKomBin.lha"
+ELSE
+IF <mode> EQ "full"
+   SET DESTFILE "NiKomFull.lha"
+ELSE
+   Echo "Usage: buildall [dev|bin|full]"
+   QUIT
+ENDIF
+ENDIF
+ENDIF
 
 Failat 20
-Delete Ram:NiKomFull.lha NiKomFull.lha
+Delete Ram:$DESTFILE $DESTFILE
 Delete Ram:NiKomDistr all
 
 ; Make the script abort if anything goes wrong during compilation
@@ -11,13 +26,19 @@ Failat 1
 ; Create temporary directories in Ram:
 MakeDir Ram:NiKomDistr
 MakeDir Ram:NiKomDistr/libs
-MakeDir Ram:NiKomDistr/libs/68000
 MakeDir Ram:NiKomDistr/libs/68020
 MakeDir Ram:NiKomDistr/bin
-MakeDir Ram:NiKomDistr/bin/68000
 MakeDir Ram:NiKomDistr/bin/68020
-MakeDir Ram:NiKomDistr/Tools
 
+IF NOT <mode> EQ "dev"
+   MakeDir Ram:NiKomDistr/libs/68000
+   MakeDir Ram:NiKomDistr/bin/68000
+   MakeDir Ram:NiKomDistr/Tools
+ENDIF
+
+
+
+IF NOT <mode> EQ "dev"
 ; Start of 68000 build
 
 cd UtilLib
@@ -51,6 +72,8 @@ Copy PreNode/NoDebug/68000/PreNode Ram:NiKomDistr/bin/68000/
 Copy Server/NoDebug/68000/NiKServer Ram:NiKomDistr/bin/68000/
 Copy Nodes/NoDebug/68000/NiKomCon Ram:NiKomDistr/bin/68000/
 Copy Nodes/NoDebug/68000/NiKomSer Ram:NiKomDistr/bin/68000/
+
+ENDIF
 
 ; Start of 68020-build
 
@@ -86,6 +109,8 @@ Copy Server/NoDebug/68020/NiKServer Ram:NiKomDistr/bin/68020/
 Copy Nodes/NoDebug/68020/NiKomCon Ram:NiKomDistr/bin/68020/
 Copy Nodes/NoDebug/68020/NiKomSer Ram:NiKomDistr/bin/68020/
 
+
+IF NOT <mode> EQ "dev"
 ; Start of Tools build
 
 cd Tools/CryptPasswords
@@ -104,19 +129,25 @@ cd //
 Copy Tools/CryptPasswords/CryptPasswords Ram:NiKomDistr/Tools/
 Copy Tools/SetNodeState/SetNodeState Ram:NiKomDistr/Tools
 Copy Tools/NiKomFido/NiKomFido Ram:NiKomDistr/Tools/
+ENDIF
 
-Copy DistrSkeleton/#? Ram:NiKomDistr/ all
-Copy ReleaseNotes.txt Ram:NiKomDistr/
-Copy LICENSE.txt Ram:NiKomDistr/
+
+IF <mode> EQ "full"
+   Copy DistrSkeleton/#? Ram:NiKomDistr/ all
+ENDIF
+IF NOT <mode> EQ "dev"
+   Copy ReleaseNotes.txt Ram:NiKomDistr/
+   Copy LICENSE.txt Ram:NiKomDistr/
+ENDIF
 
 ; Store current working directory in $NIKDIR
 Set NIKDIR `cd`
 cd Ram:NiKomDistr
-lha a -r Ram:NiKomFull.lha #?
-Copy Ram:NiKomFull.lha "$NIKDIR"
+lha a -r Ram:$DESTFILE #?
+Copy Ram:$DESTFILE "$NIKDIR"
 cd "$NIKDIR"
 UnSet NIKDIR
-Delete Ram:NiKomFull.lha
+Delete Ram:$DESTFILE
 Delete Ram:NiKomDistr all
 
 Echo "Build complete!"
