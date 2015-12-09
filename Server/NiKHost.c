@@ -16,6 +16,7 @@
 #include "NiKomLib.h"
 #include "Config.h"
 #include "RexxUtils.h"
+#include "StringUtils.h"
 
 extern struct System *Servermem;
 
@@ -772,8 +773,8 @@ char *skri;
 		if(matchar(skri2,faci))
 		{
 			while(going2) {
-				skri2=hittaefter(skri2);
-				faci=hittaefter(faci);
+				skri2=FindNextWord(skri2);
+				faci=FindNextWord(faci);
 				if(skri2[0]==0)
 				{
 					found=letpek->nummer;
@@ -782,7 +783,7 @@ char *skri;
 				else if(faci[0]==0) going2=FALSE;
 				else if(!matchar(skri2,faci))
 				{
-					faci=hittaefter(faci);
+					faci=FindNextWord(faci);
 					if(faci[0]==0 || !matchar(skri2,faci)) going2=FALSE;
 				}
 			}
@@ -809,18 +810,6 @@ char *skrivet,*facit;
 	return(mat);
 }
 
-char *hittaefter(strang)
-char *strang;
-{
-	int test=TRUE;
-	while(test) {
-		test=FALSE;
-		while(*(++strang)!=' ' && *strang!=0);
-		if(*(strang+1)==' ') test=TRUE;
-	}
-	return(*strang==0 ? strang : ++strang);
-}
-
 int parse(char *skri) {
 	int nummer=0,argtyp;
 	char *arg2,*ord2;
@@ -830,13 +819,13 @@ int parse(char *skri) {
 		/* argument=skri; */
 		return(212);
 	}
-	arg2=hittaefter(skri);
+	arg2=FindNextWord(skri);
 	if(isdigit(arg2[0])) argtyp=KOMARGNUM;
 	else if(!arg2[0]) argtyp=KOMARGINGET;
 	else argtyp=KOMARGCHAR;
 	for(kompek=(struct Kommando *)Servermem->kom_list.mlh_Head;kompek->kom_node.mln_Succ;kompek=(struct Kommando *)kompek->kom_node.mln_Succ) {
 		if(matchar(skri,kompek->namn)) {
-			ord2=hittaefter(kompek->namn);
+			ord2=FindNextWord(kompek->namn);
 			if((kompek->antal_ord==2 && matchar(arg2,ord2) && arg2[0]) || kompek->antal_ord==1) {
 				if(kompek->antal_ord==1) {
 					if(kompek->argument==KOMARGNUM && argtyp==KOMARGCHAR) continue;
@@ -869,12 +858,12 @@ int parsemot(char *skri) {
 		going2=TRUE;
 		if(matchar(skri2,faci)) {
 			while(going2) {
-				skri2=hittaefter(skri2);
-				faci=hittaefter(faci);
+				skri2=FindNextWord(skri2);
+				faci=FindNextWord(faci);
 				if(skri2[0]==0) return((int)motpek->nummer);
 				else if(faci[0]==0) going2=FALSE;
 				else if(!matchar(skri2,faci)) {
-					faci=hittaefter(faci);
+					faci=FindNextWord(faci);
 					if(faci[0]==0 || !matchar(skri2,faci)) going2=FALSE;
 				}
 			}
@@ -899,15 +888,15 @@ char *skri;
 		going2=TRUE;
 		if(matchar(skri2,faci)) {
 			while(going2) {
-				skri2=hittaefter(skri2);
-				faci=hittaefter(faci);
+				skri2=FindNextWord(skri2);
+				faci=FindNextWord(faci);
 				if(skri2[0]==0) {
 					found=count;
 					going2=going=FALSE;
 				}
 				else if(faci[0]==0) going2=FALSE;
 				else if(!matchar(skri2,faci)) {
-					faci=hittaefter(faci);
+					faci=FindNextWord(faci);
 					if(faci[0]==0 || !matchar(skri2,faci)) going2=FALSE;
 				}
 			}
@@ -933,15 +922,15 @@ char *skri;
 		going2=TRUE;
 		if(matchar(skri2,faci)) {
 			while(going2) {
-				skri2=hittaefter(skri2);
-				faci=hittaefter(faci);
+				skri2=FindNextWord(skri2);
+				faci=FindNextWord(faci);
 				if(skri2[0]==0) {
 					found=count;
 					going2=going=FALSE;
 				}
 				else if(faci[0]==0) going2=FALSE;
 				else if(!matchar(skri2,faci)) {
-					faci=hittaefter(faci);
+					faci=FindNextWord(faci);
 					if(faci[0]==0 || !matchar(skri2,faci)) going2=FALSE;
 				}
 			}

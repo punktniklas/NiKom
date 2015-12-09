@@ -8,6 +8,7 @@
 #include "NiKomStr.h"
 #include "Shutdown.h"
 #include "Startup.h"
+#include "StringUtils.h"
 
 #include "Config.h"
 
@@ -15,7 +16,6 @@
 
  // TODO: Remove need for these prototypes
 int parsegrupp(char *skri);
-char *hittaefter(char *);
 
 int InitLegacyConversionData(void) {
   BPTR file;
@@ -481,10 +481,10 @@ void ReadNodeTypesConfig(void) {
 		if(!strncmp(buffer,"NODETYPE",6)) {
 			for(x=0;x<MAXNODETYPES;x++) if(!Servermem->nodetypes[x].nummer) break;
 			if(x<MAXNODETYPES) {
-				foo1=hittaefter(buffer);
+				foo1 = FindNextWord(buffer);
 				Servermem->nodetypes[x].nummer = atoi(foo1);
-				foo1=hittaefter(foo1);
-				foo2=hittaefter(foo1);
+				foo1 = FindNextWord(foo1);
+				foo2 = FindNextWord(foo1);
 				for(y=-1; foo2[y]==' ' && &foo2[y] > foo1; y--) foo2[y]=0;
 				strcpy(Servermem->nodetypes[x].path,foo1);
 				strcpy(Servermem->nodetypes[x].desc,foo2);
@@ -543,26 +543,26 @@ void ReadFidoConfig(void) {
 		if(!strncmp(buffer,"DOMAIN",6)) {
 			for(x=0;x<10;x++) if(!Servermem->fidodata.fd[x].domain[0]) break;
 			if(x<10) {
-				foo1=hittaefter(buffer);
+				foo1=FindNextWord(buffer);
 				Servermem->fidodata.fd[x].nummer = atoi(foo1);
-				foo1=hittaefter(foo1);
-				foo2=hittaefter(foo1);
+				foo1=FindNextWord(foo1);
+				foo2=FindNextWord(foo1);
 				foo2[-1]=0;
 				strncpy(Servermem->fidodata.fd[x].domain,foo1,19);
 				Servermem->fidodata.fd[x].zone=getzone(foo2);
 				Servermem->fidodata.fd[x].net=getnet(foo2);
 				Servermem->fidodata.fd[x].node=getnode(foo2);
 				Servermem->fidodata.fd[x].point=getpoint(foo2);
-				foo1=hittaefter(foo2);
+				foo1=FindNextWord(foo2);
 				strncpy(Servermem->fidodata.fd[x].zones,foo1,49);
 			}
 		}
 		else if(!strncmp(buffer,"ALIAS",5)) {
 			for(x=0;x<20;x++) if(!Servermem->fidodata.fa[x].namn[0]) break;
 			if(x<20) {
-				foo1=hittaefter(buffer);
+				foo1=FindNextWord(buffer);
 				Servermem->fidodata.fa[x].nummer = atoi(foo1);
-				foo1=hittaefter(foo1);
+				foo1=FindNextWord(foo1);
 				strncpy(Servermem->fidodata.fa[x].namn,foo1,35);
 			}
 		}

@@ -1,0 +1,1 @@
+char *FindNextWord(char *str);
