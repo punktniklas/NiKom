@@ -41,12 +41,6 @@ void freeshortusermem(void) {
 	}
 }
 
-void freeloginmem(void) {
-	struct SpecialLogin *pek;
-	while(pek=(struct SpecialLogin *)RemHead((struct List *)&Servermem->special_login))
-		FreeMem(pek,sizeof(struct SpecialLogin));
-}
-
 void freegroupmem(void) {
 	struct UserGroup *pekare;
 	while(Servermem->grupp_list.mlh_Head->mln_Succ) {
@@ -73,7 +67,6 @@ void cleanup(int exitCode,char *errorMsg) {
     FreeCommandMem();
     freemotmem();
     freeshortusermem();
-    freeloginmem();
     if(Servermem->confTexts.texts != NULL) {
       FreeMem(Servermem->confTexts.texts,
               Servermem->confTexts.arraySize * sizeof(short));

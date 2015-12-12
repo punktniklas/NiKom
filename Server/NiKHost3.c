@@ -70,10 +70,6 @@ void rexxstatusinfo(struct RexxMsg *mess)
 
 	switch(mess->rm_Args[2][0])
 	{
-		case 'i' : case 'I' :
-			sprintf(str,"%d",Servermem->cfg.inaktiv[status]);
-			break;
-
 		case 'r' : case 'R' :
 			sprintf(str,"%d",Servermem->cfg.uldlratio[status]);
 			break;

@@ -5,10 +5,12 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <ctype.h>
 #include "NiKomStr.h"
 #include "Shutdown.h"
 #include "Startup.h"
 #include "StringUtils.h"
+#include "ConfigUtils.h"
 
 #include "Config.h"
 
@@ -16,6 +18,10 @@
 
  // TODO: Remove need for these prototypes
 int parsegrupp(char *skri);
+
+void initSystemConfigDefaults(void);
+int handleSystemConfigStatusSection(char *line, BPTR fh);
+int handleSystemConfigLine(char *line, BPTR fh);
 
 int InitLegacyConversionData(void) {
   BPTR file;
@@ -64,207 +70,260 @@ int getcfgfilestring(char *str,BPTR fh,char *vart) {
 }
 
 void ReadSystemConfig(void) {
-	BPTR fh;
-	char buffer[100];
-	int status,len;
-	struct SpecialLogin *tempnode;
-	NewList((struct List *)&Servermem->special_login);
-	if(!(fh=Open("NiKom:DatoCfg/System.cfg",MODE_OLDFILE)))
-		cleanup(ERROR,"Kunde inte öppna NiKom:DatoCfg/System.cfg");
-	if(getcfgfilestring("DEFAULTFLAGS",fh,buffer)) {
-		Close(fh);
-		return;
-	} else Servermem->cfg.defaultflags=atoi(buffer);
-	if(getcfgfilestring("DEFAULTSTATUS",fh,buffer)) {
-		Close(fh);
-		return;
-	} else Servermem->cfg.defaultstatus=atoi(buffer);
-	if(getcfgfilestring("DEFAULTRADER",fh,buffer)) {
-		Close(fh);
-		return;
-	} else Servermem->cfg.defaultrader=atoi(buffer);
-	for(;;) {
-		if(!FGets(fh,buffer,99)) {
-			printf("Korrupt fil, hittar inte ENDSTATUS\n");
-			Close(fh);
-			return;
-		}
-		if(!strncmp(buffer,"ENDSTATUS",9)) break;
-		if(!strncmp(buffer,"STATUS",6)) {
-			status=atoi(&buffer[6]);
-			if(status<0 || status>100) {
-				printf("Man kan inte ha %d som status!\n",status);
-				Close(fh);
-				return;
-			}
-			if(getcfgfilestring("MAXTID",fh,buffer)) {
-				Close(fh);
-				return;
-			} else Servermem->cfg.maxtid[status]=atoi(buffer);
-			if(getcfgfilestring("ULDL",fh,buffer)) {
-				Close(fh);
-				return;
-			} else Servermem->cfg.uldlratio[status]=atoi(buffer);
-			if(getcfgfilestring("INAKTIV",fh,buffer)) {
-				Close(fh);
-				return;
-			} else Servermem->cfg.inaktiv[status]=atoi(buffer);
-		}
-	}
-	if(getcfgfilestring("CLOSEDBBS",fh,buffer)) {
-		Close(fh);
-		return;
-	} else {
-		if(!(strncmp(buffer,"JA",2))) Servermem->cfg.cfgflags |= NICFG_CLOSEDBBS;
-		else Servermem->cfg.cfgflags &= ~NICFG_CLOSEDBBS;
-	}
-	if(getcfgfilestring("BREVLÅDA",fh,buffer)) {
-		Close(fh);
-		return;
-	} else {
-		strncpy(Servermem->cfg.brevnamn,buffer,40);
-	}
-	if(getcfgfilestring("NY",fh,buffer)) {
-		Close(fh);
-		return;
-	} else {
-		strncpy(Servermem->cfg.ny,buffer,20);
-	}
-	if(getcfgfilestring("DISKFREE",fh,buffer)) {
-		Close(fh);
-		return;
-	} else Servermem->cfg.diskfree=atoi(buffer);
-	if(getcfgfilestring("ULTMP",fh,buffer)) {
-		Close(fh);
-		return;
-	} else {
-		len=strlen(buffer);
-		if(buffer[len-1]!='/' && buffer[len]!=':') {
-			buffer[len]='/';
-			buffer[len+1]=0;
-		}
-		strncpy(Servermem->cfg.ultmp,buffer,99);
-	}
-	if(getcfgfilestring("PREINLOGG",fh,buffer)) {
-		Close(fh);
-		return;
-	} else Servermem->cfg.ar.preinlogg=atoi(buffer);
-	if(getcfgfilestring("POSTINLOGG",fh,buffer)) {
-		Close(fh);
-		return;
-	} else Servermem->cfg.ar.postinlogg=atoi(buffer);
-	if(getcfgfilestring("UTLOGG",fh,buffer)) {
-		Close(fh);
-		return;
-	} else Servermem->cfg.ar.utlogg=atoi(buffer);
-	if(getcfgfilestring("NYANV",fh,buffer)) {
-		Close(fh);
-		return;
-	} else Servermem->cfg.ar.nyanv=atoi(buffer);
-	if(getcfgfilestring("PREUPLOAD1",fh,buffer)) {
-		Close(fh);
-		return;
-	} else Servermem->cfg.ar.preup1=atoi(buffer);
-	if(getcfgfilestring("PREUPLOAD2",fh,buffer)) {
-		Close(fh);
-		return;
-	} else Servermem->cfg.ar.preup2=atoi(buffer);
-	if(getcfgfilestring("POSTUPLOAD1",fh,buffer)) {
-		Close(fh);
-		return;
-	} else Servermem->cfg.ar.postup1=atoi(buffer);
-	if(getcfgfilestring("POSTUPLOAD2",fh,buffer)) {
-		Close(fh);
-		return;
-	} else Servermem->cfg.ar.postup2=atoi(buffer);
-	if(getcfgfilestring("NORIGHT",fh,buffer)) {
-		Close(fh);
-		return;
-	} else Servermem->cfg.ar.noright=atoi(buffer);
-	if(getcfgfilestring("NEXTMEET",fh,buffer)) {
-		Close(fh);
-		return;
-	} else Servermem->cfg.ar.nextmeet=atoi(buffer);
-	if(getcfgfilestring("NEXTTEXT",fh,buffer)) {
-		Close(fh);
-		return;
-	} else Servermem->cfg.ar.nexttext=atoi(buffer);
-	if(getcfgfilestring("NEXTKOM",fh,buffer)) {
-		Close(fh);
-		return;
-	} else Servermem->cfg.ar.nextkom=atoi(buffer);
-	if(getcfgfilestring("SETID",fh,buffer)) {
-		Close(fh);
-		return;
-	} else Servermem->cfg.ar.setid=atoi(buffer);
-	if(getcfgfilestring("NEXTLETTER",fh,buffer)) {
-		Close(fh);
-		return;
-	} else Servermem->cfg.ar.nextletter=atoi(buffer);
-	if(getcfgfilestring("CARDROPPED",fh,buffer)) {
-		Close(fh);
-		return;
-	} else Servermem->cfg.ar.cardropped=atoi(buffer);
-	for(;;) {
-		if(getcfgfilestring("SPECIALLOGIN",fh,buffer)) {
-			Close(fh);
-			return;
-		}
-		if(!strnicmp(buffer,"END",3)) break;
-		if(!(tempnode=(struct SpecialLogin *)AllocMem(sizeof(struct SpecialLogin),MEMF_PUBLIC|MEMF_CLEAR)))
-			cleanup(ERROR,"Kunde inte allokera en SpecialLogin-struktur\n");
-		tempnode->bokstav=buffer[0];
-		tempnode->rexxprg=atoi(&buffer[1]);
-		AddTail((struct List *)&Servermem->special_login,(struct Node *)tempnode);
-	}
-	if(getcfgfilestring("LOGMASK",fh,buffer)) {
-		Close(fh);
-		return;
-	} else Servermem->cfg.logmask=atoi(buffer);
-	if(getcfgfilestring("SCREEN",fh,buffer)) {
-		Close(fh);
-		return;
-	} else strcpy(pubscreen,buffer);
-	if(getcfgfilestring("YPOS",fh,buffer)) {
-		Close(fh);
-		return;
-	} else ypos=atoi(buffer);
-	if(getcfgfilestring("XPOS",fh,buffer)) {
-		Close(fh);
-		return;
-	} else xpos=atoi(buffer);
-	if(getcfgfilestring("VALIDERAFILER",fh,buffer)) {
-		Close(fh);
-		return;
-	} else {
-		if(buffer[0]=='J' || buffer[0]=='j') Servermem->cfg.cfgflags |= NICFG_VALIDATEFILES;
-		else Servermem->cfg.cfgflags &= ~NICFG_VALIDATEFILES;
-	}
-	if(getcfgfilestring("LOGINTRIES",fh,buffer)) {
-		Close(fh);
-		return;
-	} else Servermem->cfg.logintries=atoi(buffer);
-	if(getcfgfilestring("LOCALCOLOURS",fh,buffer)) {
-		Close(fh);
-		return;
-	} else {
-		if(buffer[0]=='J' || buffer[0]=='j') Servermem->cfg.cfgflags |= NICFG_LOCALCOLOURS;
-		else Servermem->cfg.cfgflags &= ~NICFG_LOCALCOLOURS;
-	}
+  BPTR fh;
+  char buffer[200];
 
-	if(getcfgfilestring("CRYPTEDPASSWORDS",fh,buffer)) {
-		Close(fh);
-		return;
-	} else {
-		if(buffer[0]=='J' || buffer[0]=='j') Servermem->cfg.cfgflags |= NICFG_CRYPTEDPASSWORDS;
-		else Servermem->cfg.cfgflags &= ~NICFG_CRYPTEDPASSWORDS;
-	}
-	if(getcfgfilestring("NEWUSERCHARSET", fh, buffer)) {
-          Close(fh);
-          return;
-	} else Servermem->cfg.defaultcharset = atoi(buffer);
-	Close(fh);
-	printf("System.cfg inläst\n");
+  printf("Reading System.cfg\n");
+  initSystemConfigDefaults();
+
+  if(!(fh = Open("NiKom:DatoCfg/System.cfg", MODE_OLDFILE)))
+    cleanup(ERROR, "Could not open NiKom:DatoCfg/System.cfg");
+
+  for(;;) {
+    if(!FGets(fh, buffer, 199)) {
+      Close(fh);
+      return;
+    }
+    if(buffer[0] == '#' || buffer[0] == '*' || buffer[0] == '\n') {
+      continue;
+    }
+    if(!handleSystemConfigLine(buffer, fh)) {
+      Close(fh);
+      cleanup(ERROR, "Invalid System.cfg");
+    }
+  }
+}
+
+void initSystemConfigDefaults() {
+  int i;
+  Servermem->cfg.defaultflags = 433;
+  Servermem->cfg.defaultstatus = 0;
+  Servermem->cfg.defaultrader = 25;
+  for(i = 0; i <= 100; i++) {
+    Servermem->cfg.maxtid[i] = 0;
+    Servermem->cfg.uldlratio[i] = 0;
+  }
+  Servermem->cfg.cfgflags = NICFG_VALIDATEFILES | NICFG_CRYPTEDPASSWORDS;
+  strcpy(Servermem->cfg.brevnamn, "Brevlådan");
+  strcpy(Servermem->cfg.ny, "NY");
+  Servermem->cfg.diskfree = 100000;
+  strcpy(Servermem->cfg.ultmp, "T:");
+  Servermem->cfg.ar.preinlogg = 0;
+  Servermem->cfg.ar.postinlogg = 1;
+  Servermem->cfg.ar.utlogg = 0;
+  Servermem->cfg.ar.nyanv = 0;
+  Servermem->cfg.ar.preup1 = 0;
+  Servermem->cfg.ar.preup2 = 0;
+  Servermem->cfg.ar.postup1 = 0;
+  Servermem->cfg.ar.postup2 = 0;
+  Servermem->cfg.ar.noright = 0;
+  Servermem->cfg.ar.nextmeet = 0;
+  Servermem->cfg.ar.nexttext = 0;
+  Servermem->cfg.ar.nextkom = 0;
+  Servermem->cfg.ar.setid = 0;
+  Servermem->cfg.ar.nextletter = 0;
+  Servermem->cfg.ar.cardropped = 0;
+  Servermem->cfg.logmask = 4095;
+  strcpy(pubscreen, "-");
+  xpos = 50;
+  ypos = 50;
+  Servermem->cfg.logintries = 5;
+  Servermem->cfg.defaultcharset = 1;
+}
+
+int handleSystemConfigStatusSection(char *line, BPTR fh) {
+  int status;
+  char buffer[100];
+
+  for(;;) {
+    if(!isdigit(line[6])) {
+      printf("Invalid config line, no digit after 'STATUS': %s\n", line);
+      return 0;
+    }
+    status = atoi(&line[6]);
+    if(status < 0 || status > 100) {
+      printf("Invalid config file, %d is not a valid status level: %s\n",
+             status, line);
+      return 0;
+    }
+    for(;;) {
+      if((line = FGets(fh, buffer, 99)) == NULL) {
+        printf("Invalid config file, 'ENDSTATUS' not found.\n");
+        return 0;
+      }
+      if(line[0] == '#' || line[0] == '*' || line[0] == '\n') {
+        continue;
+      }
+      if(StartsWith(line, "ENDSTATUS")) {
+        return 1;
+      } else if(StartsWith(line, "MAXTID") || StartsWith(line, "MAXTIME")) {
+        if(!GetShortCfgValue(line, &Servermem->cfg.maxtid[status])) {
+          return 0;
+        }
+      } else if(StartsWith(line, "ULDL")) {
+        if(!GetCharCfgValue(line, &Servermem->cfg.uldlratio[status])) {
+          return 0;
+        }
+      } else if(StartsWith(line, "STATUS")) {
+        break;
+      } else {
+        printf("Invalid config line in status section: %s\n", line);
+        return 0;
+      }
+    }
+  }
+}
+
+int handleSystemConfigLine(char *line, BPTR fh) {
+  int len;
+
+  if(StartsWith(line, "DEFAULTFLAGS")) {
+    if(!GetLongCfgValue(line, &Servermem->cfg.defaultflags)) {
+      return 0;
+    }
+  } else if(StartsWith(line, "DEFAULTSTATUS")) {
+    if(!GetCharCfgValue(line, &Servermem->cfg.defaultstatus)) {
+      return 0;
+    }
+    if(Servermem->cfg.defaultstatus < 0 || Servermem->cfg.defaultstatus > 100) {
+      printf("Invalid value for DEFAULTSTATUS, must be between 0 and 100.\n");
+      return 0;
+    }
+  } else if(StartsWith(line, "DEFAULTRADER") || StartsWith(line, "DEFAULTLINES")) {
+    if(!GetCharCfgValue(line, &Servermem->cfg.defaultrader)) {
+      return 0;
+    }
+  } else if(StartsWith(line, "STATUS")) {
+    if(!handleSystemConfigStatusSection(line, fh)) {
+      return 0;
+    }
+  } else if(StartsWith(line, "CLOSEDBBS")) {
+    if(!GetBoolCfgFlag(line, &Servermem->cfg.cfgflags, NICFG_CLOSEDBBS)) {
+      return 0;
+    }
+  } else if(StartsWith(line, "BREVLÅDA") || StartsWith(line, "MAILBOX")) {
+    if(!GetStringCfgValue(line, Servermem->cfg.brevnamn, 40)) {
+      return 0;
+    }
+  } else if(StartsWith(line, "NY") || StartsWith(line, "NEWUSERLOGIN")) {
+    if(!GetStringCfgValue(line, Servermem->cfg.ny, 20)) {
+      return 0;
+    }
+  } else if(StartsWith(line, "DISKFREE")) {
+    if(!GetLongCfgValue(line, &Servermem->cfg.diskfree)) {
+      return 0;
+    }
+  } else if(StartsWith(line, "ULTMP")) {
+    if(!GetStringCfgValue(line, Servermem->cfg.ultmp, 98)) {
+      return 0;
+    }
+    len = strlen(Servermem->cfg.ultmp);
+    if(Servermem->cfg.ultmp[len - 1] != '/' && Servermem->cfg.ultmp[len - 1] != ':') {
+      Servermem->cfg.ultmp[len] = '/';
+      Servermem->cfg.ultmp[len + 1] = '\0';
+    }
+  } else if(StartsWith(line, "PREINLOGG") || StartsWith(line, "AREXX_PRELOGIN")) {
+    if(!GetLongCfgValue(line, &Servermem->cfg.ar.preinlogg)) {
+      return 0;
+    }
+  } else if(StartsWith(line, "POSTINLOGG") || StartsWith(line, "AREXX_POSTLOGIN")) {
+    if(!GetLongCfgValue(line, &Servermem->cfg.ar.postinlogg)) {
+      return 0;
+    }
+  } else if(StartsWith(line, "UTLOGG") || StartsWith(line, "AREXX_LOGOUT")) {
+    if(!GetLongCfgValue(line, &Servermem->cfg.ar.utlogg)) {
+      return 0;
+    }
+  } else if(StartsWith(line, "NYANV") || StartsWith(line, "AREXX_NEWUSER")) {
+    if(!GetLongCfgValue(line, &Servermem->cfg.ar.nyanv)) {
+      return 0;
+    }
+  } else if(StartsWith(line, "PREUPLOAD1") || StartsWith(line, "AREXX_PREUPLOAD1")) {
+    if(!GetLongCfgValue(line, &Servermem->cfg.ar.preup1)) {
+      return 0;
+    }
+  } else if(StartsWith(line, "PREUPLOAD2") || StartsWith(line, "AREXX_PREUPLOAD2")) {
+    if(!GetLongCfgValue(line, &Servermem->cfg.ar.preup2)) {
+      return 0;
+    }
+  } else if(StartsWith(line, "POSTUPLOAD1") || StartsWith(line, "AREXX_POSTUPLOAD1")) {
+    if(!GetLongCfgValue(line, &Servermem->cfg.ar.postup1)) {
+      return 0;
+    }
+  } else if(StartsWith(line, "POSTUPLOAD2") || StartsWith(line, "AREXX_POSTUPLOAD2")) {
+    if(!GetLongCfgValue(line, &Servermem->cfg.ar.postup2)) {
+      return 0;
+    }
+  } else if(StartsWith(line, "NORIGHT") || StartsWith(line, "AREXX_NOPERMISSION")) {
+    if(!GetLongCfgValue(line, &Servermem->cfg.ar.noright)) {
+      return 0;
+    }
+  } else if(StartsWith(line, "NEXTMEET") || StartsWith(line, "AREXX_NEXTFORUM")) {
+    if(!GetLongCfgValue(line, &Servermem->cfg.ar.nextmeet)) {
+      return 0;
+    }
+  } else if(StartsWith(line, "NEXTTEXT") || StartsWith(line, "AREXX_NEXTTEXT")) {
+    if(!GetLongCfgValue(line, &Servermem->cfg.ar.nexttext)) {
+      return 0;
+    }
+  } else if(StartsWith(line, "NEXTKOM") || StartsWith(line, "AREXX_NEXTREPLY")) {
+    if(!GetLongCfgValue(line, &Servermem->cfg.ar.nextkom)) {
+      return 0;
+    }
+  } else if(StartsWith(line, "SETID") || StartsWith(line, "AREXX_SEETIME")) {
+    if(!GetLongCfgValue(line, &Servermem->cfg.ar.setid)) {
+      return 0;
+    }
+  } else if(StartsWith(line, "NEXTLETTER") || StartsWith(line, "AREXX_NEXTMAIL")) {
+    if(!GetLongCfgValue(line, &Servermem->cfg.ar.nextletter)) {
+      return 0;
+    }
+  } else if(StartsWith(line, "CARDROPPED") || StartsWith(line, "AREXX_AUTOLOGOUT")) {
+    if(!GetLongCfgValue(line, &Servermem->cfg.ar.cardropped)) {
+      return 0;
+    }
+  } else if(StartsWith(line, "LOGMASK")) {
+    if(!GetLongCfgValue(line, &Servermem->cfg.logmask)) {
+      return 0;
+    }
+  } else if(StartsWith(line, "SCREEN")) {
+    if(!GetStringCfgValue(line, pubscreen, 39)) {
+      return 0;
+    }
+  } else if(StartsWith(line, "YPOS") || StartsWith(line, "WIN_YPOS")) {
+    if(!GetLongCfgValue(line, (long *)&ypos)) {
+      return 0;
+    }
+  } else if(StartsWith(line, "XPOS") || StartsWith(line, "WIN_XPOS")) {
+    if(!GetLongCfgValue(line, (long *)&xpos)) {
+      return 0;
+    }
+  } else if(StartsWith(line, "VALIDERAFILER") || StartsWith(line, "UPLOADSNOTVALIDATED")) {
+    if(!GetBoolCfgFlag(line, &Servermem->cfg.cfgflags, NICFG_VALIDATEFILES)) {
+      return 0;
+    }
+  } else if(StartsWith(line, "LOGINTRIES") || StartsWith(line, "LOGINATTEMPTS")) {
+    if(!GetShortCfgValue(line, &Servermem->cfg.logintries)) {
+      return 0;
+    }
+  } else if(StartsWith(line, "LOCALCOLOURS") || StartsWith(line, "LOCALCOLORS")) {
+    if(!GetBoolCfgFlag(line, &Servermem->cfg.cfgflags, NICFG_LOCALCOLOURS)) {
+      return 0;
+    }
+  } else if(StartsWith(line, "CRYPTEDPASSWORDS")
+            || StartsWith(line, "ENCRYPTEDPASSWORDS")) {
+    if(!GetBoolCfgFlag(line, &Servermem->cfg.cfgflags, NICFG_CRYPTEDPASSWORDS)) {
+      return 0;
+    }
+  } else if(StartsWith(line, "NEWUSERCHARSET")) {
+    if(!GetCharCfgValue(line, &Servermem->cfg.defaultcharset)) {
+      return 0;
+    }
+  } else {
+    printf("Invalid config line: %s\n", line);
+    return 0;
+  }
+  return 1;
 }
 
 void ReadCommandConfig(void) {
