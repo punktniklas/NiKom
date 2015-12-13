@@ -170,8 +170,8 @@
 #define PS_NOCONV 1
 
 struct Statuscfg {
-   char skriv,texter,brev,medmoten,radmoten,sestatus,anv,chgstatus,psw,
-      bytarea,radarea,filer,laddaner,editor,crashmail, grupper;
+   char skriv,texter,brev,medmoten,radmoten,sestatus,anv,chgstatus,
+      bytarea,radarea,filer,laddaner,crashmail, grupper;
 };
 
 struct AutoRexxCfg {

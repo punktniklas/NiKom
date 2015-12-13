@@ -11,10 +11,12 @@
 #include "Startup.h"
 #include "StringUtils.h"
 #include "ConfigUtils.h"
+#include "FidoUtils.h"
 
 #include "Config.h"
 
 #define ERROR	     10
+#define WHITESPACE " \t\n\r"
 
  // TODO: Remove need for these prototypes
 int parsegrupp(char *skri);
@@ -22,6 +24,9 @@ int parsegrupp(char *skri);
 void initSystemConfigDefaults(void);
 int handleSystemConfigStatusSection(char *line, BPTR fh);
 int handleSystemConfigLine(char *line, BPTR fh);
+int handleStatusConfigLine(char *line, BPTR fh);
+int handleFidoConfigLine(char *line, BPTR fh);
+int handleCommandConfigLine(char *line, struct Kommando *command);
 
 int InitLegacyConversionData(void) {
   BPTR file;
@@ -54,44 +59,45 @@ int InitLegacyConversionData(void) {
   return putsRes == 0;
 }
 
-int getcfgfilestring(char *str,BPTR fh,char *vart) {
-	char buffer[100];
-	for(;;) {
-		if(!FGets(fh,buffer,99)) {
-			printf("Korrupt fil, hittade inte %s\n",str);
-			return(1);
-		}
-		if(!(strncmp(buffer,str,strlen(str)))) {
-			strcpy(vart,&buffer[strlen(str)+1]);
-			if(vart[strlen(vart)-1]=='\n') vart[strlen(vart)-1]=0;
-			return(0);
-		}
-	}
-}
-
-void ReadSystemConfig(void) {
+void readConfigFile(char *filename, int (*handleLine)(char *, BPTR)) {
   BPTR fh;
-  char buffer[200];
+  char buffer[200], *tmp;
+  int len;
 
-  printf("Reading System.cfg\n");
-  initSystemConfigDefaults();
+  printf("Reading %s\n", filename);
 
-  if(!(fh = Open("NiKom:DatoCfg/System.cfg", MODE_OLDFILE)))
-    cleanup(ERROR, "Could not open NiKom:DatoCfg/System.cfg");
+  if(!(fh = Open(filename, MODE_OLDFILE))) {
+    cleanup(ERROR, "Could not open config file.");
+  }
 
   for(;;) {
     if(!FGets(fh, buffer, 199)) {
       Close(fh);
       return;
     }
-    if(buffer[0] == '#' || buffer[0] == '*' || buffer[0] == '\n') {
+    if(buffer[0] == '#' || buffer[0] == '*') {
       continue;
     }
-    if(!handleSystemConfigLine(buffer, fh)) {
+    if(isspace(buffer[0])) {
+      for(tmp = buffer; *tmp != '\0' && isspace(*tmp); tmp++);
+      if(*tmp == '\0') {
+        continue; // The line is all white space
+      }
+    }
+    len = strlen(buffer);
+    if(buffer[len - 1] == '\n') {
+      buffer[len - 1] = '\0';
+    }
+    if(!handleLine(buffer, fh)) {
       Close(fh);
-      cleanup(ERROR, "Invalid System.cfg");
+      cleanup(ERROR, "Invalid config file.");
     }
   }
+}
+
+void ReadSystemConfig(void) {
+  initSystemConfigDefaults();
+  readConfigFile("NiKom:DatoCfg/System.cfg", handleSystemConfigLine);
 }
 
 void initSystemConfigDefaults() {
@@ -327,108 +333,140 @@ int handleSystemConfigLine(char *line, BPTR fh) {
 }
 
 void ReadCommandConfig(void) {
-	BPTR fh;
-	struct Kommando *allok;
-	char buffer[100],*pekare;
-	int x=0, going=TRUE, grupp, len;
+  BPTR fh;
+  struct Kommando *command = NULL;
+  char buffer[100];
+  int cnt = 0;
+  
+  FreeCommandMem();
+  
+  if(!(fh = Open("NiKom:DatoCfg/Kommandon.cfg", MODE_OLDFILE))) {
+    cleanup(ERROR, "Kunde inte öppna NiKom:DatoCfg/Kommandon.cfg\n");
+  }
 
-        FreeCommandMem();
+  while(FGets(fh, buffer, 100)) {
+    if(buffer[0] == '\n' || buffer[0] == '*') {
+      continue;
+    }
+    if(buffer[0] == 'N') {
+      if(!(command = (struct Kommando *)AllocMem(sizeof(struct Kommando),
+                                                 MEMF_CLEAR | MEMF_PUBLIC))) {
+        Close(fh);
+        cleanup(ERROR, "Out of memory while reading Kommandon.cfg\n");
+      }
+      buffer[32] = '\0';
+      if(!GetStringCfgValue(buffer, command->namn, 30)) {
+        Close(fh);
+        cleanup(ERROR, "Invalid Kommandon.cfg");
+      }
+      AddTail((struct List *)&Servermem->kom_list, (struct Node *)command);
+      cnt++;
+      continue;
+    }
 
-	if(!(fh=Open("NiKom:DatoCfg/Kommandon.cfg",MODE_OLDFILE)))
-		cleanup(ERROR,"Kunde inte öppna NiKom:DatoCfg/Kommandon.cfg\n");
-	buffer[0]=0;
-	while(buffer[0]!='N') {
-		if(!(pekare=FGets(fh,buffer,99))) {
-			if(!IoErr()) {
-				Close(fh);
-				printf("Inga kommandon hittade i Kommandon.cfg\n");
-				return;
-			} else {
-				printf("Error while reading Kommandon.cfg\n");
-				Close(fh);
-				return;
-			}
-		}
-	}
-	len = strlen(buffer);
-	if(buffer[len - 1] == '\n') buffer[len - 1] = 0;
-	if(!(allok=(struct Kommando *)AllocMem(sizeof(struct Kommando),MEMF_CLEAR | MEMF_PUBLIC)))
-		cleanup(ERROR,"Kunde inte allokera minne till en komandostruktur\n");
-	AddTail((struct List *)&Servermem->kom_list,(struct Node *)allok);
-	strncpy(allok->namn,&buffer[2],30);
-	x++;
-	while(going) {
-		if(!(pekare=FGets(fh,buffer,99))) {
-			if(!IoErr()) break;
-			else {
-				printf("Error while reading Kommandon.cfg\n");
-				Close(fh);
-				return;
-			}
-		}
-		len = strlen(buffer);
-		if(buffer[len - 1] == '\n') buffer[len - 1] = 0;
-		switch(buffer[0]) {
-			case '#' :
-				allok->nummer=atoi(&buffer[2]);
-				break;
-			case 'O' :
-				allok->antal_ord=atoi(&buffer[2]);
-				break;
-			case 'A' :
-				if(buffer[2]=='#') allok->argument=KOMARGNUM;
-				else allok->argument=KOMARGCHAR;
-				break;
-			case 'S' :
-				allok->status=atoi(&buffer[2]);
-				break;
-			case 'L' :
-				allok->minlogg=atoi(&buffer[2]);
-				break;
-			case 'D' :
-				allok->mindays=atoi(&buffer[2]);
-				break;
-			case 'X' :
-				strncpy(allok->losen,&buffer[2],19);
-				break;
-			case 'V' :
-				if(buffer[2]=='N' || buffer[2]=='n') allok->secret=TRUE;
-				break;
-			case 'B' :
-				strncpy(allok->beskr,&buffer[2],68);
-				break;
-			case 'W' :
-				strncpy(allok->vilkainfo,&buffer[2],49);
-				break;
-			case 'F' :
-				strncpy(allok->logstr,&buffer[2],49);
-				break;
-			case '(' :
-				allok->before=atoi(&buffer[2]);
-				break;
-			case ')' :
-				allok->after=atoi(&buffer[2]);
-				break;
-			case 'M' :
-				strncpy(allok->menu,&buffer[2],49);
-				break;
-			case 'G' :
-				grupp = parsegrupp(&buffer[2]);
-				if(grupp == -1) printf("I Kommandon.cfg: Okänd grupp %s\n",&buffer[2]);
-				else BAMSET((char *)&allok->grupper,grupp);
-				break;
-			case 'N' :
-				if(!(allok=(struct Kommando *)AllocMem(sizeof(struct Kommando),MEMF_CLEAR | MEMF_PUBLIC)))
-					cleanup(ERROR,"Kunde inte allokera minne till en komandostruktur\n");
-				AddTail((struct List *)&Servermem->kom_list,(struct Node *)allok);
-				strncpy(allok->namn,&buffer[2],30);
-				x++;
-				break;
-		}
-	}
-	printf("Kommandon.cfg inläst (%d kommandon)\n",x);
-	Close(fh);
-	Servermem->info.kommandon=x;
+    if(command == NULL) {
+      printf("Found command detail line before command start (\"N=\"): %s\n", buffer);
+      Close(fh);
+      cleanup(ERROR, "Invalid Kommandon.cfg");
+    }
+    if(!handleCommandConfigLine(buffer, command)) {
+      Close(fh);
+      cleanup(ERROR, "Invalid Kommandon.cfg");
+    }
+  }
+  Close(fh);
+  Servermem->info.kommandon = cnt;
+  printf("Read Kommandon.cfg, %d commands\n", cnt);
+}
+
+int handleCommandConfigLine(char *line, struct Kommando *command) {
+  char tmp[100];
+  int group;
+
+  switch(line[0]) {
+  case '#' :
+    if(!GetLongCfgValue(line, &command->nummer)) {
+      return 0;
+    }
+    break;
+  case 'O' :
+    if(!GetCharCfgValue(line, &command->antal_ord)) {
+      return 0;
+    }
+    break;
+  case 'A' :
+    if(!GetStringCfgValue(line, tmp, 9)) {
+      return 0;
+    }
+    command->argument = tmp[0] == '#' ? KOMARGNUM : KOMARGCHAR;
+    break;
+  case 'S' :
+    if(!GetCharCfgValue(line, &command->status)) {
+      return 0;
+    }
+    break;
+  case 'L' :
+    if(!GetLongCfgValue(line, &command->minlogg)) {
+      return 0;
+    }
+    break;
+  case 'D' :
+    if(!GetLongCfgValue(line, &command->mindays)) {
+      return 0;
+    }
+    break;
+  case 'X' :
+    if(!GetStringCfgValue(line, command->losen, 19)) {
+      return 0;
+    }
+    break;
+  case 'V' :
+    if(!GetStringCfgValue(line, tmp, 9)) {
+      return 0;
+    }
+    command->secret = (tmp[0]=='N' || tmp[0]=='n') ? TRUE : FALSE;
+    break;
+  case 'B' :
+    if(!GetStringCfgValue(line, command->beskr, 69)) {
+      return 0;
+    }
+    break;
+  case 'W' :
+    if(!GetStringCfgValue(line, command->vilkainfo, 49)) {
+      return 0;
+    }
+    break;
+  case 'F' :
+    if(!GetStringCfgValue(line, command->logstr, 49)) {
+      return 0;
+    }
+    break;
+  case '(' :
+    if(!GetLongCfgValue(line, &command->before)) {
+      return 0;
+    }
+    break;
+  case ')' :
+    if(!GetLongCfgValue(line, &command->after)) {
+      return 0;
+    }
+    break;
+  case 'G' :
+    if(!GetStringCfgValue(line, tmp, 99)) {
+      return 0;
+    }
+    group = parsegrupp(tmp);
+    if(group == -1) {
+      printf("Unknown group name: %s\n", tmp);
+      return 0;
+    }
+    BAMSET((char *)&command->grupper, group);
+    break;
+  default:
+    printf("Invalid line: %s\n", line);
+    return 0;
+  }
+  return 1;
 }
 
 void FreeCommandMem(void) {
@@ -439,204 +477,271 @@ void FreeCommandMem(void) {
 }
 
 void ReadFileKeyConfig(void) {
-	BPTR fh;
-	char buffer[100],*pekare;
-	int x=0;
-	if(!(fh=Open("NiKom:DatoCfg/Nycklar.cfg",MODE_OLDFILE)))
-		cleanup(ERROR,"Kunde inte öppna Nycklar.cfg\n");
-	while(pekare=FGets(fh,buffer,99)) {
-		if(x >= MAXNYCKLAR) break;
-		if(buffer[0]!=10 && buffer[0]!='*') {
-			strncpy(Servermem->Nyckelnamn[x],buffer,40);
-			x++;
-		}
-	}
-	if(IoErr()) printf("Fel vid läsandet av Nycklar.cfg\n");
-	else printf("Nycklar.cfg inläst (%d)\n",x);
-	Close(fh);
-	Servermem->info.nycklar=x;
+  BPTR fh;
+  char buffer[100];
+  int x=0;
+  if(!(fh = Open("NiKom:DatoCfg/Nycklar.cfg", MODE_OLDFILE))) {
+    cleanup(ERROR,"Could not open Nycklar.cfg");
+  }
+  while(FGets(fh, buffer, 100)) {
+    if(x >= MAXNYCKLAR) {
+      printf("Warning: Nycklar.cfg contains too many entries. Only read %d.\n",
+             MAXNYCKLAR);
+      x--;
+      break;
+    }
+    if(buffer[0] != '\n' && buffer[0] != '*' && buffer[0] != '#') {
+      buffer[40] = '\0';
+      strncpy(Servermem->Nyckelnamn[x], buffer, 41);
+      x++;
+    }
+  }
+  printf("Read Nycklar.cfg, %d keys\n", x);
+  Close(fh);
+  Servermem->info.nycklar = x;
+}
+
+void initStatusConfigDefaults(void) {
+  Servermem->cfg.st.skriv = 99;
+  Servermem->cfg.st.texter = 99;
+  Servermem->cfg.st.brev = 99;
+  Servermem->cfg.st.medmoten = 99;
+  Servermem->cfg.st.radmoten = 99;
+  Servermem->cfg.st.sestatus = 99;
+  Servermem->cfg.st.anv = 99;
+  Servermem->cfg.st.chgstatus = 99;
+  Servermem->cfg.st.bytarea = 99;
+  Servermem->cfg.st.radarea = 99;
+  Servermem->cfg.st.filer = 99;
+  Servermem->cfg.st.laddaner = 99;
+  Servermem->cfg.st.crashmail = 99;
+  Servermem->cfg.st.grupper = 99;
 }
 
 void ReadStatusConfig(void) {
-	BPTR fh;
-	char buffer[100];
-	if(!(fh=Open("NiKom:DatoCfg/Status.cfg",MODE_OLDFILE))) {
-		printf("Kunde inte öppna NiKom:DatoCfg/Status.cfg");
-		return;
-	}
-	if(getcfgfilestring("SKRIV",fh,buffer)) {
-		Close(fh);
-		return;
-	} else Servermem->cfg.st.skriv=atoi(buffer);
-	if(getcfgfilestring("TEXTER",fh,buffer)) {
-		Close(fh);
-		return;
-	} else Servermem->cfg.st.texter=atoi(buffer);
-	if(getcfgfilestring("BREV",fh,buffer)) {
-		Close(fh);
-		return;
-	} else Servermem->cfg.st.brev=atoi(buffer);
-	if(getcfgfilestring("MEDMÖTEN",fh,buffer)) {
-		Close(fh);
-		return;
-	} else Servermem->cfg.st.medmoten=atoi(buffer);
-	if(getcfgfilestring("RADMÖTEN",fh,buffer)) {
-		Close(fh);
-		return;
-	} else Servermem->cfg.st.radmoten=atoi(buffer);
-	if(getcfgfilestring("SESTATUS",fh,buffer)) {
-		Close(fh);
-		return;
-	} else Servermem->cfg.st.sestatus=atoi(buffer);
-	if(getcfgfilestring("ANVÄNDARE",fh,buffer)) {
-		Close(fh);
-		return;
-	} else Servermem->cfg.st.anv=atoi(buffer);
-	if(getcfgfilestring("ÄNDSTATUS",fh,buffer)) {
-		Close(fh);
-		return;
-	} else Servermem->cfg.st.chgstatus=atoi(buffer);
-	if(getcfgfilestring("LÖSEN",fh,buffer)) {
-		Close(fh);
-		return;
-	} else Servermem->cfg.st.psw=atoi(buffer);
-	if(getcfgfilestring("BYTAREA",fh,buffer)) {
-		Close(fh);
-		return;
-	} else Servermem->cfg.st.bytarea=atoi(buffer);
-	if(getcfgfilestring("RADAREA",fh,buffer)) {
-		Close(fh);
-		return;
-	} else Servermem->cfg.st.radarea=atoi(buffer);
-	if(getcfgfilestring("FILER",fh,buffer)) {
-		Close(fh);
-		return;
-	} else Servermem->cfg.st.filer=atoi(buffer);
-	if(getcfgfilestring("LADDANER",fh,buffer)) {
-		Close(fh);
-		return;
-	} else Servermem->cfg.st.laddaner=atoi(buffer);
-	if(getcfgfilestring("GRUPPER",fh,buffer)) {
-		Close(fh);
-		return;
-	} else Servermem->cfg.st.grupper=atoi(buffer);
-	Close(fh);
-	printf("Status.cfg inläst\n");
+  initStatusConfigDefaults();
+  readConfigFile("NiKom:DatoCfg/Status.cfg", handleStatusConfigLine);
+}
+
+int handleStatusConfigLine(char *line, BPTR fh) {
+  if(StartsWith(line, "SKRIV") || StartsWith(line, "WRITE")) {
+    if(!GetCharCfgValue(line, &Servermem->cfg.st.skriv)) {
+      return 0;
+    }
+  } else if(StartsWith(line, "TEXTER") || StartsWith(line, "MANAGETEXTS")) {
+    if(!GetCharCfgValue(line, &Servermem->cfg.st.texter)) {
+      return 0;
+    }
+  } else if(StartsWith(line, "BREV") || StartsWith(line, "MANAGEMAIL")) {
+    if(!GetCharCfgValue(line, &Servermem->cfg.st.brev)) {
+      return 0;
+    }
+  } else if(StartsWith(line, "MEDMÖTEN") || StartsWith(line, "JOINFORUMS")) {
+    if(!GetCharCfgValue(line, &Servermem->cfg.st.medmoten)) {
+      return 0;
+    }
+  } else if(StartsWith(line, "RADMÖTEN") || StartsWith(line, "MANAGEFORUMS")) {
+    if(!GetCharCfgValue(line, &Servermem->cfg.st.radmoten)) {
+      return 0;
+    }
+  } else if(StartsWith(line, "SESTATUS") || StartsWith(line, "VIEWUSERINFO")) {
+    if(!GetCharCfgValue(line, &Servermem->cfg.st.sestatus)) {
+      return 0;
+    }
+  } else if(StartsWith(line, "ANVÄNDARE") || StartsWith(line, "MANAGEUSERS")) {
+    if(!GetCharCfgValue(line, &Servermem->cfg.st.anv)) {
+      return 0;
+    }
+  } else if(StartsWith(line, "ÄNDSTATUS") || StartsWith(line, "MANAGESTATUS")) {
+    if(!GetCharCfgValue(line, &Servermem->cfg.st.chgstatus)) {
+      return 0;
+    }
+  } else if(StartsWith(line, "BYTAREA") || StartsWith(line, "JOINAREAS")) {
+    if(!GetCharCfgValue(line, &Servermem->cfg.st.bytarea)) {
+      return 0;
+    }
+  } else if(StartsWith(line, "RADAREA") || StartsWith(line, "MANAGEAREAS")) {
+    if(!GetCharCfgValue(line, &Servermem->cfg.st.radarea)) {
+      return 0;
+    }
+  } else if(StartsWith(line, "FILER") || StartsWith(line, "MANAGEFILES")) {
+    if(!GetCharCfgValue(line, &Servermem->cfg.st.filer)) {
+      return 0;
+    }
+  } else if(StartsWith(line, "LADDANER") || StartsWith(line, "DOWNLOAD")) {
+    if(!GetCharCfgValue(line, &Servermem->cfg.st.laddaner)) {
+      return 0;
+    }
+  } else if(StartsWith(line, "GRUPPER") || StartsWith(line, "MANAGEGROUPS")) {
+    if(!GetCharCfgValue(line, &Servermem->cfg.st.grupper)) {
+      return 0;
+    }
+  } else {
+    printf("Invalid config line: %s\n", line);
+    return 0;
+  }
+  return 1;
 }
 
 void ReadNodeTypesConfig(void) {
-	BPTR fh;
-	int x,y;
-	char buffer[100],*foo1,*foo2;
-	if(!(fh=Open("NiKom:DatoCfg/NodeTypes.cfg",MODE_OLDFILE))) {
-		printf("Kunde inte läsa in NodeTypes.cfg\n");
-		return;
-	}
-	for(x=0;x<MAXNODETYPES;x++) Servermem->nodetypes[x].nummer=0;
-	printf("Läser in NodeTypes.cfg\n");
-	while(FGets(fh,buffer,99)) {
-		x=strlen(buffer);
-		if(buffer[x-1]=='\n') buffer[x-1]=0;
-		if(!strncmp(buffer,"NODETYPE",6)) {
-			for(x=0;x<MAXNODETYPES;x++) if(!Servermem->nodetypes[x].nummer) break;
-			if(x<MAXNODETYPES) {
-				foo1 = FindNextWord(buffer);
-				Servermem->nodetypes[x].nummer = atoi(foo1);
-				foo1 = FindNextWord(foo1);
-				foo2 = FindNextWord(foo1);
-				for(y=-1; foo2[y]==' ' && &foo2[y] > foo1; y--) foo2[y]=0;
-				strcpy(Servermem->nodetypes[x].path,foo1);
-				strcpy(Servermem->nodetypes[x].desc,foo2);
-			}
-		}
-	}
-	Close(fh);
-}
+  BPTR fh;
+  int i;
+  char buffer[100], *tmp;
+  if(!(fh = Open("NiKom:DatoCfg/NodeTypes.cfg", MODE_OLDFILE))) {
+    cleanup(ERROR, "Could not find NodeTypes.cfg");
+  }
+  for(i = 0; i < MAXNODETYPES; i++) {
+    Servermem->nodetypes[i].nummer = 0;
+  }
+  printf("Reading NodeTypes.cfg\n");
+  while(FGets(fh,buffer,100)) {
+    if(buffer[0] == '\n' || buffer[0] == '#') {
+      continue;
+    }
+    tmp = strtok(buffer, WHITESPACE);
+    if(tmp == NULL || strcmp(tmp, "NODETYPE") != 0) {
+      printf("Invalid config line: %s\n", buffer);
+      Close(fh);
+      cleanup(ERROR, "Invalid NodeTypes.cfg");
+    }
+    for(i = 0; i < MAXNODETYPES; i++) {
+      if(Servermem->nodetypes[i].nummer == 0) {
+        break;
+      }
+    }
+    if(i == MAXNODETYPES) {
+      Close(fh);
+      cleanup(ERROR, "Too many nodetypes defined in NodeTypes.cfg");
+    }
 
+    tmp = strtok(NULL, WHITESPACE);
+    if(tmp == NULL) {
+      printf("No node type number found on line: %s\n", buffer);
+      Close(fh);
+      cleanup(ERROR, "Invalid NodeTypes.cfg");
+    }
+    Servermem->nodetypes[i].nummer = atoi(tmp);
 
-int getzone(char *adr) {
-	int x;
-	for(x=0;adr[x]!=':' && adr[x]!=' ' && adr[x]!=0;x++);
-	if(adr[x]==':') return(atoi(adr));
-	else return(0);
-}
+    tmp = strtok(NULL, WHITESPACE);
+    if(tmp == NULL) {
+      printf("No node type path found on line: %s\n", buffer);
+      Close(fh);
+      cleanup(ERROR, "Invalid NodeTypes.cfg");
+    }
+    strcpy(Servermem->nodetypes[i].path, tmp);
 
-int getnet(char *adr) {
-	int x;
-	char *pek;
-	for(x=0;adr[x]!=':' && adr[x]!=' ' && adr[x]!=0;x++);
-	if(adr[x]==':') pek=&adr[x+1];
-	else pek=adr;
-	return(atoi(pek));
-}
-
-int getnode(char *adr) {
-	int x;
-	for(x=0;adr[x]!='/' && adr[x]!=' ' && adr[x]!=0;x++);
-	return(atoi(&adr[x+1]));
-}
-
-int getpoint(char *adr) {
-	int x;
-	for(x=0;adr[x]!='.' && adr[x]!=' ' && adr[x]!=0;x++);
-	if(adr[x]=='.') return(atoi(&adr[x+1]));
-	else return(0);
+    tmp = strtok(NULL, "");
+    if(tmp == NULL) {
+      printf("No node type description found on line: %s\n", buffer);
+      Close(fh);
+      cleanup(ERROR, "Invalid NodeTypes.cfg");
+    }
+    strcpy(Servermem->nodetypes[i].desc, tmp);
+  }
+  Close(fh);
 }
 
 void ReadFidoConfig(void) {
-	BPTR fh;
-	int x;
-	char buffer[100],*foo1,*foo2;
-	if(!(fh=Open("NiKom:DatoCfg/NiKomFido.cfg",MODE_OLDFILE))) {
-		printf("Kunde inte läsa in NiKomFido.cfg\n");
-		return;
-	}
-	printf("Läser in NiKomFido.cfg\n");
-	for(x = 0; x < 10; x++) Servermem->fidodata.fd[x].domain[0] = 0;
-	for(x = 0; x < 20; x++) Servermem->fidodata.fa[x].namn[0] = 0;
-	Servermem->fidodata.mailgroups = 0;
+  int i;
+  for(i = 0; i < 10; i++) {
+    Servermem->fidodata.fd[i].domain[0] = '\0';
+  }
+  for(i = 0; i < 20; i++) {
+    Servermem->fidodata.fa[i].namn[0] = '\0';
+  }
+  Servermem->fidodata.mailgroups = 0;
 
-	while(FGets(fh,buffer,99)) {
-		x=strlen(buffer);
-		if(buffer[x-1]=='\n') buffer[x-1]=0;
-		if(!strncmp(buffer,"DOMAIN",6)) {
-			for(x=0;x<10;x++) if(!Servermem->fidodata.fd[x].domain[0]) break;
-			if(x<10) {
-				foo1=FindNextWord(buffer);
-				Servermem->fidodata.fd[x].nummer = atoi(foo1);
-				foo1=FindNextWord(foo1);
-				foo2=FindNextWord(foo1);
-				foo2[-1]=0;
-				strncpy(Servermem->fidodata.fd[x].domain,foo1,19);
-				Servermem->fidodata.fd[x].zone=getzone(foo2);
-				Servermem->fidodata.fd[x].net=getnet(foo2);
-				Servermem->fidodata.fd[x].node=getnode(foo2);
-				Servermem->fidodata.fd[x].point=getpoint(foo2);
-				foo1=FindNextWord(foo2);
-				strncpy(Servermem->fidodata.fd[x].zones,foo1,49);
-			}
-		}
-		else if(!strncmp(buffer,"ALIAS",5)) {
-			for(x=0;x<20;x++) if(!Servermem->fidodata.fa[x].namn[0]) break;
-			if(x<20) {
-				foo1=FindNextWord(buffer);
-				Servermem->fidodata.fa[x].nummer = atoi(foo1);
-				foo1=FindNextWord(foo1);
-				strncpy(Servermem->fidodata.fa[x].namn,foo1,35);
-			}
-		}
-		else if(!strncmp(buffer,"BOUNCE",6)) {
-			if(buffer[7]=='Y' || buffer[7]=='y') Servermem->fidodata.bounce=TRUE;
-		}
-		else if(!strncmp(buffer,"MATRIXDIR",9)) strncpy(Servermem->fidodata.matrixdir,&buffer[10],99);
-		else if(!strncmp(buffer,"MAILGROUP",9)) {
-			x=parsegrupp(&buffer[10]);
-			if(x==-1) printf("I NiKomFido.cfg: Okänd grupp %s\n",&buffer[10]);
-			else BAMSET((char *)&Servermem->fidodata.mailgroups,x);
-		}
-		else if(!strncmp(buffer,"MAILSTATUS",10)) Servermem->fidodata.mailstatus=atoi(&buffer[11]);
-		else if(!strncmp(buffer,"DEFAULTORIGIN",13)) strncpy(Servermem->fidodata.defaultorigin,&buffer[14],69);
-		else if(!strncmp(buffer,"CRASHSTATUS",11)) Servermem->fidodata.crashstatus = atoi(&buffer[12]);
-	}
-	Close(fh);
+  readConfigFile("NiKom:DatoCfg/NiKomFido.cfg", handleFidoConfigLine);
+}
+
+int handleFidoConfigLine(char *line, BPTR fh) {
+  int i, address[4], group;
+  char *tmp1, *tmp2, tmpbuf[50];
+
+  if(StartsWith(line,"DOMAIN")) {
+    for(i = 0; i < 10; i++) {
+      if(!Servermem->fidodata.fd[i].domain[0]) {
+        break;
+      }
+    }
+    if(i == 10) {
+      printf("Too many FidoNet domains defined.\n");
+      return 0;
+    }
+    tmp1 = FindNextWord(line);
+    Servermem->fidodata.fd[i].nummer = atoi(tmp1);
+    if(Servermem->fidodata.fd[i].nummer <= 0) {
+      printf("The domain number must be a positive integer: %s\n", line);
+      return 0;
+    }
+    tmp1 = FindNextWord(tmp1);
+    tmp2 = FindNextWord(tmp1);
+    tmp2[-1] = '\0';
+    strncpy(Servermem->fidodata.fd[i].domain, tmp1, 19);
+    if(!ParseFidoAddress(tmp2, address)) {
+      printf("Invalid FidoNet address '%s'\n", tmp2);
+      return 0;
+    }
+    Servermem->fidodata.fd[i].zone = address[0];
+    Servermem->fidodata.fd[i].net = address[1];
+    Servermem->fidodata.fd[i].node = address[2];
+    Servermem->fidodata.fd[i].point = address[3];
+
+    tmp1 = FindNextWord(tmp2);
+    strncpy(Servermem->fidodata.fd[i].zones, tmp1, 49);
+  }
+  else if(StartsWith(line, "ALIAS")) {
+    for(i = 0; i < 20; i++) {
+      if(!Servermem->fidodata.fa[i].namn[0]) {
+        break;
+      }
+    }
+    if(i == 20) {
+      printf("Too many FidoNet aliases defined.\n");
+      return 0;
+    }
+    tmp1 = FindNextWord(line);
+    Servermem->fidodata.fa[i].nummer = atoi(tmp1);
+    tmp1 = FindNextWord(tmp1);
+    strncpy(Servermem->fidodata.fa[i].namn, tmp1, 35);
+  }
+  else if(StartsWith(line, "BOUNCE")) {
+    if(!GetStringCfgValue(line, tmpbuf, 10)) {
+      return 0;
+    }
+    if(tmpbuf[0] == 'Y' || tmpbuf[0] == 'y') {
+      Servermem->fidodata.bounce = TRUE;
+    }
+  } else if(StartsWith(line, "MATRIXDIR")) {
+    if(!GetStringCfgValue(line, Servermem->fidodata.matrixdir, 99)) {
+      return 0;
+    }
+  } else if(StartsWith(line, "MAILGROUP")) {
+    if(!GetStringCfgValue(line, tmpbuf, 49)) {
+      return 0;
+    }
+    group = parsegrupp(tmpbuf);
+    if(group == -1) {
+      printf("Unknown user group '%s'\n", tmpbuf);
+      return 0;
+    }
+    BAMSET((char *)&Servermem->fidodata.mailgroups, group);
+  }
+  else if(StartsWith(line, "MAILSTATUS")) {
+    if(!GetCharCfgValue(line, &Servermem->fidodata.mailstatus)) {
+      return 0;
+    }
+  } else if(StartsWith(line, "DEFAULTORIGIN")) {
+    if(!GetStringCfgValue(line, Servermem->fidodata.defaultorigin, 69)) {
+      return 0;
+    }
+  } else if(StartsWith(line, "CRASHSTATUS")) {
+    if(!GetCharCfgValue(line, &Servermem->fidodata.crashstatus)) {
+      return 0;
+    }
+  } else {
+    printf("Invalid config line: %s\n", line);
+    return 0;
+  }
+  return 1;
 }
