@@ -1,4 +1,23 @@
 ---------------------------------------------------------------------------
+                         NiKom v2.1.0, 2016-xx-yy
+---------------------------------------------------------------------------
+- Overhauled startup of NiKServer and the code that reads configuration
+  and data files. The configuration files are better checked for errors
+  and NiKServer will shut down if something can not be properly loaded
+  instead of starting up with incomplete or corrupt data. Older
+  installations of NiKom most likely has entries in some configuration
+  files that are deprecated. NiKServer will now complain over this and
+  they will need to be removed for NiKServer to start up.
+
+  The default configuration files have changed format a bit so that
+  all configuration entries are in English. Comments now start with
+  the standard '#' instead of '*'. It should be fully compatible with
+  the old configuration files though. (Except for unused things that
+  need to be removed.) For the new format see the default configurations
+  that come with the NiKom full distribution.
+
+
+---------------------------------------------------------------------------
                          NiKom v2.0.0, 2015-12-06
 ---------------------------------------------------------------------------
 - The handling of texts in conferences and how the system remembers what
