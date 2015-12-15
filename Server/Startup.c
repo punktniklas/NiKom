@@ -648,6 +648,7 @@ void readFileAreaFiles(void) {
       }
       Insert((struct List *)&Servermem->areor[i].ar_list, (struct Node *)newFile,
              (struct Node *)searchFile->f_node.mln_Pred);
+      cnt++;
     }
     printf(" %d files.\n", cnt);
   }
