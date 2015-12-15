@@ -38,6 +38,7 @@ extern struct Inloggning Statstr;
 
 int sendrexxrc;
 
+void handleRexxFinished(struct RexxMsg *nikrexxmess);
 void handleRexxCommand(char *cmdName, struct RexxMsg *mess);
 void rexxgetstring(struct RexxMsg *mess);
 void rexxsendtextfile(struct RexxMsg *mess);
@@ -70,6 +71,57 @@ void rxsendrawfile(struct RexxMsg *);
 void rxchglatestinfo(struct RexxMsg *);
 void rxgetnumber(struct RexxMsg *mess);
 
+static const char *rexxErrors[] = {
+  "the script explicitly exited with an exit code > 0",
+  "Program not found",
+  "execution halted",
+  "no memory available",
+  "invalid character in program",
+  "unmatched quote",
+  "unterminated comment",
+  "clause too long",
+  "unrecognized token",
+  "symbol or string too long",
+  "invalid message packet",
+  "command string error",
+  "error return from function",
+  "host environment not found",
+  "required library not found",
+  "function not found",
+  "no return value",
+  "wrong number of arguments",
+  "invalid argument to function",
+  "invalid PROCEDURE",
+  "unexpected THEN/ELSE",
+  "unexpected WHEN/OTHERWISE",
+  "unexpected LEAVE or ITERATE",
+  "invalid statement in SELECT",
+  "missing THEN clauses",
+  "missing OTHERWISE",
+  "missing or unexpected END",
+  "symbol mismatch on END",
+  "invalid DO syntax",
+  "incomplete DO/IF/SELECT",
+  "label not found",
+  "symbol expected",
+  "string or symbol expected",
+  "invalid sub-keyword",
+  "required keyword missing",
+  "extraneous characters",
+  "sub-keyword conflict",
+  "invalid template",
+  "invalid TRACE request",
+  "uninitialized variable",
+  "invalid variable name",
+  "invalid expression",
+  "unbalanced parentheses",
+  "nesting level exceeded",
+  "invalid expression result",
+  "expression required",
+  "boolean value not 0 or 1",
+  "arithmetic conversion error",
+  "invalid operand"
+};
 
 int commonsendrexx(int komnr,int hasarg) {
   char rexxCmd[1081];
@@ -94,7 +146,7 @@ int commonsendrexx(int komnr,int hasarg) {
     return -5;
   }
 
-  nikrexxmess->rm_Action = RXCOMM | RXFB_TOKEN;
+  nikrexxmess->rm_Action = RXCOMM;
   if(!SafePutToPort((struct Message *)nikrexxmess, "REXX")) {
     LogEvent(SYSTEM_LOG, ERROR, "Can't launch ARexx script, REXX port not found.");
     return -5;
@@ -104,17 +156,7 @@ int commonsendrexx(int komnr,int hasarg) {
     mess = (struct RexxMsg *)WaitPort(rexxport);
     while(mess = (struct RexxMsg *)GetMsg(rexxport)) {
       if(mess->rm_Node.mn_Node.ln_Type == NT_REPLYMSG) {
-        DeleteArgstring(nikrexxmess->rm_Args[0]);
-        if(nikrexxmess->rm_Result1) {
-          LogEvent(SYSTEM_LOG, WARN, "Error return code %d from ARexx script: '%s'",
-                   nikrexxmess->rm_Result1, rexxCmd);
-          SendString("\r\n\nError executing ARexx script.\r\n\n");
-        }
-        DeleteRexxMsg(nikrexxmess);
-        if(!rxlinecount) {
-          rxlinecount=TRUE;
-          radcnt = 0;
-        }
+        handleRexxFinished(nikrexxmess);
         return sendrexxrc;
       }
       handleRexxCommand(mess->rm_Args[0], mess);
@@ -123,6 +165,23 @@ int commonsendrexx(int komnr,int hasarg) {
   }
   if(ImmediateLogout()) return(-8);
   return(sendrexxrc);
+}
+
+void handleRexxFinished(struct RexxMsg *nikrexxmess) {
+  if(nikrexxmess->rm_Result1 != 0) {
+    LogEvent(SYSTEM_LOG, WARN,
+             "Error running ARexx script: error level %d, code %d: %s "
+             "(command = \"%s\")",
+             nikrexxmess->rm_Result1, nikrexxmess->rm_Result2,
+             rexxErrors[nikrexxmess->rm_Result2], nikrexxmess->rm_Args[0]);
+    SendString("\r\n\nError executing ARexx script.\r\n\n");
+  }
+  DeleteArgstring(nikrexxmess->rm_Args[0]);
+  DeleteRexxMsg(nikrexxmess);
+  if(!rxlinecount) {
+    rxlinecount=TRUE;
+    radcnt = 0;
+  }
 }
 
 void handleRexxCommand(char *cmdName, struct RexxMsg *mess) {

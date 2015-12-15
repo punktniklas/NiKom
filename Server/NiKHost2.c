@@ -17,8 +17,12 @@
 #endif
 #include "FileAreaUtils.h"
 #include "RexxUtils.h"
+#include "StringUtils.h"
 
+// TODO: Get rid of these prototypes
 struct Fil *parsefil(char *,int);
+void purgeOldTexts(int numberOfTexts);
+void sparatext(struct NiKMess *);
 
 extern struct System *Servermem;
 
@@ -26,7 +30,6 @@ struct Header infohead= { 0,0,0,0,{0},0,-1 };
 struct MinList edit_list;
 
 void freeeditlist(void);
-char *hittaefter(char *);
 
 extern int writefiles(int);
 extern int updatefile(int,struct Fil *);
@@ -493,7 +496,7 @@ void createletter(struct RexxMsg *mess) {
         }
         Close(fhout);
         Close(fhin);
-        motstr=hittaefter(&tostring[1]);
+        motstr=FindNextWord(&tostring[1]);
         if(motstr[0]) {
                 if(!(lock=Lock(orgfilename,ACCESS_READ))) {
                         printf("Kunde inte få ett lock för brevet\n\r",-1);
@@ -520,7 +523,7 @@ void createletter(struct RexxMsg *mess) {
                         UnLock(lock);
                         return;
                 }
-                motstr=hittaefter(motstr);
+                motstr=FindNextWord(motstr);
         }
         if(lock) UnLock(lock);
         if(!(mess->rm_Result2=(long)CreateArgstring("0",strlen("0"))))
@@ -1086,15 +1089,15 @@ int parsegrupp(char *skri) {
                 going2=TRUE;
                 if(matchar(skri2,faci)) {
                         while(going2) {
-                                skri2=hittaefter(skri2);
-                                faci=hittaefter(faci);
+                                skri2=FindNextWord(skri2);
+                                faci=FindNextWord(faci);
                                 if(skri2[0]==0) {
                                         found=letpek->nummer;
                                         going2=going=FALSE;
                                 }
                                 else if(faci[0]==0) going2=FALSE;
                                 else if(!matchar(skri2,faci)) {
-                                        faci=hittaefter(faci);
+                                        faci=FindNextWord(faci);
                                         if(faci[0]==0 || !matchar(skri2,faci)) going2=FALSE;
                                 }
                         }

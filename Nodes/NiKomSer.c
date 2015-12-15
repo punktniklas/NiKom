@@ -167,7 +167,7 @@ void main(int argc,char *argv[]) {
     }
     radcnt=-174711;
     if(Servermem->say[nodnr]) displaysay();
-    if(Servermem->cfg.ar.utlogg) sendrexx(Servermem->cfg.ar.utlogg);
+    if(Servermem->cfg.ar.utlogg) sendautorexx(Servermem->cfg.ar.utlogg);
     sendfile("NiKom:Texter/Utlogg.txt");
   }
   SaveProgramCategory(inloggad);

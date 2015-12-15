@@ -55,7 +55,6 @@ void rxsendrawfile(struct RexxMsg *mess);
 
 /* Prototypes for functions defined in Stuff.c */
 char *hittaefter(char *);
-int speciallogin(char);
 int parsenamn(char *);
 int matchar(char *, char *);
 int readuser(int,struct User *);

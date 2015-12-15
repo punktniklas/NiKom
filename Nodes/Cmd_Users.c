@@ -68,12 +68,6 @@ void Cmd_Status(void) {
   }
   sprintf(outbuffer,"Annan info           : %s\r\n",readuserstr.annan_info);
   if(puttekn(outbuffer,-1)) return;
-  if(!Servermem->cfg.cfgflags & NICFG_CRYPTEDPASSWORDS
-     && Servermem->inne[nodnr].status>=Servermem->cfg.st.psw
-     && readuserstr.status<Servermem->inne[nodnr].status) {
-    sprintf(outbuffer,"Lösenord             : %s\r\n",readuserstr.losen);
-    if(puttekn(outbuffer,-1)) return;
-  }
   sprintf(outbuffer,"Antal rader          : %d\r\n",readuserstr.rader);
   if(puttekn(outbuffer,-1)) return;
   ts=localtime(&readuserstr.forst_in);

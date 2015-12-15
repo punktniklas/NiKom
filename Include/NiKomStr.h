@@ -170,8 +170,8 @@
 #define PS_NOCONV 1
 
 struct Statuscfg {
-   char skriv,texter,brev,medmoten,radmoten,sestatus,anv,chgstatus,psw,
-      bytarea,radarea,filer,laddaner,editor,crashmail, grupper;
+   char skriv,texter,brev,medmoten,radmoten,sestatus,anv,chgstatus,
+      bytarea,radarea,filer,laddaner,crashmail, grupper;
 };
 
 struct AutoRexxCfg {
@@ -189,8 +189,7 @@ struct Config {
    struct AutoRexxCfg ar;
    long defaultflags, diskfree, logmask, cfgflags;
    short maxtid[101],logintries;
-   char uldlratio[101],inaktiv[101],
-     defaultrader, defaultprotokoll,defaultstatus, defaultcharset,
+   char uldlratio[101], defaultrader, defaultprotokoll,defaultstatus, defaultcharset,
      brevnamn[41],ny[21],ultmp[100];
 };
 
@@ -301,12 +300,6 @@ struct Alias {
    char namn[21],blirtill[41];
 };
 
-struct SpecialLogin {
-   struct MinNode login_node;
-   long rexxprg;
-   char bokstav;
-};
-
 struct EditLine {
    struct MinNode line_node;
    long number;
@@ -375,7 +368,6 @@ struct System {
   struct Inloggning senaste[MAXSENASTE];
   struct Area areor[MAXAREA];
   char Nyckelnamn[MAXNYCKLAR][41];
-  struct MinList special_login;
   struct FidoData fidodata;
   struct NodeType nodetypes[MAXNODETYPES];
   struct SignalSemaphore semaphores[NIKSEM_NOOF];

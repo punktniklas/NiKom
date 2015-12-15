@@ -310,7 +310,6 @@ Ger information om en viss status
 
 Följande subject kan användas:
 
-i - Hur länge användaren får vara inaktiv innan han blir utloggad. (används ej ännu)
 r - Vilken ULDL ratio användaren har.
 t - Hur lång tid användaren får vara inloggad per inloggning i sekunder.
 

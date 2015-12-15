@@ -1,0 +1,71 @@
+#include <ctype.h>
+#include <stdlib.h>
+
+#include "FidoUtils.h"
+
+/*
+ * Parses a FidoNet address into its numeric components. The format
+ * is Zone:Net/Node.Point (e.g. 2:201/420.0) where zone and point is optional.
+ * Zone defaults to 1 and point to 0. "123/456" is equal to "1:123/456.0".
+ * The parsed result is stored in the four first positions of the given
+ * results array.
+ * The string to parsed can be followed by a NUL byte, whitespace or '@'.
+ * Other characters will result in a parsing error.
+ *
+ * Returns 0 if parsing fails and non zero if successful.
+ */
+int ParseFidoAddress(char *str, int result[]) {
+  int foundZone = 0, foundNet = 0, foundNode = 0;
+  char *start, *search;
+  start = search = str;
+  for(;;) {
+    if(*search == '\0' || isspace(*search) || *search == '@') {
+      break;
+    }
+    switch(*search) {
+    case ':':
+      if(foundZone || foundNet || foundNode) {
+        return 0;
+      }
+      result[0] = atoi(start);
+      foundZone = 1;
+      start = search + 1;
+      break;
+    case '/':
+      if(foundNet || foundNode) {
+        return 0;
+      }
+      result[1] = atoi(start);
+      foundNet = 1;
+      if(!foundZone) {
+        result[0] = 1;
+        foundZone = 1;
+      }
+      start = search + 1;
+      break;
+    case '.':
+      if(!foundNet || foundNode) {
+        return 0;
+      }
+      result[2] = atoi(start);
+      foundNode = 1;
+      start = search + 1;
+      break;
+    default:
+      if(!isdigit(*search)) {
+        return 0;
+      }
+    }
+    search++;
+  }
+  if(!foundNet) {
+    return 0;
+  }
+  if(foundNode) {
+    result[3] = atoi(start);
+  } else {
+    result[2] = atoi(start);
+    result[3] = 0;
+  }
+  return 1;
+}

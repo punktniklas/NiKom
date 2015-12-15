@@ -31,13 +31,6 @@ char *strang;
 	return(*strang==0 ? strang : ++strang);
 }
 
-int speciallogin(char bokstav) {
-	struct SpecialLogin *pek;
-	for(pek=(struct SpecialLogin *)Servermem->special_login.mlh_Head;pek->login_node.mln_Succ;pek=(struct SpecialLogin *)pek->login_node.mln_Succ)
-		if(pek->bokstav==bokstav) return(pek->rexxprg);
-	return(0);
-}
-
 int parsenamn(skri)
 char *skri;
 {
