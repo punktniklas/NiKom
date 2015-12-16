@@ -16,13 +16,7 @@
 #include "Logging.h"
 #include "Terminal.h"
 
-#define ERROR	10
-#define OK		0
 #define EKO		1
-#define EJEKO	0
-#define KOM		1
-#define EJKOM	0
-#define BREVKOM	-1
 
 extern struct System *Servermem;
 extern char outbuffer[],*argument,inmat[];

@@ -16,13 +16,6 @@
 #include "NiKomLib.h"
 #include "Terminal.h"
 
-#define ERROR	10
-#define OK		0
-#define EKO		1
-#define EJEKO	0
-#define KOM		1
-#define EJKOM	0
-
 extern struct System *Servermem;
 extern int nodnr,inloggad,senast_text_typ,rad,mote2,buftkn,senast_brev_nr,senast_brev_anv;
 extern char outbuffer[],inmat[],backspace[],*argument,vilkabuf[];

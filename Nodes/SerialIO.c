@@ -14,9 +14,9 @@
 #include "NiKomLib.h"
 #include "BasicIO.h"
 
-#define ERROR	128
-#define OK	0
-#define NOCARRIER	32
+#define EXIT_ERROR	128
+#define EXIT_OK	0
+#define NOCARRIER 32
 
 struct IOStdReq *conwritereq=NULL;
 struct MsgPort *conwriteport=NULL;
@@ -146,7 +146,7 @@ struct IOExtSer *writereq,*readreq,*changereq;
 	}
 
 	if(error=OpenDevice(device,unit,(struct IORequest *)writereq,0))
-		cleanup(ERROR,"Kunde inte öppna devicet\n");
+		cleanup(EXIT_ERROR,"Kunde inte öppna devicet\n");
 	writereq->io_Baud=dtespeed;
 	writereq->io_RBufLen=16384;
 	writereq->io_ReadLen=8;
@@ -320,7 +320,7 @@ char gettekn(void) {
       WaitIO((struct IORequest *)serreadreq);
       AbortIO((struct IORequest *)inactivereq);
       WaitIO((struct IORequest *)inactivereq);
-      cleanup(OK,"");
+      cleanup(EXIT_OK,"");
     }
     if(signals & SIGBREAKF_CTRL_C) {
       AbortIO((struct IORequest *)conreadreq);
@@ -329,7 +329,7 @@ char gettekn(void) {
       WaitIO((struct IORequest *)serreadreq);
       AbortIO((struct IORequest *)inactivereq);
       WaitIO((struct IORequest *)inactivereq);
-      cleanup(OK,"");
+      cleanup(EXIT_OK,"");
     }
     if((signals & inactivesig) && CheckIO((struct IORequest *)inactivereq)) {
       WaitIO((struct IORequest *)inactivereq);
@@ -485,7 +485,7 @@ void getnodeconfig(char *configname) {
 	int len;
 	if(!(fp=fopen(configname,"r"))) {
 		printf("Kunde inte öppna %s.\n",configname);
-		cleanup(ERROR,"");
+		cleanup(EXIT_ERROR,"");
 	}
 	while(fgets(buffer,99,fp)) {
 		len = strlen(buffer);
@@ -936,7 +936,7 @@ int sendtosercon(char *conpek, char *serpek, int consize, int sersize) {
         AbortIO((struct IORequest *)serwritereq);
         WaitIO((struct IORequest *)serwritereq);
       }
-      cleanup(OK,"");
+      cleanup(EXIT_OK,"");
     }
     if(signals & nikomnodesig) {
       while(nikmess = (struct NiKMess *) GetMsg(nikomnodeport)) {
@@ -993,7 +993,7 @@ int sendtocon(char *pekare, int size)
 		if(signals & windsig) {
 			mymess=(struct IntuiMessage *)GetMsg(NiKwind->UserPort);
 			ReplyMsg((struct Message *)mymess);
-			cleanup(OK,"");
+			cleanup(EXIT_OK,"");
 		}
 		if(signals & nikomnodesig) {
 			while(nikmess = (struct NiKMess *) GetMsg(nikomnodeport)) {
@@ -1118,7 +1118,7 @@ int sendtoser(char *pekare, int size) {
     if(signals & windsig) {
       mymess=(struct IntuiMessage *)GetMsg(NiKwind->UserPort);
       ReplyMsg((struct Message *)mymess);
-      cleanup(OK,"");
+      cleanup(EXIT_OK,"");
     }
     if(signals & nikomnodesig) {
       while(nikmess = (struct NiKMess *) GetMsg(nikomnodeport)) {

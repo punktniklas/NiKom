@@ -18,8 +18,7 @@
 #include "Shutdown.h"
 #include "Config.h"
 
-#define ERROR	     10
-#define OK	     0
+#define EXIT_OK	     0
 
 void sparatext(struct NiKMess *);
 int CXBRK(void) { return(0); }
@@ -142,9 +141,9 @@ void main() {
     if(signals & windmask) {
       myintmess=(struct IntuiMessage *)GetMsg(NiKWindow->UserPort);
       ReplyMsg((struct Message *)myintmess);
-      if(!noder) cleanup(OK,"");
+      if(!noder) cleanup(EXIT_OK,"");
     }
-    if(signals & SIGBREAKF_CTRL_C) if(!noder) cleanup(OK,"");
+    if(signals & SIGBREAKF_CTRL_C) if(!noder) cleanup(EXIT_OK,"");
     if(signals & nikPortMask) {
       while(MyNiKMess=(struct NiKMess *)GetMsg(NiKPort)) {
         switch(MyNiKMess->kommando) {

@@ -15,7 +15,7 @@
 
 #include "Config.h"
 
-#define ERROR	     10
+#define EXIT_ERROR	     10
 #define WHITESPACE " \t\n\r"
 
  // TODO: Remove need for these prototypes
@@ -67,7 +67,7 @@ void readConfigFile(char *filename, int (*handleLine)(char *, BPTR)) {
   printf("Reading %s\n", filename);
 
   if(!(fh = Open(filename, MODE_OLDFILE))) {
-    cleanup(ERROR, "Could not open config file.");
+    cleanup(EXIT_ERROR, "Could not open config file.");
   }
 
   for(;;) {
@@ -90,7 +90,7 @@ void readConfigFile(char *filename, int (*handleLine)(char *, BPTR)) {
     }
     if(!handleLine(buffer, fh)) {
       Close(fh);
-      cleanup(ERROR, "Invalid config file.");
+      cleanup(EXIT_ERROR, "Invalid config file.");
     }
   }
 }
@@ -341,7 +341,7 @@ void ReadCommandConfig(void) {
   FreeCommandMem();
   
   if(!(fh = Open("NiKom:DatoCfg/Kommandon.cfg", MODE_OLDFILE))) {
-    cleanup(ERROR, "Kunde inte öppna NiKom:DatoCfg/Kommandon.cfg\n");
+    cleanup(EXIT_ERROR, "Kunde inte öppna NiKom:DatoCfg/Kommandon.cfg\n");
   }
 
   while(FGets(fh, buffer, 100)) {
@@ -352,12 +352,12 @@ void ReadCommandConfig(void) {
       if(!(command = (struct Kommando *)AllocMem(sizeof(struct Kommando),
                                                  MEMF_CLEAR | MEMF_PUBLIC))) {
         Close(fh);
-        cleanup(ERROR, "Out of memory while reading Kommandon.cfg\n");
+        cleanup(EXIT_ERROR, "Out of memory while reading Kommandon.cfg\n");
       }
       buffer[32] = '\0';
       if(!GetStringCfgValue(buffer, command->namn, 30)) {
         Close(fh);
-        cleanup(ERROR, "Invalid Kommandon.cfg");
+        cleanup(EXIT_ERROR, "Invalid Kommandon.cfg");
       }
       AddTail((struct List *)&Servermem->kom_list, (struct Node *)command);
       cnt++;
@@ -367,11 +367,11 @@ void ReadCommandConfig(void) {
     if(command == NULL) {
       printf("Found command detail line before command start (\"N=\"): %s\n", buffer);
       Close(fh);
-      cleanup(ERROR, "Invalid Kommandon.cfg");
+      cleanup(EXIT_ERROR, "Invalid Kommandon.cfg");
     }
     if(!handleCommandConfigLine(buffer, command)) {
       Close(fh);
-      cleanup(ERROR, "Invalid Kommandon.cfg");
+      cleanup(EXIT_ERROR, "Invalid Kommandon.cfg");
     }
   }
   Close(fh);
@@ -481,7 +481,7 @@ void ReadFileKeyConfig(void) {
   char buffer[100];
   int x=0;
   if(!(fh = Open("NiKom:DatoCfg/Nycklar.cfg", MODE_OLDFILE))) {
-    cleanup(ERROR,"Could not open Nycklar.cfg");
+    cleanup(EXIT_ERROR,"Could not open Nycklar.cfg");
   }
   while(FGets(fh, buffer, 100)) {
     if(x >= MAXNYCKLAR) {
@@ -588,7 +588,7 @@ void ReadNodeTypesConfig(void) {
   int i;
   char buffer[100], *tmp;
   if(!(fh = Open("NiKom:DatoCfg/NodeTypes.cfg", MODE_OLDFILE))) {
-    cleanup(ERROR, "Could not find NodeTypes.cfg");
+    cleanup(EXIT_ERROR, "Could not find NodeTypes.cfg");
   }
   for(i = 0; i < MAXNODETYPES; i++) {
     Servermem->nodetypes[i].nummer = 0;
@@ -602,7 +602,7 @@ void ReadNodeTypesConfig(void) {
     if(tmp == NULL || strcmp(tmp, "NODETYPE") != 0) {
       printf("Invalid config line: %s\n", buffer);
       Close(fh);
-      cleanup(ERROR, "Invalid NodeTypes.cfg");
+      cleanup(EXIT_ERROR, "Invalid NodeTypes.cfg");
     }
     for(i = 0; i < MAXNODETYPES; i++) {
       if(Servermem->nodetypes[i].nummer == 0) {
@@ -611,14 +611,14 @@ void ReadNodeTypesConfig(void) {
     }
     if(i == MAXNODETYPES) {
       Close(fh);
-      cleanup(ERROR, "Too many nodetypes defined in NodeTypes.cfg");
+      cleanup(EXIT_ERROR, "Too many nodetypes defined in NodeTypes.cfg");
     }
 
     tmp = strtok(NULL, WHITESPACE);
     if(tmp == NULL) {
       printf("No node type number found on line: %s\n", buffer);
       Close(fh);
-      cleanup(ERROR, "Invalid NodeTypes.cfg");
+      cleanup(EXIT_ERROR, "Invalid NodeTypes.cfg");
     }
     Servermem->nodetypes[i].nummer = atoi(tmp);
 
@@ -626,7 +626,7 @@ void ReadNodeTypesConfig(void) {
     if(tmp == NULL) {
       printf("No node type path found on line: %s\n", buffer);
       Close(fh);
-      cleanup(ERROR, "Invalid NodeTypes.cfg");
+      cleanup(EXIT_ERROR, "Invalid NodeTypes.cfg");
     }
     strcpy(Servermem->nodetypes[i].path, tmp);
 
@@ -634,7 +634,7 @@ void ReadNodeTypesConfig(void) {
     if(tmp == NULL) {
       printf("No node type description found on line: %s\n", buffer);
       Close(fh);
-      cleanup(ERROR, "Invalid NodeTypes.cfg");
+      cleanup(EXIT_ERROR, "Invalid NodeTypes.cfg");
     }
     strcpy(Servermem->nodetypes[i].desc, tmp);
   }

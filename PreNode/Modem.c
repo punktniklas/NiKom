@@ -17,8 +17,8 @@
 #include "Terminal.h"
 #include "BasicIO.h"
 
-#define ERROR	10
-#define OK	0
+#define EXIT_ERROR	10
+#define EXIT_OK	0
 #define RELOGIN 1
 
 extern struct IOExtSer *serwritereq;
@@ -54,7 +54,7 @@ void disconnect() {
 		Delay(100);
 		dtespeed = highbaud;
 		if(OpenSerial(serwritereq,serreadreq,serchangereq))
-			cleanup(ERROR,"Couldn't open user defined device\n");
+			cleanup(EXIT_ERROR,"Couldn't open user defined device\n");
 	} else {
 		sendplus();
 		Delay(50);
@@ -202,7 +202,7 @@ char wc_gettkn(int seropen) {
 			AbortIO((struct IORequest *)serreadreq);
 			WaitIO((struct IORequest *)serreadreq);
 		}
-		cleanup(OK,"");
+		cleanup(EXIT_OK,"");
 	}
 	if(signals & nikomnodesig) {
 		while(nikmess = (struct NiKMess *) GetMsg(nikomnodeport)) {
@@ -246,7 +246,7 @@ void waitconnect(void) {
 			nodestate = nodestate & (NIKSTATE_CLOSESER | NIKSTATE_NOANSWER);
 			if((oldstate & NIKSTATE_CLOSESER) && !(nodestate & NIKSTATE_CLOSESER)) {
 				if(OpenSerial(serwritereq,serreadreq,serchangereq))
-					cleanup(ERROR,"Couldn't open user defined device\n");
+					cleanup(EXIT_ERROR,"Couldn't open user defined device\n");
 				serreqtkn();
 				sendat(init);
 			} else if(!(oldstate & NIKSTATE_CLOSESER) && (nodestate & NIKSTATE_CLOSESER))

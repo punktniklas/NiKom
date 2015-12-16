@@ -13,8 +13,8 @@
 #include "funcs.h"
 
 /* För UserLibInit() */
-#define ERROR 1
-#define OK    0
+#define RET_ERROR 1
+#define RET_OK    0
 
 struct DosLibrary *DOSBase;
 struct IntuitionBase *IntuitionBase;
@@ -41,33 +41,33 @@ __UserLibInit(register __a6 struct NiKomBase * NiKomBase)
 {
 	/* NiKomBase private initialization */
 
-	if(!(DOSBase = (struct DosLibrary *)OpenLibrary("dos.library",37L))) return(ERROR);
+	if(!(DOSBase = (struct DosLibrary *)OpenLibrary("dos.library",37L))) return(RET_ERROR);
 	if(!(IntuitionBase = (struct IntuitionBase *)OpenLibrary("intuition.library",37L))) {
 		CloseLibrary((struct Library *)DOSBase);
-		return(ERROR);
+		return(RET_ERROR);
 	}
 	if(!(RexxSysBase = OpenLibrary("rexxsyslib.library",36L))) {
 		CloseLibrary((struct Library *)IntuitionBase);
 		CloseLibrary((struct Library *)DOSBase);
-		return(ERROR);
+		return(RET_ERROR);
 	}
 	if(!(UtilityBase = OpenLibrary("utility.library",37L))) {
 		CloseLibrary(RexxSysBase);
 		CloseLibrary((struct Library *)IntuitionBase);
 		CloseLibrary((struct Library *)DOSBase);
-		return(ERROR);
+		return(RET_ERROR);
 	}
 	if(!getlastmatrix(NiKomBase)) {
 		CloseLibrary(UtilityBase);
 		CloseLibrary(RexxSysBase);
 		CloseLibrary((struct Library *)IntuitionBase);
 		CloseLibrary((struct Library *)DOSBase);
-		return(ERROR);
+		return(RET_ERROR);
 	}
 	InitSemaphore(& NiKomBase->sem);
 	copychrstables(NiKomBase);
 
-	return (OK);
+	return (RET_OK);
 }
 
 void __saveds __asm

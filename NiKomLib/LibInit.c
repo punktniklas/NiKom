@@ -12,10 +12,6 @@
 
 #include "NiKomBase.h"
 
-/* För UserLibInit() */
-#define ERROR 1
-#define OK    0
-
 /* Prototypes */
 ULONG __saveds __asm _LibExpunge( register __a6 struct NiKomBase *libbase );
 ULONG __saveds __asm _LibInit(register __a0 APTR seglist,

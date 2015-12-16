@@ -13,8 +13,8 @@
 #include "NiKomLib.h"
 #include "BasicIO.h"
 
-#define ERROR	128
-#define OK	0
+#define EXIT_ERROR	10
+#define EXIT_OK	0
 
 struct IOStdReq *conwritereq=NULL;
 struct MsgPort *conwriteport=NULL;
@@ -147,7 +147,7 @@ char gettekn(void) {
     if(signals & windsig) {
       mymess=(struct IntuiMessage *)GetMsg(NiKwind->UserPort);
       ReplyMsg((struct Message *)mymess);
-      cleanup(OK,"");
+      cleanup(EXIT_OK,"");
     }
     if(signals & nikomnodesig) {
       while(nikmess = (struct NiKMess *) GetMsg(nikomnodeport)) {
@@ -352,7 +352,7 @@ int sendtocon(char *pekare, int size)
 		if(signals & windsig) {
 			mymess=(struct IntuiMessage *)GetMsg(NiKwind->UserPort);
 			ReplyMsg((struct Message *)mymess);
-			cleanup(OK,"");
+			cleanup(EXIT_OK,"");
 		}
 		if(signals & nikomnodesig) {
 			while(nikmess = (struct NiKMess *) GetMsg(nikomnodeport)) {
@@ -384,7 +384,7 @@ void getnodeconfig(char *configname) {
 	int len;
 	if(!(fp=fopen(configname,"r"))) {
 		printf("Kunde inte öppna %s.\n",configname);
-		cleanup(ERROR,"");
+		cleanup(EXIT_ERROR,"");
 	}
 	while(fgets(buffer,99,fp)) {
 		len = strlen(buffer);

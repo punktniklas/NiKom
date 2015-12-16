@@ -17,7 +17,7 @@
 
 #include "Startup.h"
 
-#define ERROR	     10
+#define EXIT_ERROR	     10
 #define OK	     0
 #define MINOSVERSION 37
 
@@ -98,7 +98,7 @@ void RegisterARexxFunctionHost(int add) {
   struct MsgPort *rexxmastport;
   if(!(mess=(struct RexxMsg *)AllocMem(sizeof(struct RexxMsg),
                                        MEMF_CLEAR | MEMF_PUBLIC))) {
-    cleanup(ERROR, "Out of memory.");
+    cleanup(EXIT_ERROR, "Out of memory.");
   }
   mess->rm_Node.mn_Node.ln_Type = NT_MESSAGE;
   mess->rm_Node.mn_Length = sizeof(struct RexxMsg);
@@ -115,7 +115,7 @@ void RegisterARexxFunctionHost(int add) {
   if(rexxmastport == NULL) {
     FreeMem(mess, sizeof(struct RexxMsg));
     if(add) {
-      cleanup(ERROR, "Can't find port 'REXX' (ARexx master server)");
+      cleanup(EXIT_ERROR, "Can't find port 'REXX' (ARexx master server)");
     }
     return;
   }
@@ -127,26 +127,26 @@ void RegisterARexxFunctionHost(int add) {
 void openLibrariesAndPorts(void) {
   if(!(IntuitionBase = (struct IntuitionBase *)OpenLibrary("intuition.library",
                                                            MINOSVERSION))) {
-    cleanup(ERROR,"Can't open intuition.library.");
+    cleanup(EXIT_ERROR,"Can't open intuition.library.");
   }
   if(!(RexxSysBase = (struct RsxLib *)OpenLibrary("rexxsyslib.library",0L))) {
-    cleanup(ERROR,"Can't open rexxsyslib.library.");
+    cleanup(EXIT_ERROR,"Can't open rexxsyslib.library.");
   }
   if(!(UtilityBase = OpenLibrary("utility.library", MINOSVERSION))) {
-    cleanup(ERROR,"Can't open utility.library.");
+    cleanup(EXIT_ERROR,"Can't open utility.library.");
   }
   if(!(NiKomBase = OpenLibrary("nikom.library",19L))) {
-    cleanup(ERROR,"Can't open nikom.library");
+    cleanup(EXIT_ERROR,"Can't open nikom.library");
   }
   if(!(permitport = (struct MsgPort *)CreatePort("NiKomPermit",0))) {
-    cleanup(ERROR,"Can't open port 'NiKomPermit'");
+    cleanup(EXIT_ERROR,"Can't open port 'NiKomPermit'");
   }
   if(!(nodereplyport = CreateMsgPort())) {
-    cleanup(ERROR,"Can't open node reply message port.");
+    cleanup(EXIT_ERROR,"Can't open node reply message port.");
   }
 
   if(!(rexxport=(struct MsgPort *)CreatePort("NIKOMREXXHOST",0))) {
-    cleanup(ERROR, "Could not open ARexx function host port.");
+    cleanup(EXIT_ERROR, "Could not open ARexx function host port.");
   }
   RegisterARexxFunctionHost(TRUE);
 }
@@ -155,7 +155,7 @@ void setupServermem(void) {
   int i;
   if(!(Servermem = (struct System *)AllocMem(sizeof(struct System),
                                              MEMF_PUBLIC | MEMF_CLEAR))) {
-    cleanup(ERROR,"Can't allocate NiKServer shared memory.");
+    cleanup(EXIT_ERROR,"Can't allocate NiKServer shared memory.");
   }
   NewList((struct List *)&Servermem->user_list);
   NewList((struct List *)&Servermem->grupp_list);
@@ -177,12 +177,12 @@ void readSysInfo() {
   BPTR fh;
 
   if(!(fh=Open(SYSINFO_FILEPATH, MODE_OLDFILE))) {
-    cleanup(ERROR,"Couldn't open " SYSINFO_FILEPATH "\n");
+    cleanup(EXIT_ERROR,"Couldn't open " SYSINFO_FILEPATH "\n");
   }
   if(Read(fh,(void *)&Servermem->info,sizeof(struct SysInfo))
      != sizeof(struct SysInfo)) {
     Close(fh);
-    cleanup(ERROR, "Couldn't read " SYSINFO_FILEPATH "\n");
+    cleanup(EXIT_ERROR, "Couldn't read " SYSINFO_FILEPATH "\n");
   }
   printf("Sysinfo.dat inläst\n");
   Close(fh);
@@ -197,16 +197,16 @@ void readTextInfo(void) {
 
   if(!(fib=(struct FileInfoBlock *)AllocMem(sizeof(struct FileInfoBlock),
                                             MEMF_CLEAR))) {
-    cleanup(ERROR, "Couldn't allocate a FileInfoBlock");
+    cleanup(EXIT_ERROR, "Couldn't allocate a FileInfoBlock");
   }
   if(!(lock=Lock("NiKom:Moten",ACCESS_READ))) {
     FreeMem(fib,sizeof(struct FileInfoBlock));
-    cleanup(ERROR, "Couldn't lock NiKom:Moten.");
+    cleanup(EXIT_ERROR, "Couldn't lock NiKom:Moten.");
   }
   if(!Examine(lock,fib)) {
     FreeMem(fib,sizeof(struct FileInfoBlock));
     UnLock(lock);
-    cleanup(ERROR, "Couldn't Examine() NiKom:Moten.");
+    cleanup(EXIT_ERROR, "Couldn't Examine() NiKom:Moten.");
   }
   while(ExNext(lock, fib)) {
     if(strncmp(fib->fib_FileName, "Head", 4)) {
@@ -233,15 +233,15 @@ void readTextInfo(void) {
   sprintf(filename, "NiKom:Moten/Head%d.dat", low);
   if(!(fh = Open(filename, MODE_OLDFILE))) {
     printf("Can't open %s.\n", filename);
-    cleanup(ERROR, "Couldn't get lowest textnumber.");
+    cleanup(EXIT_ERROR, "Couldn't get lowest textnumber.");
   }
   if(Seek(fh,0,OFFSET_BEGINNING) == -1) {
     Close(fh);
-    cleanup(ERROR, "Couldn't Seek() in Head.dat (1)");
+    cleanup(EXIT_ERROR, "Couldn't Seek() in Head.dat (1)");
   }
   if(Read(fh, &readhead, sizeof(struct Header)) != sizeof(struct Header)) {
     Close(fh);
-    cleanup(ERROR, "Couldn't read Head.dat (1)");
+    cleanup(EXIT_ERROR, "Couldn't read Head.dat (1)");
   }
   Servermem->info.lowtext = readhead.nummer;
   Close(fh);
@@ -249,15 +249,15 @@ void readTextInfo(void) {
   sprintf(filename,"NiKom:Moten/Head%d.dat", high);
   if(!(fh = Open(filename,MODE_OLDFILE))) {
     printf("Can't open %s.\n", filename);
-    cleanup(ERROR, "Couldn't get highest textnumber.");
+    cleanup(EXIT_ERROR, "Couldn't get highest textnumber.");
   }
   if(Seek(fh, -sizeof(struct Header), OFFSET_END) == -1) {
     Close(fh);
-    cleanup(ERROR, "Couldn't Seek() in Head.dat (2)");
+    cleanup(EXIT_ERROR, "Couldn't Seek() in Head.dat (2)");
   }
   if(Read(fh, &readhead, sizeof(struct Header)) != sizeof(struct Header)) {
     Close(fh);
-    cleanup(ERROR, "Couldn't read Head.dat (2)");
+    cleanup(EXIT_ERROR, "Couldn't read Head.dat (2)");
   }
   Servermem->info.hightext = readhead.nummer;
   Close(fh);
@@ -272,20 +272,20 @@ void readGroupData(void) {
 
   NewList((struct List *)&Servermem->grupp_list);
   if(!(fh=Open("NiKom:DatoCfg/Grupper.dat",MODE_OLDFILE))) {
-    cleanup(ERROR, "Couldn't open NiKom:DatoCfg/Grupper.dat.");
+    cleanup(EXIT_ERROR, "Couldn't open NiKom:DatoCfg/Grupper.dat.");
   }
   
   for(;;) {
     if(!(userGroup=(struct UserGroup *)AllocMem(sizeof(struct UserGroup),
                                                 MEMF_CLEAR | MEMF_PUBLIC))) {
-      cleanup(ERROR, "Out of memory.");
+      cleanup(EXIT_ERROR, "Out of memory.");
     }
     SetIoErr(0L);
     if(!FRead(fh, userGroup, sizeof(struct UserGroup), 1)) {
       if(IoErr()) {
         FreeMem(userGroup, sizeof(struct UserGroup));
         Close(fh);
-        cleanup(ERROR, "Error reading Grupper.dat");
+        cleanup(EXIT_ERROR, "Error reading Grupper.dat");
       } else {
         FreeMem(userGroup, sizeof(struct UserGroup));
         break;
@@ -309,18 +309,18 @@ void readConferenceData(void) {
   struct Mote *newConf, *conf;
 
   if(!(fh = Open("NiKom:DatoCfg/Möten.dat", MODE_OLDFILE))) {
-    cleanup(ERROR, "Could not open NiKom:DatoCfg/Möten.dat");
+    cleanup(EXIT_ERROR, "Could not open NiKom:DatoCfg/Möten.dat");
   }
   for(;;) {
     if(!(newConf = (struct Mote *)AllocMem(sizeof(struct Mote),
                                            MEMF_CLEAR | MEMF_PUBLIC))) {
-      cleanup(ERROR, "Out of memory.");
+      cleanup(EXIT_ERROR, "Out of memory.");
     }
     ret = Read(fh, newConf, sizeof(struct Mote));
     if(ret == -1) {
       FreeMem(newConf, sizeof(struct Mote));
       Close(fh);
-      cleanup(ERROR, "Error reading Möten.dat");
+      cleanup(EXIT_ERROR, "Error reading Möten.dat");
     } else if(ret == 0) {
       FreeMem(newConf, sizeof(struct Mote));
       break;
@@ -352,7 +352,7 @@ void readConferenceTexts(void) {
   if(!(Servermem->confTexts.texts =
        AllocMem(Servermem->confTexts.arraySize * sizeof(short),
                 MEMF_CLEAR | MEMF_PUBLIC))) {
-    cleanup(ERROR, "Can't allocate ConferenceTexts array");
+    cleanup(EXIT_ERROR, "Can't allocate ConferenceTexts array");
   }
 
   if(maybeConvertConferenceTextData(numberOfTexts)) {
@@ -361,7 +361,7 @@ void readConferenceTexts(void) {
 
   printf("Reading ConferenceTexts.dat\n");
   if(!(file = Open("NiKom:DatoCfg/ConferenceTexts.dat",MODE_OLDFILE))) {
-    cleanup(ERROR, "Can't open ConferenceTexts.dat");
+    cleanup(EXIT_ERROR, "Can't open ConferenceTexts.dat");
   }
   readIntoConfTextsArray(0, 0, numberOfTexts, file);
   Close(file);
@@ -394,11 +394,11 @@ int maybeConvertConferenceTextData(int numberOfTexts) {
 
   printf("  Textmot.dat read, writing ConferenceTexts.dat.\n");
   if(!WriteConferenceTexts()) {
-    cleanup(ERROR, "Couldn't write ConferenceTexts.dat.");
+    cleanup(EXIT_ERROR, "Couldn't write ConferenceTexts.dat.");
   }
   printf("  ConferenceTexts.dat written, deleting Textmot.dat.\n");
   if(!DeleteFile("NiKom:DatoCfg/Textmot.dat")) {
-    cleanup(ERROR, "Couldn't delete Textmot.dat.");
+    cleanup(EXIT_ERROR, "Couldn't delete Textmot.dat.");
   }
   printf("  Conversion finished.\n");
 }
@@ -408,13 +408,13 @@ void readIntoConfTextsArray(int arrayIndex, int fileIndex, int textsToRead,
   printf("  Reading from position %d.\n", fileIndex);
   if(Seek(file, fileIndex * sizeof(short), OFFSET_BEGINNING) == -1) {
     Close(file);
-    cleanup(ERROR, "Couldn't seek in file.");
+    cleanup(EXIT_ERROR, "Couldn't seek in file.");
   }
   printf("  Reading %d texts into index %d.\n", textsToRead, arrayIndex);
   if(FRead(file, &Servermem->confTexts.texts[arrayIndex], sizeof(short), textsToRead)
      != textsToRead) {
     Close(file);
-    cleanup(ERROR, "Couldn't read from file.");
+    cleanup(EXIT_ERROR, "Couldn't read from file.");
   }
 }
 
@@ -437,7 +437,7 @@ int readSingleUser(int userId) {
   Close(fh);
   if(!(newShortUser = (struct ShortUser *)AllocMem(sizeof(struct ShortUser),
                                                    MEMF_CLEAR | MEMF_PUBLIC))) {
-    cleanup(ERROR,"Out of memory.");
+    cleanup(EXIT_ERROR,"Out of memory.");
   }
   ITER_EL(shortUser, Servermem->user_list, user_node, struct ShortUser *) {
     if(shortUser->nummer > userId) {
@@ -463,12 +463,12 @@ int scanUserDir(char *dirname) {
 
   printf("  Reading user directory %s...\n", dirname);
   if(!(ec = (struct ExAllControl *)AllocDosObject(DOS_EXALLCONTROL, NULL))) {
-    cleanup(ERROR,"Out of memory.");
+    cleanup(EXIT_ERROR,"Out of memory.");
   }
   sprintf(path, "NiKom:Users/%s", dirname);
   if(!(lock = Lock(path, ACCESS_READ))) {
     FreeDosObject(DOS_EXALLCONTROL, ec);
-    cleanup(ERROR,"Could not Lock() NiKom:Users/x");
+    cleanup(EXIT_ERROR,"Could not Lock() NiKom:Users/x");
   }
   ec->eac_LastKey = 0L;
   ec->eac_MatchString = NULL;
@@ -513,11 +513,11 @@ void readUserData(void) {
   printf("Reading user data...\n");
 
   if(!(ec = (struct ExAllControl *)AllocDosObject(DOS_EXALLCONTROL, NULL))) {
-    cleanup(ERROR, "Out of memory.");
+    cleanup(EXIT_ERROR, "Out of memory.");
   }
   if(!(lock = Lock("NiKom:Users", ACCESS_READ))) {
     FreeDosObject(DOS_EXALLCONTROL, ec);
-    cleanup(ERROR,"Could not Lock() NiKom:Users\n");
+    cleanup(EXIT_ERROR,"Could not Lock() NiKom:Users\n");
   }
   ec->eac_LastKey = 0L;
   ec->eac_MatchString = NULL;
@@ -536,7 +536,7 @@ void readUserData(void) {
     if(!scanUserDir(ed->ed_Name)) {
       UnLock(lock);
       FreeDosObject(DOS_EXALLCONTROL,ec);
-      cleanup(ERROR, "Could not read users.");
+      cleanup(EXIT_ERROR, "Could not read users.");
     }
     ed = ed->ed_Next;
     if(!ed) {
@@ -558,10 +558,10 @@ void readUserData(void) {
 void readLastLogins(void) {
   BPTR fh;
   if(!(fh = Open("NiKom:DatoCfg/Senaste.dat", MODE_OLDFILE))) {
-    cleanup(ERROR, "Could not read Senaste.dat");
+    cleanup(EXIT_ERROR, "Could not read Senaste.dat");
   }
   if(!Read(fh, Servermem->senaste, sizeof(struct Inloggning) * MAXSENASTE)) {
-    cleanup(ERROR, "Error reading last login data.");
+    cleanup(EXIT_ERROR, "Error reading last login data.");
   }
   printf("Read last login data.\n");
   Close(fh);
@@ -589,13 +589,13 @@ void readFileAreas(void) {
   BPTR fh;
   int i;
   if(!(fh = Open("NiKom:DatoCfg/Areor.dat", MODE_OLDFILE))) {
-    cleanup(ERROR,"Could not open NiKom:DatoCfg/Areor.dat");
+    cleanup(EXIT_ERROR,"Could not open NiKom:DatoCfg/Areor.dat");
   }
   SetIoErr(0L);
   Servermem->info.areor = FRead(fh, (void *)Servermem->areor,
                                 sizeof(struct Area), MAXAREA);
   if(IoErr()) {
-    cleanup(ERROR, "Error reading Areor.dat");
+    cleanup(EXIT_ERROR, "Error reading Areor.dat");
   }
   Close(fh);
   for(i = 0; i < MAXAREA; i++) {
@@ -617,7 +617,7 @@ void readFileAreaFiles(void) {
     printf("  Reading file area %s...", Servermem->areor[i].namn);
     sprintf(path, "NiKom:DatoCfg/Areor/%d.dat", i);
     if(!(fh = Open(path, MODE_OLDFILE))) {
-      cleanup(ERROR, "Could not open Areor/x.dat");
+      cleanup(EXIT_ERROR, "Could not open Areor/x.dat");
     }
     index = 0;
     cnt = 0;
@@ -625,14 +625,14 @@ void readFileAreaFiles(void) {
       if(!(newFile = (struct Fil *)AllocMem(sizeof(struct Fil),
                                             MEMF_CLEAR | MEMF_PUBLIC))) {
         Close(fh);
-        cleanup(ERROR, "Out of memory.");
+        cleanup(EXIT_ERROR, "Out of memory.");
       }
       if((readlen = Read(fh, newFile, sizeof(struct DiskFil)))
          != sizeof(struct DiskFil)) {
         FreeMem(newFile, sizeof(struct DiskFil));
         Close(fh);
         if(readlen != 0) {
-          cleanup(ERROR, "Error reading Areor/x.dat");
+          cleanup(EXIT_ERROR, "Error reading Areor/x.dat");
         }
         break;
       }
@@ -686,7 +686,7 @@ void openWindow(void) {
   strcpy(NiKomReleaseStr, NIKRELEASE " (" __DATE__ " " __TIME__ ")");
   sprintf(windowTitle, "NiKom %s,  0 noder aktiva", NiKomReleaseStr);
   if(!(lockscreen = LockPubScreen(pubscreen[0] == '-' ? NULL : pubscreen))) {
-    cleanup(ERROR,"Kunde inte låsa angiven Public Screen\n");
+    cleanup(EXIT_ERROR,"Kunde inte låsa angiven Public Screen\n");
   }
   windowHeight = lockscreen->WBorTop + lockscreen->Font->ta_YSize + 1;
   NiKWindow = (struct Window *)OpenWindowTags(NULL,
@@ -706,6 +706,6 @@ void openWindow(void) {
                                               WA_PubScreen, lockscreen);
   UnlockPubScreen(NULL, lockscreen);
   if(NiKWindow == NULL) {
-    cleanup(ERROR, "Could not open window.");
+    cleanup(EXIT_ERROR, "Could not open window.");
   }
 }

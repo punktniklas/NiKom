@@ -12,13 +12,6 @@
 #include "NiKomFuncs.h"
 #include "NiKomLib.h"
 
-#define ERROR	10
-#define OK		0
-#define EKO		1
-#define EJEKO	0
-#define KOM		1
-#define EJKOM	0
-
 char *hittaefter(char *);
 
 extern struct System *Servermem;

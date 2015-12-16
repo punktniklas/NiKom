@@ -17,8 +17,8 @@
 #include "Terminal.h"
 #include "NewUser.h"
 
-#define ERROR	10
-#define OK	0
+#define EXIT_ERROR	10
+#define EXIT_OK	0
 #define coneka	eka
 #define conputtekn puttekn
 
@@ -77,27 +77,27 @@ void main(int argc, char **argv) {
   NewList((struct List *)&aliaslist);
   NewList((struct List *)&edit_list);
   if(!(IntuitionBase=(struct IntuitionBase *)OpenLibrary("intuition.library",0)))
-    cleanup(ERROR,"Kunde inte öppna intuition.library\n");
+    cleanup(EXIT_ERROR,"Kunde inte öppna intuition.library\n");
   if(!(UtilityBase=OpenLibrary("utility.library",37L)))
-    cleanup(ERROR,"Kunde inte öppna utility.library\n");
+    cleanup(EXIT_ERROR,"Kunde inte öppna utility.library\n");
   if(!(NiKomBase=OpenLibrary("nikom.library",0L)))
-    cleanup(ERROR,"Kunde inte öppna nikom.linbrary");
+    cleanup(EXIT_ERROR,"Kunde inte öppna nikom.linbrary");
   getnodeconfig("NiKom:Datocfg/ConNode.cfg");
-  if(!(initnode(NODCON))) cleanup(ERROR,"Kunde inte registrera noden i Servern\n");
+  if(!(initnode(NODCON))) cleanup(EXIT_ERROR,"Kunde inte registrera noden i Servern\n");
   if(!(nikomnodeport = CreateMsgPort()))
-    cleanup(ERROR,"Kunde inte skapa NiKomNode-porten");
+    cleanup(EXIT_ERROR,"Kunde inte skapa NiKomNode-porten");
   sprintf(nikomnodeportnamn,"NiKomNode%d",nodnr);
   nikomnodeport->mp_Node.ln_Name = nikomnodeportnamn;
   nikomnodeport->mp_Node.ln_Pri = 1;
   AddPort(nikomnodeport);
   sprintf(rexxportnamn,"NiKomRexx%d",nodnr);
   if(!(rexxport=(struct MsgPort *)CreateMsgPort()))
-    cleanup(ERROR,"Kunde inte öppna RexxPort\n");
+    cleanup(EXIT_ERROR,"Kunde inte öppna RexxPort\n");
   rexxport->mp_Node.ln_Name=rexxportnamn;
   rexxport->mp_Node.ln_Pri=50;
   AddPort(rexxport);
   if(!(RexxSysBase=(struct RsxLib *)OpenLibrary("rexxsyslib.library",0L)))
-    cleanup(ERROR,"Kunde inte öppna rexxsyslib.library\n");
+    cleanup(EXIT_ERROR,"Kunde inte öppna rexxsyslib.library\n");
   if(pubscreen[0]=='-') tmppscreen=NULL;
   else tmppscreen=pubscreen;
   if(!(NiKwind=(struct Window *)OpenWindowTags(NULL,WA_Left,xpos,
@@ -119,8 +119,8 @@ void main(int argc, char **argv) {
                                                WA_AutoAdjust,TRUE,
                                                WA_PubScreenName,tmppscreen,
                                                TAG_DONE)))
-    cleanup(ERROR,"Kunde inte öppna fönstret\n");
-  if(!OpenIO(NiKwind)) cleanup(ERROR,"Kunde inte öppna IO\n");
+    cleanup(EXIT_ERROR,"Kunde inte öppna fönstret\n");
+  if(!OpenIO(NiKwind)) cleanup(EXIT_ERROR,"Kunde inte öppna IO\n");
   strcpy(Servermem->nodid[nodnr],nodid);
   sprintf(titel,"Nod #%d CON: <Ingen inloggad>",nodnr);
   SetWindowTitles(NiKwind,titel,(UBYTE *)-1L);
@@ -207,5 +207,5 @@ void main(int argc, char **argv) {
   panik:
     puttekn("\r\n\nEn inloggning till? (J/n)",-1);
   } while((ch = GetChar()) != 'n' && ch != 'N');
-  cleanup(OK,"");
+  cleanup(EXIT_OK,"");
 }

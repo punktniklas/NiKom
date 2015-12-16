@@ -19,12 +19,10 @@
 #include "NewUser.h"
 #include "BasicIO.h"
 
-#define ERROR	10
-#define OK	0
+#define EXIT_ERROR	10
+#define EXIT_OK	0
 #define EKO	1
 #define EJEKO	0
-#define NOCARRIER	32
-#define KONVCHAR 400
 
 int CXBRK(void) { return(0); }
 
@@ -165,34 +163,34 @@ void main(int argc,char *argv[]) {
       } else strcpy(configname,argv[x]);
     }
   if(!(IntuitionBase=(struct IntuitionBase *)OpenLibrary("intuition.library",0)))
-    cleanup(ERROR,"Kunde inte öppna intuition.library\n");
+    cleanup(EXIT_ERROR,"Kunde inte öppna intuition.library\n");
   if(!(UtilityBase=OpenLibrary("utility.library",37L)))
-    cleanup(ERROR,"Kunde inte öppna utility.library\n");
+    cleanup(EXIT_ERROR,"Kunde inte öppna utility.library\n");
   if(!(NiKomBase=OpenLibrary("nikom.library",0L)))
-    cleanup(ERROR,"Kunde inte öppna nikom.library\n");
-  if(!initnode(NODSER)) cleanup(ERROR,"Kunde inte registrera noden i Servern\n");
+    cleanup(EXIT_ERROR,"Kunde inte öppna nikom.library\n");
+  if(!initnode(NODSER)) cleanup(EXIT_ERROR,"Kunde inte registrera noden i Servern\n");
   if(!(nikomnodeport = CreateMsgPort()))
-    cleanup(ERROR,"Kunde inte skapa NiKomNode-porten");
+    cleanup(EXIT_ERROR,"Kunde inte skapa NiKomNode-porten");
   sprintf(nikomnodeportnamn,"NiKomNode%d",nodnr);
   nikomnodeport->mp_Node.ln_Name = nikomnodeportnamn;
   nikomnodeport->mp_Node.ln_Pri = 1;
   AddPort(nikomnodeport);
   sprintf(rexxportnamn,"NiKomPreRexx%d",nodnr);
   if(!(rexxport=(struct MsgPort *)CreateMsgPort()))
-    cleanup(ERROR,"Kunde inte öppna RexxPort\n");
+    cleanup(EXIT_ERROR,"Kunde inte öppna RexxPort\n");
   rexxport->mp_Node.ln_Name=rexxportnamn;
   rexxport->mp_Node.ln_Pri=50;
   AddPort(rexxport);
   if(!(RexxSysBase=(struct RsxLib *)OpenLibrary("rexxsyslib.library",0L)))
-    cleanup(ERROR,"Kunde inte öppna rexxsyslib.library\n");
+    cleanup(EXIT_ERROR,"Kunde inte öppna rexxsyslib.library\n");
   getnodeconfig(configname);
   if(pubscreen[0]=='-') tmppscreen=NULL;
   else tmppscreen=pubscreen;
   if(!(NiKwind=openmywindow(tmppscreen)))
-    cleanup(ERROR,"Kunde inte öppna fönstret\n");
+    cleanup(EXIT_ERROR,"Kunde inte öppna fönstret\n");
   if(getty) dtespeed = gettybps;
   else dtespeed = highbaud;
-  if(!OpenIO(NiKwind)) cleanup(ERROR,"Couldn't setup IO");
+  if(!OpenIO(NiKwind)) cleanup(EXIT_ERROR,"Couldn't setup IO");
   strcpy(Servermem->nodid[nodnr],nodid);
   conreqtkn();
   serreqtkn();
@@ -260,7 +258,7 @@ void main(int argc,char *argv[]) {
       } else if(inloggad==-1) puttekn("\r\nHittar ej namnet\r\n",-1);
     }
     if(!car) {
-      if(getty) cleanup(OK,"");
+      if(getty) cleanup(EXIT_OK,"");
       disconnect();
       continue;
     }
@@ -314,14 +312,14 @@ void main(int argc,char *argv[]) {
     nodestate = SystemTags(commandstring, SYS_UserShell, TRUE, TAG_DONE);
     AddPort(nikomnodeport);
     if(!getty || (nodestate & NIKSTATE_RELOGIN)) {
-      if(!(NiKwind = openmywindow(tmppscreen))) cleanup(ERROR,"Kunde inte öppna fönstret\n");
+      if(!(NiKwind = openmywindow(tmppscreen))) cleanup(EXIT_ERROR,"Kunde inte öppna fönstret\n");
       OpenConsole(NiKwind);
     }
     serreqtkn();
     if(nodestate & NIKSTATE_RELOGIN) goto reloginspec;
   panik:
     Delay(hangupdelay);
-    if(getty) cleanup(OK,"");
+    if(getty) cleanup(EXIT_OK,"");
     disconnect();
   }
 }
