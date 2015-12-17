@@ -15,6 +15,7 @@ int conputtekn(char *pekare,int size);
 void DisplayInternalError(void);
 int GetYesOrNo(char *label, char yesChar, char noChar, char *yesStr, char *noStr,
                int yesIsDefault, int *res);
+int EditString(char *label, char *str, int maxlen, int nonEmpty);
 int MaybeEditString(char *label, char *str, int maxlen);
 int MaybeEditPassword(char *label1, char *label2, char *pwd, int maxlen);
 int MaybeEditNumber(char *label, int *number, int maxlen, int minVal, int maxVal);

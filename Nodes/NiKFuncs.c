@@ -10,6 +10,7 @@
 #include <time.h>
 #include <ctype.h>
 #include <limits.h>
+#include <math.h>
 #include "NiKomstr.h"
 #include "NiKomFuncs.h"
 #include "NiKomLib.h"
@@ -17,6 +18,7 @@
 #include "Terminal.h"
 #include "Cmd_Users.h"
 #include "NiKversion.h"
+#include "BasicIO.h"
 
 #define EKO             1
 #define EJEKO   0
@@ -465,7 +467,7 @@ void tiden(void)
 
 int skapmot(void) {
   struct ShortUser *shortUser;
-  int mad, setPermission, changed, ch, i, fidoDomainId;
+  int mad, setPermission, changed, ch, i, fidoDomainId, highestId;
   struct FidoDomain *fidoDomain;
   BPTR lock;
   struct User user;
@@ -566,11 +568,9 @@ int skapmot(void) {
   } else {
     SendString("Fido-möte\n\n\r");
     tmpConf.type = MOTE_FIDO;
-    SendString("I vilken katalog ligger .msg-filerna? ");
-    if(GetString(79, NULL)) {
+    if(EditString("Katalog for .msg-filerna", tmpConf.dir, 79, TRUE)) {
       return 1;
     }
-    strcpy(tmpConf.dir, inmat);
     if(!(lock = Lock(tmpConf.dir, SHARED_LOCK))) {
       if(!(lock = CreateDir(tmpConf.dir)))
         SendString("\n\rKunde inte skapa katalogen\n\r");
@@ -578,16 +578,14 @@ int skapmot(void) {
     if(lock) {
       UnLock(lock);
     }
-    SendString("\n\rVilket tag-namn har mötet? ");
-    if(GetString(49, NULL)) {
+    if(EditString("FidoNet tag-namn", tmpConf.tagnamn, 49, TRUE)) {
       return 1;
     }
-    strcpy(tmpConf.tagnamn, inmat);
-    SendString("\n\rVilken origin-rad ska användas för mötet? ");
-    if(GetString(69, Servermem->fidodata.defaultorigin)) {
+    strcpy(tmpConf.origin, Servermem->fidodata.defaultorigin);
+    if(MaybeEditString("Origin-rad", tmpConf.origin, 69)) {
       return 1;
     }
-    strcpy(tmpConf.origin, inmat);
+    
     SendString("\n\n\rVilken teckenuppsättning ska användas för utgående texter?\n\r");
     SendString("1: ISO Latin 1 (ISO 8859-1)\n\r");
     SendString("2: SIS-7 (SF7, 'Måsvingar')\n\r");
@@ -622,10 +620,12 @@ int skapmot(void) {
       break;
     }
     SendString("Vilken domän är mötet i?\n\r");
+    highestId = 0;
     for(i = 0; i < 10; i++) {
       if(!Servermem->fidodata.fd[i].domain[0]) {
         break;
       }
+      highestId = max(highestId, Servermem->fidodata.fd[i].nummer);
       SendString("%3d: %s (%d:%d/%d.%d)\n\r",
                  Servermem->fidodata.fd[i].nummer,
                  Servermem->fidodata.fd[i].domain,
@@ -639,7 +639,11 @@ int skapmot(void) {
       return 0;
     }
     for(;;) {
-      fidoDomainId = GetNumber(0, i - 1, NULL);
+      SendString("Domän: ");
+      fidoDomainId = GetNumber(0, highestId, NULL);
+      if(ImmediateLogout()) {
+        return 1;
+      }
       if(fidoDomain = getfidodomain(fidoDomainId, 0)) {
         break;
       } else {

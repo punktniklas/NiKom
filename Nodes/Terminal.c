@@ -601,6 +601,20 @@ int GetYesOrNo(char *label, char yesChar, char noChar, char *yesStr, char *noStr
   }
 }
 
+int EditString(char *label, char *str, int maxlen, int nonEmpty) {
+  for(;;) {
+    SendString("\r\n%s : ", label);
+    if(GetString(maxlen, NULL)) {
+      return 1;
+    }
+    if(inmat[0] == '\0' && nonEmpty) {
+      continue;
+    }
+    strncpy(str, inmat, maxlen + 1);
+    return 0;
+  }
+}
+
 /*
  * Asks the user to edit the given string. str must be able to hold maxlen + 1
  * characters (for the trailing '\0' character).
