@@ -6,7 +6,6 @@
 #include <proto/intuition.h>
 #include <string.h>
 #include <stdlib.h>
-#include <ctype.h>
 #include <stdio.h>
 #include <time.h>
 #include "NiKomstr.h"

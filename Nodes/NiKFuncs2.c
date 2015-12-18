@@ -7,10 +7,10 @@
 #include <proto/utility.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
 #include <stdio.h>
 #include <time.h>
 #include <devices/timer.h>
+#include "StringUtils.h"
 #include "NiKomstr.h"
 #include "NiKomFuncs.h"
 #include "NiKomLib.h"
@@ -32,7 +32,7 @@ char *skri;
 	char *faci,*skri2;
 	struct ShortUser *letpek;
 	if(skri[0]==0 || skri[0]==' ') return(-3);
-	if(isdigit(skri[0]) || (skri[0]=='#' && isdigit(skri[1]))) {
+	if(IzDigit(skri[0]) || (skri[0]=='#' && IzDigit(skri[1]))) {
 		if(skri[0]=='#') skri++;
 		nummer=atoi(skri);
 		faci=getusername(nummer);

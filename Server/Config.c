@@ -5,7 +5,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <ctype.h>
 #include "NiKomStr.h"
 #include "Shutdown.h"
 #include "Startup.h"
@@ -78,8 +77,8 @@ void readConfigFile(char *filename, int (*handleLine)(char *, BPTR)) {
     if(buffer[0] == '#' || buffer[0] == '*') {
       continue;
     }
-    if(isspace(buffer[0])) {
-      for(tmp = buffer; *tmp != '\0' && isspace(*tmp); tmp++);
+    if(IzSpace(buffer[0])) {
+      for(tmp = buffer; *tmp != '\0' && IzSpace(*tmp); tmp++);
       if(*tmp == '\0') {
         continue; // The line is all white space
       }
@@ -142,7 +141,7 @@ int handleSystemConfigStatusSection(char *line, BPTR fh) {
   char buffer[100];
 
   for(;;) {
-    if(!isdigit(line[6])) {
+    if(!IzDigit(line[6])) {
       printf("Invalid config line, no digit after 'STATUS': %s\n", line);
       return 0;
     }

@@ -1,5 +1,5 @@
 CPU   = 68020
-FLAGS = NMINC STRMERGE CPU=$(CPU) DEBUG=FULL IDIR=/Include IDIR=/UtilLib
+FLAGS = NMINC STRMERGE CPU=$(CPU) DEBUG=FULL ERROR=ALL IDIR=/Include IDIR=/UtilLib
 OBJS  = NiKServer.o NiKHost.o NiKHost2.o NiKHost3.o NiKVersion.o NodeComm.o \
 	Config.o Startup.o Shutdown.o
 

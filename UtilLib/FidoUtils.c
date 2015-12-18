@@ -1,5 +1,5 @@
-#include <ctype.h>
 #include <stdlib.h>
+#include "StringUtils.h"
 
 #include "FidoUtils.h"
 
@@ -19,7 +19,7 @@ int ParseFidoAddress(char *str, int result[]) {
   char *start, *search;
   start = search = str;
   for(;;) {
-    if(*search == '\0' || isspace(*search) || *search == '@') {
+    if(*search == '\0' || IzSpace(*search) || *search == '@') {
       break;
     }
     switch(*search) {
@@ -52,7 +52,7 @@ int ParseFidoAddress(char *str, int result[]) {
       start = search + 1;
       break;
     default:
-      if(!isdigit(*search)) {
+      if(!IzDigit(*search)) {
         return 0;
       }
     }

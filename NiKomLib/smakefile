@@ -2,7 +2,7 @@ CPU     = 68020
 OBJS    = LibInit.o UserLibInit.o Matrix.o Rexx.o Lock.o ReadFidoText.o Echo.o \
           NodeTypes.o Conf.o NiKVersion.o Terminal.o ServerComm.o Hash.o \
           UnreadTexts.o Crypt.o FCrypt.o ConferenceTexts.o Util.o
-SCFLAGS = STREQ STRINGMERGE CPU=$(CPU)  NOSTKCHK LIBCODE UNSIGNEDCHAR \
+SCFLAGS = STREQ STRINGMERGE CPU=$(CPU)  NOSTKCHK LIBCODE UNSIGNEDCHAR ERROR=ALL \
 	  DEFINE=NIKOMLIB=1 IDIR=/Include IDIR=/UtilLib
 DEBUG   = DEBUG=LINE
 

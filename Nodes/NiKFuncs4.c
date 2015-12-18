@@ -7,7 +7,6 @@
 #include <proto/intuition.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
 #include <stdio.h>
 #include <time.h>
 #include <fifoproto.h>
@@ -18,6 +17,7 @@
 #include "Terminal.h"
 #include "Logging.h"
 #include "ServerMemUtils.h"
+#include "StringUtils.h"
 #include "BasicIO.h"
 
 #define EKO		1
@@ -36,7 +36,7 @@ int movetext(void) {
   int nummer, newConf, oldConf;
   struct Mote *motpek;
   struct Header movehead;
-  if(!isdigit(argument[0])) {
+  if(!IzDigit(argument[0])) {
     puttekn("\r\n\nSkriv: Flytta Text <textnummer> <möte>\r\n",-1);
     return(0);
   }

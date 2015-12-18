@@ -7,7 +7,6 @@
 #include "Util.h"
 #include "Funcs.h"
 
-#include <ctype.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>

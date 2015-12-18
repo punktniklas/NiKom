@@ -1,7 +1,7 @@
 CPU      = 68020
-SCFLAGS  = NMINC STRMERGE CPU=$(CPU) DEBUG=FULL IDIR=/Include
+SCFLAGS  = NMINC STRMERGE CPU=$(CPU) DEBUG=FULL IDIR=/Include ERROR=ALL
 NLFLAGS  = NMINC STRMERGE CPU=$(CPU) DEBUG=LINE NOSTKCHK LIBCODE DEFINE=NIKOMLIB=1 \
-           IDIR=/Include
+           IDIR=/Include ERROR=ALL
 OBJS     = DiskUtils.o FileAreaUtils.o Logging.o RexxUtils.o ExecUtils.o \
 	   ServerMemUtils.o StringUtils.o ConfigUtils.o FidoUtils.o
 NLIBOBJS = Logging_nlib.o

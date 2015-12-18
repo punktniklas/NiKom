@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <ctype.h>
 #include <string.h>
 #include <stdlib.h>
 #include <limits.h>
@@ -17,16 +16,16 @@ char *findStringCfgValue(char *str) {
     return NULL;
   }
   tmp++;
-  if(isspace(tmp[0])) {
+  if(IzSpace(tmp[0])) {
     tmp = FindNextWord(tmp);
   }
-  if(isspace(tmp[0]) || tmp[0] == '\0') {
+  if(IzSpace(tmp[0]) || tmp[0] == '\0') {
     printf("Invalid config line, no value after '=': %s\n", str);
     return NULL;
   }
 
   lastpos = strlen(tmp) - 1;
-  while(isspace(tmp[lastpos])) {
+  while(IzSpace(tmp[lastpos])) {
     tmp[lastpos--] = '\0';
   }
   return tmp;
@@ -50,7 +49,7 @@ int GetLongCfgValue(char *str, long *value) {
     return 0;
   }
   for(tmp = valstr; *tmp != '\0'; tmp++) {
-    if(!isdigit(*tmp) && *tmp != '-') {
+    if(!IzDigit(*tmp) && *tmp != '-') {
       printf("Invalid config line, value must be only digits: %s\n", str);
       return 0;
     }

@@ -1,5 +1,5 @@
 CPU=68020
-FLAGS = NMINC STRMERGE CPU=$(CPU) DEBUG=FULL IDIR=/Include IDIR=/UtilLib \
+FLAGS = NMINC STRMERGE CPU=$(CPU) DEBUG=FULL ERROR=ALL IDIR=/Include IDIR=/UtilLib \
         IDIR=/Nodes
 OBJS = Ser.o SerialIO.o Terminal.o ServerComm.o Modem.o Rexx.o Stuff.o \
        NiKVersion.o NewUser.o CharacterSets.o

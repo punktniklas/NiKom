@@ -6,7 +6,6 @@
 #include <dos.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
 #include <stdio.h>
 #include <time.h>
 #include <error.h>
@@ -17,6 +16,7 @@
 #include "NiKomLib.h"
 #include "Terminal.h"
 #include "Logging.h"
+#include "StringUtils.h"
 
 #define EKO		1
 #define EJEKO	0
@@ -35,7 +35,7 @@ int endast(void) {
 	int antal,foo=TRUE;
 	int motnr, nyttmote = 1;
 	struct Mote *motpek = NULL;
-	if(!isdigit(argument[0])) {
+	if(!IzDigit(argument[0])) {
 		puttekn("\r\n\nSkriv: Endast <antal texter> [mötesnamn]\r\n",-1);
 		return(-5);
 	}
@@ -874,7 +874,7 @@ int dumpatext(void) {
 	struct Header dumphead;
 	FILE *fpr,*fpd;
 	char *dumpfil,foostr[82],filnamn[40];
-	if(!isdigit(argument[0])) {
+	if(!IzDigit(argument[0])) {
 		puttekn("\r\n\nSkriv: Dumpa Text <textnr> [filnamn]\r\n\n",-1);
 		return(0);
 	}
@@ -949,7 +949,7 @@ void listaarende(void) {
       else if(nextarg[1]=='f' || nextarg[1]=='F') {
         forward = TRUE;
       }
-    } else if(isdigit(nextarg[0])) {
+    } else if(IzDigit(nextarg[0])) {
       textNumber = atoi(nextarg);
     }
     nextarg=hittaefter(nextarg);

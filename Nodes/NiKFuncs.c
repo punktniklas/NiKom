@@ -8,13 +8,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
-#include <ctype.h>
 #include <limits.h>
 #include <math.h>
 #include "NiKomstr.h"
 #include "NiKomFuncs.h"
 #include "NiKomLib.h"
 #include "Logging.h"
+#include "StringUtils.h"
 #include "Terminal.h"
 #include "Cmd_Users.h"
 #include "NiKversion.h"
@@ -805,7 +805,7 @@ int parse(char *skri) {
         }
 
 		arg2=hittaefter(skri);
-        if(isdigit(arg2[0])) argtyp=KOMARGNUM;
+        if(IzDigit(arg2[0])) argtyp=KOMARGNUM;
         else if(!arg2[0]) argtyp=KOMARGINGET;
         else argtyp=KOMARGCHAR;
 

@@ -10,7 +10,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
 #include "NiKomStr.h"
 #include "ServerFuncs.h"
 #include "NiKomLib.h"
@@ -756,7 +755,7 @@ char *skri;
 	char *faci,*skri2;
 	struct ShortUser *letpek;
 	if(skri[0]==0 || skri[0]==' ') return(-3);
-	if(isdigit(skri[0])) {
+	if(IzDigit(skri[0])) {
 		nummer=atoi(skri);
 		if(userexists(nummer)) return(nummer);
 		else return(-1);
@@ -813,12 +812,12 @@ int parse(char *skri) {
 	char *arg2,*ord2;
 	struct Kommando *kompek,*forst=NULL;
 	if(skri[0]==0) return(-3);
-	if(isdigit(skri[0])) {
+	if(IzDigit(skri[0])) {
 		/* argument=skri; */
 		return(212);
 	}
 	arg2=FindNextWord(skri);
-	if(isdigit(arg2[0])) argtyp=KOMARGNUM;
+	if(IzDigit(arg2[0])) argtyp=KOMARGNUM;
 	else if(!arg2[0]) argtyp=KOMARGINGET;
 	else argtyp=KOMARGCHAR;
 	for(kompek=(struct Kommando *)Servermem->kom_list.mlh_Head;kompek->kom_node.mln_Succ;kompek=(struct Kommando *)kompek->kom_node.mln_Succ) {
