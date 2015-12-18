@@ -54,12 +54,6 @@ int __saveds __asm LIBCreateUser(register __d0 LONG, register __a0 struct TagIte
 int __saveds __asm LIBNiKParse(register __a0 char *string, register __d0 char subject, register __a6 struct NiKomBase *NiKomBase);
 int __saveds __asm LIBSysInfo(register __a0 char *subject, register __a6 struct NiKomBase *NiKomBase);
 
-int __saveds __asm LIBAddProgramData( register __d0 int, register __a1 char *, register __a2 char *, register __a3 char *, register __a6 struct NiKomBase *);
-char __saveds __asm *LIBGetProgramData( register __d0 int, register __a0 char *, register __a1 char *, register __a2 char *, register __a6 struct NiKomBase *);
-int __saveds __asm LIBFreeProgramCategory( register __d0 int usernumber, register __a6 struct NiKomBase *NiKomBase);
-int __saveds __asm LIBLoadProgramCategory( register __d0 int, register __a6 struct NiKomBase *);
-int __saveds __asm LIBSaveProgramCategory( register __d0 int, register __a6 struct NiKomBase *);
-
 /* Andra trevliga små funktioner */
 
 /* Matrix.c */
@@ -90,19 +84,3 @@ UBYTE convnokludge(UBYTE);
 struct MsgPort *SafePutToPort(struct NiKMess *, char *);
 long sendservermess(short, long, long, long, long);
 int linksaystring(int, int, char *, struct NiKomBase *);
-
-/* PrgCat.c */
-int InsertProgramCategory(char *, struct ProgramCategory **);
-int InsertProgramData(char *, char *, char *, struct ProgramCategory *);
-struct ProgramCategory *GetCategorypek(char *, struct ProgramCategory *);
-int DeleteCategory(char *, struct ProgramCategory **);
-void DeleteProgramData(struct ProgramData *);
-void DeleteAll(struct ProgramCategory **);
-int LoadAll(char *, struct ProgramCategory **);
-int SaveAll(int, struct ProgramCategory *);
-char *InternGetProgramData(char *, char *, struct ProgramCategory *);
-
-struct ProgramDataCache *CheckifUserisCached(int, struct NiKomBase *);
-struct ProgramCategory *CacheProgramDataforUser(int, struct NiKomBase *);
-void InsertProgramDataCachedUser(int, struct ProgramCategory *, struct NiKomBase *);
-void RemoveFirstCachedUser(struct NiKomBase *);

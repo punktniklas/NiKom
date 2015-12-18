@@ -1,7 +1,7 @@
 CPU     = 68020
 OBJS    = LibInit.o UserLibInit.o Matrix.o Rexx.o Lock.o ReadFidoText.o Echo.o \
           NodeTypes.o Conf.o NiKVersion.o Terminal.o ServerComm.o Hash.o \
-          PrgCat.o UnreadTexts.o Crypt.o FCrypt.o ConferenceTexts.o Util.o
+          UnreadTexts.o Crypt.o FCrypt.o ConferenceTexts.o Util.o
 SCFLAGS = STREQ STRINGMERGE CPU=$(CPU)  NOSTKCHK LIBCODE UNSIGNEDCHAR \
 	  DEFINE=NIKOMLIB=1 IDIR=/Include IDIR=/UtilLib
 DEBUG   = DEBUG=LINE
@@ -71,9 +71,6 @@ ServerComm.o:   ServerComm.c    nikom.fd /Include/NiKomLib.h /Include/NiKomStr.h
 Hash.o:         Hash.c          nikom.fd /Include/NiKomLib.h /Include/NiKomStr.h
 
 UserGroups.o:   UserGroups.c    nikom.fd /Include/NiKomLib.h /Include/NiKomStr.h
-
-PrgCat.o:       PrgCat.c        nikom.fd /Include/NiKomLib.h /Include/NiKomStr.h
-        sc $(SCFLAGS) $(DEBUG) COMMENTNEST $*
 
 UnreadTexts.o:  UnreadTexts.c nikom.fd /Include/NiKomLib.h /Include/NiKomStr.h \
                   UnreadTexts.h Util.h

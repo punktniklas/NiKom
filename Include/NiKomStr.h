@@ -328,14 +328,6 @@ struct NodeType {
 	char path[50],desc[80];
 };
 
-struct ProgramDataCache
-{
-	struct ProgramCategory *PrgCat;
-	struct ProgramDataCache *prev, *next;
-
-	int usernumber;
-};
-
 struct LegacyConversionData {
   long lowTextWhenBitmap0ConversionStarted;
 };
@@ -371,7 +363,6 @@ struct System {
   struct FidoData fidodata;
   struct NodeType nodetypes[MAXNODETYPES];
   struct SignalSemaphore semaphores[NIKSEM_NOOF];
-  struct ProgramDataCache *PrgDataCache;
   struct LegacyConversionData legacyConversionData;
 };
 

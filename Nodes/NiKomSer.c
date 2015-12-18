@@ -166,7 +166,6 @@ void main(int argc,char *argv[]) {
     if(Servermem->cfg.ar.utlogg) sendautorexx(Servermem->cfg.ar.utlogg);
     sendfile("NiKom:Texter/Utlogg.txt");
   }
-  SaveProgramCategory(inloggad);
   Servermem->inloggad[nodnr]=-1;
   if(Servermem->cfg.logmask & LOG_UTLOGG) {
     LogEvent(USAGE_LOG, INFO, "%s loggar ut från nod %d",

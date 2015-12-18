@@ -13,8 +13,6 @@
 
 #include "Cmd_Users.h"
 
-void showProgramDatacfg(int person);
-
 extern struct System *Servermem;
 extern int nodnr, inloggad;
 extern char outbuffer[],inmat[], *argument;
@@ -110,8 +108,6 @@ void Cmd_Status(void) {
     if(puttekn(outbuffer,-1)) return;
   }
 
-  showProgramDatacfg(nummer);
-
   if(readuserstr.grupper) {
     puttekn("Grupper:\r\n",-1);
     for(listpek=(struct UserGroup *)Servermem->grupp_list.mlh_Head;listpek->grupp_node.mln_Succ;listpek=(struct UserGroup *)listpek->grupp_node.mln_Succ) {
@@ -164,121 +160,6 @@ void Cmd_Status(void) {
   puttekn("\r\n\n",-1);
   sprintf(filnamn,"NiKom:Users/%d/%d/Lapp",nummer/100,nummer);
   if(!access(filnamn,0)) sendfile(filnamn);
-}
-
-void showProgramDatacfg(int person) {
-  FILE *fp;
-  char buffer[257], buffer2[513], command[81], command2[81],
-    command3[81], command4[81], temp[2];
-  int i;
-
-  if(fp=fopen("NiKom:Datocfg/ProgramData.cfg", "r")) {
-    while(!feof(fp)) {
-      buffer[0] = NULL, buffer2[0] = command[0] = NULL;
-
-      fgets(buffer,256,fp);
-      buffer[strlen(buffer)-1] = NULL;
-      i = 0;
-
-      while(i<strlen(buffer)) {
-        if(buffer[i] != '%') {
-          if(buffer2[0] = NULL) {
-            buffer2[0] = buffer[i];
-            buffer2[1] = NULL;
-          } else {
-            temp[0] = buffer[i];
-            temp[1] = NULL;
-            strcat(buffer2,temp);
-          }
-        } else {
-          if(buffer[i+1] == '%' || buffer[i+1] == NULL) {
-            strcat(buffer2, "%");
-            if(buffer[i+1] != NULL)
-              i++;
-          } else {
-            command[0] = command2[0] = NULL;
-            command3[0] = NULL, command4[0] = NULL;
-            
-            while(buffer[++i] != '%' && buffer[i] != NULL) {
-              if(buffer[i] != '|') {
-                if(command[0] == NULL) {
-                  command[0] = buffer[i];
-                  command[1] = NULL;
-                } else {
-                  temp[0] = buffer[i];
-                  temp[1] = NULL;
-                  strcat(command, temp);
-                }
-              } else {
-                while(buffer[++i] != '%' && buffer[i] != NULL) {
-                  if(command2[0] == NULL) {
-                    command2[0] = buffer[i];
-                    command2[1] = NULL;
-                  } else {
-                    temp[0] = buffer[i];
-                    temp[1] = NULL;
-                    strcat(command2, temp);
-                  }
-                }
-                
-                if(buffer[++i] != NULL) {
-                  while(buffer[i] != ',' && buffer[i] != NULL) {
-                    if(command3[0] == NULL) {
-                      command3[0] = buffer[i];
-                      command3[1] = NULL;
-                    } else {
-                      temp[0] = buffer[i];
-                      temp[1] = NULL;
-                      strcat(command3, temp);
-                    }
-                    i++;
-                  }
-
-                  while(buffer[i] != '%' && buffer[i] != NULL) {
-                    if(command4[0] == NULL) {
-                      command4[0] = buffer[i];
-                      command4[1] = NULL;
-                    } else {
-                      temp[0] = buffer[i];
-                      temp[1] = NULL;
-                      strcat(command4, temp);
-                    }
-                    i++;
-                  }
-                }
-              }
-            }
-
-            if(buffer2[0] != NULL) {
-              puttekn(buffer2,-1);
-              buffer2[0] = NULL;
-            }
-
-            if(command && command2) {
-              if(command3[0] == NULL) {
-                puttekn(GetProgramData(person, NULL, command, command2), -1);
-                puttekn("\n\r", -1);
-              } else {
-                if(atoi(GetProgramData(person, NULL, command, command2)))
-                  puttekn(command3, -1);
-                else
-                  puttekn(command4, -1);
-
-                puttekn("\n\r", -1);
-                i = strlen(buffer);
-              }
-            }
-          }
-        }
-        if(buffer2[0] != NULL)
-          puttekn(buffer2,-1);
-
-        i++;
-      }
-    }
-    fclose(fp);
-    puttekn("\n\r", -1);
-  }
 }
 
 int Cmd_ChangeUser(void) {

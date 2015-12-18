@@ -128,5 +128,4 @@ void SaveCurrentUser(int inloggad, int nodnr)
 	Servermem->inne[nodnr].senast_in=tid;
 	writeuser(inloggad,&Servermem->inne[nodnr]);
         WriteUnreadTexts(&Servermem->unreadTexts[nodnr], inloggad);
-	SaveProgramCategory(inloggad);
 }

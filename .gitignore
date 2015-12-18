@@ -4,7 +4,7 @@ Debug
 NoDebug
 /InitNiKom/InitNiKom
 nikom_pragmas.h
-/NiKomBinDistr.lha
+/NiKomDev.lha
 Tools/SetNodeState/SetNodeState
 Tools/CryptPasswords/CryptPasswords
 Tools/NiKomFido/NiKomFido

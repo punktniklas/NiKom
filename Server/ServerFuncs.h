@@ -66,8 +66,6 @@ void swapbps(long *bps, long *);
 void rexxstatusinfo(struct RexxMsg *);
 void rexxsysteminfo(struct RexxMsg *);
 int arearatt(int, int, struct User *);
-void rexxgetprogramdata(struct RexxMsg *);
-void rexxaddprogramdata(struct RexxMsg *);
 void rexxmarktextread(struct RexxMsg *);
 void rexxmarktextunread(struct RexxMsg *);
 void rexxmarktext(struct RexxMsg *mess, int desiredUnreadStatus);

@@ -1140,7 +1140,6 @@ int connection(void)
         int promret,motret,foo;
         char tellstr[100];
         dellostsay();
-        LoadProgramCategory(inloggad);
         NewList((struct List *)&aliaslist);
         trimLowestPossibleUnreadTextsForFido();
         time(&logintime);

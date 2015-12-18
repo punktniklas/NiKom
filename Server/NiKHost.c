@@ -55,8 +55,6 @@ void handlerexx(struct RexxMsg *mess) {
 	else if(!stricmp(mess->rm_Args[0],"AREARIGHT")) rexxarearight(mess);
 	else if(!stricmp(mess->rm_Args[0],"SYSSETTINGS")) rexxsysteminfo(mess);
 	else if(!stricmp(mess->rm_Args[0],"MOVEFILE")) movefile(mess);
-	else if(!stricmp(mess->rm_Args[0],"GETPROGRAMDATA")) rexxgetprogramdata(mess);
-	else if(!stricmp(mess->rm_Args[0],"ADDPROGRAMDATA")) rexxaddprogramdata(mess);
 	else if(!stricmp(mess->rm_Args[0],"MARKTEXTREAD")) rexxmarktextread(mess);
 	else if(!stricmp(mess->rm_Args[0],"MARKTEXTUNREAD")) rexxmarktextunread(mess);
 	else if(!stricmp(mess->rm_Args[0],"NEXTPATTERNFILE")) rexxnextpatternfile(mess);

@@ -188,7 +188,6 @@ void main(int argc, char **argv) {
     sendfile("NiKom:Texter/Utlogg.txt");
     sprintf(titel,"Nod #%d CON: <Ingen inloggad>",nodnr);
     SetWindowTitles(NiKwind,titel,(UBYTE *)-1L);
-    SaveProgramCategory(inloggad);
     Servermem->inloggad[nodnr]=-1;
     
     Servermem->action[nodnr]=0;

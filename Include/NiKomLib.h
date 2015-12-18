@@ -49,19 +49,6 @@ struct FidoLine
 	char text[81];
 };
 
-struct ProgramCategory
-{
-	struct ProgramData
-	{
-		char typ[41], data[81];
-
-		struct ProgramData *next, *prev;
-	} *datastart;
-
-	char namn[81];
-	struct ProgramCategory *next, *prev;
-};
-
 /* Tags att skicka med till ReadFidoText() */
 #define RFT_Dummy (TAG_USER + 4711)
 

@@ -51,16 +51,6 @@ void SetUnreadTexts(int conf, int amount, struct UnreadTexts *unreadTexts);
 int ReadUnreadTexts(struct UnreadTexts *unreadTexts, int userId);
 int WriteUnreadTexts(struct UnreadTexts *unreadTexts, int userId);
 
-/* PrgCat.c */
-
-int AddProgramData( int, char *, char *, char *, char *);
-char *GetProgramData( int, char *, char *, char *);
-int FreeProgramCategory(int);
-int LoadProgramCategory(int);
-int SaveProgramCategory(int);
-void DisplayAll(char *, struct ProgramCategory *);
-void Debuglog(char *);
-
 /* Crypt.c */
 
 int CheckPassword(char *, char *);

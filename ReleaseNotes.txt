@@ -16,6 +16,14 @@
   need to be removed.) For the new format see the default configurations
   that come with the NiKom full distribution.
 
+- Removed the implementation of "program data" where ARexx scripts can
+  store custom data for a user by calling AddProgramData() and
+  GetProgramData(). The current implementation was simply not working
+  (see https://github.com/punktniklas/NiKom/issues/7 for details) and
+  there is likely no one using it.
+  If functions like this are needed in future it's probably better to
+  re-implement it from scratch than to try to straighten out this
+  implementation.
 
 ---------------------------------------------------------------------------
                          NiKom v2.0.0, 2015-12-06

@@ -1347,53 +1347,6 @@ Returvärden:
 -5  - Fel vid skrivning av datafiler
 @endnode
 
-@node AddProgramData "Referens: AddProgramData()"
-AddProgramData(användare, kategori, typ, data)
-
-Addera eller ändra värdet på en typ i en viss kategori
-för användaren som specificerades.
-
-Dethär är ett smidigt sätt för externa program att lagra data
-utan att behöva skapa en egen fil att lagra den i och det är
-ganska lätt hanterat och snabbt.
-
-Exempel:
-
-retur = AddProgramData(0, "DCredit", "UploadBytes", "98845")
-varde = GetProgramData(0, "DCredit", "UploadBytes")
-if(c2d(varde) ~= 0) say varde
-
---> 98845
-
-Returvärden:
- 0	- Allt ok.
--1	- Kunde inte hitta användaren.
--2	- Kunde inte allokera minne.
-@endnode
-
-@node GetProgramData "Referens: GetProgramData()"
-GetProgramData(användare, kategori, typ)
-
-Hämtar värdet för den angivna kategorin och typen för
-användaren som specificerades.
-
-Dethär är ett smidigt sätt för externa program att lagra data
-utan att behöva skapa en egen fil att lagra den i och det är
-ganska lätt hanterat och snabbt.
-
-Exempel:
-
-retur = AddProgramData(0, "DCredit", "UploadBytes", "98845")
-varde = GetProgramData(0, "DCredit", "UploadBytes")
-if varde ~= '' say varde
-
---> 98845
-
-Returvärden:
-En tom sträng ('') - Kunde inte hitta kategorin eller typen...
-Annars får man värdet på typen i den aktuella kategorin!
-@endnode
-
 @node MarkTextRead "Referens: MarkTextRead()"
 MarkTextRead(användare, textnummer)
 
