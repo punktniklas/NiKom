@@ -3,7 +3,7 @@ SCFLAGS  = NMINC STRMERGE CPU=$(CPU) DEBUG=FULL IDIR=/Include ERROR=ALL
 NLFLAGS  = NMINC STRMERGE CPU=$(CPU) DEBUG=LINE NOSTKCHK LIBCODE DEFINE=NIKOMLIB=1 \
            IDIR=/Include ERROR=ALL
 OBJS     = DiskUtils.o FileAreaUtils.o Logging.o RexxUtils.o ExecUtils.o \
-	   ServerMemUtils.o StringUtils.o ConfigUtils.o FidoUtils.o
+	   ServerMemUtils.o StringUtils.o ConfigUtils.o FidoUtils.o Stack.o
 NLIBOBJS = Logging_nlib.o
 
 all: nikomutils.lib nikomutils_nlib.lib
@@ -47,3 +47,5 @@ StringUtils.o: StringUtils.c StringUtils.h
 ConfigUtils.o: ConfigUtils.c ConfigUtils.h
 
 FidoUtils.o: FidoUtils.c FidoUtils.h
+
+Stack.o: Stack.c Stack.h
