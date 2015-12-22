@@ -15,8 +15,10 @@
 #include "NiKomFuncs.h"
 #include "NiKomLib.h"
 #include "Terminal.h"
+#include "KOM.h"
 #include "Logging.h"
 #include "StringUtils.h"
+#include "Stack.h"
 
 #define EKO		1
 #define EJEKO	0
@@ -31,52 +33,54 @@ extern long logintime;
 extern struct MinList edit_list;
 extern struct ReadLetter brevspar;
 
-int endast(void) {
-	int antal,foo=TRUE;
-	int motnr, nyttmote = 1;
-	struct Mote *motpek = NULL;
-	if(!IzDigit(argument[0])) {
-		puttekn("\r\n\nSkriv: Endast <antal texter> [mötesnamn]\r\n",-1);
-		return(-5);
-	}
-	antal=atoi(argument);
-	argument=hittaefter(argument);
-	if(argument[0])
-	{
-		if(matchar(argument,Servermem->cfg.brevnamn))
-			motnr = -1;
-		else
-		{
-			motnr=parsemot(argument);
-			if(motnr==-3)
-			{
-				puttekn("\r\n\nSkriv: Endast <antal texter> [mötesnamn]\r\n\n",-1);
-				return(-5);
-			}
-			if(motnr==-1)
-			{
-				puttekn("\r\n\nFinns inget sådant möte!\r\n\n", -1);
-				return(-5);
-			}
-		}
-		nyttmote = 0;
-	}
-	else
-		motnr = mote2;
+void endast(void) {
+  int amount, mailId;
+  int confId;
+  struct Mote *conf = NULL;
 
-	if(motnr==-1) {
-		Servermem->inne[nodnr].brevpek=getnextletter(inloggad)-antal;
-		foo=getfirstletter(inloggad);
-		if(foo>Servermem->inne[nodnr].brevpek) Servermem->inne[nodnr].brevpek=foo;
-	} else {
-		motpek = getmotpek(motnr);
-		if(motpek->type==MOTE_ORGINAL) org_endast(motnr,antal);
-		else if(motpek->type==MOTE_FIDO) fido_endast(motpek,antal);
-	}
-	if(nyttmote)
-		return(-11);
-	else
-		return(-5);
+  if(!IzDigit(argument[0])) {
+    SendString("\r\n\nSkriv: Endast <antal texter> [mötesnamn]\r\n");
+    return;
+  }
+  amount = atoi(argument);
+  argument = hittaefter(argument);
+  if(argument[0]) {
+    if(matchar(argument, Servermem->cfg.brevnamn)) {
+      confId = -1;
+    } else {
+      confId = parsemot(argument);
+      if(confId == -3) {
+        SendString("\r\n\nSkriv: Endast <antal texter> [mötesnamn]\r\n\n");
+        return;
+      }
+      if(confId == -1) {
+        SendString("\r\n\nFinns inget sådant möte!\r\n\n", -1);
+        return;
+      }
+    }
+  }
+  else {
+    confId = mote2;
+  }
+  
+  if(confId == -1) {
+    Servermem->inne[nodnr].brevpek = getnextletter(inloggad) - amount;
+    mailId = getfirstletter(inloggad);
+    if(mailId > Servermem->inne[nodnr].brevpek) {
+      Servermem->inne[nodnr].brevpek = mailId;
+    }
+  } else {
+    conf = getmotpek(confId);
+    if(conf->type == MOTE_ORGINAL) {
+      org_endast(confId,amount);
+    } else if(conf->type == MOTE_FIDO) {
+      fido_endast(conf,amount);
+    }
+  }
+  if(confId == mote2) {
+    StackClear(g_unreadRepliesStack);
+    var(mote2);
+  }
 }
 
 int personlig(void) {

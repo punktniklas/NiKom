@@ -233,21 +233,6 @@ void listflagg(void) {
 	}
 }
 
-int hoppaover(int rot,int ack) {
-	static struct Header hoppahead;
-	int x=0;
-	long kom_i[MAXKOM];
-	if(readtexthead(rot,&hoppahead)) return(ack);
-	memcpy(kom_i,hoppahead.kom_i,MAXKOM*sizeof(long));
-        ChangeUnreadTextStatus(rot, 0, &Servermem->unreadTexts[nodnr]);
-	ack++;
-	while(kom_i[x]!=-1 && x<MAXKOM) {
-		ack=hoppaover(kom_i[x],ack);
-		x++;
-	}
-	return(ack);
-}
-
 int parseflagga(skri)
 char *skri;
 {

@@ -156,7 +156,7 @@ void main(int argc,char *argv[]) {
     }
     if(Servermem->cfg.ar.cardropped) sendautorexx(Servermem->cfg.ar.cardropped);
   } else {
-    if(nodestate & NIKSTATE_LOGOUT) {
+    if(nodestate & NIKSTATE_AUTOLOGOUT) {
       puttekn("\n\n\r*** Automagisk utloggning ***\n\n\r",-1);
     } else if(nodestate & NIKSTATE_INACTIVITY) {
       puttekn("\n\n\r*** Utloggning p.g.a inaktivitet ***\n\n\r",-1);
@@ -186,10 +186,9 @@ void main(int argc,char *argv[]) {
   sprintf(tellstr,"loggade just ut från nod %d",nodnr);
   tellallnodes(tellstr);
 
-  nodestate &= ~(NIKSTATE_LOGOUT | NIKSTATE_INACTIVITY);
   if(nodestate & NIKSTATE_NOCARRIER) {
     nodestate &= ~NIKSTATE_RELOGIN;
   }
+  nodestate &= (NIKSTATE_RELOGIN | NIKSTATE_CLOSESER | NIKSTATE_NOANSWER);
   cleanup(nodestate,"");
 }
-

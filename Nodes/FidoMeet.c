@@ -15,6 +15,8 @@
 #include "Logging.h"
 #include "Terminal.h"
 
+#include "FidoMeet.h"
+
 #define EKO		1
 
 extern struct System *Servermem;
@@ -33,42 +35,29 @@ void fido_lasa(int tnr,struct Mote *motpek) {
 	fido_visatext(tnr,motpek);
 }
 
-int checkfidomote(struct Mote *motpek) {
-  if(Servermem->unreadTexts[nodnr].lowestPossibleUnreadText[motpek->nummer]
-     <= motpek->texter) {
-    return TRUE;
+int HasUnreadInFidoConf(struct Mote *conf) {
+  return Servermem->unreadTexts[nodnr].lowestPossibleUnreadText[conf->nummer]
+    <= conf->texter;
+}
+
+void NextTextInFidoConf(struct Mote *conf) {
+  struct UnreadTexts *unreadTexts = &Servermem->unreadTexts[nodnr];
+
+  if(unreadTexts->lowestPossibleUnreadText[conf->nummer] < conf->lowtext) {
+    unreadTexts->lowestPossibleUnreadText[conf->nummer] = conf->lowtext;
   }
-  return FALSE;
+  if(unreadTexts->lowestPossibleUnreadText[conf->nummer] > conf->texter) {
+    SendString("\n\n\rFinns inga olästa texter i detta möte.\n\r");
+    return;
+  }
+  unreadTexts->lowestPossibleUnreadText[conf->nummer]++;
+  fido_visatext(unreadTexts->lowestPossibleUnreadText[conf->nummer], conf);
 }
 
 int countfidomote(struct Mote *motpek) {
   return motpek->texter
     - Servermem->unreadTexts[nodnr].lowestPossibleUnreadText[motpek->nummer]
     + 1;
-}
-
-int clearfidomote(struct Mote *motpek) {
-  struct UnreadTexts *unreadTexts = &Servermem->unreadTexts[nodnr];
-  int going=TRUE,promret;
-  while(going) {
-    if(unreadTexts->lowestPossibleUnreadText[motpek->nummer] > motpek->texter) {
-      return -5;
-    }
-    if(unreadTexts->lowestPossibleUnreadText[motpek->nummer] < motpek->lowtext) {
-      unreadTexts->lowestPossibleUnreadText[motpek->nummer] = motpek->lowtext;
-    }
-    if((promret=prompt(210))==-1) return(-1);
-    else if(promret==-3) return(-3);
-    else if(promret==-4) puttekn("\r\n\nFinns ingen nästa kommentar!\r\n\n",-1);
-    else if(promret==-8) return(-8);
-    else if(promret==-9) return(-9);
-    else if(promret==-11) return(-11);
-    else if(promret>=0) return(promret);
-    else if(promret==-2 || promret==-6) {
-      fido_visatext(unreadTexts->lowestPossibleUnreadText[motpek->nummer], motpek);
-      unreadTexts->lowestPossibleUnreadText[motpek->nummer]++;
-    }
-  }
 }
 
 void fido_visatext(int text,struct Mote *motpek) {

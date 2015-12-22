@@ -25,7 +25,7 @@
 int CXBRK(void) { return(0); }
 
 extern long logintime;
-extern int area2, nodnr;
+extern int area2, nodnr, nodestate;
 extern struct MinList aliaslist,edit_list;
 extern char outbuffer[], nodid[], inmat[];
 extern struct System *Servermem;
@@ -204,6 +204,7 @@ void main(int argc, char **argv) {
     sprintf(tellstr,"loggade just ut från nod %d",nodnr);
     tellallnodes(tellstr);
   panik:
+    nodestate = 0;
     puttekn("\r\n\nEn inloggning till? (J/n)",-1);
   } while((ch = GetChar()) != 'n' && ch != 'N');
   cleanup(EXIT_OK,"");

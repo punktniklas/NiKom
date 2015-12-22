@@ -11,7 +11,11 @@
 #include "NiKomFuncs.h"
 #include "NiKomLib.h"
 #include "Logging.h"
+#include "Stack.h"
 #include "Terminal.h"
+#include "KOM.h"
+
+#include "OrgMeet.h"
 
 #define EKO		1
 #define KOM		1
@@ -96,84 +100,60 @@ void org_lasa(int tnr) {
 	org_visatext(tnr);
 }
 
-int checkmote(int conf) {
+int HasUnreadInOrgConf(int conf) {
   long unreadText;
 
   unreadText = FindNextUnreadText(0, conf, &Servermem->unreadTexts[nodnr]);
   if(unreadText == -1) {
     Servermem->unreadTexts[nodnr].lowestPossibleUnreadText[conf] =
-      Servermem->info.hightext+1;
+      Servermem->info.hightext + 1;
   }
   return unreadText != -1;
 }
 
-int clearmote(int conf) {
-  struct UnreadTexts *unreadTexts = &Servermem->unreadTexts[nodnr];
-  int going=TRUE, textnr = 0, promret, komret;
+void pushTextRepliesToStack(struct Header *textHeader) {
+  int i, confId, textId;
 
-  while(going) {
-    textnr = FindNextUnreadText(textnr, conf, unreadTexts);
-    if(textnr == -1) {
-      return -5;
+  for(i = MAXKOM; i >= 0; i--) {
+    if(textHeader->kom_i[i] == -1) {
+      continue;
     }
-    if((promret=prompt(210))==-1) return(-1);
-    else if(promret==-3) return(-3);
-    else if(promret==-4) puttekn("\r\n\nFinns ingen nästa kommentar!\r\n\n",-1);
-    else if(promret==-8) return(-8);
-    else if(promret==-9) return(-9);
-    else if(promret==-11) return(-11);
-    else if(promret>=0) return(promret);
-    else if(promret==-2 || promret==-6) {
-      ChangeUnreadTextStatus(textnr, 0, unreadTexts);
-      if(org_visatext(textnr)) {
-        if((komret=clearkom())==-1) return(-1);
-        else if(komret==-3) return(-3);
-        else if(komret==-8) return(-8);
-        else if(komret==-9) return(-9);
-        else if(komret==-11) return(-11);
-        else if(komret>=0) return(komret);
-      }
+    textId = textHeader->kom_i[i];
+    confId = GetConferenceForText(textId);
+    if(confId == -1
+       || !IsTextUnread(textId, &Servermem->unreadTexts[nodnr])
+       || !IsMemberConf(confId, inloggad, &Servermem->inne[nodnr])) {
+      continue;
     }
-    if(promret!=-5) textnr++;
+    StackPush(g_unreadRepliesStack, textId);
   }
 }
 
-int clearkom(void) {
-  long kom[MAXKOM];
-  int promret,komret,x=0, confId;
-  memcpy(kom,readhead.kom_i,MAXKOM*sizeof(long));
-  while(kom[x]!=-1) {
-    confId = GetConferenceForText(kom[x]);
-    if(confId != -1
-       && IsTextUnread(kom[x], &Servermem->unreadTexts[nodnr])
-       && IsMemberConf(confId, inloggad, &Servermem->inne[nodnr])) {
-      if((promret=prompt(211))==-1) return(-1);
-      else if(promret==-2) return(-2);
-      else if(promret==-3) return(-3);
-      else if(promret==-8) return(-8);
-      else if(promret==-9) return(-9);
-      else if(promret==-10) {
-        sprintf(outbuffer,"\r\n\nDu hoppade över %d texter.\r\n",hoppaover(readhead.nummer,0)-1);
-        puttekn(outbuffer,-1);
-        return(-5);
-      }
-      else if(promret==-11) return(-11);
-      else if(promret>=0) return(promret);
-      else if(promret==-4 || promret==-6) {
-        ChangeUnreadTextStatus(kom[x], 0, &Servermem->unreadTexts[nodnr]);
-        if(org_visatext(kom[x])) {
-          if((komret=clearkom())==-1) return(-1);
-          else if(komret==-3) return(-3);
-          else if(komret==-8) return(-8);
-          else if(komret==-9) return(-9);
-          else if(komret==-11) return(-11);
-          else if(komret>=0) return(komret);
-        }
-      }
-      if(promret!=-5) x++;
-    } else x++;
+void displayTextAndClearUnread(int textId) {
+  ChangeUnreadTextStatus(textId, 0, &Servermem->unreadTexts[nodnr]);
+  if(org_visatext(textId)) {
+    pushTextRepliesToStack(&readhead);
   }
-  return(-5);
+}
+
+void NextTextInOrgConf(void) {
+  int textId;
+
+  textId = FindNextUnreadText(0, mote2, &Servermem->unreadTexts[nodnr]);
+  if(textId == -1) {
+    SendString("\n\n\rFinns inga olästa texter i detta möte.\n\r");
+    return;
+  }
+  StackClear(g_unreadRepliesStack);
+  displayTextAndClearUnread(textId);
+}
+
+void NextReplyInOrgConf(void) {
+  if(StackSize(g_unreadRepliesStack) == 0) {
+    SendString("\n\n\rFinns inga fler olästa kommentarer\n\r");
+    return;
+  }
+  displayTextAndClearUnread(StackPop(g_unreadRepliesStack));
 }
 
 int org_visatext(int text) {

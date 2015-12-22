@@ -25,6 +25,14 @@
   re-implement it from scratch than to try to straighten out this
   implementation.
 
+- Major refactoring of the main command loop. Almost everything should
+  work the same as before but the code behind it is not the complete
+  mess that it used to be. One improvement is that some commands were
+  a bit special when executed from ARexx scripts, especially commands
+  that also could show up as default commands in the prompt. There should
+  now be nothing special about them and executing then from ARexx should
+  work the same as manually from the command prompt.
+
 ---------------------------------------------------------------------------
                          NiKom v2.0.0, 2015-12-06
 ---------------------------------------------------------------------------

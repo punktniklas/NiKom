@@ -79,8 +79,10 @@ struct FidoLine
 #define NIKSTATE_CLOSESER   2   /* Devicet ska stängas när det inte är någon inloggad */
 #define NIKSTATE_NOANSWER   4   /* Ser-noder ska inte svara på inkommande samtal */
 #define NIKSTATE_NOCARRIER  8   /* Carriern är släppt */
-#define NIKSTATE_LOGOUT     16  /* Användaren ska loggas ut bums */
+#define NIKSTATE_AUTOLOGOUT     16  /* Användaren ska loggas ut bums */
 #define NIKSTATE_INACTIVITY 32  /* Inaktivitets-tiden har gått ut */
+#define NIKSTATE_USERLOGOUT 64  // The user has requested to logout
+#define NIKSTATE_OUTOFTIME 128  // The user is out of time and should be logged out
 
 /************************************************************************/
 /*************************     Grupper     ******************************/

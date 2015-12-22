@@ -442,15 +442,6 @@ nikcommand <kommando>
 Utför det angivna kommandot precis som om det var skrivet vid prompten, dvs
 kommandona kan förkortas precis som vanligt.
 
-                      OBSERVERA
-
-En del kommandon fungerar på ett speciellt sätt internt i NiKom. Detta
-gör att man måste köra de allra sist i ett ARexx-program.
-
-De aktuella kommandona är:
-Gå, Nästa Text, Nästa Kommentar, Nästa Möte, Sluta, Logout,
-Offdown, Börja Om
-
 Möjliga returvärden är:
 0 - Kommandot utfördes ok
 1 - Kommandot kunde inte tolkas.

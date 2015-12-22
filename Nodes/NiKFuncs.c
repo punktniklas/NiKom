@@ -19,6 +19,7 @@
 #include "Cmd_Users.h"
 #include "NiKversion.h"
 #include "BasicIO.h"
+#include "KOM.h"
 
 #define EKO             1
 #define EJEKO   0
@@ -32,209 +33,15 @@ extern struct ReadLetter brevread;
 extern struct MinList edit_list;
 
 long logintime, extratime;
-int mote2,rad,senast_text_typ,felcnt,nu_skrivs,area2,rexxlogout,
+int mote2,rad,senast_text_typ,nu_skrivs,area2,
         senast_brev_nr,senast_brev_anv,senast_text_nr,senast_text_mote;
 char *month[] = { "januari","februari","mars","april","maj","juni",
                 "juli","augusti","september","oktober","november","december" },
                 *veckodag[] = { "Söndag","Måndag","Tisdag","Onsdag","Torsdag","Fredag",
-                "Lördag" },*argument,usernamebuf[50],aliasbuf[1081],argbuf[1081],vilkabuf[50];
+                "Lördag" },*argument,usernamebuf[50],argbuf[1081],vilkabuf[50];
 struct Header sparhead,readhead;
 struct Inloggning Statstr;
 struct MinList aliaslist;
-
-int prompt(int kmd) {
-        long klockan,tidgrans,tidkvar;
-        int parseret,kmdret, after;
-        struct Alias *aliaspek;
-        struct Kommando *kmdpek;
-        if(Servermem->say[nodnr]) displaysay();
-        tidgrans=60*(Servermem->cfg.maxtid[Servermem->inne[nodnr].status])+extratime;
-        if(Servermem->cfg.maxtid[Servermem->inne[nodnr].status]) {
-                if((time(&klockan)-logintime) > tidgrans) {
-                        sendfile("NiKom:Texter/TidenSlut.txt");
-                        return(-3);
-                }
-        }
-        if(rexxlogout) {
-                rexxlogout=FALSE;
-                return(-3);
-        }
-        Servermem->idletime[nodnr] = time(NULL);
-        Servermem->action[nodnr] = LASER;
-        Servermem->varmote[nodnr] = mote2;
-        if(kmd==221) {
-                if(Servermem->cfg.ar.nextmeet) sendautorexx(Servermem->cfg.ar.nextmeet);
-                puttekn("\r\n(Gå till) nästa möte ",-1);
-        } else if(kmd==210) {
-                if(mote2!=-1) {
-                        if(Servermem->cfg.ar.nexttext) sendautorexx(Servermem->cfg.ar.nexttext);
-                        puttekn("\r\n(Läsa) nästa text ",-1);
-                } else {
-                        if(Servermem->cfg.ar.nextletter) sendautorexx(Servermem->cfg.ar.nextletter);
-                        puttekn("\r\n(Läsa) nästa brev ",-1);
-                }
-        } else if(kmd==211) {
-                if(Servermem->cfg.ar.nextkom) sendautorexx(Servermem->cfg.ar.nextkom);
-                puttekn("\r\n(Läsa) nästa kommentar ",-1);
-        } else if(kmd==306) {
-                Servermem->action[nodnr] = INGET;
-                if(Servermem->cfg.ar.setid) sendautorexx(Servermem->cfg.ar.setid);
-                puttekn("\r\n(Se) tiden ",-1);
-        } else if(kmd==222) {
-                if(Servermem->cfg.ar.nextmeet) sendautorexx(Servermem->cfg.ar.nextmeet);
-                sprintf(outbuffer,"\r\nGå (till) %s ",Servermem->cfg.brevnamn);
-                puttekn(outbuffer,-1);
-        }
-        tidkvar=logintime+tidgrans-klockan;
-        if(tidgrans && tidkvar<300) {
-                sprintf(outbuffer,"(%d) %s ",tidkvar/60,Servermem->inne[nodnr].prompt);
-                puttekn(outbuffer,-1);
-        } else {
-                puttekn(Servermem->inne[nodnr].prompt,-1);
-                eka(' ');
-        }
-        if(getstring(EKO,999,NULL)) return(-8);
-        if(inmat[0]=='.' || inmat[0]==' ') return(-5);
-        if(inmat[0] && (aliaspek=parsealias(inmat)))
-        {
-			strcpy(aliasbuf,aliaspek->blirtill);
-			strcat(aliasbuf," ");
-			strncat(aliasbuf,hittaefter(inmat),980);
-			strcpy(inmat,aliasbuf);
-        }
-        if((parseret=parse(inmat))==-1) {
-                puttekn("\r\n\nFelaktigt kommando!\r\n",-1);
-                if(++felcnt>=2 && !(Servermem->inne[nodnr].flaggor & INGENHELP)) sendfile("NiKom:Texter/2fel.txt");
-                return(-5);
-        }
-        else if(parseret==-3) return(-6);
-        else if(parseret==-4) {
-                puttekn("\r\n\nDu har ingen rätt att utföra det kommandot!\r\n",-1);
-                if(Servermem->cfg.ar.noright) sendautorexx(Servermem->cfg.ar.noright);
-                return(-5);
-        } else if(parseret==-5) {
-                puttekn("\r\n\nFelaktigt lösen!\r\n",-1);
-                return(-5);
-        } else {
-                kmdpek = getkmdpek(parseret);
-                if(!kmdpek) return(-5);
-                if(kmdpek->before) sendautorexx(kmdpek->before);
-                if(kmdpek->logstr[0]) {
-                  LogEvent(USAGE_LOG, INFO, "%s %s",
-                           getusername(inloggad), kmdpek->logstr);
-                }
-                if(kmdpek->vilkainfo[0])
-                {
-                        Servermem->action[nodnr] = GORNGTANNAT;
-                        Servermem->vilkastr[nodnr] = kmdpek->vilkainfo;
-                }
-                after = kmdpek->after;
-                kmdret=dokmd(parseret,kmd);
-                if(after) sendautorexx(after);
-                return(kmdret);
-        }
-}
-
-int dokmd(int parseret,int kmd) {
-        if(parseret==201) return(ga(argument));
-        else if(parseret==210) return(-2);
-        else if(parseret==211) return(-4);
-        else if(parseret==221) return(-1);
-        else if(parseret==222) return(-9);
-        else if(parseret==301) return(-3);
-        else if(parseret==101) listmot(argument);
-        else if(parseret==102) { if(Cmd_ListUsers()) return(-8); }
-        else if(parseret==103) listmed();
-        else if(parseret==104) sendfile("NiKom:Texter/ListaKommandon.txt");
-        else if(parseret==105) listratt();
-        else if(parseret==106) listasenaste();
-        else if(parseret==107) listnyheter();
-        else if(parseret==108) listaarende();
-        else if(parseret==109) listflagg();
-        else if(parseret==111) listarea();
-        else if(parseret==112) listnyckel();
-        else if(parseret==113) listfiler();
-        else if(parseret==114) listagrupper();
-        else if(parseret==115) listgruppmed();
-        else if(parseret==116) listabrev();
-        else if(parseret==202) { if(skriv()) return(-8); }
-        else if(parseret==203) { if(kommentera()) return(-8); }
-        else if(parseret==204) { if(personlig()) return(-8); }
-        else if(parseret==205) { if(skickabrev()) return(-8); }
-        else if(parseret==206) igen();
-        else if(parseret==207) atersekom();
-        else if(parseret==208) medlem(argument);
-        else if(parseret==209) uttrad(argument);
-        else if(parseret==212) lasa();
-        else if(parseret==213) return(endast());
-        else if(parseret==214) {
-                if(kmd==211) return(-10);
-                else puttekn("\r\n\nFinns inga kommentarer att hoppa över!\r\n\n",-1);
-        } else if(parseret==215) addratt();
-        else if(parseret==216) subratt();
-        else if(parseret==217) radtext();
-        else if(parseret==218) { if(skapmot()) return(-8); }
-        else if(parseret==219) return(radmot());
-        else if(parseret==220) var(mote2);
-        else if(parseret==223) andmot();
-        else if(parseret==224) radbrev();
-        else if(parseret==225) rensatexter();
-        else if(parseret==226) rensabrev();
-        else if(parseret==227) gamlatexter();
-        else if(parseret==228) gamlabrev();
-        else if(parseret==229) { if(dumpatext()) return(-8); }
-        else if(parseret==231) { if(movetext()) return(-8); }
-        else if(parseret==232) motesstatus();
-        else if(parseret==233) hoppaarende();
-        else if(parseret==234) flyttagren();
-        else if(parseret==302) sendfile("NiKom:Texter/Help.txt");
-        else if(parseret==303) { if(Cmd_ChangeUser()) return(-8); }
-        else if(parseret==304) slaav();
-        else if(parseret==305) slapa();
-        else if(parseret==306) tiden();
-        else if(parseret==307) { if(ropa()) return(-8); }
-        else if(parseret==308) Cmd_Status();
-        else if(parseret==309) Cmd_DeleteUser();
-        else if(parseret==310) vilka();
-        else if(parseret==311) visainfo();
-        else if(parseret==312) getconfig();
-        else if(parseret==313) writeinfo();
-        else if(parseret==314) { if(sag()) return(-8); }
-        else if(parseret==315) { if(skrivlapp()) return(-8); }
-        else if(parseret==316) radlapp();
-        else if(parseret==317) { grab(); return(-11); }
-        else if(parseret==318) { if(skapagrupp()) return(-8); }
-        else if(parseret==319) { if(andragrupp()) return(-8); }
-        else if(parseret==320) raderagrupp();
-        else if(parseret==321) { if(adderagruppmedlem()) return(-8); }
-        else if(parseret==322) { if(subtraheragruppmedlem()) return(-8); }
-        else if(parseret==323) DisplayVersionInfo();
-        else if(parseret==324) alias();
-        else if(parseret==325) { nodestate |= NIKSTATE_RELOGIN; return(-3); }
-        else if(parseret==326) { if(bytnodtyp()) return(-8); }
-        else if(parseret==327) bytteckenset();
-        else if(parseret==328) SaveCurrentUser(inloggad, nodnr);
-        else if(parseret==401) bytarea();
-        else if(parseret==402) filinfo();
-        else if(parseret==403) { if(upload()) return(-8); }
-        else if(parseret==404) { if(download()) return(-8); }
-        else if(parseret==405) { if(skaparea()) return(-8); }
-        else if(parseret==406) radarea();
-        else if(parseret==407) { if(andraarea()) return(-8); }
-        else if(parseret==408) { if(skapafil()) return(-8); }
-        else if(parseret==409) radfil();
-        else if(parseret==410) { if(andrafil()) return(-8); }
-        else if(parseret==411) { if(lagrafil()) return(-8); }
-        else if(parseret==412) { if(flyttafil()) return(-8); }
-        else if(parseret==413) { if(sokfil()) return(-8); }
-        else if(parseret==414) filstatus();
-        else if(parseret==415) typefil();
-        else if(parseret==416) nyafiler();
-        else if(parseret==417) validerafil();
-        else if(parseret>=500) return(sendrexx(parseret));
-        felcnt=0;
-        return(-5);
-}
 
 void atersekom(void) {
         struct Mote *motpek;
@@ -399,53 +206,6 @@ void varmote(int mote) {
                 sprintf(outbuffer,"Du har %d olästa texter\r\n",cnt);
                 puttekn(outbuffer,-1);
         }
-}
-
-int ga(char *confName) {
-  struct UnreadTexts *unreadTexts = &Servermem->unreadTexts[nodnr];
-  int confId, becomeMember;
-  char buffer[121];
-  struct Mote *conf;
-
-  if(matchar(confName, Servermem->cfg.brevnamn)) {
-    return -9;
-  }
-  confId = parsemot(confName);
-  if(confId == -3) {
-    SendString("\r\n\nSkriv: Gå <mötesnamn>\r\n\n");
-    return -5;
-  }
-  if(confId == -1) {
-    SendString("\r\n\nFinns inget sådant möte!\r\n\n");
-    return -5;
-  }
-
-  if(!IsMemberConf(confId, inloggad, &Servermem->inne[nodnr])) {
-    conf = getmotpek(confId);
-    if(MayBeMemberConf(conf->nummer, inloggad, &Servermem->inne[nodnr])) {
-
-      sprintf(buffer, "\r\n\nDu är inte medlem i mötet %s, vill du bli medlem?",
-              conf->namn);
-      if(GetYesOrNo(buffer, 'j', 'n', "Ja\r\n", "Nej\r\n", TRUE, &becomeMember)) {
-        return -8;
-      }
-
-      if(becomeMember) {
-        BAMSET(Servermem->inne[nodnr].motmed, confId);
-        if(conf->type == MOTE_ORGINAL) {
-          unreadTexts->lowestPossibleUnreadText[confId] = 0;
-        }
-        else if(conf->type == MOTE_FIDO) {
-          unreadTexts->lowestPossibleUnreadText[confId] = conf->lowtext;
-        }
-      } else {
-        return -5;
-      }
-    } else {
-      return -5;
-    }
-  }
-  return confId;
 }
 
 void tiden(void)
@@ -1062,18 +822,6 @@ int uttrad(char *foo) {
         return(ret);
 }
 
-int unread(int meet) {
-        struct Mote *motpek;
-        if(meet==-1) return(checkmail());
-        if(!IsMemberConf(meet, inloggad, &Servermem->inne[nodnr])) {
-                return(FALSE);
-        }
-        motpek=getmotpek(meet);
-        if(motpek->type==MOTE_ORGINAL) return(checkmote(meet));
-        if(motpek->type==MOTE_FIDO) return(checkfidomote(motpek));
-        return(0);
-}
-
 int countunread(int conf) {
   struct Mote *motpek;
   if(conf == -1) {
@@ -1089,40 +837,6 @@ int countunread(int conf) {
   return 0;
 }
 
-int nextmeet(int curmeet) {
-        struct Mote *motpek;
-        int seekmeet=0,mailiscur=FALSE;
-        if(checkmail()) return(-1);
-        if(curmeet==-1) {
-                motpek=(struct Mote *)Servermem->mot_list.mlh_Head;
-                mailiscur=TRUE;
-        } else {
-                motpek=getmotpek(curmeet);
-                motpek=(struct Mote *)motpek->mot_node.mln_Succ;
-                if(!motpek->mot_node.mln_Succ) motpek=(struct Mote *)Servermem->mot_list.mlh_Head;
-        }
-        seekmeet=motpek->nummer;
-        while(seekmeet!=curmeet) {
-                if(!(motpek->status & SUPERHEMLIGT) && unread(seekmeet)) return(seekmeet);
-                motpek=(struct Mote *)motpek->mot_node.mln_Succ;
-                if(!motpek->mot_node.mln_Succ) {
-                        if(mailiscur) return(-2);
-                        motpek=(struct Mote *)Servermem->mot_list.mlh_Head;
-                }
-                seekmeet=motpek->nummer;
-        }
-        return(-2);
-}
-
-int clearmeet(int meet) {
-        struct Mote *motpek;
-        if(meet==-1) return(mail());
-        motpek=getmotpek(meet);
-        if(motpek->type==MOTE_ORGINAL) return(clearmote(meet));
-        if(motpek->type==MOTE_FIDO) return(clearfidomote(motpek));
-        return(-5);
-}
-
 void trimLowestPossibleUnreadTextsForFido(void) {
   struct UnreadTexts *unreadTexts = &Servermem->unreadTexts[nodnr];
   struct Mote *motpek;
@@ -1135,151 +849,33 @@ void trimLowestPossibleUnreadTextsForFido(void) {
   }
 }
 
-int connection(void)
-{
-        int promret,motret,foo;
-        char tellstr[100];
-        dellostsay();
-        NewList((struct List *)&aliaslist);
-        trimLowestPossibleUnreadTextsForFido();
-        time(&logintime);
-        extratime=0;
-        memset(&Statstr,0,sizeof(struct Inloggning));
-        Statstr.anv=inloggad;
-        mote2=-1;
-        Servermem->action[nodnr]=GORNGTANNAT;
-        strcpy(vilkabuf,"loggar in");
-        Servermem->vilkastr[nodnr]=vilkabuf;
-        senast_text_typ=0;
-        if(Servermem->cfg.logmask & LOG_INLOGG) {
-          LogEvent(USAGE_LOG, INFO, "%s loggar in på nod %d",
-                   getusername(inloggad), nodnr);
-        }
-        sprintf(tellstr,"loggade just in på nod %d",nodnr);
-        tellallnodes(tellstr);
-        area2=Servermem->inne[nodnr].defarea;
-        if(area2<0 || area2>Servermem->info.areor || !Servermem->areor[area2].namn || !arearatt(area2, inloggad, &Servermem->inne[nodnr])) area2=-1;
-        initgrupp();
-        rexxlogout=FALSE;
-        rxlinecount = TRUE;
-        radcnt=0;
-        if(Servermem->cfg.ar.postinlogg) sendautorexx(Servermem->cfg.ar.postinlogg);
-        DisplayVersionInfo();
-        var(mote2);
-        for(;;) {
-                if(unread(mote2)) {
-                        motret=clearmeet(mote2);
-                        if(motret==-1) {          /* Nästa Möte */
-                                foo=nextmeet(mote2);
-                                if(foo==-2) puttekn("\n\n\rFinns inget mer möte med olästa texter!\n\r",-1);
-                                else {
-                                        mote2=foo;
-                                        var(mote2);
-                                }
-                                continue;
-                        }
-                        else if(motret==-3) return(0); /* Logga ut */
-                        else if(motret==-8) return(1); /* Carriern släppt */
-                        else if(motret==-9) {          /* Gå till brevlådan */
-                                mote2=-1;
-                                var(mote2);
-                                continue;
-                        }
-                        else if(motret==-11) {         /* Endast anropat */
-                                var(mote2);
-                                continue;
-                        }
-                        else if(motret>=0) {           /* Gå till ngt möte */
-                                mote2=motret;
-                                var(mote2);
-                                continue;
-                        }
-                }
-                foo=nextmeet(mote2);
-                if(foo!=-2) {
-                        if(foo==-1) promret=prompt(222);
-                        else promret=prompt(221);
-                        if(promret==-1 || promret==-6) {  /* Gå till mötet */
-                                mote2=foo;
-                                var(mote2);
-                                continue;
-                        }
-                        else if(promret==-2) {            /* Läsa nästa text */
-                                puttekn("\n\n\rFinns inga olästa texter i detta möte\n\r",-1);
-                                continue;
-                        }
-                        else if(promret==-3) return(0);
-                        else if(promret==-4) {            /* Läsa nästa kommentar */
-                                puttekn("\n\n\rFinns inga fler olästa kommentarer\n\r",-1);
-                                continue;
-                        }
-                        else if(promret==-5) continue;    /* Ngt oviktigt kommando givet */
-                        else if(promret==-8) return(1);
-                        else if(promret==-9) {            /* Gå till brevlådan */
-                                mote2=-1;
-                                var(mote2);
-                                continue;
-                        }
-                        else if(promret==-11) {           /* Endast anropat */
-                                var(mote2);
-                                continue;
-                        }
-                        else if(promret>=0) {             /* Gå till ngt möte */
-                                mote2=promret;
-                                var(mote2);
-                                continue;
-                        }
-                }
-                promret=prompt(306);
-                if(promret==-1) puttekn("\r\n\nFinns inga fler möten med olästa texter\r\n",-1);
-                else if(promret==-2) puttekn("\r\n\nFinns inga olästa texter i detta möte\r\n",-1);
-                else if(promret==-3) return(0);
-                else if(promret==-4) puttekn("\r\n\nFinns inga olästa kommentarer\r\n",-1);
-                else if(promret==-6) tiden();
-                else if(promret==-8) return(1);
-                else if(promret==-9) {
-                        mote2=-1;
-                        var(mote2);
-                }
-                else if(promret==-11) var(mote2);
-                else if(promret>=0) {
-                        mote2=promret;
-                        var(mote2);
-                }
-        }
+void connection(void) {
+  char tellstr[100];
+  dellostsay();
+  NewList((struct List *)&aliaslist);
+  trimLowestPossibleUnreadTextsForFido();
+  time(&logintime);
+  extratime=0;
+  memset(&Statstr,0,sizeof(struct Inloggning));
+  Statstr.anv=inloggad;
+  mote2=-1;
+  Servermem->action[nodnr]=GORNGTANNAT;
+  strcpy(vilkabuf,"loggar in");
+  Servermem->vilkastr[nodnr]=vilkabuf;
+  senast_text_typ=0;
+  if(Servermem->cfg.logmask & LOG_INLOGG) {
+    LogEvent(USAGE_LOG, INFO, "%s loggar in på nod %d",
+             getusername(inloggad), nodnr);
+  }
+  sprintf(tellstr,"loggade just in på nod %d",nodnr);
+  tellallnodes(tellstr);
+  area2=Servermem->inne[nodnr].defarea;
+  if(area2<0 || area2>Servermem->info.areor || !Servermem->areor[area2].namn || !arearatt(area2, inloggad, &Servermem->inne[nodnr])) area2=-1;
+  initgrupp();
+  rxlinecount = TRUE;
+  radcnt=0;
+  if(Servermem->cfg.ar.postinlogg) sendautorexx(Servermem->cfg.ar.postinlogg);
+  DisplayVersionInfo();
+  var(mote2);
+  KomLoop();
 }
-
-
-
-/* Temp! timing .. */
-
-void starttimer(unsigned int *start)
-{
-	timer(start);
-}
-
-void endtimer(char *string, unsigned int *startclock)
-{
-	unsigned int curclock[2];
-	unsigned int sekunder;
-	int millisekunder;
-
-	timer(curclock);
-
-	sekunder = curclock[0] - startclock[0];
-	millisekunder = curclock[1] - startclock[1] - 500;
-
-	while(millisekunder < 0)
-	{
-		if(sekunder > 0)
-		{
-			sekunder--;
-			millisekunder += 1000000;
-		}
-		else
-			millisekunder = -millisekunder;
-	}
-
-	printf("Tid: %u.%d (%s)\n", sekunder, millisekunder, string);
-}
-

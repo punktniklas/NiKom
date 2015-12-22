@@ -371,7 +371,7 @@ int sendtocon(char *pekare, int size)
 }
 
 int ImmediateLogout(void) {
-  return nodestate & NIKSTATE_LOGOUT;
+  return nodestate & NIKSTATE_AUTOLOGOUT;
 }
 
 int ConnectionLost(void) {

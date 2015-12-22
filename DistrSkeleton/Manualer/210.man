@@ -6,8 +6,10 @@ Nästa Text
 Synopsis: Nästa Text
 
 Beskrivning:
-Detta kommando bryter den kommentars-kedja man är inne i och tar fram
-'(Läsa) Nästa Text'-prompten. Kommentarerna man inte läste är dock
-fortfarande markerade som olästa.
+Detta kommando visar nästa olästa texter i det aktuella mötet. Om man
+för närvarande läser en kedja av kommentarar (dvs, prompten säger
+"(Läsa) nästa kommentar") bryts kedjan och nästa olästa text i mötet
+visas istället. Kommentarerna man inte läste är dock fortfarande markerade
+som olästa.
 
 Se Även: Hoppa Över, Endast

@@ -71,3 +71,7 @@ int StackPeek(struct Stack *stack) {
 int StackSize(struct Stack *stack) {
   return stack->size;
 }
+
+void StackClear(struct Stack *stack) {
+  stack->size = 0;
+}

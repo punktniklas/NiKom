@@ -7,3 +7,4 @@ void StackPush(struct Stack *stack, int value);
 int StackPop(struct Stack *stack);
 int StackPeek(struct Stack *stack);
 int StackSize(struct Stack *stack);
+void StackClear(struct Stack *stack);

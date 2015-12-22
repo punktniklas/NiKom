@@ -456,7 +456,7 @@ void serputstring(char *pekare,int size, long flags)
 }
 
 int ImmediateLogout(void) {
-  return nodestate & (NIKSTATE_NOCARRIER | NIKSTATE_LOGOUT | NIKSTATE_INACTIVITY);
+  return nodestate & (NIKSTATE_NOCARRIER | NIKSTATE_AUTOLOGOUT | NIKSTATE_INACTIVITY);
 }
 
 int ConnectionLost(void) {

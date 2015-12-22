@@ -57,19 +57,10 @@ void shutdownnode(int);
 void handleservermess(struct NiKMess *);
 
 /* Prototypes for functions defined in NiKFuncs.c */
-int bamtest(char *foobar,int bar);
-void bamset(char *foobar,int bar);
-void bamclear(char *foobar,int bar);
-int prompt(int kmd);
-int dokmd(int parseret,int kmd);
 int kommentera(void);
 void lasa(void);
-int checkmote(int mote);
 int countmote(int mote);
 void var(int mot);
-int ga(char *foo);
-int clearmote(int foo);
-int clearkom(void);
 int visatext(int text);
 void tiden(void);
 int skapmot(void);
@@ -81,24 +72,17 @@ int uttrad(char *foo);
 void sparatext(void);
 void linkkom(void);
 int initheader(int komm);
-int unread(int meet);
 int countunread(int meet);
-int nextmeet(int curmeet);
-int clearmeet(int meet);
 void initLowestPossibleUnreadTexts(void);
-int connection(void);
+void connection(void);
 void varmote(int mote);
 int skriv(void);
 void igen(void);
 void atersekom(void);
-void starttimer(unsigned int *);
-void endtimer(char *string, unsigned int *);
 
 /* Prototypes for functions defined in NiKFuncs2.c */
-int checkmail(void);
 int countmail(int user,int brevpek);
 void varmail(void);
-int mail(void);
 void visabrev(int brev,int anv);
 int recisthere(char *str,int rec);
 int updatenextletter(int user);
@@ -109,7 +93,6 @@ void listmed(void);
 void listratt(void);
 void listnyheter(void);
 void listflagg(void);
-int hoppaover(int rot,int ack);
 int parseflagga(char *skri);
 void slaav(void);
 void slapa(void);
@@ -119,7 +102,7 @@ void addratt(void);
 void subratt(void);
 
 /* Prototypes for functions defined in NiKFuncs3.c */
-int endast(void);
+void endast(void);
 int personlig(void);
 void radtext(void);
 int radmot(void);
@@ -259,8 +242,8 @@ int grabkom(FILE *fp);
 void grab(void);
 
 /* Prototypes for functions defined in NiKRexx.c */
-int sendrexx(int komnr);
-int sendautorexx(int komnr);
+void sendrexx(int komnr);
+void sendautorexx(int komnr);
 
 /* Prototypes for functions defined in NiKUUCico.c */
 void douucico(void);
@@ -272,10 +255,8 @@ int getnet(char *);
 int getpoint(char *);
 int brev_kommentera(void);
 void brev_lasa(int tnr);
-int checkmail(void);
 int countmail(int user,int brevpek);
 void varmail(void);
-int mail(void);
 void visabrev(int brev,int anv);
 void visafidobrev(struct ReadLetter *,BPTR,int,int);
 int initbrevheader(int tillpers);
@@ -290,8 +271,6 @@ int org_kommentera(void);
 void org_lasa(int);
 int checkmote(int);
 void varmote(int);
-int clearmote(int);
-int clearkom(void);
 int org_visatext(int);
 void org_sparatext(void);
 void org_linkkom(void);
@@ -300,9 +279,7 @@ void org_endast(int, int);
 
 /* Prototypes for functions defined in FidoMeet.c */
 void fido_lasa(int tnr,struct Mote *motpek);
-int checkfidomote(struct Mote *motpek);
 int countfidomote(struct Mote *motpek);
-int clearfidomote(struct Mote *motpek);
 void fido_visatext(int text,struct Mote *motpek);
 void fido_endast(struct Mote *,int);
 void makefidodate(char *);

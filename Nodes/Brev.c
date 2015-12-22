@@ -13,6 +13,8 @@
 #include "Logging.h"
 #include "Terminal.h"
 
+#include "Brev.h"
+
 #define EKO		1
 #define BREVKOM	-1
 
@@ -125,15 +127,24 @@ void brev_lasa(int tnr) {
 	visabrev(tnr,brevanv);
 }
 
-int checkmail(void) {
-	BPTR lock;
-	char filnamn[40];
-	sprintf(filnamn,"NiKom:Users/%d/%d/%d.letter",inloggad/100,inloggad,Servermem->inne[nodnr].brevpek);
-	if(lock=Lock(filnamn,ACCESS_READ)) {
-		UnLock(lock);
-		return(TRUE);
-	}
-	return(FALSE);
+int HasUnreadMail(void) {
+  BPTR lock;
+  char filename[40];
+  sprintf(filename, "NiKom:Users/%d/%d/%d.letter", inloggad/100, inloggad,
+          Servermem->inne[nodnr].brevpek);
+  if(lock = Lock(filename, ACCESS_READ)) {
+    UnLock(lock);
+    return TRUE;
+  }
+  return FALSE;
+}
+
+void NextMail(void) {
+  if(!HasUnreadMail()) {
+    SendString("\r\n\nDu har inga olästa brev.\r\n\n");
+    return;
+  }
+  visabrev(Servermem->inne[nodnr].brevpek++, inloggad);
 }
 
 int countmail(int user,int brevpek) {
@@ -150,30 +161,6 @@ void varmail(void) {
 	else {
 		sprintf(outbuffer,"Du har %d olästa brev.\r\n\n",antal);
 		puttekn(outbuffer,-1);
-	}
-}
-
-int mail(void) {
-	BPTR lock;
-	int promret;
-	char filnamn[40];
-	for(;;) {
-		sprintf(filnamn,"NiKom:Users/%d/%d/%d.letter",inloggad/100,inloggad,Servermem->inne[nodnr].brevpek);
-		if(lock=Lock(filnamn,ACCESS_READ)) UnLock(lock);
-		else return(-5);
-		for(;;) {
-			if((promret=prompt(210))==-1) return(-1);
-			else if(promret==-3) return(-3);
-			else if(promret==-4) puttekn("\r\n\nFinns ingen nästa kommentar!\r\n\n",-1);
-			else if(promret==-8) return(-8);
-			else if(promret==-9) puttekn("\r\n\nDu är redan i brevlådan!\r\n\n",-1);
-			else if(promret>=0) return(promret);
-			else if(promret==-2 || promret==-6) {
-				visabrev(Servermem->inne[nodnr].brevpek++,inloggad);
-				break;
-			}
-			else if(promret==-11) return(-11);
-		}
 	}
 }
 

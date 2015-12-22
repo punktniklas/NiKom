@@ -11,13 +11,15 @@
 #include <stdio.h>
 #include <time.h>
 #include <limits.h>
-#include "NiKomstr.h"
+#include "NiKomStr.h"
+#include "NiKomLib.h"
 #include "NiKomFuncs.h"
 #include "Terminal.h"
 #include "RexxUtils.h"
 #include "ExecUtils.h"
 #include "Logging.h"
 #include "BasicIO.h"
+#include "KOM.h"
 
 #define EKO             1
 #define EJEKO   0
@@ -25,14 +27,13 @@
 extern struct System *Servermem;
 extern long logintime,extratime;
 extern int nodnr,inloggad,senast_text_typ,senast_text_nr,senast_text_mote,
-        nu_skrivs,rad,mote2,area2,rexxlogout,senast_brev_nr,senast_brev_anv,rxlinecount,radcnt;
+  nu_skrivs,rad,mote2,area2,senast_brev_nr,senast_brev_anv,rxlinecount,radcnt,
+  nodestate;
 extern char outbuffer[],inmat[],*argument,brevtxt[][81],typeaheadbuf[],xprfilnamn[],vilkabuf[];
 extern struct MsgPort *rexxport;
 extern struct Header readhead;
 extern struct MinList edit_list,tf_list;
 extern struct Inloggning Statstr;
-
-int sendrexxrc;
 
 void handleRexxFinished(struct RexxMsg *nikrexxmess);
 void handleRexxCommand(char *cmdName, struct RexxMsg *mess);
@@ -119,11 +120,10 @@ static const char *rexxErrors[] = {
   "invalid operand"
 };
 
-int commonsendrexx(int komnr,int hasarg) {
+void commonsendrexx(int komnr,int hasarg) {
   char rexxCmd[1081];
   struct RexxMsg *nikrexxmess, *mess;
 
-  sendrexxrc = -5;
   if(!hasarg) {
     sprintf(rexxCmd, "NiKom:rexx/ExtKom%d %d %d", komnr, nodnr, inloggad);
   } else {
@@ -133,19 +133,19 @@ int commonsendrexx(int komnr,int hasarg) {
   if(!(nikrexxmess = (struct RexxMsg *) CreateRexxMsg(
       rexxport, "nik", rexxport->mp_Node.ln_Name))) {
     LogEvent(SYSTEM_LOG, ERROR, "Couldn't allocate a RexxMsg.");
-    return -5;
+    return;
   }
   if(!(nikrexxmess->rm_Args[0] =
        (STRPTR)CreateArgstring(rexxCmd,strlen(rexxCmd)))) {
     DeleteRexxMsg(nikrexxmess);
     LogEvent(SYSTEM_LOG, ERROR, "Couldn't allocate a rexx ArgString.");
-    return -5;
+    return;
   }
 
   nikrexxmess->rm_Action = RXCOMM;
   if(!SafePutToPort((struct Message *)nikrexxmess, "REXX")) {
     LogEvent(SYSTEM_LOG, ERROR, "Can't launch ARexx script, REXX port not found.");
-    return -5;
+    return;
   }
 
   for(;;) {
@@ -153,14 +153,12 @@ int commonsendrexx(int komnr,int hasarg) {
     while(mess = (struct RexxMsg *)GetMsg(rexxport)) {
       if(mess->rm_Node.mn_Node.ln_Type == NT_REPLYMSG) {
         handleRexxFinished(nikrexxmess);
-        return sendrexxrc;
+        return;
       }
       handleRexxCommand(mess->rm_Args[0], mess);
       ReplyMsg((struct Message *)mess);
     }
   }
-  if(ImmediateLogout()) return(-8);
-  return(sendrexxrc);
 }
 
 void handleRexxFinished(struct RexxMsg *nikrexxmess) {
@@ -219,12 +217,12 @@ void handleRexxCommand(char *cmdName, struct RexxMsg *mess) {
       }
 }
 
-int sendrexx(int komnr) {
-  return commonsendrexx(komnr,1);
+void sendrexx(int komnr) {
+  commonsendrexx(komnr,1);
 }
 
-int sendautorexx(int komnr) {
-  return commonsendrexx(komnr,0);
+void sendautorexx(int komnr) {
+  commonsendrexx(komnr,0);
 }
 
 void rexxsendstring(struct RexxMsg *mess) {
@@ -316,6 +314,7 @@ void senastread(struct RexxMsg *mess) {
 void kommando(struct RexxMsg *mess) {
   int parseret;
   char *nikcmd;
+  struct Kommando *cmd;
 
   nikcmd = hittaefter(mess->rm_Args[0]);
   if((parseret = parse(nikcmd)) == -1) {
@@ -331,7 +330,15 @@ void kommando(struct RexxMsg *mess) {
              inloggad, nikcmd);   
     SetRexxResultString(mess, "3");
   } else {
-    if((sendrexxrc = dokmd(parseret,0)) == -8) {
+    if((cmd = getkmdpek(parseret)) == NULL) {
+      LogEvent(SYSTEM_LOG, ERROR,
+               "Can't find command definition for command %d when trying to "
+               "execute %s from ARexx.", parseret, nikcmd);
+      SetRexxErrorResult(mess, 20);
+      return;
+    }
+    DoExecuteCommand(cmd);
+    if(ImmediateLogout()) {
       SetRexxErrorResult(mess, 100);
     } else {
       SetRexxResultString(mess, "0");
@@ -340,11 +347,22 @@ void kommando(struct RexxMsg *mess) {
 }
 
 void niknrcommand(struct RexxMsg *mess) {
-  int nr;
+  int cmdId;
   char *commandstr = hittaefter(mess->rm_Args[0]);
-  nr = atoi(commandstr);
+  struct Kommando *cmd;
+
+  cmdId = atoi(commandstr);
   argument=hittaefter(commandstr);
-  if((sendrexxrc = dokmd(nr, 0)) == -8) {
+
+  if((cmd = getkmdpek(cmdId)) == NULL) {
+    LogEvent(SYSTEM_LOG, ERROR,
+             "Can't find command definition for command %d when trying to "
+             "execute numeric comand from ARexx.", cmdId);
+    SetRexxErrorResult(mess, 10);
+    return;
+  }
+  DoExecuteCommand(cmd);
+  if(ImmediateLogout()) {
     SetRexxErrorResult(mess, 100);
   } else {
     SetRexxErrorResult(mess, 0);
@@ -573,8 +591,7 @@ void rexxrecbinfile(struct RexxMsg *mess) {
 }
 
 void rxlogout(struct RexxMsg *mess) {
-  rexxlogout=TRUE;
-  radcnt = -174711;
+  nodestate |= NIKSTATE_USERLOGOUT;
   SetRexxErrorResult(mess, 0);
 }
 
@@ -637,7 +654,7 @@ void rxentermeet(struct RexxMsg *mess) {
     SetRexxErrorResult(mess, 5);
     return;
   }
-  sendrexxrc = confId;
+  GoConf(confId);
   SetRexxErrorResult(mess, 0);
 }
 
