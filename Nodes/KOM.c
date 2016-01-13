@@ -12,6 +12,7 @@
 #include "Terminal.h"
 #include "Cmd_Kom.h"
 #include "Cmd_Users.h"
+#include "NiKFiles.h"
 #include "NiKversion.h"
 #include "BasicIO.h"
 #include "NiKomFuncs.h"
@@ -241,7 +242,7 @@ void DoExecuteCommand(struct Kommando *cmd) {
   case 402: filinfo(); break;
   case 403: upload(); break;
   case 404: download(); break;
-  case 405: skaparea(); break;
+  case 405: Cmd_CreateArea(); break;
   case 406: radarea(); break;
   case 407: andraarea(); break;
   case 408: skapafil(); break;

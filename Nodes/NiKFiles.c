@@ -96,114 +96,149 @@ int updatefile(int area,struct Fil *fil)
 	return 0;
 }
 
-int skaparea(void) {
-	BPTR fh;
-	long tid;
-	char tempdir[101];
-	int going = TRUE, x, old = Servermem->info.areor, ret = 0, y, isCorrect;
-	for(x=0;x<MAXAREA;x++) {
-		if(!Servermem->areor[x].namn[0]) break;
-	}
-	if(x==MAXAREA) {
-		puttekn("\r\n\nFinns ej plats för fler areor!!\r\n",-1);
-		return(0);
-	}
-	if(x==Servermem->info.areor) Servermem->info.areor++;
-	memset(&Servermem->areor[x],0,sizeof(struct Area));
-	if(argument[0]==0) {
-		puttekn("\r\n\nNamn på arean: ",-1);
-		if(getstring(EKO,40,NULL)) { Servermem->info.areor=old; return(1); }
-		if(parsearea(inmat)!=-1) { Servermem->info.areor=old; return(0); }
-		strcpy(Servermem->areor[x].namn,inmat);
-	} else strcpy(Servermem->areor[x].namn,argument);
-	time(&tid);
-	Servermem->areor[x].skapad_tid=tid;
-	Servermem->areor[x].skapad_av=inloggad;
-	Servermem->areor[x].filer=0;
-	Servermem->areor[x].status=0;
-	NewList((struct List *)&Servermem->areor[x].ar_list);
-	while(going) {
-		puttekn("\r\nTill vilket möte ska arean höra? (<RETURN> för inget) ",-1);
-		if(getstring(EKO,40,NULL)) { Servermem->info.areor=old; Servermem->areor[x].namn[0]=0; return(1); }
-		if((ret=parsemot(inmat))>=0) {
-			Servermem->areor[x].mote=ret;
-			sprintf(outbuffer,"\r\nKopplar arean till mötet %s",getmotnamn(ret));
-			puttekn(outbuffer,-1);
-			going=FALSE;
-		} else if(ret==-3) {
-			Servermem->areor[x].mote=-1;
-			going=FALSE;
-		} else puttekn("\r\nFinns inget sådant möte!",-1);
-	}
+void Cmd_CreateArea(void) {
+  BPTR fh;
+  char tempdir[101], *tmpName;
+  int ret = 0, isCorrect, i, areaId;
+  struct Area tmpArea;
 
-        if(GetYesOrNo("\n\rSka uploads till arean tillåtas?", 'j', 'n', "Ja", "Nej",
-                      TRUE, &isCorrect)) {
-          return 1;
-        }
+  for(areaId = 0; areaId < MAXAREA; areaId++) {
+    if(Servermem->areor[areaId].namn[0] == '\0') {
+      break;
+    }
+  }
+  if(areaId == MAXAREA) {
+    SendString("\r\n\nFinns ej plats för fler areor!!\r\n");
+    return;
+  }
+  memset(&tmpArea, 0, sizeof(struct Area));
+  if(argument[0] == '\0') {
+    SendString("\r\n\nNamn på arean: ");
+    if(GetString(41, NULL)) {
+      return;
+    }
+    tmpName = inmat;
+  } else {
+    tmpName = argument;
+  }
+  switch(parsearea(tmpName)) {
+  case -1:
+    break;
+  default:
+    SendString("\r\n\nFinns redan en area med det namnet.");
+  case -3:
+    SendString("\r\n");
+    return;
+  }
 
-	if(!isCorrect) {
-          Servermem->areor[x].flaggor |= AREA_NOUPLOAD;
-	}
-
-        if(GetYesOrNo("\n\rSka downloads från arean tillåtas?", 'j', 'n',
-                      "Ja", "Nej", TRUE, &isCorrect)) {
-          return 1;
-        }
-
-	if(!isCorrect) {
-          Servermem->areor[x].flaggor |= AREA_NODOWNLOAD;
-	}
-
-	puttekn("\r\nVilka grupper ska ha tillgång till arean? (? för lista)\r\n",-1);
-	Servermem->areor[x].grupper=0L;
-	if(editgrupp((char *)&Servermem->areor[x].grupper)) { Servermem->info.areor=old; Servermem->areor[x].namn[0]=0; return(1); }
-	puttekn("\r\nTill vilka directoryn ska arean höra?",-1);
-	for(y=0;y<16;y++) Servermem->areor[x].dir[y][0]=0;
-	for(y=0;y<16;y++)
-	{
-		while(!Servermem->areor[x].dir[y][0])
-		{
-			sprintf(outbuffer,"\r\nDirectory %d: ",y+1);
-			puttekn(outbuffer,-1);
-			inmat[0] = 0;
-			if(getstring(EKO,39,NULL)) { Servermem->info.areor=old; return(1); }
-			if(!inmat[0]) break;
-			ret=strlen(inmat);
-			if(inmat[ret-1]!='/' && inmat[ret-1]!=':') {
-				inmat[ret]='/';
-				inmat[ret+1]=0;
-			}
-			strcpy(Servermem->areor[x].dir[y],inmat);
-			strcpy(tempdir, inmat);
-			tempdir[strlen(tempdir)-1] = 0;
-			if(mkdir(tempdir))
-			{
-				Servermem->areor[x].dir[y][0] = 0;
-				puttekn("\r\nKunde inte skapa biblioteket!", -1);
-			}
-		}
-		if(!inmat[0]) break;
-		sprintf(tempdir,"%slongdesc",Servermem->areor[x].dir[y]);
-		mkdir(tempdir);
-		puttekn("\r\nNycklar till directoryt.\r\n",-1);
-		editkey(Servermem->areor[x].nycklar[y]);
-	}
-	NiKForbid();
-	if(!(fh=Open("NiKom:DatoCfg/Areor.dat",MODE_OLDFILE))) {
-		puttekn("\r\n\nKunde inte öppna Areor.dat\r\n",-1);
-		Servermem->info.areor=old;
-		Servermem->areor[x].namn[0]=0;
-		NiKPermit();
-		return(0);
-	}
-	if(Write(fh,(void *)Servermem->areor,sizeof(struct Area)*Servermem->info.areor)==-1) {
-		puttekn("\r\n\nFel vid skrivandet av Möten.dat\r\n",-1);
-		Servermem->info.areor=old;
-		Servermem->areor[x].namn[0]=0;
-	}
-	Close(fh);
-	NiKPermit();
-	return(0);
+  strncpy(tmpArea.namn, tmpName, 40);
+  tmpArea.skapad_tid = time(NULL);
+  tmpArea.skapad_av = inloggad;
+  tmpArea.filer = 0;
+  tmpArea.status = 0;
+  NewList((struct List *)&tmpArea.ar_list);
+  for(;;) {
+    SendString("\r\nTill vilket möte ska arean höra? (<RETURN> för inget) ");
+    if(GetString(41,NULL)) { 
+      return;
+    }
+    if((ret = parsemot(inmat)) >= 0) {
+      tmpArea.mote = ret;
+      SendString("\r\nKopplar arean till mötet %s\r\n", getmotnamn(ret));
+      break;
+    } else if(ret == -3) {
+      tmpArea.mote = -1;
+      break;
+    } else {
+      SendString("\r\nFinns inget sådant möte!");
+    }
+  }
+  
+  if(GetYesOrNo("\n\rSka uploads till arean tillåtas?", 'j', 'n', "Ja", "Nej",
+                TRUE, &isCorrect)) {
+    return;
+  }
+  
+  if(!isCorrect) {
+    tmpArea.flaggor |= AREA_NOUPLOAD;
+  }
+  
+  if(GetYesOrNo("\n\rSka downloads från arean tillåtas?", 'j', 'n',
+                "Ja", "Nej", TRUE, &isCorrect)) {
+    return;
+  }
+  
+  if(!isCorrect) {
+    tmpArea.flaggor |= AREA_NODOWNLOAD;
+  }
+  
+  SendString("\r\nVilka grupper ska ha tillgång till arean? (? för lista)\r\n");
+  tmpArea.grupper = 0L;
+  if(editgrupp((char *)&tmpArea.grupper)) {
+    return;
+  }
+  SendString("\r\nTill vilka directoryn ska arean höra?");
+  for(i = 0; i < 16; i++) {
+    tmpArea.dir[i][0] = '\0';
+  }
+  for(i = 0; i < 16; i++) {
+    while(tmpArea.dir[i][0] == '\0') {
+      SendString("\r\nDirectory %d: ", i+1);
+      if(GetString(40,NULL)) {
+        return;
+      }
+      if(inmat[0] == '\0') {
+        break;
+      }
+      ret = strlen(inmat);
+      if(inmat[ret - 1] != '/' && inmat[ret - 1] != ':') {
+        inmat[ret] = '/';
+        inmat[ret + 1] = '\0';
+      }
+      strcpy(tmpArea.dir[i], inmat);
+      strcpy(tempdir, inmat);
+      tempdir[strlen(tempdir) - 1] = '\0';
+      if(mkdir(tempdir)) {
+        tmpArea.dir[i][0] = 0;
+        SendString("\r\nKatalogen kunde inte skapas i filsystemet.\r\n");
+      }
+    }
+    if(inmat[0] == '\0') {
+      break;
+    }
+    sprintf(tempdir, "%slongdesc", tmpArea.dir[i]);
+    mkdir(tempdir);
+    SendString("\r\nNycklar till directoryt.\r\n");
+    editkey(tmpArea.nycklar[i]);
+  }
+  NiKForbid();
+  if(!(fh=Open("NiKom:DatoCfg/Areor.dat", MODE_OLDFILE))) {
+    LogEvent(SYSTEM_LOG, ERROR,
+             "Could not open Areor.dat for writing when creating area.");
+    DisplayInternalError();
+    NiKPermit();
+    return;
+  }
+  if(areaId == Servermem->info.areor) {
+    Servermem->info.areor++;
+  }
+  memcpy(&Servermem->areor[areaId], &tmpArea, sizeof(struct Area));
+  if(Write(fh, Servermem->areor, sizeof(struct Area) * Servermem->info.areor) == -1) {
+    LogEvent(SYSTEM_LOG, ERROR,
+             "Error writing to Areor.dat when creating area.");
+    DisplayInternalError();
+  }
+  Close(fh);
+  NiKPermit();
+  sprintf(tempdir, "NiKom:DatoCfg/Areor/%d.dat", areaId);
+  if(!(fh = Open(tempdir, MODE_NEWFILE))) {
+    LogEvent(SYSTEM_LOG, ERROR, "Could not create empty file %s.", tempdir);
+    DisplayInternalError();
+  } else {
+    Close(fh);
+  }
+  SendString("\r\n\nArean är skapad.\r\n");
+  return;
 }
 
 int parsearea(skri)

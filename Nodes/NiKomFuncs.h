@@ -184,7 +184,6 @@ void SaveCurrentUser(int, int);   /* Kommandot SPARA */
 int edittext(char *filnamn);
 
 /* Prototypes for functions defined in NiKFiles.c */
-int skaparea(void);
 int parsearea(char *skri);
 void listarea(void);
 int parsenyckel(char *skri);
