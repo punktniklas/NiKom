@@ -127,12 +127,14 @@ void main(int argc, char **argv) {
   Servermem->connectbps[nodnr] = -1;
   conreqtkn();
   do {
+    Servermem->idletime[nodnr] = time(NULL);
     memset(commandhistory,0,1024);
     Servermem->inne[nodnr].rader=0;
     sendfile("NiKom:Texter/Inlogg.txt");
     if(Servermem->cfg.ar.preinlogg) sendautorexx(Servermem->cfg.ar.preinlogg);
     going=TRUE;
     while(going) {
+      Servermem->idletime[nodnr] = time(NULL);
       puttekn("\r\nNamn: ",-1);
       getstring(EKO,40,NULL);
       if(!stricmp(inmat,Servermem->cfg.ny)) {
