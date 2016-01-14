@@ -10,7 +10,7 @@
 #include "Brev.h"
 
 extern struct System *Servermem;
-extern int inloggad, nodnr, mote2, nodestate;
+extern int inloggad, nodnr, mote2, nodestate, senast_text_typ, senast_text_nr;
 extern char *argument;
 extern struct Header readhead;
 
@@ -120,13 +120,24 @@ void Cmd_ReLogin(void) {
 void Cmd_SkipReplies(void) {
   struct Stack *skipStack = CreateStack();
   struct Header skipHeader;
-  int textId, i, cnt = -1;
+  int textId, i, cnt = 0;
+
+  if(senast_text_typ == 0) {
+    SendString("\r\n\nDu har inte läst någon text ännu.\r\n");
+    return;
+  }
+  if(senast_text_typ != TEXT) {
+    SendString("\r\n\nDu kan bara använda 'Hoppa Över' på texter i vanliga möten.\r\n");
+    return;
+  }
   
-  StackPush(skipStack, readhead.nummer);
+  StackPush(skipStack, senast_text_nr);
   while(StackSize(skipStack) > 0) {
     textId = StackPop(skipStack);
+    if(IsTextUnread(textId, &Servermem->unreadTexts[nodnr])) {
+      cnt++;
+    }
     ChangeUnreadTextStatus(textId, 0, &Servermem->unreadTexts[nodnr]);
-    cnt++;
     if(readtexthead(textId, &skipHeader)) {
       LogEvent(SYSTEM_LOG, ERROR,
                "Couldn't read text %d in Cmd_SkipReplies()", textId);
