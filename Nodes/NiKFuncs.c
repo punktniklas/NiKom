@@ -35,6 +35,7 @@ extern struct MinList edit_list;
 long logintime, extratime;
 int mote2,rad,senast_text_typ,nu_skrivs,area2,
         senast_brev_nr,senast_brev_anv,senast_text_nr,senast_text_mote;
+int g_lastKomTextType, g_lastKomTextNr, g_lastKomTextConf;
 char *month[] = { "januari","februari","mars","april","maj","juni",
                 "juli","augusti","september","oktober","november","december" },
                 *veckodag[] = { "Söndag","Måndag","Tisdag","Onsdag","Torsdag","Fredag",
@@ -91,95 +92,6 @@ int skriv(void) {
         if(motpek->type==MOTE_ORGINAL) return(org_skriv());
         else if(motpek->type==MOTE_FIDO) return(fido_skriv(EJKOM,0));
         return(0);
-}
-
-int kommentera(void) {
-  struct Mote *conf;
-  int isCorrect;
-
-  if(argument[0]) {
-    if(mote2 == -1) {
-      return(brev_kommentera());
-    }
-    conf = getmotpek(mote2);
-    if(conf->type == MOTE_ORGINAL) {
-      return(org_kommentera());
-    }
-    if(conf->type == MOTE_FIDO) {
-      if(!MayReplyConf(mote2, inloggad, &Servermem->inne[nodnr])) {
-        SendString("\r\n\nDu får inte kommentera den texten!\r\n\n");
-        return 0;
-      }
-      if(conf->status & KOMSKYDD) {
-        if(GetYesOrNo(
-           "\r\n\nVill du verkligen kommentera i ett kommentarsskyddat möte? ",
-           'j', 'n', "Ja\r\n", "Nej\r\n", FALSE, &isCorrect)) {
-          return 1;
-        }
-        if(!isCorrect) {
-          return 0;
-        }
-      }
-      return(fido_skriv(KOM, atoi(argument)));
-    }
-  }
-
-  if(!senast_text_typ) {
-    SendString("\n\n\rDu har inte läst någon text ännu.\n\r");
-    return 0;
-  }
-  if(senast_text_typ == BREV) {
-    return(brev_kommentera());
-  }
-  conf = getmotpek(senast_text_mote);
-  if(!conf) {
-    LogEvent(SYSTEM_LOG, ERROR,
-             "Conference for last read text (confId = %d) does not exist.",
-             senast_text_mote);
-    DisplayInternalError();
-    return 0;
-  }
-  if(!MayReplyConf(senast_text_mote, inloggad, &Servermem->inne[nodnr])) {
-    SendString("\r\n\nDu får inte kommentera den texten!\r\n\n");
-    return 0;
-  }
-  if(conf->status & KOMSKYDD) {
-    if(GetYesOrNo(
-       "\r\n\nVill du verkligen kommentera i ett kommentarsskyddat möte? ",
-       'j', 'n', "Ja\r\n", "Nej\r\n", FALSE, &isCorrect)) {
-      return 1;
-    }
-    if(!isCorrect) {
-      return 0;
-    }
-  }
-  if(conf->type == MOTE_ORGINAL) {
-    return(org_kommentera());
-  }
-  if(conf->type == MOTE_FIDO) {
-    return(fido_skriv(KOM,senast_text_nr));
-  }
-  return 0;
-}
-
-void lasa(void) {
-        int tnr;
-        struct Mote *motpek;
-        if(!(argument[0]>='0' && argument[0]<='9')) {
-                puttekn("\r\n\nSkriv: Läsa <textnr>\r\n\n",-1);
-                return;
-        }
-        tnr=atoi(argument);
-        if(mote2==-1) brev_lasa(tnr);
-        else {
-                motpek=getmotpek(mote2);
-                if(!motpek) {
-                        puttekn("Hmm.. Mötet du befinner dig i finns inte.\n\r",-1);
-                        return;
-                }
-                if(motpek->type==MOTE_ORGINAL) org_lasa(tnr);
-                else if(motpek->type==MOTE_FIDO) fido_lasa(tnr,motpek);
-        }
 }
 
 void var(int mot) {

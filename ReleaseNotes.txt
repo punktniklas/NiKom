@@ -33,6 +33,17 @@
   now be nothing special about them and executing then from ARexx should
   work the same as manually from the command prompt.
 
+- The commands "kommentera" (reply) and "läsa" (read) now understands an
+  alternative argument besides a text number. If the argument is "senaste",
+  or any abbreviation such as simply "s", NiKom will use the last text
+  that was chosen by the KOM engine (i.e. the texts that you get by just
+  pressing return at the prompt, or executing the corresponding commands
+  manually). Texts read with other commands such as "återse kommentar"
+  or "läsa" does not change which the "senaste" text is. For this to work
+  the command definitions in Kommandon.cfg för LÄSA and KOMMENTERA must
+  be changed so they accept all kinds of arguments. Change "A=#" to
+  "A=.".
+
 ---------------------------------------------------------------------------
                          NiKom v2.0.0, 2015-12-06
 ---------------------------------------------------------------------------

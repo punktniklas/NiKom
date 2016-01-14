@@ -12,6 +12,7 @@
 #include "Terminal.h"
 #include "Cmd_Kom.h"
 #include "Cmd_Users.h"
+#include "Cmd_Conf.h"
 #include "NiKFiles.h"
 #include "NiKversion.h"
 #include "BasicIO.h"
@@ -184,14 +185,14 @@ void DoExecuteCommand(struct Kommando *cmd) {
   case 115: listgruppmed(); break;
   case 116: listabrev(); break;
   case 202: skriv(); break;
-  case 203: kommentera(); break;
+  case 203: Cmd_Reply(); break;
   case 204: personlig(); break;
   case 205: skickabrev(); break;
   case 206: igen(); break;
   case 207: atersekom(); break;
   case 208: medlem(argument); break;
   case 209: uttrad(argument); break;
-  case 212: lasa(); break;
+  case 212: Cmd_Read(); break;
   case 213: endast(); break;
   case 214: Cmd_SkipReplies(); break;
   case 215: addratt(); break;

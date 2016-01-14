@@ -14,6 +14,7 @@
 #include "Stack.h"
 #include "Terminal.h"
 #include "KOM.h"
+#include "ConfCommon.h"
 
 #include "OrgMeet.h"
 
@@ -25,6 +26,7 @@ extern struct System *Servermem;
 extern char outbuffer[],*argument,inmat[];
 extern int nodnr,senast_text_typ,senast_text_nr,senast_text_mote,nu_skrivs,inloggad,
 	rad,mote2;
+extern int g_lastKomTextType, g_lastKomTextNr, g_lastKomTextConf;
 extern struct Header readhead,sparhead;
 extern struct Inloggning Statstr;
 extern struct MinList edit_list;
@@ -38,58 +40,70 @@ int org_skriv(void) {
 	return(0);
 }
 
-int org_kommentera(void) {
-  int nummer, editret, confId, isCorrect;
-  struct Mote *motpek;
-  nummer=atoi(argument);
+void org_kommentera(void) {
+  int textId, editret, confId, isCorrect;
+  struct Mote *conf;
   if(argument[0]) {
-    if(nummer<Servermem->info.lowtext || nummer>Servermem->info.hightext) {
-      puttekn("\r\n\nTexten finns inte!\r\n\n",-1);
-      return(0);
+    textId = parseTextNumber(argument, TEXT);
+    if(textId < Servermem->info.lowtext || textId > Servermem->info.hightext) {
+      SendString("\r\n\nFinns ingen sådan text.\r\n");
+      return;
     }
-    confId = GetConferenceForText(nummer);
+    confId = GetConferenceForText(textId);
     if(!MayBeMemberConf(confId, inloggad, &Servermem->inne[nodnr])) {
-      puttekn("\r\n\nDu har inga rättigheter i mötet där texten finns!\r\n\n",-1);
-      return(0);
+      SendString("\r\n\nDu har inga rättigheter i mötet där texten finns.\r\n");
+      return;
     }
-    motpek=getmotpek(confId);
-    if(!motpek) {
-      puttekn("\n\n\rHmm.. Mötet där texten ligger finns inte..\n\r",-1);
-      return(0);
+    conf = getmotpek(confId);
+    if(conf == NULL) {
+      LogEvent(SYSTEM_LOG, ERROR,
+               "Can't find conference %d in memory in Cmd_Reply().", confId);
+      DisplayInternalError();
+      return;
     }
-    if(motpek->status & KOMSKYDD) {
-      if(!MayReplyConf(motpek->nummer, inloggad, &Servermem->inne[nodnr])) {
-        puttekn("\r\n\nDu får inte kommentera i kommentarsskyddade möten!\r\n\n",-1);
-        return(0);
+    if(conf->status & KOMSKYDD) {
+      if(!MayReplyConf(conf->nummer, inloggad, &Servermem->inne[nodnr])) {
+        SendString("\r\n\nDu får inte kommentera i kommentarsskyddade möten.\r\n");
+        return;
       } else {
         if(GetYesOrNo(
            "\r\n\nVill du verkligen kommentera i ett kommentarsskyddat möte? ",
            'j', 'n', "Ja\r\n", "Nej\r\n", FALSE, &isCorrect)) {
-          return 1;
+          return;
         }
         if(!isCorrect) {
-          return 0;
+          return;
         }
       }
     }
-    if(readtexthead(nummer,&readhead)) return(0);
-    senast_text_typ=TEXT;
-    senast_text_nr=nummer;
-    senast_text_mote=motpek->nummer;
+    if(readtexthead(textId,&readhead)) {
+      LogEvent(SYSTEM_LOG, ERROR,
+               "Can't read header for text %d in Cmd_Reply()", textId);
+      DisplayInternalError();
+      return;
+    }
+    senast_text_typ = TEXT;
+    senast_text_nr = textId;
+    senast_text_mote = conf->nummer;
   }
-  motpek=getmotpek(senast_text_mote);
-  if(!motpek) {
-    puttekn("\n\n\rHmm.. Mötet där texten ligger finns inte..\n\r",-1);
-    return(0);
+  conf = getmotpek(senast_text_mote);
+  if(conf == NULL) {
+    LogEvent(SYSTEM_LOG, ERROR,
+             "Can't find conference %d in memory in Cmd_Reply().", senast_text_mote);
+    DisplayInternalError();
+    return;
   }
-  if(org_initheader(KOM)) return(1);
-  nu_skrivs=TEXT;
-  if((editret=edittext(NULL))==1) return(1);
+  if(org_initheader(KOM)) {
+    return;
+  }
+  nu_skrivs = TEXT;
+  if((editret = edittext(NULL))==1) {
+    return;
+  }
   else if(!editret)	{
     org_linkkom();
     org_sparatext();
   }
-  return(0);
 }
 
 void org_lasa(int tnr) {
@@ -134,6 +148,9 @@ void displayTextAndClearUnread(int textId) {
   if(org_visatext(textId)) {
     pushTextRepliesToStack(&readhead);
   }
+  g_lastKomTextType = TEXT;
+  g_lastKomTextNr = textId;
+  g_lastKomTextConf = GetConferenceForText(textId);
 }
 
 void NextTextInOrgConf(void) {

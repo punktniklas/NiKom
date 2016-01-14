@@ -23,6 +23,7 @@ extern struct System *Servermem;
 extern char outbuffer[],*argument,inmat[];
 extern int nodnr,senast_text_typ,senast_text_nr,senast_text_mote,nu_skrivs,inloggad,
 	rad,mote2;
+extern int g_lastKomTextType, g_lastKomTextNr, g_lastKomTextConf;
 extern struct Header readhead,sparhead;
 extern struct Inloggning Statstr;
 extern struct MinList edit_list;
@@ -52,6 +53,9 @@ void NextTextInFidoConf(struct Mote *conf) {
   }
   unreadTexts->lowestPossibleUnreadText[conf->nummer]++;
   fido_visatext(unreadTexts->lowestPossibleUnreadText[conf->nummer], conf);
+  g_lastKomTextType = TEXT_FIDO;
+  g_lastKomTextNr = unreadTexts->lowestPossibleUnreadText[conf->nummer];
+  g_lastKomTextConf = conf->nummer;
 }
 
 int countfidomote(struct Mote *motpek) {

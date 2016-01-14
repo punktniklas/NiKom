@@ -57,8 +57,6 @@ void shutdownnode(int);
 void handleservermess(struct NiKMess *);
 
 /* Prototypes for functions defined in NiKFuncs.c */
-int kommentera(void);
-void lasa(void);
 int countmote(int mote);
 void var(int mot);
 int visatext(int text);
@@ -266,7 +264,7 @@ void savefidocopy(struct FidoText *,int);
 
 /* Prototypes for functions defined in OrgMeet.c */
 int org_skriv(void);
-int org_kommentera(void);
+void org_kommentera(void);
 void org_lasa(int);
 int checkmote(int);
 void varmote(int);

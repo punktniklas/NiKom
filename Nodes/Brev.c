@@ -12,6 +12,7 @@
 #include "NiKomLib.h"
 #include "Logging.h"
 #include "Terminal.h"
+#include "StringUtils.h"
 
 #include "Brev.h"
 
@@ -22,6 +23,7 @@
 extern struct System *Servermem;
 extern char outbuffer[],*argument,inmat[];
 extern int inloggad,nodnr,senast_text_typ,senast_text_nr,senast_text_mote,senast_brev_nr,senast_brev_anv,nu_skrivs;
+extern int g_lastKomTextType, g_lastKomTextNr, g_lastKomTextConf;
 extern struct Inloggning Statstr;
 extern struct MinList edit_list;
 extern struct Header readhead;
@@ -63,6 +65,10 @@ int brev_kommentera(void) {
 	int nummer,editret,anv;
 	char *brevpers,filnamn[50];
 	if(argument[0]) {
+          if(!IzDigit(argument[0])) {
+            SendString("\r\n\nFinns inget sådant brev.\r\n");
+            return 0;
+          }
 		nummer=atoi(argument);
 		brevpers=hittaefter(argument);
 		if(!brevpers[0]) anv=inloggad;
@@ -144,6 +150,9 @@ void NextMail(void) {
     SendString("\r\n\nDu har inga olästa brev.\r\n\n");
     return;
   }
+  g_lastKomTextType = BREV;
+  g_lastKomTextNr = Servermem->inne[nodnr].brevpek;
+  g_lastKomTextConf = -1;
   visabrev(Servermem->inne[nodnr].brevpek++, inloggad);
 }
 
