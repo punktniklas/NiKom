@@ -719,43 +719,53 @@ void alias(void) {
 	else defalias();
 }
 
-int readtextlines(char typ, long pos, int rader, int nummer) {
-	FILE *fp;
-	struct EditLine *el;
-	int x,fil;
-	char rlbuf[100],filnamn[40];
-	fil=nummer/512;
-	NewList((struct List *)&edit_list);
-	NiKForbid();
-	if(typ==TEXT) sprintf(filnamn,"NiKom:Moten/Text%d.dat",fil);
-	else puttekn("\n\n\rAj! Buggelibugg! Försöker läsa BrevText.dat\n\r",-1);
-	if(!(fp=fopen(filnamn,"r"))) {
-		NiKPermit();
-		return(1);
-	}
-	if(fseek(fp,pos,0)) {
-		fclose(fp);
-		NiKPermit();
-		return(1);
-	}
-	for(x=0;x<rader;x++) {
-		if(!fgets(rlbuf,MAXFULLEDITTKN+1,fp))
-		{
-			fclose(fp);
-			NiKPermit();
-			return(1);
-		}
-		if(!(el=(struct EditLine *)AllocMem(sizeof(struct EditLine),MEMF_CLEAR|MEMF_PUBLIC))) {
-			fclose(fp);
-			NiKPermit();
-			return(1);
-		}
-		strcpy(el->text,rlbuf);
-		AddTail((struct List *)&edit_list,(struct Node *)el);
-	}
-	fclose(fp);
-	NiKPermit();
-	return(0);
+int readtextlines(long pos, int lines, int textId) {
+  FILE *fp;
+  struct EditLine *el;
+  int i, fileNumber;
+  char rlbuf[100], filename[40];
+
+  fileNumber = textId / 512;
+  NewList((struct List *)&edit_list);
+  NiKForbid();
+  sprintf(filename, "NiKom:Moten/Text%d.dat", fileNumber);
+  if(!(fp = fopen(filename, "r"))) {
+    NiKPermit();
+    LogEvent(SYSTEM_LOG, ERROR, "Could not open %s for reading.", filename);
+    DisplayInternalError();
+    return 1;
+  }
+  if(fseek(fp,pos,0)) {
+    fclose(fp);
+    NiKPermit();
+    LogEvent(SYSTEM_LOG, ERROR, "Could not find position %d in %s.", pos, filename);
+    DisplayInternalError();
+    return 1;
+  }
+  for(i = 0; i < lines; i++) {
+    if(!fgets(rlbuf, MAXFULLEDITTKN+1, fp)) {
+      fclose(fp);
+      NiKPermit();
+      LogEvent(SYSTEM_LOG, ERROR, "Could not read line from %s.", filename);
+      DisplayInternalError();
+      return 1;
+    }
+    if(!(el = (struct EditLine *)AllocMem(sizeof(struct EditLine),
+                                          MEMF_CLEAR | MEMF_PUBLIC))) {
+      fclose(fp);
+      NiKPermit();
+      LogEvent(SYSTEM_LOG, ERROR,
+               "Out of memory while reading text %d from %s (pos %d).",
+               textId, filename, pos);
+      DisplayInternalError();
+      return 1;
+    }
+    strcpy(el->text,rlbuf);
+    AddTail((struct List *)&edit_list,(struct Node *)el);
+  }
+  fclose(fp);
+  NiKPermit();
+  return 0;
 }
 
 void freeeditlist(void) {

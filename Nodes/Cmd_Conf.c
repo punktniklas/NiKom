@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 #include "NiKomStr.h"
 #include "NiKomLib.h"
 #include "NiKomFuncs.h"
@@ -13,6 +14,9 @@
 extern char *argument;
 extern int mote2, inloggad, nodnr, senast_text_typ, senast_text_nr, senast_text_mote;
 extern struct System *Servermem;
+extern struct MinList edit_list;
+
+int saveFootNoteLines(int textId, struct Header *textHeader);
 
 void Cmd_Reply(void) {
   struct Mote *conf;
@@ -116,3 +120,78 @@ void Cmd_Read(void) {
   }
 }
 
+void Cmd_FootNote(void) {
+  int textId, confId, editRet;
+  struct Header textHeader;
+
+  if(argument[0] == '\0') {
+    SendString("\n\n\rSkriv: Fotnot <text nummer>\n\r");
+    return;
+  }
+  textId = atoi(argument);
+  confId = GetConferenceForText(textId);
+  if(confId == -1) {
+    SendString("\n\n\rFinns ingen sådan text.\n\r");
+    return;
+  }
+  if(readtexthead(textId,&textHeader)) {
+    return;
+  }
+  if(textHeader.person != inloggad
+     && !MayAdminConf(confId, inloggad, &Servermem->inne[nodnr])) {
+    SendString("\r\n\nDu kan bara lägga till fotnoter på dina egna texter.\r\n\n");
+    return;
+  }
+  if(textHeader.footNote != 0) {
+    SendString("\n\n\rTexten har redan en fotnot.\n\r");
+    return;
+  }
+
+  SendString("\n\n\rFotnot till text %d av %s\n\r",
+             textId, getusername(textHeader.person));
+  if((editRet = edittext(NULL)) != 0) {
+    return;
+  }
+
+  if(saveFootNoteLines(textId, &textHeader)) {
+    writetexthead(textId, &textHeader);
+  }
+  freeeditlist();
+}
+
+int saveFootNoteLines(int textId, struct Header *textHeader) {
+  int len, lineCnt = 0;
+  BPTR fh;
+  char filename[30];
+  struct EditLine *line;
+
+  NiKForbid();
+  sprintf(filename, "NiKom:Moten/Text%d.dat", textId/512);
+  if(!(fh = Open(filename, MODE_OLDFILE))) {
+    LogEvent(SYSTEM_LOG, ERROR, "Could not open %s to add footnote.", filename);
+    DisplayInternalError();
+    NiKPermit();
+    return 0;
+  }
+  Seek(fh, 0, OFFSET_END);
+  textHeader->footNote = Seek(fh, 0, OFFSET_CURRENT);
+  ITER_EL(line, edit_list, line_node, struct EditLine *) {
+    len = strlen(line->text);
+    line->text[len] = '\n';
+    if(Write(fh, line->text, len + 1) != len + 1) {
+      LogEvent(SYSTEM_LOG, ERROR, "Error writing to %s when adding footnote.",
+               filename);
+      DisplayInternalError();
+      Close(fh);
+      NiKPermit();
+      return 0;
+    }
+    if(++lineCnt >= 255) {
+      break;
+    }
+  }
+  Close(fh);
+  NiKPermit();
+  textHeader->footNote |= (lineCnt << 24);
+  return 1;
+}

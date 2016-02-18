@@ -80,7 +80,7 @@ int grabtext(int text,FILE *fpgrab) {
 	if(grabhead.kom_till_nr!=-1)
 		fprintf(fpgrab,"Kommentar till text %d av %s\n",grabhead.kom_till_nr,getusername(grabhead.kom_till_per));
 	fprintf(fpgrab,"Ärende: %s\n\n",grabhead.arende);
-	if(readtextlines(TEXT,grabhead.textoffset,grabhead.rader,grabhead.nummer))
+	if(readtextlines(grabhead.textoffset,grabhead.rader,grabhead.nummer))
 		puttekn("\n\rFel vid läsandet i Text.dat\n\r",-1);
 	for(el=(struct EditLine *)edit_list.mlh_Head;el->line_node.mln_Succ;el=(struct EditLine *)el->line_node.mln_Succ) {
 		if(fputs(el->text,fpgrab)) {

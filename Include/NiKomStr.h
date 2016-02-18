@@ -199,10 +199,12 @@ struct ReadLetter {
       subject[100];
 };
 
+// Note, footNote has the position in Textx.dat in the 24 lowest bits
+// and the number of lines in the 8 highest bits
 struct Header {
    short rader,mote,status;
    long person,kom_av[MAXKOM],kom_till_per,nummer,textoffset,
-      tid,kom_i[MAXKOM],kom_till_nr,root_text,reserv2;
+      tid,kom_i[MAXKOM],kom_till_nr,root_text,footNote;
    char arende[41];
 };
 

@@ -44,6 +44,19 @@
   be changed so they accept all kinds of arguments. Change "A=#" to
   "A=.".
 
+- A new command "Fotnot" adds a footnote to a text. Normally users can
+  only add footnotes to their own texts. However users with administration
+  permissions in a forum can add footnotes to any text in that forum. Only
+  one footnote can be added to a text. The footnote can be up to 255 lines.
+  The new command has number 235 and must be added to Kommandon.cfg.
+  E.g.
+     N=FOTNOT
+     S=2
+     O=1
+     #=235
+     A=#
+
+
 ---------------------------------------------------------------------------
                          NiKom v2.0.0, 2015-12-06
 ---------------------------------------------------------------------------

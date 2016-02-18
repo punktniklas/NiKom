@@ -1,0 +1,17 @@
+
+
+Fotnot
+-----------
+
+Syntax: Fotnot <textnummer>
+
+Beskrivning:
+Lägger till en fotnot till den angivna texten. När kommandot ges
+startas editorn och man kan skriva sin fotnot, som kan ha flera rader.
+Fotnoten sparas med Ctrl-Z eller kastas bort med Ctrl-C.
+
+Man kan endast lägga till en fotnot på en text man skrivit själv.
+Användare med administrationsrättigheter i ett möte kan dock lägga
+till fotnoter på alla texter i det mötet.
+
+Se Även: Skriv, Läsa
