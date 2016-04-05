@@ -311,11 +311,11 @@ int skapmot(void) {
       return 0;
     }
     for(;;) {
-      SendString("Domän: ");
-      fidoDomainId = GetNumber(0, highestId, NULL);
-      if(ImmediateLogout()) {
+      SendString("\r\nDomän: ");
+      if(GetString(5, NULL)) {
         return 1;
       }
+      fidoDomainId = atoi(inmat);
       if(fidoDomain = getfidodomain(fidoDomainId, 0)) {
         break;
       } else {

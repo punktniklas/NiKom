@@ -149,22 +149,32 @@ void makefidousername(char *str,int anv) {
 }
 
 struct FidoDomain *getfidodomain(int nr,int zone) {
-	int x,found = FALSE;
-	char *foo;
-	for(x=0;x<10;x++) {
-		if(!Servermem->fidodata.fd[x].domain[0]) break;
-		if(nr && nr == Servermem->fidodata.fd[x].nummer) found = TRUE;
-		else {
-			foo=Servermem->fidodata.fd[x].zones;
-			while(foo[0] && !found) {
-				if(atoi(foo) == zone) found=TRUE;
-				else foo=hittaefter(foo);
-			}
-		}
-		if(found) break;
-	}
-	if(!found) return(NULL);
-	else return(&Servermem->fidodata.fd[x]);
+  int i;
+  char *zonestr;
+
+  for(i = 0; i < 10; i++) {
+    if(!Servermem->fidodata.fd[i].domain[0]) {
+      return NULL;
+    }
+    if(nr > 0) {
+      if(nr == Servermem->fidodata.fd[i].nummer) {
+        break;
+      }
+    } else {
+      zonestr = Servermem->fidodata.fd[i].zones;
+      while(zonestr[0]) {
+        if(atoi(zonestr) == zone) {
+          break;
+        } else {
+          zonestr = hittaefter(zonestr);
+        }
+      }
+    }
+  }
+  if(i == 10) {
+    return NULL;
+  }
+  return(&Servermem->fidodata.fd[i]);
 }
 
 
