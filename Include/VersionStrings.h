@@ -1,3 +1,3 @@
-#define NIKRELEASE "v2.1.0dev"
+#define NIKRELEASE "v2.1.0"
 #define NIKLIBVERSION "22"
 #define NIKLIBREVISION "1"

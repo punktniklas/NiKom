@@ -1,5 +1,5 @@
 ---------------------------------------------------------------------------
-                         NiKom v2.1.0, 2016-xx-yy
+                         NiKom v2.1.0, 2016-04-06
 ---------------------------------------------------------------------------
 - Overhauled startup of NiKServer and the code that reads configuration
   and data files. The configuration files are better checked for errors
