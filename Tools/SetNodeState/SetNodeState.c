@@ -23,7 +23,7 @@ void main(int argc, char *argv[]) {
       state |= NIKSTATE_NOANSWER;
     }
     if(!stricmp(argv[i],"LOGOUT")) {
-      state |= NIKSTATE_LOGOUT;
+      state |= NIKSTATE_AUTOLOGOUT;
     }
   }
   if(NiKomBase = OpenLibrary("nikom.library",0)) {
