@@ -184,7 +184,7 @@ int lineedit(char *filename) {
           if(letmp[2] == 'n' || letmp[2] == 'N') {
             if(linechange(atoi(hittaefter(&letmp[1])))) return 1;
           } else if(letmp[2]=='r' || letmp[2]=='R') {
-            linearende(hittaefter(letmp));
+            linearende(hittaefter(&letmp[1]));
           }
         }
         else if(letmp[1] == 'd' || letmp[1] == 'D') linedump();
