@@ -51,8 +51,8 @@ void NextTextInFidoConf(struct Mote *conf) {
     SendString("\n\n\rFinns inga olästa texter i detta möte.\n\r");
     return;
   }
-  unreadTexts->lowestPossibleUnreadText[conf->nummer]++;
   fido_visatext(unreadTexts->lowestPossibleUnreadText[conf->nummer], conf);
+  unreadTexts->lowestPossibleUnreadText[conf->nummer]++;
   g_lastKomTextType = TEXT_FIDO;
   g_lastKomTextNr = unreadTexts->lowestPossibleUnreadText[conf->nummer];
   g_lastKomTextConf = conf->nummer;
@@ -78,8 +78,8 @@ void fido_visatext(int text,struct Mote *motpek) {
 	if(Servermem->inne[nodnr].flaggor & SHOWKLUDGE) ft=ReadFidoTextTags(fullpath,TAG_DONE);
 	else ft=ReadFidoTextTags(fullpath,RFT_NoKludges,TRUE,RFT_NoSeenBy,TRUE,TAG_DONE);
 	if(!ft) {
-		puttekn("\n\n\rKunde inte läsa texten\n\r",-1);
-		return;
+          DisplayInternalError();
+          return;
 	}
 
 	if(Servermem->inne[nodnr].flaggor & CLEARSCREEN)

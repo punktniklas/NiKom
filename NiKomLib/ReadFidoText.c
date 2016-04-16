@@ -30,6 +30,7 @@
 #include "NiKomBase.h"
 #include "funcs.h"
 #include "VersionStrings.h"
+#include "Logging.h"
 
 int getfidoline(char *fidoline,char *buffer,int linelen, int chrs, BPTR fh,char *quotepre,struct NiKomBase *NiKomBase) {
 	int anttkn,foo,tmpret,hasquoted=FALSE,donotwordwrap=FALSE;
@@ -173,8 +174,10 @@ struct FidoText * __saveds __asm LIBReadFidoText(register __a0 char *filename, r
 	if(!(fidotext = (struct FidoText *)AllocMem(sizeof(struct FidoText),MEMF_CLEAR))) return(NULL);
 	NewList((struct List *)&fidotext->text);
 	if(!(fh=Open(filename,MODE_OLDFILE))) {
-		FreeMem(fidotext,sizeof(struct FidoText));
-		return(NULL);
+          FreeMem(fidotext,sizeof(struct FidoText));
+          LogEvent(NiKomBase->Servermem, SYSTEM_LOG, ERROR,
+                   "Can't open %s when trying to read fido text.", filename);
+          return(NULL);
 	}
 	Read(fh,ftshead,190);
 	strcpy(fidotext->fromuser,&ftshead[0]);

@@ -100,24 +100,26 @@ void var(int mot) {
 }
 
 void varmote(int mote) {
-        int cnt;
-        struct Mote *motpek;
-        motpek = getmotpek(mote);
-        sprintf(outbuffer,"\r\n\nDu befinner dig i %s.\r\n",motpek->namn);
-        puttekn(outbuffer,-1);
-        if(motpek->type == MOTE_FIDO) {
-                if(motpek->lowtext > motpek->texter) strcpy(outbuffer,"Det finns inga texter.\n\r");
-                else sprintf(outbuffer,"Det finns texter numrerade från %d till %d.\n\r",motpek->lowtext,motpek->texter);
-                puttekn(outbuffer,-1);
-        }
-        cnt=countunread(mote);
-        if(!cnt) puttekn("Du har inga olästa texter\r\n",-1);
-        else if(cnt==1) {
-                puttekn("Du har 1 oläst text\r\n",-1);
-        } else {
-                sprintf(outbuffer,"Du har %d olästa texter\r\n",cnt);
-                puttekn(outbuffer,-1);
-        }
+  int cnt;
+  struct Mote *conf;
+  conf = getmotpek(mote);
+  SendString("\r\n\nDu befinner dig i %s.\r\n", conf->namn);
+  if(conf->type == MOTE_FIDO) {
+    if(conf->lowtext > conf->texter) {
+      SendString("Det finns inga texter.\n\r");
+    } else {
+      SendString("Det finns texter numrerade från %d till %d.\n\r",
+                 conf->lowtext, conf->texter);
+    }
+  }
+  cnt = countunread(mote);
+  if(cnt == 0) {
+    SendString("Du har inga olästa texter\r\n");
+  } else if(cnt == 1) {
+    SendString("Du har 1 oläst text\r\n");
+  } else {
+    SendString("Du har %d olästa texter\r\n", cnt);
+  }
 }
 
 void tiden(void)
