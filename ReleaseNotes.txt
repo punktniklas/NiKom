@@ -1,4 +1,14 @@
 ---------------------------------------------------------------------------
+                         NiKom v2.1.1, 2016-04-16
+---------------------------------------------------------------------------
+Fixing three bugs in 2.1.0.
+- It wasn't possible to send Fido mail. It would just say that it didn't
+  recognize the zone.
+- The "next text" command would display the wrong text in Fido forums.
+- When you got a prompt saying you should go to the mailbox, nothing
+  would happen.
+
+---------------------------------------------------------------------------
                          NiKom v2.1.0, 2016-04-06
 ---------------------------------------------------------------------------
 - Overhauled startup of NiKServer and the code that reads configuration
