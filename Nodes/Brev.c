@@ -452,8 +452,8 @@ int fido_brev(char *tillpers,char *adr,struct Mote *motpek) {
 	}
 	fd = getfidodomain(0,ft.tozone);
 	if(!fd) {
-		puttekn("\n\n\rDu kan inte skriva brev till den zonen.\n\r",-1);
-		return(0);
+          SendString("\n\n\rDu kan inte skriva brev till zon %d.\n\r", ft.tozone);
+          return 0;
 	}
 	if(!tillpers && !motpek) {
 		foo = strchr(brevread.to,'(')+1;

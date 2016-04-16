@@ -158,23 +158,20 @@ struct FidoDomain *getfidodomain(int nr,int zone) {
     }
     if(nr > 0) {
       if(nr == Servermem->fidodata.fd[i].nummer) {
-        break;
+        return &Servermem->fidodata.fd[i];
       }
     } else {
       zonestr = Servermem->fidodata.fd[i].zones;
       while(zonestr[0]) {
         if(atoi(zonestr) == zone) {
-          break;
+          return &Servermem->fidodata.fd[i];
         } else {
           zonestr = hittaefter(zonestr);
         }
       }
     }
   }
-  if(i == 10) {
-    return NULL;
-  }
-  return(&Servermem->fidodata.fd[i]);
+  return NULL;
 }
 
 
