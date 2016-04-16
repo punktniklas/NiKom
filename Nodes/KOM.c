@@ -34,6 +34,11 @@ extern int inloggad, nodnr, nodestate, mote2;
 extern long logintime, extratime;
 extern char inmat[], *argument;
 
+struct Kommando internalGoMailCommand = {
+  { NULL, NULL }, CMD_GOMAIL, 0, 0, 0, 0, 0, "Gå Brevlådan",
+  0, 2, 0, NULL, NULL, 0, NULL, NULL, NULL
+};
+
 int hasUnreadInConf(int confId) {
   struct Mote *conf;
   if(confId == MAILBOX_CONFID) {
@@ -159,15 +164,19 @@ struct Kommando *getCommandToExecute(int defaultCmd) {
     badCommandCnt = 0;
     break;
   }
+  if(cmdId == CMD_GOMAIL) {
+    return &internalGoMailCommand;
+  }
   return getkmdpek(cmdId);
 }
 
 void DoExecuteCommand(struct Kommando *cmd) {
   switch(cmd->nummer) {
   case 201: Cmd_GoConf(); break; // ga(argument);
-  case 210: case 222: Cmd_NextText(); break;
+  case 210: Cmd_NextText(); break;
   case 211: Cmd_NextReply(); break;
   case 221: Cmd_NextConf(); break;
+  case 222: GoConf(MAILBOX_CONFID); break;
   case 301: Cmd_Logout(); break;
   case 101: listmot(argument); break;
   case 102: Cmd_ListUsers(); break;
