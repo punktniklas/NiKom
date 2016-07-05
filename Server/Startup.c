@@ -135,8 +135,8 @@ void openLibrariesAndPorts(void) {
   if(!(UtilityBase = OpenLibrary("utility.library", MINOSVERSION))) {
     cleanup(EXIT_ERROR,"Can't open utility.library.");
   }
-  if(!(NiKomBase = OpenLibrary("nikom.library",19L))) {
-    cleanup(EXIT_ERROR,"Can't open nikom.library");
+  if(!(NiKomBase = OpenLibrary("nikom.library", NIKLIBVERSION))) {
+    cleanup(EXIT_ERROR, "Can't open nikom.library v" NIKLIBVERSIONSTR " or later.");
   }
   if(!(permitport = (struct MsgPort *)CreatePort("NiKomPermit",0))) {
     cleanup(EXIT_ERROR,"Can't open port 'NiKomPermit'");
