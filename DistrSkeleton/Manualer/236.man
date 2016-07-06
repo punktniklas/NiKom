@@ -1,0 +1,22 @@
+
+
+Sök
+---
+
+Syntax: Sök [-g] <söksträng>
+
+Beskrivning:
+Gör en fritextsökning bland texterna i ett eller alla möten. (Endast
+interna möten, ej Fido-möten.) Om flaggan "-g" (global) anges så
+genomsöks alla möten. Annars endast det möte man befinner sig i.
+
+Sökningen gör inte skillnad på stora och små bokstäver och tolkar även
+bokstäver med tex accenter som samma som de utan accenter. Tex kommer
+söksträngen "entre" hitta en text med ordet "entré".
+
+Sökningen sker bara i själva meddelandetexterna, inte i tex ärenderaden.
+Söksträngen måste även finnas på en och samma rad. Söker man på tex
+"varma bullar" så kommer den inte att hitta en text som har ordet
+"varma" sist på en rad och ordet "bullar" först på nästa.
+
+Se Även: Lista Ärende

@@ -1,9 +1,9 @@
 
 
-Sök
----
+Filsök
+------
 
-Synsopsis: Sök [<söksträng>]
+Syntax: Filsök [<söksträng>]
 
 Beskrivning:
 Söker efter filer i filarean. Om man inte anger något argument så kommer

@@ -1,11 +1,13 @@
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
 #include "NiKomStr.h"
 #include "NiKomLib.h"
 #include "NiKomFuncs.h"
 #include "Terminal.h"
 #include "Logging.h"
 #include "ConfCommon.h"
+#include "StringUtils.h"
 
 #include "Cmd_Conf.h"
 
@@ -194,4 +196,119 @@ int saveFootNoteLines(int textId, struct Header *textHeader) {
   NiKPermit();
   textHeader->footNote |= (lineCnt << 24);
   return 1;
+}
+
+void Cmd_Search(void) {
+  char *argptr = argument, buf[100], *searchstr;
+  int global = FALSE, currentText, pos, searchstrlen, cnt = 0, foundsomething = 0, confId, i;
+  struct Mote *conf;
+  struct Header textHeader;
+  struct EditLine *el;
+  struct tm *ts;
+
+  global = FALSE;
+  if(argptr[0] == '-') {
+    if(argptr[1] == 'g') {
+      global = TRUE;
+    } else {
+      SendString("\r\n\nFelaktig flagga.\r\n\n");
+      return;
+    }
+    argptr = FindNextWord(argptr);
+  }
+  if(argptr[0] == '\0') {
+    SendString("\r\n\nSkriv: Sök [-g] <söksträng>\r\n\n");
+    return;
+  }
+  searchstr = argptr;
+  searchstrlen = strlen(searchstr);
+
+  if(!global) {
+    if(mote2 == -1) {
+      SendString("\r\n\nDu kan inte söka i %s.\r\n\n", Servermem->cfg.brevnamn);
+      return;
+    }
+    conf = getmotpek(mote2);
+    if(conf->type == MOTE_FIDO) {
+      SendString("\r\n\n Sök fungerar inte i FidoNet-möten.\r\n\n");
+      return;
+    }
+  }
+
+  currentText = Servermem->info.hightext + 1;
+  SendString("\r\n\n");
+
+  for(;;) {
+    if((++cnt % 100) == 0) {
+      if(SendString(".")) {
+        return;
+      }
+    }
+    if(global) {
+      for(i = currentText - 1; i >= Servermem->info.lowtext; i--) {
+        if((confId = GetConferenceForText(i)) == -1) {
+          continue;
+        }
+        if(!MayReadConf(confId, inloggad, &Servermem->inne[nodnr])) {
+          continue;
+        }
+        break;
+      }
+      currentText = i < Servermem->info.lowtext ? -1 : i;
+    } else {
+      currentText = FindPrevTextInConference(currentText - 1, mote2);
+    }
+    if(currentText == -1) {
+      SendString("\r\x1b\x5b\x4b");
+      if(!foundsomething) {
+        SendString("Inga texter hittades.\r\n\n");
+      }
+      return;
+    }
+    if(readtexthead(currentText, &textHeader)) {
+      return;
+    }
+    if(readtextlines(textHeader.textoffset, textHeader.rader, textHeader.nummer)) {
+      freeeditlist();
+      return;
+    }
+    ITER_EL(el, edit_list, line_node, struct EditLine *) {
+      if((pos = LenientFindSubString(el->text, searchstr)) == -1) {
+        continue;
+      }
+      foundsomething = 1;
+      ts = localtime(&textHeader.tid);
+      if(SendString("\r\x1b\x5b\x4bText: %d skriven %02d%02d%02d av %s\r\n",
+                    currentText, ts->tm_year % 100, ts->tm_mon + 1,
+                    ts->tm_mday, getusername(textHeader.person))) {
+        freeeditlist();
+        return;
+      }
+      if(global) {
+        conf = getmotpek(textHeader.mote);
+        if(SendString("Möte: %s\r\n", conf->namn)) {
+          freeeditlist();
+          return;
+        }
+      }
+      SendStringNoBrk("   ");
+      if(pos > 0) {
+        strncpy(buf, el->text, pos);
+        buf[pos] = '\0';
+        SendStringNoBrk(buf);
+      }
+      strncpy(buf, el->text + pos, searchstrlen);
+      buf[searchstrlen] = '\0';
+      SendStringNoBrk("\x1b\x5b\x31\x6d%s\x1b\x5b\x30\x6d", buf);
+      if(el->text[pos + searchstrlen] != '\0') {
+        SendStringNoBrk(&el->text[pos + searchstrlen]);
+      }
+      if(SendString("\r\n\n")) {
+        freeeditlist();
+        return;
+      }
+      break;
+    }
+    freeeditlist();
+  }
 }

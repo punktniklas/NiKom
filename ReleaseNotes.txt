@@ -1,4 +1,12 @@
 ---------------------------------------------------------------------------
+                         NiKom v2.2.0, 2016-xx-yy
+---------------------------------------------------------------------------
+- A new command, "Sök", to search for words and phrases in the body of
+  forum texts. Either a single forum or all forums (global search) can
+  be searched. Only internal forums can be searched though, not Fido
+  forums. See the man page for more info.
+
+---------------------------------------------------------------------------
                          NiKom v2.1.1, 2016-04-16
 ---------------------------------------------------------------------------
 Fixing three bugs in 2.1.0.
