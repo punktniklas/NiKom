@@ -1,6 +1,12 @@
 ---------------------------------------------------------------------------
                          NiKom v2.2.0, 2016-xx-yy
 ---------------------------------------------------------------------------
+- Two new commands "Hylla" and "Dissa" to mark that you like or dislike
+  a certain text. When reading a text a count of how many people that
+  have liked and disliked the text will be displayed. Also the command
+  "Läsa" has a a new flag, "-v", to show the list of persons that have
+  liked and disliked the text.
+  
 - A new command, "Sök", to search for words and phrases in the body of
   forum texts. Either a single forum or all forums (global search) can
   be searched. Only internal forums can be searched though, not Fido

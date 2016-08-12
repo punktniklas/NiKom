@@ -1,0 +1,13 @@
+
+
+Hylla
+-----
+
+Syntax: Hylla [<textnummer>]
+
+Beskrivning:
+Markerar den angivna texten som hyllad av din användare. När någon läser
+texten så kommer det synas att den har blivit hyllad. Om inget textnummer
+anges så hyllas den senast lästa texten.
+
+Se Även: Dissa, Läsa

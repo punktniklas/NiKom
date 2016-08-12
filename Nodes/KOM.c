@@ -223,6 +223,8 @@ void DoExecuteCommand(struct Kommando *cmd) {
   case 234: flyttagren(); break;
   case 235: Cmd_FootNote(); break;
   case 236: Cmd_Search(); break;
+  case 237: Cmd_Like(); break;
+  case 238: Cmd_Dislike(); break;
   case 302: sendfile("NiKom:Texter/Help.txt"); break;
   case 303: Cmd_ChangeUser(); break;
   case 304: slaav(); break;

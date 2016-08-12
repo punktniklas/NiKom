@@ -3,11 +3,14 @@
 Läsa
 ----
 
-Synopsis: [Läsa] <textnummer>
+Synopsis: [Läsa] <textnummer> [-v]
 
 Beskrivning:
 Visar den angivna texten. Observera att man inte behöver skriva 'Läsa' utan
 det räcker med bara textnummret.
+
+Anges flaggan -v så visas extra information om texten, tex vilka personer
+som har hyllat eller dissat den.
 
 För texter i de lokala mötena så räcker det att vara i något lokalt möte
 (inte nödvändigtvis det texten finns i) när man ger kommandot. För Fido-

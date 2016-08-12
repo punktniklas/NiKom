@@ -265,10 +265,10 @@ void savefidocopy(struct FidoText *,int);
 /* Prototypes for functions defined in OrgMeet.c */
 int org_skriv(void);
 void org_kommentera(void);
-void org_lasa(int);
+void org_lasa(int, char);
 int checkmote(int);
 void varmote(int);
-int org_visatext(int);
+int org_visatext(int, char);
 void org_sparatext(void);
 void org_linkkom(void);
 int org_initheader(int);

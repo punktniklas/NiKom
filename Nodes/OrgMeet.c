@@ -15,6 +15,7 @@
 #include "Terminal.h"
 #include "KOM.h"
 #include "ConfCommon.h"
+#include "ConfHeaderExtensions.h"
 
 #include "OrgMeet.h"
 
@@ -106,12 +107,12 @@ void org_kommentera(void) {
   }
 }
 
-void org_lasa(int tnr) {
+void org_lasa(int tnr, char verbose) {
 	if(tnr<Servermem->info.lowtext || tnr>Servermem->info.hightext) {
 		puttekn("\r\n\nTexten finns inte!\r\n",-1);
 		return;
 	}
-	org_visatext(tnr);
+	org_visatext(tnr, verbose);
 }
 
 int HasUnreadInOrgConf(int conf) {
@@ -145,7 +146,7 @@ void pushTextRepliesToStack(struct Header *textHeader) {
 
 void displayTextAndClearUnread(int textId) {
   ChangeUnreadTextStatus(textId, 0, &Servermem->unreadTexts[nodnr]);
-  if(org_visatext(textId)) {
+  if(org_visatext(textId, FALSE)) {
     pushTextRepliesToStack(&readhead);
   }
   g_lastKomTextType = TEXT;
@@ -173,7 +174,59 @@ void NextReplyInOrgConf(void) {
   displayTextAndClearUnread(StackPop(g_unreadRepliesStack));
 }
 
-int org_visatext(int textId) {
+void displayReactions(int textId, int index, char verbose) {
+  struct MemHeaderExtension *ext;
+  struct MemHeaderExtensionNode *node;
+  int i, j, likeCnt = 0, dislikeCnt = 0;
+  long *reactionData, userId;
+  char *reactionStr;
+
+  if(index == 0) {
+    return;
+  }
+  if(!(ext = ReadHeaderExtension(textId, readhead.extensionIndex))) {
+    DisplayInternalError();
+    return;
+  }
+  ITER_EL(node, ext->nodes, node, struct MemHeaderExtensionNode *) {
+    for(i = 0; i < 4; i++) {
+      if(node->ext.items[i].type != REACTION) {
+        continue;
+      }
+      for(j = 0; j < 64; j += sizeof(long)) {
+        reactionData = (long *)&node->ext.items[i].data[j];
+        if(*reactionData == 0) {
+          break;
+        }
+        userId = *reactionData & 0x00ffffff;
+        switch(*reactionData & 0xff000000) {
+        case EXT_REACTION_LIKE:
+          likeCnt++;
+          reactionStr = "hyllats";
+          break;
+        case EXT_REACTION_DISLIKE:
+          dislikeCnt++;
+          reactionStr = "dissats";
+          break;
+        default:
+          reactionStr = "fluppats";
+        }
+        if(verbose) {
+          SendString("  - Texten har %s av %s\r\n", reactionStr, getusername(userId));
+        }
+      }
+    }
+  }
+  DeleteMemHeaderExtension(ext);
+  if(likeCnt > 0) {
+    SendString("(Texten har hyllats av %d personer)\r\n", likeCnt);
+  }
+  if(dislikeCnt > 0) {
+    SendString("(Texten har dissats av %d personer)\r\n", dislikeCnt);
+  }
+}
+
+int org_visatext(int textId, char verbose) {
   int i, length, confId, pos;
   struct tm *ts;
   struct EditLine *el;
@@ -237,6 +290,8 @@ int org_visatext(int textId) {
                  getusername(readhead.kom_av[i]));
     }
   }
+
+  displayReactions(textId, readhead.extensionIndex, verbose);
 
   if(readhead.footNote != 0) {
     length = (readhead.footNote >> 24) & 0xff;
@@ -319,7 +374,7 @@ int org_initheader(int komm) {
 	ts=localtime(&tid);
 	sparhead.tid=tid;
 	sparhead.textoffset=(long)&edit_list;
-	sparhead.status=0;
+        sparhead.extensionIndex = 0;
 	sprintf(outbuffer,"\r\n\nMöte: %s    %4d%02d%02d %02d:%02d\r\n",
                 getmotnamn(sparhead.mote), ts->tm_year + 1900, ts->tm_mon + 1,
                 ts->tm_mday, ts->tm_hour, ts->tm_min);

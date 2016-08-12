@@ -8,6 +8,7 @@
 #include "Logging.h"
 #include "ConfCommon.h"
 #include "StringUtils.h"
+#include "ConfHeaderExtensions.h"
 
 #include "Cmd_Conf.h"
 
@@ -94,6 +95,7 @@ void Cmd_Reply(void) {
 void Cmd_Read(void) {
   int textId;
   struct Mote *conf;
+  char verbose = FALSE, *flag;
   if(argument[0] == '\0') {
     SendString("\r\n\nSkriv: Läsa <textnr>\r\n");
     return;
@@ -103,6 +105,11 @@ void Cmd_Read(void) {
     SendString("\r\n\nFinns ingen sådan text.\r\n");
     return;
   }
+  flag = hittaefter(argument);
+  if(flag[0] == '-' && (flag[1] == 'v' || flag[1] == 'V')) {
+    verbose = TRUE;
+  }
+  
   if(mote2 == -1) {
     brev_lasa(textId);
   }
@@ -115,7 +122,7 @@ void Cmd_Read(void) {
       return;
     }
     if(conf->type == MOTE_ORGINAL) {
-      org_lasa(textId);
+      org_lasa(textId, verbose);
     } else if(conf->type == MOTE_FIDO) {
       fido_lasa(textId,conf);
     }
@@ -311,4 +318,124 @@ void Cmd_Search(void) {
     }
     freeeditlist();
   }
+}
+
+void setReactionInExtension(struct MemHeaderExtension *ext, long reaction) {
+  struct MemHeaderExtensionNode *extNode;
+  int i, j;
+  long *reactionData, userId;
+  
+  ITER_EL(extNode, ext->nodes, node, struct MemHeaderExtensionNode *) {
+    for(i = 0; i < 4; i++) {
+      if(extNode->ext.items[i].type == REACTION) {
+        for(j = 0; j < 64; j += sizeof(long)) {
+          reactionData = (long *)&extNode->ext.items[i].data[j];
+          userId = *reactionData & 0x00ffffff;
+          if(userId != inloggad) {
+            continue;
+          }
+          *reactionData = reaction | inloggad;
+          extNode->dirty = 1;
+          return;
+        }
+      } else if(extNode->ext.items[i].type == NONE) {
+        extNode->ext.items[i].type = REACTION;
+        *((long *)extNode->ext.items[i].data) = reaction | inloggad;
+        extNode->dirty = 1;
+        return;
+      }
+    }
+  }
+  if(!(extNode = AddMemHeaderExtensionNode(ext))) {
+    DeleteMemHeaderExtension(ext);
+    LogEvent(SYSTEM_LOG, ERROR, "Can't allocate MemHeaderExtensionNode in Cmd_Like()");
+    DisplayInternalError();
+    return;
+  }
+  extNode->ext.items[0].type = REACTION;
+  *((long *)extNode->ext.items[0].data) = reaction | inloggad;
+}
+
+void cmd_Reaction(long reaction) {
+  struct Mote *conf;
+  int textId, confId;
+  struct MemHeaderExtension *ext;
+  struct Header textHeader;
+  
+  if(argument[0]) {
+    if(mote2 == -1) {
+      SendString("\r\n\nDu kan inte hylla/dissa brev.\r\n");
+      return;
+    }
+    conf = getmotpek(mote2);
+    if(conf->type != MOTE_ORGINAL) {
+      SendString("\r\n\nDu kan bara hylla/dissa lokala texter.\r\n\n");
+      return;
+    }
+    textId = parseTextNumber(argument, TEXT);
+    if(textId == -1 || (confId = GetConferenceForText(textId)) == -1) {
+      SendString("\r\n\nFinns ingen sådan text.\r\n");
+      return;
+    }
+    if(!MayReadConf(confId, inloggad, &Servermem->inne[nodnr])) {
+      SendString("\r\n\nDu har ingen rätt att hylla/dissa den texten.\r\n");
+      return;
+    }
+  } else {
+    if(!senast_text_typ) {
+      SendString("\n\n\rDu har inte läst någon text ännu.\n\r");
+      return;
+    }
+    if(senast_text_typ == BREV) {
+      SendString("\r\n\nDu kan inte hylla/dissa brev.\r\n");
+      return;
+    }
+    conf = getmotpek(senast_text_mote);
+    if(!conf) {
+      LogEvent(SYSTEM_LOG, ERROR,
+               "Conference for last read text (confId = %d) does not exist.",
+               senast_text_mote);
+      DisplayInternalError();
+      return;
+    }
+    if(conf->type != MOTE_ORGINAL) {
+      SendString("\r\n\nDu kan bara hylla/dissa lokala texter.\r\n\n");
+      return;
+    }
+    textId = senast_text_nr;
+  }
+
+  if(readtexthead(textId, &textHeader)) {
+    DisplayInternalError();
+    return;
+  }
+
+  if(textHeader.extensionIndex > 0) {
+    if(!(ext = ReadHeaderExtension(textId, textHeader.extensionIndex))) {
+      DisplayInternalError();
+      return;
+    }
+  } else {
+    if(!(ext = CreateMemHeaderExtension(textId))) {
+      LogEvent(SYSTEM_LOG, ERROR, "Can't allocate MemHeaderExtension in Cmd_Like()");
+      DisplayInternalError();
+      return;
+    }
+  }
+  setReactionInExtension(ext, reaction);
+  if(SaveHeaderExtension(ext)) {
+    DisplayInternalError();
+  }
+  DeleteMemHeaderExtension(ext);
+
+  SendString("\r\n\nDu har %s text %d.\r\n",
+             reaction == EXT_REACTION_LIKE ? "hyllat" : "dissat", textId);
+}
+
+void Cmd_Like(void) {
+  cmd_Reaction(EXT_REACTION_LIKE);
+}
+
+void Cmd_Dislike(void) {
+  cmd_Reaction(EXT_REACTION_DISLIKE);
 }

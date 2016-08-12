@@ -165,6 +165,7 @@
 #define BAMCLEAR(a,b) (((char *)(a))[(b)/8] &= ~(1 << 8-1-(b)%8))
 
 #define ITER_EL(var, list, nodeField, type) for(var = (type)list.mlh_Head; var->nodeField.mln_Succ; var = (type) var->nodeField.mln_Succ)
+#define ITER_EL_R(var, list, nodeField, type) for(var = (type)list.mlh_TailPred; var->nodeField.mln_Pred; var = (type) var->nodeField.mln_Pred)
 
 /* Flaggor till putstring() */
 #define PS_NOCONV 1
@@ -201,11 +202,40 @@ struct ReadLetter {
 
 // Note, footNote has the position in Textx.dat in the 24 lowest bits
 // and the number of lines in the 8 highest bits
+// Extensionindex points out the position of a possible HeaderExtension
+// in Extensionxx.dat. The index is 1-based since 0 means "no extension".
+// The byte position in the file is calculated as
+// (extensionIndex - 1) * sizeof(HeaderExtension)
 struct Header {
-   short rader,mote,status;
+   short rader, mote, extensionIndex;
    long person,kom_av[MAXKOM],kom_till_per,nummer,textoffset,
       tid,kom_i[MAXKOM],kom_till_nr,root_text,footNote;
    char arende[41];
+};
+
+enum HeaderExtensionType {
+  NONE = 0,
+  REACTION = 1
+};
+
+struct HeaderExtensionItem {
+  enum HeaderExtensionType type;
+  char data[64];
+};
+
+struct HeaderExtension {
+  short nextIndex;
+  struct HeaderExtensionItem items[4];
+};
+
+
+#define EXT_REACTION_LIKE    (1 << 24)
+#define EXT_REACTION_DISLIKE (2 << 24)
+
+// The top 8 bits of each reaction is what type of reaction it is.
+// The low 24 bits is the user id.
+struct HeaderExtension_Reaction {
+  long reactions[16];
 };
 
 struct Mote {

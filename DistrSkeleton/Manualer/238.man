@@ -1,0 +1,13 @@
+
+
+Dissa
+-----
+
+Syntax: Dissa [<textnummer>]
+
+Beskrivning:
+Markerar den angivna texten som dissad av din användare. När någon läser
+texten så kommer det synas att den har blivit dissad. Om inget textnummer
+anges så dissas den senast lästa texten.
+
+Se Även: Hylla, Läsa

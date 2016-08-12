@@ -55,7 +55,7 @@ void atersekom(void) {
                 if(motpek->type==MOTE_ORGINAL) {
                         if(readhead.kom_till_nr==-1) puttekn("\r\n\nTexten är inte någon kommentar!\r\n\n",-1);
                         else if(readhead.kom_till_nr<Servermem->info.lowtext) puttekn("\r\n\nTexten finns inte!\r\n\n",-1);
-                        else org_visatext(readhead.kom_till_nr);
+                        else org_visatext(readhead.kom_till_nr, FALSE);
                 }
                 else if(motpek->type==MOTE_FIDO) puttekn("\n\n\rÅterse Kommenterade kan inte användas på Fido-texter\n\r",-1);
         }
@@ -67,7 +67,7 @@ void igen(void) {
         if(senast_text_typ==BREV) visabrev(senast_brev_nr,senast_brev_anv);
         else if(senast_text_typ==TEXT) {
                 motpek=getmotpek(senast_text_mote);
-                if(motpek->type==MOTE_ORGINAL) org_visatext(senast_text_nr);
+                if(motpek->type==MOTE_ORGINAL) org_visatext(senast_text_nr, FALSE);
                 else if(motpek->type==MOTE_FIDO) fido_visatext(senast_text_nr,motpek);
         }
         else puttekn("\r\n\nDu har inte läst någon text ännu!\r\n\n",-1);

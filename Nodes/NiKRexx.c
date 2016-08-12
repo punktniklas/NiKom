@@ -641,7 +641,7 @@ void rxvisatext(struct RexxMsg *mess) {
     type = conf->type;
   }
   if(type == MOTE_ORGINAL) {
-    org_visatext(text);
+    org_visatext(text, FALSE);
   }
   // TODO: Other conference types
   SetRexxErrorResult(mess, 0);
