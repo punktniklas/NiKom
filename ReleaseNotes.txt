@@ -1,4 +1,14 @@
 ---------------------------------------------------------------------------
+                         NiKom v2.1.2, 2016-08-14
+---------------------------------------------------------------------------
+Fixing a problem with how NiKom reads and writes 16 bit values in FidoNet
+.msg files. Until now it has been handling them in big endian format, which
+seems to have been compatible with Amiga tossers. The FTS standard mandates
+however that values should be handled in little endian format, which e.g.
+CrashMail under x86 Linux does. This version introduces a new config option
+in NiKomFido.cfg to choose which format to use.
+
+---------------------------------------------------------------------------
                          NiKom v2.1.1, 2016-04-16
 ---------------------------------------------------------------------------
 Fixing three bugs in 2.1.0.
