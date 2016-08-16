@@ -738,6 +738,17 @@ int handleFidoConfigLine(char *line, BPTR fh) {
     if(!GetCharCfgValue(line, &Servermem->fidodata.crashstatus)) {
       return 0;
     }
+  } else if(StartsWith(line, "MESSAGE_BYTE_ORDER")) {
+    if(!GetStringCfgValue(line, tmpbuf, 49)) {
+      return 0;
+    }
+    if(strcmp(tmpbuf, "BIG_ENDIAN") == 0) {
+      Servermem->fidodata.littleEndianByteOrder = 0;
+    } else if(strcmp(tmpbuf, "LITTLE_ENDIAN") == 0) {
+      Servermem->fidodata.littleEndianByteOrder = 1;
+    } else {
+      printf("Invalid byte order '%s'\n", tmpbuf);
+    }
   } else {
     printf("Invalid config line: %s\n", line);
     return 0;

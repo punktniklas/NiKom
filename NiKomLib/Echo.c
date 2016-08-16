@@ -173,8 +173,8 @@ int __saveds __asm LIBReNumberConf(register __a0 struct Mote *motpek,register __
 	}
 	newmotpek->renumber_offset += diff;
 	LIBWriteConf(newmotpek,NiKomBase);
-	if(!(hwm = gethwm(newmotpek->dir))) return(4);
-	if(!sethwm(newmotpek->dir,hwm-diff)) return(5);
+	if(!(hwm = gethwm(newmotpek->dir, LITTLE_ENDIAN))) return(4);
+	if(!sethwm(newmotpek->dir, hwm - diff, LITTLE_ENDIAN)) return(5);
 	return(0);
 }
 

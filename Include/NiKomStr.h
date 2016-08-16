@@ -349,10 +349,11 @@ struct FidoAlias {
 };
 
 struct FidoData {
-	struct FidoDomain fd[10];
-	struct FidoAlias fa[20];
-	long lastmatrix,mailgroups;
-	char mailstatus, bounce, crashstatus, matrixdir[100],defaultorigin[70];
+  struct FidoDomain fd[10];
+  struct FidoAlias fa[20];
+  long lastmatrix,mailgroups;
+  char mailstatus, bounce, crashstatus, matrixdir[100],defaultorigin[70],
+    littleEndianByteOrder;
 };
 
 struct NodeType {

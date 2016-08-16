@@ -33,6 +33,7 @@ struct NiKomBase {
 
 };
 
+#define LITTLE_ENDIAN NiKomBase->Servermem->fidodata.littleEndianByteOrder
 
 #define NIKOMBASE_H
 #endif /* NIKOMBASE */

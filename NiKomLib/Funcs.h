@@ -70,8 +70,8 @@ int getzone(char *);
 int getnet(char *);
 int getnode(char *);
 int getpoint(char *);
-int gethwm(char *);
-int sethwm(char *,int);
+int gethwm(char *, char);
+int sethwm(char *,int, char);
 
 /* Echo.c */
 struct Mote *getmotpek(int, struct System *);
