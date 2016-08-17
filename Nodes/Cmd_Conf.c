@@ -320,29 +320,40 @@ void Cmd_Search(void) {
   }
 }
 
-void setReactionInExtension(struct MemHeaderExtension *ext, long reaction) {
+/*
+ * Returns 0 if the user already has that reaction. Otherwise the reaction
+ * is stored and 1 is returned.
+ */
+int setReactionInExtension(struct MemHeaderExtension *ext, long newReaction) {
   struct MemHeaderExtensionNode *extNode;
   int i, j;
-  long *reactionData, userId;
+  long userId, oldReaction;
+  struct HeaderExtension_Reaction *extReact;
   
   ITER_EL(extNode, ext->nodes, node, struct MemHeaderExtensionNode *) {
     for(i = 0; i < 4; i++) {
       if(extNode->ext.items[i].type == REACTION) {
-        for(j = 0; j < 64; j += sizeof(long)) {
-          reactionData = (long *)&extNode->ext.items[i].data[j];
-          userId = *reactionData & 0x00ffffff;
-          if(userId != inloggad) {
-            continue;
+        extReact = (struct HeaderExtension_Reaction *) extNode->ext.items[i].data;
+        for(j = 0; j < 16; j += 1) {
+          oldReaction = extReact->reactions[j] & 0xff000000;
+          userId = extReact->reactions[j] & 0x00ffffff;
+          if(extReact->reactions[j] != 0) {
+            if(userId != inloggad) {
+              continue;
+            }
+            if(newReaction == oldReaction) {
+              return 0;
+            }
           }
-          *reactionData = reaction | inloggad;
+          extReact->reactions[j] = newReaction | inloggad;
           extNode->dirty = 1;
-          return;
+          return 1;
         }
       } else if(extNode->ext.items[i].type == NONE) {
         extNode->ext.items[i].type = REACTION;
-        *((long *)extNode->ext.items[i].data) = reaction | inloggad;
+        *((long *)extNode->ext.items[i].data) = newReaction | inloggad;
         extNode->dirty = 1;
-        return;
+        return 1;
       }
     }
   }
@@ -350,10 +361,11 @@ void setReactionInExtension(struct MemHeaderExtension *ext, long reaction) {
     DeleteMemHeaderExtension(ext);
     LogEvent(SYSTEM_LOG, ERROR, "Can't allocate MemHeaderExtensionNode in Cmd_Like()");
     DisplayInternalError();
-    return;
+    return 1;
   }
   extNode->ext.items[0].type = REACTION;
-  *((long *)extNode->ext.items[0].data) = reaction | inloggad;
+  *((long *)extNode->ext.items[0].data) = newReaction | inloggad;
+  return 1;
 }
 
 void cmd_Reaction(long reaction) {
@@ -422,14 +434,17 @@ void cmd_Reaction(long reaction) {
       return;
     }
   }
-  setReactionInExtension(ext, reaction);
-  if(SaveHeaderExtension(ext)) {
-    DisplayInternalError();
+  if(!setReactionInExtension(ext, reaction)) {
+    SendString("\r\n\nDu har redan %s text %d.\r\n",
+               reaction == EXT_REACTION_LIKE ? "hyllat" : "dissat", textId);
+  } else {
+    if(SaveHeaderExtension(ext)) {
+      DisplayInternalError();
+    }
+    SendString("\r\n\nDu har %s text %d.\r\n",
+               reaction == EXT_REACTION_LIKE ? "hyllat" : "dissat", textId);
   }
   DeleteMemHeaderExtension(ext);
-
-  SendString("\r\n\nDu har %s text %d.\r\n",
-             reaction == EXT_REACTION_LIKE ? "hyllat" : "dissat", textId);
 }
 
 void Cmd_Like(void) {
