@@ -94,6 +94,21 @@ void readConfigFile(char *filename, int (*handleLine)(char *, BPTR)) {
   }
 }
 
+int isMatchingConfigLine(char *line, char *keyword) {
+  int i;
+  for(i = 0;; i++) {
+    if(line[i] == '\0') {
+      return 0;
+    }
+    if(keyword[i] == '\0') {
+      return line[i] == '=' || line[i] == ' ' || line[i] == '\t';
+    }
+    if(line[i] != keyword[i]) {
+      return 0;
+    }
+  }
+}
+
 void ReadSystemConfig(void) {
   initSystemConfigDefaults();
   readConfigFile("NiKom:DatoCfg/System.cfg", handleSystemConfigLine);
@@ -161,11 +176,11 @@ int handleSystemConfigStatusSection(char *line, BPTR fh) {
       }
       if(StartsWith(line, "ENDSTATUS")) {
         return 1;
-      } else if(StartsWith(line, "MAXTID") || StartsWith(line, "MAXTIME")) {
+      } else if(isMatchingConfigLine(line, "MAXTID") || isMatchingConfigLine(line, "MAXTIME")) {
         if(!GetShortCfgValue(line, &Servermem->cfg.maxtid[status])) {
           return 0;
         }
-      } else if(StartsWith(line, "ULDL")) {
+      } else if(isMatchingConfigLine(line, "ULDL")) {
         if(!GetCharCfgValue(line, &Servermem->cfg.uldlratio[status])) {
           return 0;
         }
@@ -182,11 +197,11 @@ int handleSystemConfigStatusSection(char *line, BPTR fh) {
 int handleSystemConfigLine(char *line, BPTR fh) {
   int len;
 
-  if(StartsWith(line, "DEFAULTFLAGS")) {
+  if(isMatchingConfigLine(line, "DEFAULTFLAGS")) {
     if(!GetLongCfgValue(line, &Servermem->cfg.defaultflags)) {
       return 0;
     }
-  } else if(StartsWith(line, "DEFAULTSTATUS")) {
+  } else if(isMatchingConfigLine(line, "DEFAULTSTATUS")) {
     if(!GetCharCfgValue(line, &Servermem->cfg.defaultstatus)) {
       return 0;
     }
@@ -194,7 +209,7 @@ int handleSystemConfigLine(char *line, BPTR fh) {
       printf("Invalid value for DEFAULTSTATUS, must be between 0 and 100.\n");
       return 0;
     }
-  } else if(StartsWith(line, "DEFAULTRADER") || StartsWith(line, "DEFAULTLINES")) {
+  } else if(isMatchingConfigLine(line, "DEFAULTRADER") || isMatchingConfigLine(line, "DEFAULTLINES")) {
     if(!GetCharCfgValue(line, &Servermem->cfg.defaultrader)) {
       return 0;
     }
@@ -202,23 +217,23 @@ int handleSystemConfigLine(char *line, BPTR fh) {
     if(!handleSystemConfigStatusSection(line, fh)) {
       return 0;
     }
-  } else if(StartsWith(line, "CLOSEDBBS")) {
+  } else if(isMatchingConfigLine(line, "CLOSEDBBS")) {
     if(!GetBoolCfgFlag(line, &Servermem->cfg.cfgflags, NICFG_CLOSEDBBS)) {
       return 0;
     }
-  } else if(StartsWith(line, "BREVLÅDA") || StartsWith(line, "MAILBOX")) {
+  } else if(isMatchingConfigLine(line, "BREVLÅDA") || isMatchingConfigLine(line, "MAILBOX")) {
     if(!GetStringCfgValue(line, Servermem->cfg.brevnamn, 40)) {
       return 0;
     }
-  } else if(StartsWith(line, "NY") || StartsWith(line, "NEWUSERLOGIN")) {
+  } else if(isMatchingConfigLine(line, "NY") || isMatchingConfigLine(line, "NEWUSERLOGIN")) {
     if(!GetStringCfgValue(line, Servermem->cfg.ny, 20)) {
       return 0;
     }
-  } else if(StartsWith(line, "DISKFREE")) {
+  } else if(isMatchingConfigLine(line, "DISKFREE")) {
     if(!GetLongCfgValue(line, &Servermem->cfg.diskfree)) {
       return 0;
     }
-  } else if(StartsWith(line, "ULTMP")) {
+  } else if(isMatchingConfigLine(line, "ULTMP")) {
     if(!GetStringCfgValue(line, Servermem->cfg.ultmp, 98)) {
       return 0;
     }
@@ -227,100 +242,100 @@ int handleSystemConfigLine(char *line, BPTR fh) {
       Servermem->cfg.ultmp[len] = '/';
       Servermem->cfg.ultmp[len + 1] = '\0';
     }
-  } else if(StartsWith(line, "PREINLOGG") || StartsWith(line, "AREXX_PRELOGIN")) {
+  } else if(isMatchingConfigLine(line, "PREINLOGG") || isMatchingConfigLine(line, "AREXX_PRELOGIN")) {
     if(!GetLongCfgValue(line, &Servermem->cfg.ar.preinlogg)) {
       return 0;
     }
-  } else if(StartsWith(line, "POSTINLOGG") || StartsWith(line, "AREXX_POSTLOGIN")) {
+  } else if(isMatchingConfigLine(line, "POSTINLOGG") || isMatchingConfigLine(line, "AREXX_POSTLOGIN")) {
     if(!GetLongCfgValue(line, &Servermem->cfg.ar.postinlogg)) {
       return 0;
     }
-  } else if(StartsWith(line, "UTLOGG") || StartsWith(line, "AREXX_LOGOUT")) {
+  } else if(isMatchingConfigLine(line, "UTLOGG") || isMatchingConfigLine(line, "AREXX_LOGOUT")) {
     if(!GetLongCfgValue(line, &Servermem->cfg.ar.utlogg)) {
       return 0;
     }
-  } else if(StartsWith(line, "NYANV") || StartsWith(line, "AREXX_NEWUSER")) {
+  } else if(isMatchingConfigLine(line, "NYANV") || isMatchingConfigLine(line, "AREXX_NEWUSER")) {
     if(!GetLongCfgValue(line, &Servermem->cfg.ar.nyanv)) {
       return 0;
     }
-  } else if(StartsWith(line, "PREUPLOAD1") || StartsWith(line, "AREXX_PREUPLOAD1")) {
+  } else if(isMatchingConfigLine(line, "PREUPLOAD1") || isMatchingConfigLine(line, "AREXX_PREUPLOAD1")) {
     if(!GetLongCfgValue(line, &Servermem->cfg.ar.preup1)) {
       return 0;
     }
-  } else if(StartsWith(line, "PREUPLOAD2") || StartsWith(line, "AREXX_PREUPLOAD2")) {
+  } else if(isMatchingConfigLine(line, "PREUPLOAD2") || isMatchingConfigLine(line, "AREXX_PREUPLOAD2")) {
     if(!GetLongCfgValue(line, &Servermem->cfg.ar.preup2)) {
       return 0;
     }
-  } else if(StartsWith(line, "POSTUPLOAD1") || StartsWith(line, "AREXX_POSTUPLOAD1")) {
+  } else if(isMatchingConfigLine(line, "POSTUPLOAD1") || isMatchingConfigLine(line, "AREXX_POSTUPLOAD1")) {
     if(!GetLongCfgValue(line, &Servermem->cfg.ar.postup1)) {
       return 0;
     }
-  } else if(StartsWith(line, "POSTUPLOAD2") || StartsWith(line, "AREXX_POSTUPLOAD2")) {
+  } else if(isMatchingConfigLine(line, "POSTUPLOAD2") || isMatchingConfigLine(line, "AREXX_POSTUPLOAD2")) {
     if(!GetLongCfgValue(line, &Servermem->cfg.ar.postup2)) {
       return 0;
     }
-  } else if(StartsWith(line, "NORIGHT") || StartsWith(line, "AREXX_NOPERMISSION")) {
+  } else if(isMatchingConfigLine(line, "NORIGHT") || isMatchingConfigLine(line, "AREXX_NOPERMISSION")) {
     if(!GetLongCfgValue(line, &Servermem->cfg.ar.noright)) {
       return 0;
     }
-  } else if(StartsWith(line, "NEXTMEET") || StartsWith(line, "AREXX_NEXTFORUM")) {
+  } else if(isMatchingConfigLine(line, "NEXTMEET") || isMatchingConfigLine(line, "AREXX_NEXTFORUM")) {
     if(!GetLongCfgValue(line, &Servermem->cfg.ar.nextmeet)) {
       return 0;
     }
-  } else if(StartsWith(line, "NEXTTEXT") || StartsWith(line, "AREXX_NEXTTEXT")) {
+  } else if(isMatchingConfigLine(line, "NEXTTEXT") || isMatchingConfigLine(line, "AREXX_NEXTTEXT")) {
     if(!GetLongCfgValue(line, &Servermem->cfg.ar.nexttext)) {
       return 0;
     }
-  } else if(StartsWith(line, "NEXTKOM") || StartsWith(line, "AREXX_NEXTREPLY")) {
+  } else if(isMatchingConfigLine(line, "NEXTKOM") || isMatchingConfigLine(line, "AREXX_NEXTREPLY")) {
     if(!GetLongCfgValue(line, &Servermem->cfg.ar.nextkom)) {
       return 0;
     }
-  } else if(StartsWith(line, "SETID") || StartsWith(line, "AREXX_SEETIME")) {
+  } else if(isMatchingConfigLine(line, "SETID") || isMatchingConfigLine(line, "AREXX_SEETIME")) {
     if(!GetLongCfgValue(line, &Servermem->cfg.ar.setid)) {
       return 0;
     }
-  } else if(StartsWith(line, "NEXTLETTER") || StartsWith(line, "AREXX_NEXTMAIL")) {
+  } else if(isMatchingConfigLine(line, "NEXTLETTER") || isMatchingConfigLine(line, "AREXX_NEXTMAIL")) {
     if(!GetLongCfgValue(line, &Servermem->cfg.ar.nextletter)) {
       return 0;
     }
-  } else if(StartsWith(line, "CARDROPPED") || StartsWith(line, "AREXX_AUTOLOGOUT")) {
+  } else if(isMatchingConfigLine(line, "CARDROPPED") || isMatchingConfigLine(line, "AREXX_AUTOLOGOUT")) {
     if(!GetLongCfgValue(line, &Servermem->cfg.ar.cardropped)) {
       return 0;
     }
-  } else if(StartsWith(line, "LOGMASK")) {
+  } else if(isMatchingConfigLine(line, "LOGMASK")) {
     if(!GetLongCfgValue(line, &Servermem->cfg.logmask)) {
       return 0;
     }
-  } else if(StartsWith(line, "SCREEN")) {
+  } else if(isMatchingConfigLine(line, "SCREEN")) {
     if(!GetStringCfgValue(line, pubscreen, 39)) {
       return 0;
     }
-  } else if(StartsWith(line, "YPOS") || StartsWith(line, "WIN_YPOS")) {
+  } else if(isMatchingConfigLine(line, "YPOS") || isMatchingConfigLine(line, "WIN_YPOS")) {
     if(!GetLongCfgValue(line, (long *)&ypos)) {
       return 0;
     }
-  } else if(StartsWith(line, "XPOS") || StartsWith(line, "WIN_XPOS")) {
+  } else if(isMatchingConfigLine(line, "XPOS") || isMatchingConfigLine(line, "WIN_XPOS")) {
     if(!GetLongCfgValue(line, (long *)&xpos)) {
       return 0;
     }
-  } else if(StartsWith(line, "VALIDERAFILER") || StartsWith(line, "UPLOADSNOTVALIDATED")) {
+  } else if(isMatchingConfigLine(line, "VALIDERAFILER") || isMatchingConfigLine(line, "UPLOADSNOTVALIDATED")) {
     if(!GetBoolCfgFlag(line, &Servermem->cfg.cfgflags, NICFG_VALIDATEFILES)) {
       return 0;
     }
-  } else if(StartsWith(line, "LOGINTRIES") || StartsWith(line, "LOGINATTEMPTS")) {
+  } else if(isMatchingConfigLine(line, "LOGINTRIES") || isMatchingConfigLine(line, "LOGINATTEMPTS")) {
     if(!GetShortCfgValue(line, &Servermem->cfg.logintries)) {
       return 0;
     }
-  } else if(StartsWith(line, "LOCALCOLOURS") || StartsWith(line, "LOCALCOLORS")) {
+  } else if(isMatchingConfigLine(line, "LOCALCOLOURS") || isMatchingConfigLine(line, "LOCALCOLORS")) {
     if(!GetBoolCfgFlag(line, &Servermem->cfg.cfgflags, NICFG_LOCALCOLOURS)) {
       return 0;
     }
-  } else if(StartsWith(line, "CRYPTEDPASSWORDS")
-            || StartsWith(line, "ENCRYPTEDPASSWORDS")) {
+  } else if(isMatchingConfigLine(line, "CRYPTEDPASSWORDS")
+            || isMatchingConfigLine(line, "ENCRYPTEDPASSWORDS")) {
     if(!GetBoolCfgFlag(line, &Servermem->cfg.cfgflags, NICFG_CRYPTEDPASSWORDS)) {
       return 0;
     }
-  } else if(StartsWith(line, "NEWUSERCHARSET")) {
+  } else if(isMatchingConfigLine(line, "NEWUSERCHARSET")) {
     if(!GetCharCfgValue(line, &Servermem->cfg.defaultcharset)) {
       return 0;
     }
@@ -523,55 +538,55 @@ void ReadStatusConfig(void) {
 }
 
 int handleStatusConfigLine(char *line, BPTR fh) {
-  if(StartsWith(line, "SKRIV") || StartsWith(line, "WRITE")) {
+  if(isMatchingConfigLine(line, "SKRIV") || isMatchingConfigLine(line, "WRITE")) {
     if(!GetCharCfgValue(line, &Servermem->cfg.st.skriv)) {
       return 0;
     }
-  } else if(StartsWith(line, "TEXTER") || StartsWith(line, "MANAGETEXTS")) {
+  } else if(isMatchingConfigLine(line, "TEXTER") || isMatchingConfigLine(line, "MANAGETEXTS")) {
     if(!GetCharCfgValue(line, &Servermem->cfg.st.texter)) {
       return 0;
     }
-  } else if(StartsWith(line, "BREV") || StartsWith(line, "MANAGEMAIL")) {
+  } else if(isMatchingConfigLine(line, "BREV") || isMatchingConfigLine(line, "MANAGEMAIL")) {
     if(!GetCharCfgValue(line, &Servermem->cfg.st.brev)) {
       return 0;
     }
-  } else if(StartsWith(line, "MEDMÖTEN") || StartsWith(line, "JOINFORUMS")) {
+  } else if(isMatchingConfigLine(line, "MEDMÖTEN") || isMatchingConfigLine(line, "JOINFORUMS")) {
     if(!GetCharCfgValue(line, &Servermem->cfg.st.medmoten)) {
       return 0;
     }
-  } else if(StartsWith(line, "RADMÖTEN") || StartsWith(line, "MANAGEFORUMS")) {
+  } else if(isMatchingConfigLine(line, "RADMÖTEN") || isMatchingConfigLine(line, "MANAGEFORUMS")) {
     if(!GetCharCfgValue(line, &Servermem->cfg.st.radmoten)) {
       return 0;
     }
-  } else if(StartsWith(line, "SESTATUS") || StartsWith(line, "VIEWUSERINFO")) {
+  } else if(isMatchingConfigLine(line, "SESTATUS") || isMatchingConfigLine(line, "VIEWUSERINFO")) {
     if(!GetCharCfgValue(line, &Servermem->cfg.st.sestatus)) {
       return 0;
     }
-  } else if(StartsWith(line, "ANVÄNDARE") || StartsWith(line, "MANAGEUSERS")) {
+  } else if(isMatchingConfigLine(line, "ANVÄNDARE") || isMatchingConfigLine(line, "MANAGEUSERS")) {
     if(!GetCharCfgValue(line, &Servermem->cfg.st.anv)) {
       return 0;
     }
-  } else if(StartsWith(line, "ÄNDSTATUS") || StartsWith(line, "MANAGESTATUS")) {
+  } else if(isMatchingConfigLine(line, "ÄNDSTATUS") || isMatchingConfigLine(line, "MANAGESTATUS")) {
     if(!GetCharCfgValue(line, &Servermem->cfg.st.chgstatus)) {
       return 0;
     }
-  } else if(StartsWith(line, "BYTAREA") || StartsWith(line, "JOINAREAS")) {
+  } else if(isMatchingConfigLine(line, "BYTAREA") || isMatchingConfigLine(line, "JOINAREAS")) {
     if(!GetCharCfgValue(line, &Servermem->cfg.st.bytarea)) {
       return 0;
     }
-  } else if(StartsWith(line, "RADAREA") || StartsWith(line, "MANAGEAREAS")) {
+  } else if(isMatchingConfigLine(line, "RADAREA") || isMatchingConfigLine(line, "MANAGEAREAS")) {
     if(!GetCharCfgValue(line, &Servermem->cfg.st.radarea)) {
       return 0;
     }
-  } else if(StartsWith(line, "FILER") || StartsWith(line, "MANAGEFILES")) {
+  } else if(isMatchingConfigLine(line, "FILER") || isMatchingConfigLine(line, "MANAGEFILES")) {
     if(!GetCharCfgValue(line, &Servermem->cfg.st.filer)) {
       return 0;
     }
-  } else if(StartsWith(line, "LADDANER") || StartsWith(line, "DOWNLOAD")) {
+  } else if(isMatchingConfigLine(line, "LADDANER") || isMatchingConfigLine(line, "DOWNLOAD")) {
     if(!GetCharCfgValue(line, &Servermem->cfg.st.laddaner)) {
       return 0;
     }
-  } else if(StartsWith(line, "GRUPPER") || StartsWith(line, "MANAGEGROUPS")) {
+  } else if(isMatchingConfigLine(line, "GRUPPER") || isMatchingConfigLine(line, "MANAGEGROUPS")) {
     if(!GetCharCfgValue(line, &Servermem->cfg.st.grupper)) {
       return 0;
     }
@@ -657,7 +672,7 @@ int handleFidoConfigLine(char *line, BPTR fh) {
   int i, address[4], group;
   char *tmp1, *tmp2, tmpbuf[50];
 
-  if(StartsWith(line,"DOMAIN")) {
+  if(isMatchingConfigLine(line,"DOMAIN")) {
     for(i = 0; i < 10; i++) {
       if(!Servermem->fidodata.fd[i].domain[0]) {
         break;
@@ -689,7 +704,7 @@ int handleFidoConfigLine(char *line, BPTR fh) {
     tmp1 = FindNextWord(tmp2);
     strncpy(Servermem->fidodata.fd[i].zones, tmp1, 49);
   }
-  else if(StartsWith(line, "ALIAS")) {
+  else if(isMatchingConfigLine(line, "ALIAS")) {
     for(i = 0; i < 20; i++) {
       if(!Servermem->fidodata.fa[i].namn[0]) {
         break;
@@ -704,18 +719,18 @@ int handleFidoConfigLine(char *line, BPTR fh) {
     tmp1 = FindNextWord(tmp1);
     strncpy(Servermem->fidodata.fa[i].namn, tmp1, 35);
   }
-  else if(StartsWith(line, "BOUNCE")) {
+  else if(isMatchingConfigLine(line, "BOUNCE")) {
     if(!GetStringCfgValue(line, tmpbuf, 10)) {
       return 0;
     }
     if(tmpbuf[0] == 'Y' || tmpbuf[0] == 'y') {
       Servermem->fidodata.bounce = TRUE;
     }
-  } else if(StartsWith(line, "MATRIXDIR")) {
+  } else if(isMatchingConfigLine(line, "MATRIXDIR")) {
     if(!GetStringCfgValue(line, Servermem->fidodata.matrixdir, 99)) {
       return 0;
     }
-  } else if(StartsWith(line, "MAILGROUP")) {
+  } else if(isMatchingConfigLine(line, "MAILGROUP")) {
     if(!GetStringCfgValue(line, tmpbuf, 49)) {
       return 0;
     }
@@ -726,19 +741,19 @@ int handleFidoConfigLine(char *line, BPTR fh) {
     }
     BAMSET((char *)&Servermem->fidodata.mailgroups, group);
   }
-  else if(StartsWith(line, "MAILSTATUS")) {
+  else if(isMatchingConfigLine(line, "MAILSTATUS")) {
     if(!GetCharCfgValue(line, &Servermem->fidodata.mailstatus)) {
       return 0;
     }
-  } else if(StartsWith(line, "DEFAULTORIGIN")) {
+  } else if(isMatchingConfigLine(line, "DEFAULTORIGIN")) {
     if(!GetStringCfgValue(line, Servermem->fidodata.defaultorigin, 69)) {
       return 0;
     }
-  } else if(StartsWith(line, "CRASHSTATUS")) {
+  } else if(isMatchingConfigLine(line, "CRASHSTATUS")) {
     if(!GetCharCfgValue(line, &Servermem->fidodata.crashstatus)) {
       return 0;
     }
-  } else if(StartsWith(line, "MESSAGE_BYTE_ORDER")) {
+  } else if(isMatchingConfigLine(line, "MESSAGE_BYTE_ORDER")) {
     if(!GetStringCfgValue(line, tmpbuf, 49)) {
       return 0;
     }
