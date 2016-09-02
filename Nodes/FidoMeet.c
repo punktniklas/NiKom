@@ -78,6 +78,7 @@ void fido_visatext(int text,struct Mote *motpek) {
 	if(Servermem->inne[nodnr].flaggor & SHOWKLUDGE) ft=ReadFidoTextTags(fullpath,TAG_DONE);
 	else ft=ReadFidoTextTags(fullpath,RFT_NoKludges,TRUE,RFT_NoSeenBy,TRUE,TAG_DONE);
 	if(!ft) {
+          LogEvent(SYSTEM_LOG, ERROR, "Can't read fido text %s.", fullpath);
           DisplayInternalError();
           return;
 	}
@@ -193,8 +194,9 @@ int fido_skriv(int komm,int komtill) {
 		AddPart(fullpath,filnamn,99);
 		komft = ReadFidoTextTags(fullpath,RFT_HeaderOnly,TRUE,TAG_DONE);
 		if(!komft) {
-			puttekn("\n\n\rTexten finns inte.\n\r",-1);
-			return(0);
+                  LogEvent(SYSTEM_LOG, ERROR, "Can't read fido text %s.", fullpath);
+                  DisplayInternalError();
+                  return 0;
 		}
 		strcpy(ft.touser,komft->fromuser);
 		if(!strncmp(komft->subject,"Re:",3)) strcpy(ft.subject,komft->subject);

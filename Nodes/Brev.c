@@ -413,8 +413,9 @@ int fido_brev(char *tillpers,char *adr,struct Mote *motpek) {
 			AddPart(fullpath,filnamn,99);
 			komft = ReadFidoTextTags(fullpath,RFT_HeaderOnly,TRUE,TAG_DONE);
 			if(!komft) {
-				puttekn("\n\n\rTexten finns inte.\n\r",-1);
-				return(0);
+                          LogEvent(SYSTEM_LOG, ERROR, "Can't read fido text %s.", fullpath);
+                          DisplayInternalError();
+                          return 0;
 			}
 			strcpy(ft.touser,komft->fromuser);
 			ft.tozone = komft->fromzone;

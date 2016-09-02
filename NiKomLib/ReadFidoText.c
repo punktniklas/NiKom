@@ -193,8 +193,6 @@ struct FidoText * __saveds __asm LIBReadFidoText(register __a0 char *filename, r
 	NewList((struct List *)&fidotext->text);
 	if(!(fh=Open(filename,MODE_OLDFILE))) {
           FreeMem(fidotext,sizeof(struct FidoText));
-          LogEvent(NiKomBase->Servermem, SYSTEM_LOG, ERROR,
-                   "Can't open %s when trying to read fido text.", filename);
           return(NULL);
 	}
 	Read(fh,ftshead,190);

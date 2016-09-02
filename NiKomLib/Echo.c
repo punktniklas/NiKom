@@ -16,6 +16,7 @@
 #include "NiKomBase.h"
 #include "/Include/NiKomLib.h"
 #include "funcs.h"
+#include "Logging.h"
 
 void __saveds __asm LIBReScanFidoConf(register __a0 struct Mote *motpek,register __d0 int motnr, register __a6 struct NiKomBase *NiKomBase) {
 	struct ExAllData *ead;
@@ -70,35 +71,46 @@ void __saveds __asm LIBReScanFidoConf(register __a0 struct Mote *motpek,register
 }
 
 void __saveds __asm LIBUpdateFidoConf(register __a0 struct Mote *motpek,register __a6 struct NiKomBase *NiKomBase) {
-	int tmpmin,tmpmax;
-	BPTR lock;
-	char filnamn[20],fullpath[100];
+  int tmpmin, tmpmax, oldmin, oldmax;
+  BPTR lock;
+  char filnamn[20],fullpath[100];
 
-	if(!NiKomBase->Servermem) return;
+  if(!NiKomBase->Servermem) return;
 
-	tmpmax = motpek->texter + 1 - motpek->renumber_offset;
-	for(;;) {
-		strcpy(fullpath,motpek->dir);
-		sprintf(filnamn,"%d.msg",tmpmax);
-		AddPart(fullpath,filnamn,99);
-		if(lock = Lock(fullpath,ACCESS_READ)) {
-			UnLock(lock);
-			tmpmax++;
-		} else break;
-	}
-	motpek->texter=tmpmax - 1 + motpek->renumber_offset;
+  oldmax = motpek->texter;
+  tmpmax = motpek->texter + 1 - motpek->renumber_offset;
+  for(;;) {
+    strcpy(fullpath,motpek->dir);
+    sprintf(filnamn,"%d.msg",tmpmax);
+    AddPart(fullpath,filnamn,99);
+    if(lock = Lock(fullpath,ACCESS_READ)) {
+      UnLock(lock);
+      tmpmax++;
+    } else break;
+  }
+  motpek->texter=tmpmax - 1 + motpek->renumber_offset;
 
-	tmpmin=motpek->lowtext - motpek->renumber_offset;
-	while(tmpmin<=motpek->texter) {
-		strcpy(fullpath,motpek->dir);
-		sprintf(filnamn,"%d.msg",tmpmin);
-		AddPart(fullpath,filnamn,99);
-		if(lock=Lock(fullpath,ACCESS_READ)) {
-			UnLock(lock);
-			break;
-		} else tmpmin++;
-	}
-	motpek->lowtext = tmpmin + motpek->renumber_offset;
+  oldmin = motpek->lowtext;
+  tmpmin=motpek->lowtext - motpek->renumber_offset;
+  while(tmpmin<=motpek->texter) {
+    strcpy(fullpath,motpek->dir);
+    sprintf(filnamn,"%d.msg",tmpmin);
+    AddPart(fullpath,filnamn,99);
+    if(lock=Lock(fullpath,ACCESS_READ)) {
+      UnLock(lock);
+      break;
+    } else tmpmin++;
+  }
+  motpek->lowtext = tmpmin + motpek->renumber_offset;
+  LogEvent(NiKomBase->Servermem, FIDO_LOG, INFO,
+           "Updated area %s. Low %d (%d.msg) -> %d (%d.msg), high %d (%d.msg) -> %d (%d.msg)"
+           " (%d new messages)",
+           motpek->tagnamn,
+           oldmin, oldmin - motpek->renumber_offset,
+           motpek->lowtext, motpek->lowtext - motpek->renumber_offset,
+           oldmax, oldmax - motpek->renumber_offset,
+           motpek->texter, motpek->texter - motpek->renumber_offset,
+           motpek->texter - oldmax);
 }
 
 void __saveds __asm LIBUpdateAllFidoConf(register __a6 struct NiKomBase *NiKomBase) {

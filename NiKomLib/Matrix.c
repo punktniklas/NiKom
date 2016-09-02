@@ -23,7 +23,7 @@ int getlastmatrix(struct NiKomBase *NiKomBase) {
 void __saveds __asm LIBMatrix2NiKom(register __a6 struct NiKomBase *NiKomBase) {
   struct FidoText *fidotext;
   struct FidoLine *fl;
-  int going = TRUE, userId, mailId;
+  int going = TRUE, userId, mailId, oldLastMatrix;
   BPTR fh;
   char buffer[100], *subject, filename[20];
   struct TagItem ti = { TAG_DONE };
@@ -33,22 +33,19 @@ void __saveds __asm LIBMatrix2NiKom(register __a6 struct NiKomBase *NiKomBase) {
   }
   
   LIBLockNiKomBase(NiKomBase);
-  LogEvent(NiKomBase->Servermem, FIDO_LOG, INFO,
-           "Starting Matrix import with message %d", NiKomBase->lastmatrix);
+  oldLastMatrix = NiKomBase->lastmatrix;
 
   while(going) {
     strcpy(buffer, NiKomBase->Servermem->fidodata.matrixdir);
     sprintf(filename, "%d.msg", NiKomBase->lastmatrix);
     AddPart(buffer, filename, 99);
     if(!(fidotext = LIBReadFidoText(buffer, &ti, NiKomBase))) {
-      LogEvent(NiKomBase->Servermem, FIDO_LOG, DEBUG,
-               "Message file %s not found, ending import.", buffer);
       break;
     }
     NiKomBase->lastmatrix++;
     if(fidotext->attribut & FIDOT_LOCAL) {
       LogEvent(NiKomBase->Servermem, FIDO_LOG, DEBUG,
-               "Message %d is local, skipping.", NiKomBase->lastmatrix - 1);
+               "Netmail %d is local, skipping.", NiKomBase->lastmatrix - 1);
       continue;
     }
     LogEvent(NiKomBase->Servermem,
@@ -110,7 +107,8 @@ void __saveds __asm LIBMatrix2NiKom(register __a6 struct NiKomBase *NiKomBase) {
   sprintf(buffer, "%d", NiKomBase->lastmatrix);
   SetVar("NiKom:DatoCfg/LastMatrix", buffer, -1, GVF_GLOBAL_ONLY);
   LogEvent(NiKomBase->Servermem, FIDO_LOG, INFO,
-           "Finished Matrix import. New LastMatrix = %d.", NiKomBase->lastmatrix);
+           "Finished Netmail import. LastMatrix:  %d -> %d. (%d new messages)",
+           oldLastMatrix, NiKomBase->lastmatrix, NiKomBase->lastmatrix - oldLastMatrix);
   LIBUnLockNiKomBase(NiKomBase);
 }
 
