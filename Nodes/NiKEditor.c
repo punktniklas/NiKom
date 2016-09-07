@@ -164,8 +164,9 @@ int lineedit(char *filename) {
     }
     getret = linegetline(letmp, wrap, currow);
     switch(getret) {
-    case 0 :
-      if(letmp[0] == '!') {
+    case 0:
+    case 3:
+      if(letmp[0] == '!' && getret == 0) {
         letmp[0] = 0;
         if(letmp[1] == 'r' || letmp[1] == 'R') linedelline(hittaefter(&letmp[1]));
         else if(letmp[1] == 'i' || letmp[1] == 'I') {
@@ -201,6 +202,9 @@ int lineedit(char *filename) {
         el->number=currow++;
         AddTail((struct List *)&edit_list,(struct Node *)el);
         strcpy(letmp,wrap);
+        if(getret == 3) {
+          return 0;
+        }
       }
       break;
       
@@ -214,8 +218,6 @@ int lineedit(char *filename) {
         currow--;
       }
       break;
-    case 3 :
-      return 0;
     }
   }
 }
@@ -248,7 +250,10 @@ int linegetline(char *str, char *wrap, int linenr) {
         str[col++] = ' ';
         eka(' ');
       }
-    } else if(ch == 26 && col==0) { // Ctrl-Z
+    } else if(ch == 26) { // Ctrl-Z
+      if(col != 0) {
+        SendStringNoBrk("\r\n");
+      }
       SendStringNoBrk("!Spara\r\n\n");
       return 3;
     }
