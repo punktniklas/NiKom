@@ -57,7 +57,6 @@ int __saveds __asm LIBSysInfo(register __a0 char *subject, register __a6 struct 
 /* Andra trevliga små funktioner */
 
 /* Matrix.c */
-int getlastmatrix(struct NiKomBase *);
 int sprattmatchar(char *,char *);
 int fidoparsenamn(char *,struct System *);
 int updatenextletter(int);

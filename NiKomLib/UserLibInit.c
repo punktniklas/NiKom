@@ -57,13 +57,6 @@ __UserLibInit(register __a6 struct NiKomBase * NiKomBase)
 		CloseLibrary((struct Library *)DOSBase);
 		return(RET_ERROR);
 	}
-	if(!getlastmatrix(NiKomBase)) {
-		CloseLibrary(UtilityBase);
-		CloseLibrary(RexxSysBase);
-		CloseLibrary((struct Library *)IntuitionBase);
-		CloseLibrary((struct Library *)DOSBase);
-		return(RET_ERROR);
-	}
 	InitSemaphore(& NiKomBase->sem);
 	copychrstables(NiKomBase);
 

@@ -25,7 +25,6 @@ struct NiKomBase {
 
 	struct SignalSemaphore sem;	/* Semaphore to gain exclusive access to NiKomBase */
 
-	int lastmatrix; /* Vilket brev i Mail:Matrix som är nästa att importera */
 	struct System *Servermem;
 	UBYTE IbmToAmiga[256], AmigaToIbm[256],
 			SF7ToAmiga[256], AmigaToSF7[256],
