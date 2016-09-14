@@ -1,6 +1,17 @@
 ---------------------------------------------------------------------------
                          NiKom v2.2.0, 2016-xx-yy
 ---------------------------------------------------------------------------
+
+- Added a flag to the "Status" command to make it list all the forums
+  the user is a member of. Not just the ones with unread texts. Also
+  fixed the problem that it was not including FidoNet forums in the list.
+
+- Made it possible to press Ctrl-Z to save the text anywhere in the line
+  editor. Not just at the beginning of an empty line.
+
+- Some improvements to logging when NiKom is importing/updating/scanning
+  FidoNet texts. Also improved the handling of the LastMatrix file.
+  
 - Two new commands "Hylla" and "Dissa" to mark that you like or dislike
   a certain text. When reading a text a count of how many people that
   have liked and disliked the text will be displayed. Also the command

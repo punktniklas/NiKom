@@ -20,146 +20,138 @@ extern char outbuffer[],inmat[], *argument;
 
 void Cmd_Status(void) {
   struct User readuserstr;
-  struct Mote *motpek=(struct Mote *)Servermem->mot_list.mlh_Head;
-  int nummer,nod,cnt=0,olasta=FALSE,tot=0;
+  struct Mote *conf;
+  int userId, nod, cnt = 0, sumUnread = 0, showAllConf = FALSE;
   struct tm *ts;
   struct UserGroup *listpek;
   char filnamn[100];
   struct UnreadTexts unreadTextsBuf, *unreadTexts;
 
-  if(argument[0]==0) {
-    memcpy(&readuserstr,&Servermem->inne[nodnr],sizeof(struct User));
+  if(argument[0] == '-' && (argument[1] == 'a' || argument[1] == 'A')) {
+    showAllConf = TRUE;
+    argument = hittaefter(argument);
+  }
+  if(argument[0] == 0) {
+    memcpy(&readuserstr, &Servermem->inne[nodnr], sizeof(struct User));
     unreadTexts = &Servermem->unreadTexts[nodnr];
-    nummer=inloggad;
+    userId = inloggad;
   } else {
-    if((nummer=parsenamn(argument))==-1) {
-      puttekn("\r\n\nFinns ingen som heter så eller har det numret\r\n\n",-1);
+    if((userId = parsenamn(argument)) == -1) {
+      SendString("\r\n\nFinns ingen som heter så eller har det numret\r\n\n");
       return;
     }
-    for(nod=0;nod<MAXNOD;nod++) if(nummer==Servermem->inloggad[nod]) break;
-    if(nod<MAXNOD) {
-      memcpy(&readuserstr,&Servermem->inne[nod],sizeof(struct User));
+    for(nod = 0; nod < MAXNOD; nod++) {
+      if(userId == Servermem->inloggad[nod]) {
+        break;
+      }
+    }
+    if(nod < MAXNOD) {
+      memcpy(&readuserstr, &Servermem->inne[nod], sizeof(struct User));
       unreadTexts = &Servermem->unreadTexts[nod];
     } else {
-      if(readuser(nummer,&readuserstr)) return;
-      if(!ReadUnreadTexts(&unreadTextsBuf, nummer)) {
+      if(readuser(userId,&readuserstr)) {
+        return;
+      }
+      if(!ReadUnreadTexts(&unreadTextsBuf, userId)) {
         return;
       }
       unreadTexts = &unreadTextsBuf;
     }
   }
-  sprintf(outbuffer,"\r\n\nStatus för %s #%d\r\n\n",readuserstr.namn,nummer);
-  if(puttekn(outbuffer,-1)) return;
-  sprintf(outbuffer,"Status               : %d\r\n",readuserstr.status);
-  if(puttekn(outbuffer,-1)) return;
+  if(SendString("\r\n\nStatus för %s #%d\r\n\n", readuserstr.namn,userId)) { return; }
+  if(SendString("Status               : %d\r\n", readuserstr.status)) { return; }
   if(!((readuserstr.flaggor & SKYDDAD)
-       && Servermem->inne[nodnr].status<Servermem->cfg.st.sestatus
-       && inloggad!=nummer)) {
-    sprintf(outbuffer,"Gatuadress           : %s\r\n",readuserstr.gata);
-    if(puttekn(outbuffer,-1)) return;
-    sprintf(outbuffer,"Postadress           : %s\r\n",readuserstr.postadress);
-    if(puttekn(outbuffer,-1)) return;
-    sprintf(outbuffer,"Land                 : %s\r\n",readuserstr.land);
-    if(puttekn(outbuffer,-1)) return;
-    sprintf(outbuffer,"Telefon              : %s\r\n",readuserstr.telefon);
-    if(puttekn(outbuffer,-1)) return;
+       && Servermem->inne[nodnr].status < Servermem->cfg.st.sestatus
+       && inloggad != userId)) {
+    if(SendString("Gatuadress           : %s\r\n", readuserstr.gata)) { return; }
+    if(SendString("Postadress           : %s\r\n", readuserstr.postadress)) { return; }
+    if(SendString("Land                 : %s\r\n", readuserstr.land)) { return; }
+    if(SendString("Telefon              : %s\r\n", readuserstr.telefon)) { return; }
   }
-  sprintf(outbuffer,"Annan info           : %s\r\n",readuserstr.annan_info);
-  if(puttekn(outbuffer,-1)) return;
-  sprintf(outbuffer,"Antal rader          : %d\r\n",readuserstr.rader);
-  if(puttekn(outbuffer,-1)) return;
-  ts=localtime(&readuserstr.forst_in);
-  sprintf(outbuffer,"Först inloggad       : %4d%02d%02d  %02d:%02d\r\n",
+  if(SendString("Annan info           : %s\r\n", readuserstr.annan_info)) { return; }
+  if(SendString("Antal rader          : %d\r\n", readuserstr.rader)) { return; }
+  ts = localtime(&readuserstr.forst_in);
+  if(SendString("Först inloggad       : %4d%02d%02d  %02d:%02d\r\n",
           ts->tm_year + 1900, ts->tm_mon + 1, ts->tm_mday, ts->tm_hour,
-          ts->tm_min);
-  if(puttekn(outbuffer,-1)) return;
-  ts=localtime(&readuserstr.senast_in);
-  sprintf(outbuffer,"Senast inloggad      : %4d%02d%02d  %02d:%02d\r\n",
+          ts->tm_min)) { return; }
+  ts = localtime(&readuserstr.senast_in);
+  if(SendString("Senast inloggad      : %4d%02d%02d  %02d:%02d\r\n",
           ts->tm_year + 1900, ts->tm_mon + 1, ts->tm_mday, ts->tm_hour,
-          ts->tm_min);
-  if(puttekn(outbuffer,-1)) return;
-  sprintf(outbuffer,"Total tid inloggad   : %d:%02d\r\n",readuserstr.tot_tid/3600,
-          (readuserstr.tot_tid%3600)/60);
-  if(puttekn(outbuffer,-1)) return;
-  sprintf(outbuffer,"Antal inloggningar   : %d\r\n",readuserstr.loggin);
-  if(puttekn(outbuffer,-1)) return;
-  sprintf(outbuffer,"Antal lästa texter   : %d\r\n",readuserstr.read);
-  if(puttekn(outbuffer,-1)) return;
-  sprintf(outbuffer,"Antal skrivna texter : %d\r\n",readuserstr.skrivit);
-  if(puttekn(outbuffer,-1)) return;
-  sprintf(outbuffer,"Antal downloads      : %d\r\n",readuserstr.download);
-  if(puttekn(outbuffer,-1)) return;
-  sprintf(outbuffer,"Antal uploads        : %d\r\n",readuserstr.upload);
-  if(puttekn(outbuffer,-1)) return;
+          ts->tm_min)) { return; }
+  if(SendString("Total tid inloggad   : %d:%02d\r\n", readuserstr.tot_tid / 3600,
+          (readuserstr.tot_tid % 3600) / 60)) { return; }
+  if(SendString("Antal inloggningar   : %d\r\n", readuserstr.loggin)) { return; }
+  if(SendString("Antal lästa texter   : %d\r\n", readuserstr.read)) { return; }
+  if(SendString("Antal skrivna texter : %d\r\n", readuserstr.skrivit)) { return; }
+  if(SendString("Antal downloads      : %d\r\n", readuserstr.download)) { return; }
+  if(SendString("Antal uploads        : %d\r\n", readuserstr.upload)) { return; }
 
   if(readuserstr.downloadbytes < 90000)	{
-    sprintf(outbuffer,"Antal downloaded B   : %d\r\n",readuserstr.downloadbytes);
-    if(puttekn(outbuffer,-1)) return;
+    if(SendString("Antal downloaded B   : %d\r\n", readuserstr.downloadbytes)) { return; }
   } else {
-    sprintf(outbuffer,"Antal downloaded KB  : %d\r\n",readuserstr.downloadbytes/1024);
-    if(puttekn(outbuffer,-1)) return;
+    if(SendString("Antal downloaded KB  : %d\r\n", readuserstr.downloadbytes / 1024)) { return; }
   }
 
   if(readuserstr.uploadbytes < 90000) {
-    sprintf(outbuffer,"Antal uploaded B     : %d\r\n\n",readuserstr.uploadbytes);
-    if(puttekn(outbuffer,-1)) return;
+    if(SendString("Antal uploaded B     : %d\r\n\n", readuserstr.uploadbytes)) { return; }
   } else {
-    sprintf(outbuffer,"Antal uploaded KB    : %d\r\n\n",readuserstr.uploadbytes/1024);
-    if(puttekn(outbuffer,-1)) return;
+    if(SendString("Antal uploaded KB    : %d\r\n\n", readuserstr.uploadbytes / 1024)) { return; }
   }
 
   if(readuserstr.grupper) {
-    puttekn("Grupper:\r\n",-1);
-    for(listpek=(struct UserGroup *)Servermem->grupp_list.mlh_Head;listpek->grupp_node.mln_Succ;listpek=(struct UserGroup *)listpek->grupp_node.mln_Succ) {
-      if(!BAMTEST((char *)&readuserstr.grupper,listpek->nummer)) continue;
-      if((listpek->flaggor & HEMLIGT)
-         && !BAMTEST((char *)&Servermem->inne[nodnr].grupper,listpek->nummer)
-         && Servermem->inne[nodnr].status<Servermem->cfg.st.medmoten) {
+    SendString("Grupper:\r\n");
+    ITER_EL(listpek, Servermem->grupp_list, grupp_node, struct UserGroup *) {
+      if(!BAMTEST((char *)&readuserstr.grupper, listpek->nummer)) {
         continue;
       }
-      sprintf(outbuffer," %s\r\n",listpek->namn);
-      if(puttekn(outbuffer,-1)) return;
-    }
-    eka('\n');
-  }
-  if(cnt=countmail(nummer,readuserstr.brevpek)) {
-    sprintf(outbuffer,"%4d %s\r\n",cnt,Servermem->cfg.brevnamn);
-    if(puttekn(outbuffer,-1)) return;
-    olasta=TRUE;
-    tot+=cnt;
-  }
-  for(;motpek->mot_node.mln_Succ;motpek=(struct Mote *)motpek->mot_node.mln_Succ) {
-    if(motpek->status & SUPERHEMLIGT) continue;
-    if(IsMemberConf(motpek->nummer, nummer, &readuserstr)) {
-      cnt=0;
-      switch(motpek->type) {
-      case MOTE_ORGINAL :
-        cnt = CountUnreadTexts(motpek->nummer, unreadTexts);
-        break;
-      default :
-        break;
+      if((listpek->flaggor & HEMLIGT)
+         && !BAMTEST((char *)&Servermem->inne[nodnr].grupper, listpek->nummer)
+         && Servermem->inne[nodnr].status < Servermem->cfg.st.medmoten) {
+        continue;
       }
-      if(cnt && MaySeeConf(motpek->nummer, inloggad, &Servermem->inne[nodnr])) {
-        sprintf(outbuffer,"%4d %s\r\n",cnt,motpek->namn);
-        if(puttekn(outbuffer,-1)) return;
-        olasta=TRUE;
-        tot+=cnt;
-      }
+      if(SendString(" %s\r\n", listpek->namn)) { return; }
+    }
+    SendString("\n");
+  }
+  if(cnt = countmail(userId, readuserstr.brevpek)) {
+    if(SendString("%4d %s\r\n", cnt, Servermem->cfg.brevnamn)) { return; }
+    sumUnread += cnt;
+  }
+  ITER_EL(conf, Servermem->mot_list, mot_node, struct Mote *) {
+    if(!MaySeeConf(conf->nummer, inloggad, &Servermem->inne[nodnr])
+       || !IsMemberConf(conf->nummer, userId, &readuserstr)) {
+      continue;
+    }
+    cnt = 0;
+    switch(conf->type) {
+    case MOTE_ORGINAL :
+      cnt = CountUnreadTexts(conf->nummer, unreadTexts);
+      break;
+    case MOTE_FIDO:
+      cnt = conf->texter - unreadTexts[nodnr].lowestPossibleUnreadText[conf->nummer] + 1;
+      break;
+    default :
+      break;
+    }
+    if(cnt > 0 || showAllConf) {
+      if(SendString("%4d %s\r\n", cnt, conf->namn)) { return; }
+      sumUnread += cnt;
     }
   }
-  if(!olasta) {
-    if(nummer==inloggad) puttekn("Du har inga olästa texter.",-1);
-    else {
-      sprintf(outbuffer,"%s har inga olästa texter.",readuserstr.namn);
-      puttekn(outbuffer,-1);
+  if(sumUnread == 0) {
+    if(userId == inloggad) {
+      SendString("\r\nDu har inga olästa texter.");
+    } else {
+      if(SendString("\r\n%s har inga olästa texter.",readuserstr.namn)) { return; }
     }
   } else {
-    sprintf(outbuffer,"\r\nSammanlagt %d olästa.",tot);
-    puttekn(outbuffer,-1);
+    if(SendString("\r\nSammanlagt %d olästa.",sumUnread)) { return; }
   }
-  puttekn("\r\n\n",-1);
-  sprintf(filnamn,"NiKom:Users/%d/%d/Lapp",nummer/100,nummer);
-  if(!access(filnamn,0)) sendfile(filnamn);
+  SendString("\r\n\n");
+  sprintf(filnamn, "NiKom:Users/%d/%d/Lapp", userId / 100, userId);
+  if(!access(filnamn,0)) {
+    sendfile(filnamn);
+  }
 }
 
 int Cmd_ChangeUser(void) {

@@ -3,7 +3,7 @@
 Status
 ------
 
-Synopsis: Status [<användare>]
+Synopsis: Status [-a] [<användare>]
 
 Beskrivning:
 Visar den angivna användarens status eller den egna statusen om man inte
@@ -11,5 +11,8 @@ anger någon användare. Den informationen man får är Namn, adress, telenummer,
 antal lästa/skrivna texter etc. Om användaren har flaggan 'Skyddad status' på
 visas inte adress och telefonnummer. Sist av allt visas användarens lapp, om
 en sådan finns.
+
+Om flaggan '-a' anges så visas alla möten användaren är medlem i. Inte bara de
+som användaren har olästa texter i.
 
 Se Även: Ändra Användare
