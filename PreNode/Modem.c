@@ -87,11 +87,15 @@ void sendat(char *atstring) {
 	conputtekn(outbuffer,-1);
 
 	while(going) {
+		i = 0;
 		while(tknwaiting()) {
-			gettekn();
-			i++;
+                  gettekn();
+                  i++;
+                  if(i >= 100) {
+                    cleanup(EXIT_ERROR,"Serial device is returning an endless stream of junk data.");
+                  }
 		}
-		sprintf(outbuffer,"\nTog bort %d tecken",i);
+		sprintf(outbuffer, "\nRemoved %d junk bytes from serial device", i);
 		conputtekn(outbuffer,-1);
 		conputtekn("\nInitiating modem\n",-1);
 		putstring(atstring,-1,0);

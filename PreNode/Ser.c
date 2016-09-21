@@ -67,25 +67,37 @@ struct Window *openmywindow(char *screenname) {
 }
 
 
-void cleanup(int kod,char *text)
-{
-	shutdownnode(NODSER);
-	CloseIO();
-	if(NiKwind) CloseWindow(NiKwind);
-	if(RexxSysBase) CloseLibrary((struct Library *)RexxSysBase);
-	if(nikomnodeport) {
-		RemPort(nikomnodeport);
-		DeleteMsgPort(nikomnodeport);
-	}
-	if(rexxport) {
-		RemPort(rexxport);
-		DeleteMsgPort(rexxport);
-	}
-	if(NiKomBase) CloseLibrary(NiKomBase);
-	if(UtilityBase) CloseLibrary(UtilityBase);
-	if(IntuitionBase) CloseLibrary((struct Library *)IntuitionBase);
-	printf("%s",text);
-	exit(kod);
+void cleanup(int errorCode, char *text) {
+  LogEvent(SYSTEM_LOG, ERROR, "PreNode (%d) is exiting with error code %d: %s",
+           nodnr, errorCode, text);
+
+  shutdownnode(NODSER);
+  CloseIO();
+  if(NiKwind) {
+    CloseWindow(NiKwind);
+  }
+  if(RexxSysBase) {
+    CloseLibrary((struct Library *)RexxSysBase);
+  }
+  if(nikomnodeport) {
+    RemPort(nikomnodeport);
+    DeleteMsgPort(nikomnodeport);
+  }
+  if(rexxport) {
+    RemPort(rexxport);
+    DeleteMsgPort(rexxport);
+  }
+  if(NiKomBase) {
+    CloseLibrary(NiKomBase);
+  }
+  if(UtilityBase) {
+    CloseLibrary(UtilityBase);
+  }
+  if(IntuitionBase) {
+    CloseLibrary((struct Library *)IntuitionBase);
+  }
+  printf("%s", text);
+  exit(errorCode);
 }
 
 struct NodeType *selectNodeType(void) {
