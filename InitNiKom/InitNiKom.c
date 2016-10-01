@@ -52,7 +52,7 @@ void createDirOrDie(char *dirname) {
 
 void createFile(char *filename, void *data, int size) {
   FILE *fp;
-  if(fp=fopen(filename, "w")) {
+  if(fp = fopen(filename, "w")) {
     if(size > 0) {
       fwrite(data, size, 1, fp);
     }
@@ -62,6 +62,15 @@ void createFile(char *filename, void *data, int size) {
     exit(10);
   }
   printf("Created file %s\n", filename);
+}
+
+void createZeroFilledFile(char *filename, int size) {
+  void *data;
+
+  data = malloc(size);
+  memset(data, 0, size);
+  createFile(filename, data, size);
+  free(data);
 }
 
 void createEmptyFile(char *filename) {
@@ -89,20 +98,16 @@ void initSysop(void) {
   createFile("Nikom:Users/0/0/.nextletter", "0", 1);
 }
 
-void initSysInfo(void) {
-  memset(&sysInfo, 0, sizeof(struct SysInfo));
-  createFile("NiKom:DatoCfg/Sysinfo.dat", &sysInfo, sizeof(struct SysInfo));
-}
-
 void initFiles(void) {
   initSysop();
   createDirOrDie("NiKom:DatoCfg");
   createDirOrDie("NiKom:Moten");
-  initSysInfo();
+  createZeroFilledFile("NiKom:DatoCfg/Sysinfo.dat", sizeof(struct SysInfo));
   createEmptyFile("NiKom:DatoCfg/Möten.dat");
   createEmptyFile("NiKom:DatoCfg/ConferenceTexts.dat");
   createEmptyFile("NiKom:DatoCfg/Areor.dat");
   createEmptyFile("NiKom:DatoCfg/Grupper.dat");
+  createZeroFilledFile("NiKom:DatoCfg/Senaste.dat", sizeof(struct Inloggning) * MAXSENASTE);
 }
 
 int deleteFile(char *filename) {
@@ -193,6 +198,7 @@ void clearFiles(void) {
   deleteFileOrDie("NiKom:DatoCfg/ConferenceTexts.dat");
   deleteFileOrDie("NiKom:DatoCfg/Areor.dat");
   deleteFileOrDie("NiKom:DatoCfg/Grupper.dat");
+  deleteFileOrDie("NiKom:DatoCfg/Senaste.dat");
 }
 
 int main(int argc, char **argv) {
@@ -206,7 +212,8 @@ int main(int argc, char **argv) {
   printf(" DatoCfg/Möten.dat\n");
   printf(" DatoCfg/ConferenceTexts.dat\n");
   printf(" DatoCfg/Areor.dat\n");
-  printf(" DatoCfg/Grupper.dat\n\n");
+  printf(" DatoCfg/Grupper.dat\n");
+  printf(" DatoCfg/Senaste.dat\n\n");
   printf("Is this ok? (y/N) ");
   while((input[count++] = getchar()) != '\n');
   if(input[0] != 'y' && input[0] != 'Y') {
