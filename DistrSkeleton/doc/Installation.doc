@@ -44,6 +44,24 @@ Privat    - Innehåller privata filareor. De användare som har en privat
 
 Users     - Innehåller all användardata.
 
+Log       - Här kommer NiKom att skapa loggfiler som innehåller information
+            om vad som hänt med systemet.
+
+            Usage.log  - Information om användaraktivitet som tex när
+                         användare loggar in, skriver texter etc.
+
+            System.log - Här loggas information som antingen inte har
+                         direkt med användaraktivitet att göra eller
+                         problem som har uppstått. Tex när filer inte
+                         kan skrivas som de ska eller liknande som inte
+                         ska inträffa i ett normalt fungerande system.
+                         Om en användare har fått upp texten "Internal
+                         error" så finns det ofast information om felet
+                         i denna fil.
+
+            Fido.log   - Här loggas information varje gång NiKom importerar
+                         FidoNet netmail eller echomail.
+
 
 Kontrollera att dessa kataloger finns. Om inte, skapa dem.
 
