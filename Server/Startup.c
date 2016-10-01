@@ -561,10 +561,11 @@ void readLastLogins(void) {
     cleanup(EXIT_ERROR, "Could not read Senaste.dat");
   }
   if(!Read(fh, Servermem->senaste, sizeof(struct Inloggning) * MAXSENASTE)) {
+    Close(fh);
     cleanup(EXIT_ERROR, "Error reading last login data.");
   }
-  printf("Read last login data.\n");
   Close(fh);
+  printf("Read last login data.\n");
 }
 
 void initflaggor(void) {
