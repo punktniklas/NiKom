@@ -45,7 +45,7 @@ struct RsxLib *RexxSysBase;
 struct Library *UtilityBase;
 struct Library *NiKomBase;
 struct MsgPort *NiKPort, *permitport, *rexxport, *nodereplyport;
-char pubscreen[40], NiKomReleaseStr[50];
+char pubscreen[40], NiKomReleaseStr[50], windowTitle[100];
 int xpos, ypos;
 struct Window *NiKWindow;
 struct System *Servermem;
@@ -680,7 +680,6 @@ void initNodes(void) {
 }
 
 void openWindow(void) {
-  char windowTitle[100];
   int windowHeight;
   struct Screen *lockscreen;
 

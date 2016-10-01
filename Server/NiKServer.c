@@ -23,6 +23,8 @@
 void sparatext(struct NiKMess *);
 int CXBRK(void) { return(0); }
 
+extern char windowTitle[];
+
 void sparatext(struct NiKMess *message) {
 	BPTR fh;
 	struct MinList *listpek;
@@ -125,7 +127,6 @@ void main() {
   struct NiKMess *MyNiKMess, *dummymess;
   struct IntuiMessage *myintmess;
   struct RexxMsg *rexxmess;
-  char titel[100];
 
   startupNiKom();
 
@@ -158,15 +159,15 @@ void main() {
           } else {
             MyNiKMess->data=NULL;
           }
-          sprintf(titel,"NiKom %s,  %d noder aktiva", NiKomReleaseStr, noder);
-          SetWindowTitles(NiKWindow,titel,(UBYTE *)-1L);
+          sprintf(windowTitle, "NiKom %s,  %d noder aktiva", NiKomReleaseStr, noder);
+          SetWindowTitles(NiKWindow, windowTitle, (UBYTE *)-1L);
           break;
           
         case NODSLUTAR :
           noder--;
           Servermem->nodtyp[MyNiKMess->nod]=0;
-          sprintf(titel,"NiKom %s,  %d noder aktiva", NiKomReleaseStr, noder);
-          SetWindowTitles(NiKWindow,titel,(UBYTE *)-1L);
+          sprintf(windowTitle, "NiKom %s,  %d noder aktiva", NiKomReleaseStr, noder);
+          SetWindowTitles(NiKWindow, windowTitle, (UBYTE *)-1L);
           break;
           
         case SPARATEXTEN :
