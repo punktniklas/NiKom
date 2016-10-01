@@ -159,11 +159,11 @@ int deleteDir(char *dirname) {
   int moreFromExAll, success = TRUE;
   BPTR lock;
 
-  printf("Deleting all files in directory %s\n", dirname);
   if(!(lock = Lock(dirname, ACCESS_READ))) {
-    printf("Can't lock directory %s\n", dirname);
-    return 0;
+    return 1;
   }
+  printf("Deleting all files in directory %s\n", dirname);
+
   ec = (struct ExAllControl *) AllocDosObject(DOS_EXALLCONTROL, NULL);
   ec->eac_LastKey=0L;
   ec->eac_MatchString=NULL;
