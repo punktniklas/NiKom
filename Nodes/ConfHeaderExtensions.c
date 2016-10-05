@@ -94,6 +94,7 @@ int SaveHeaderExtension(struct MemHeaderExtension *ext) {
       return 1;
     }
   }
+  Close(fh);
   NiKPermit();
   
   if(ext->notInHeaderYet) {
