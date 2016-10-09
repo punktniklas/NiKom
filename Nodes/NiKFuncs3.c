@@ -3,7 +3,6 @@
 #include <proto/intuition.h>
 #include <proto/dos.h>
 #include <exec/memory.h>
-#include <dos.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>

@@ -9,7 +9,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <time.h>
-#include <dos.h>
 #include "NiKomStr.h"
 #include "NiKomFuncs.h"
 #include "NiKomLib.h"

@@ -8,7 +8,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <fcntl.h>
-#include <dos.h>
 #include <time.h>
 #include <rexx/storage.h>
 #include "NiKomStr.h"

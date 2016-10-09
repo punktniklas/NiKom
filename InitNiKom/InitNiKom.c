@@ -3,7 +3,6 @@
 #include <utility/tagitem.h>
 #include <proto/exec.h>
 #include <proto/dos.h>
-#include <dos.h>
 #include <dos/dos.h>
 #include <dos/exall.h>
 #include <stdlib.h>

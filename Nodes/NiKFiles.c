@@ -5,7 +5,6 @@
 #include <proto/utility.h>
 #include <exec/memory.h>
 #include <dos/dos.h>
-#include <dos.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
