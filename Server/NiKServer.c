@@ -11,7 +11,7 @@
 #include <dos.h>
 #include <time.h>
 #include <rexx/storage.h>
-#include "NiKomstr.h"
+#include "NiKomStr.h"
 #include "ServerFuncs.h"
 #include "NiKomLib.h"
 #include "Startup.h"

@@ -2,7 +2,7 @@
 #include <exec/memory.h>
 #include <dos/dos.h>
 #include "NiKomStr.h"
-#include "Serverfuncs.h"
+#include "ServerFuncs.h"
 #include "NiKomLib.h"
 #include "nikom_protos.h"
 #include "nikom_pragmas.h"

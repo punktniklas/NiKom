@@ -10,7 +10,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <time.h>
-#include "NiKomstr.h"
+#include "NiKomStr.h"
 #include "PreNodeFuncs.h"
 #include "Terminal.h"
 #include "RexxUtils.h"

@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
-#include "NiKomstr.h"
+#include "NiKomStr.h"
 #include "NiKomFuncs.h"
 #include "NiKomLib.h"
 #include "Logging.h"

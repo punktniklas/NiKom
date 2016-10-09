@@ -11,7 +11,7 @@
 #include <string.h>
 #include <time.h>
 #include <error.h>
-#include "NiKomstr.h"
+#include "NiKomStr.h"
 #include "NiKomFuncs.h"
 #include "DiskUtils.h"
 #include "Terminal.h"

@@ -15,7 +15,7 @@
 
 #include "NiKomBase.h"
 #include "NiKomLib.h"
-#include "funcs.h"
+#include "Funcs.h"
 #include "Logging.h"
 
 void __saveds __asm LIBReScanFidoConf(register __a0 struct Mote *motpek,

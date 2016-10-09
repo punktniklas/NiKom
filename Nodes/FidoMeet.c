@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
-#include "NiKomstr.h"
+#include "NiKomStr.h"
 #include "NiKomFuncs.h"
 #include "NiKomLib.h"
 #include "VersionStrings.h"

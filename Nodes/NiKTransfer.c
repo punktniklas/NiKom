@@ -13,7 +13,7 @@
 #include <dos.h>
 #include <xproto.h>
 #include <xpr_lib.h>
-#include "NiKomstr.h"
+#include "NiKomStr.h"
 #include "NiKomFuncs.h"
 #include "DiskUtils.h"
 #include "FileAreaUtils.h"

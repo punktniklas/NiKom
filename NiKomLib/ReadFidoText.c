@@ -28,7 +28,7 @@
 #include <stdio.h>
 #include "/Include/NiKomLib.h"
 #include "NiKomBase.h"
-#include "funcs.h"
+#include "Funcs.h"
 #include "VersionStrings.h"
 #include "Logging.h"
 

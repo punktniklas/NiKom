@@ -3,7 +3,7 @@
 #include <dos/dos.h>
 #include "NiKomStr.h"
 #include "NiKomLib.h"
-#include "Serverfuncs.h"
+#include "ServerFuncs.h"
 #include <rexx/storage.h>
 #include <proto/exec.h>
 #include <proto/dos.h>

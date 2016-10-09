@@ -11,7 +11,7 @@
 #include <error.h>
 #include <math.h>
 #include <limits.h>
-#include "NiKomstr.h"
+#include "NiKomStr.h"
 #include "NiKomFuncs.h"
 #include "NiKomLib.h"
 #include "Terminal.h"

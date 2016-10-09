@@ -3,7 +3,7 @@
 #include <dos.h>
 #include <string.h>
 
-#include "funcs.h"
+#include "Funcs.h"
 
 /* Glöm inte att lägga till koll om Servermem finns! */
 

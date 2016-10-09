@@ -7,7 +7,7 @@
 #include <limits.h>
 #include "/Include/NiKomLib.h"
 #include "nikombase.h"
-#include "funcs.h"
+#include "Funcs.h"
 
 /* Namn: ConvChrsToAmiga
 *  Parametrar: a0 - En pekare till strängen som ska konverteras

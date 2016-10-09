@@ -10,14 +10,14 @@
 #include <time.h>
 #include <limits.h>
 #include <math.h>
-#include "NiKomstr.h"
+#include "NiKomStr.h"
 #include "NiKomFuncs.h"
 #include "NiKomLib.h"
 #include "Logging.h"
 #include "StringUtils.h"
 #include "Terminal.h"
 #include "Cmd_Users.h"
-#include "NiKversion.h"
+#include "NiKVersion.h"
 #include "BasicIO.h"
 #include "KOM.h"
 

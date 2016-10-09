@@ -3,7 +3,7 @@
 #include <dos/dos.h>
 #include <exec/ports.h>
 #include <stdio.h>
-#include "NiKomstr.h"
+#include "NiKomStr.h"
 #include "NiKomFuncs.h"
 #include "NiKomLib.h"
 #include <proto/exec.h>

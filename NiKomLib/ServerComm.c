@@ -9,7 +9,7 @@
 #include "/include/NiKomstr.h"
 #include "/include/NiKomLib.h"
 #include "NiKomBase.h"
-#include "funcs.h"
+#include "Funcs.h"
 
 /*
  * Namn:        SetNodeState

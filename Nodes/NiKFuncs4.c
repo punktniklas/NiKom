@@ -11,7 +11,7 @@
 #include <time.h>
 #include <fifoproto.h>
 #include <fifo.h>
-#include "NiKomstr.h"
+#include "NiKomStr.h"
 #include "NiKomFuncs.h"
 #include "NiKomLib.h"
 #include "Terminal.h"
