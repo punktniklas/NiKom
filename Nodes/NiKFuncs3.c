@@ -8,7 +8,6 @@
 #include <string.h>
 #include <stdio.h>
 #include <time.h>
-#include <error.h>
 #include <math.h>
 #include <limits.h>
 #include "NiKomStr.h"

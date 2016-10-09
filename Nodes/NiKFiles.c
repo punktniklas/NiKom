@@ -10,7 +10,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <error.h>
 #include "NiKomStr.h"
 #include "NiKomFuncs.h"
 #include "DiskUtils.h"
