@@ -5,7 +5,7 @@
 #include <exec/types.h>
 #include <string.h>
 #include <limits.h>
-#include "/Include/NiKomLib.h"
+#include "NiKomLib.h"
 #include "nikombase.h"
 #include "Funcs.h"
 

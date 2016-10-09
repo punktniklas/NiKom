@@ -1,7 +1,7 @@
 #include <exec/types.h>
 #include <dos/dos.h>
-#include "/Include/NiKomStr.h"
-#include "/Include/NiKomLib.h"
+#include "NiKomStr.h"
+#include "NiKomLib.h"
 #include "NiKomBase.h"
 #include "Funcs.h"
 

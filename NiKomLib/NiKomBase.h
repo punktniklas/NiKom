@@ -7,7 +7,7 @@
 #include <exec/semaphores.h>
 
 #ifndef NIKOMSTR_H
-#include "/Include/NiKomStr.h"
+#include "NiKomStr.h"
 #endif
 
 
