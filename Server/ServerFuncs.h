@@ -1,3 +1,5 @@
+#include <rexx/storage.h>
+
 /* Prototypes for functions defined in NiKHost.c */
 int readuser(int nummer,struct User *);
 int writeuser(int nummer,struct User *);

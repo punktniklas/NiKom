@@ -5,7 +5,7 @@
 #include "NiKomStr.h"
 #include "NiKomLib.h"
 #include "NiKomBase.h"
-#include "funcs.h"
+#include "Funcs.h"
 #include "VersionStrings.h"
 
 const char dosversion[] = "$VER: nikom.library_" NIKRELEASE " " NIKLIBVERSIONSTR "." NIKLIBREVISIONSTR " " __AMIGADATE__;

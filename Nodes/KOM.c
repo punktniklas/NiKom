@@ -10,11 +10,11 @@
 #include "FidoMeet.h"
 #include "Brev.h"
 #include "Terminal.h"
-#include "Cmd_Kom.h"
+#include "Cmd_KOM.h"
 #include "Cmd_Users.h"
 #include "Cmd_Conf.h"
 #include "NiKFiles.h"
-#include "NiKversion.h"
+#include "NiKVersion.h"
 #include "BasicIO.h"
 #include "NiKomFuncs.h"
 

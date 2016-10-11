@@ -4,7 +4,7 @@
 #include <proto/exec.h>
 
 #include "NiKomBase.h"
-#include "funcs.h"
+#include "Funcs.h"
 
 /*
  *  FUNCTION

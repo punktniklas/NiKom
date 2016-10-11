@@ -1,7 +1,7 @@
 #include <exec/types.h>
 #include <exec/memory.h>
 #include <proto/exec.h>
-#include "/Include/NiKomLib.h"
+#include "NiKomLib.h"
 
 struct NiKHashNode {
 	int id;

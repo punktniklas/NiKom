@@ -3,15 +3,13 @@
 #include <proto/intuition.h>
 #include <proto/dos.h>
 #include <exec/memory.h>
-#include <dos.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 #include <time.h>
-#include <error.h>
 #include <math.h>
 #include <limits.h>
-#include "NiKomstr.h"
+#include "NiKomStr.h"
 #include "NiKomFuncs.h"
 #include "NiKomLib.h"
 #include "Terminal.h"

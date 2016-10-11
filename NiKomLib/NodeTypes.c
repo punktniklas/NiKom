@@ -1,9 +1,9 @@
 #include <exec/types.h>
 #include <dos/dos.h>
-#include "/Include/NiKomStr.h"
-#include "/Include/NiKomLib.h"
+#include "NiKomStr.h"
+#include "NiKomLib.h"
 #include "NiKomBase.h"
-#include "funcs.h"
+#include "Funcs.h"
 
 struct NodeType * __saveds __asm LIBGetNodeType(register __d0 long number, register __a6 struct NiKomBase *NiKomBase) {
 	int x;

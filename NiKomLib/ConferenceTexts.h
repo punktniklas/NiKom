@@ -1,5 +1,5 @@
 #ifndef NIKOMLIB_H
-#include "/Include/NiKomLib.h"
+#include "NiKomLib.h"
 #endif
 
 int __saveds __asm LIBGetConferenceForText(

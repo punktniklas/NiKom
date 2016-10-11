@@ -9,7 +9,7 @@
 #include <time.h>
 #include <stdio.h>
 #include "StringUtils.h"
-#include "NiKomstr.h"
+#include "NiKomStr.h"
 #include "NiKomLib.h"
 #include "PreNodeFuncs.h"
 

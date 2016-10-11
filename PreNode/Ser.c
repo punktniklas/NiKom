@@ -10,8 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <dos.h>
-#include "NiKomstr.h"
+#include "NiKomStr.h"
 #include "NiKomLib.h"
 #include "PreNodeFuncs.h"
 #include "Logging.h"

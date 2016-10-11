@@ -10,7 +10,7 @@
 
 #include "NiKomBase.h"
 #include "NiKomLib.h"
-#include "funcs.h"
+#include "Funcs.h"
 #include "Logging.h"
 
 static int getlastmatrix(void);

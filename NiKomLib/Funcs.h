@@ -1,9 +1,9 @@
 #ifndef NIKOMSTR_H
-#include "/Include/NiKomStr.h"
+#include "NiKomStr.h"
 #endif
 
 #ifndef NIKOMLIB_H
-#include "/Include/NiKomLib.h"
+#include "NiKomLib.h"
 #endif
 
 #ifndef DOS_DOS_H

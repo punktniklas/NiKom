@@ -10,7 +10,7 @@
 #include <string.h>
 
 #include "NiKomBase.h"
-#include "funcs.h"
+#include "Funcs.h"
 
 /* För UserLibInit() */
 #define RET_ERROR 1

@@ -1,9 +1,9 @@
 #include <exec/types.h>
 #include <dos/dos.h>
-#include "/Include/NiKomStr.h"
-#include "/Include/NiKomLib.h"
+#include "NiKomStr.h"
+#include "NiKomLib.h"
 #include "NiKomBase.h"
-#include "funcs.h"
+#include "Funcs.h"
 
 struct Mote * __saveds __asm LIBGetConfPoint(register __d0 int motnr, register __a6 struct NiKomBase *NiKomBase) {
 	struct Mote *letpek;
