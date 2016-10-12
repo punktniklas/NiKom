@@ -10,9 +10,9 @@
 #include <dos/dos.h>
 #endif
 
-/* Funktionsprototyper */
+/* Function prototypes */
 
-/* De i librariet */
+/* Those in the library */
 void __saveds __asm LIBMatrix2NiKom(register __a6 struct NiKomBase *);
 LONG __saveds __asm LIBRexxEntry(register __a0 struct RexxMsg *,register __a6 struct NiKomBase *);
 void __saveds __asm LIBLockNiKomBase(register __a6 struct NiKomBase *);
@@ -54,7 +54,7 @@ int __saveds __asm LIBCreateUser(register __d0 LONG, register __a0 struct TagIte
 int __saveds __asm LIBNiKParse(register __a0 char *string, register __d0 char subject, register __a6 struct NiKomBase *NiKomBase);
 int __saveds __asm LIBSysInfo(register __a0 char *subject, register __a6 struct NiKomBase *NiKomBase);
 
-/* Andra trevliga små funktioner */
+/* Other useful little functions */
 
 /* Matrix.c */
 int sprattmatchar(char *,char *);
@@ -75,7 +75,7 @@ int sethwm(char *,int, char);
 /* Echo.c */
 struct Mote *getmotpek(int, struct System *);
 
-/* terminal.c */
+/* Terminal.c */
 UBYTE convnokludge(UBYTE);
 
 /* ServerComm.c */
