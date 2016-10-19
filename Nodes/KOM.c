@@ -71,6 +71,11 @@ int hasUnreadInConf(int confId) {
 int FindNextUnreadConf(int currentConfId) {
   struct Mote *conf;
   int tmpConfId = 0;
+
+  if(IsListEmpty((struct List *)&Servermem->mot_list)) {
+    return -2;
+  }
+
   if(currentConfId == MAILBOX_CONFID) {
     conf = (struct Mote *)Servermem->mot_list.mlh_Head;
   } else {
