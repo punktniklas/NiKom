@@ -5,6 +5,7 @@
 #include <proto/exec.h>
 #include <proto/intuition.h>
 #include <proto/dos.h>
+#include <proto/locale.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -15,6 +16,7 @@
 #include "Logging.h"
 #include "Terminal.h"
 #include "NewUser.h"
+#include "Languages.h"
 
 #define EXIT_ERROR	10
 #define EXIT_OK	0
@@ -31,7 +33,7 @@ extern struct System *Servermem;
 
 struct IntuitionBase *IntuitionBase=NULL;
 struct RsxLib *RexxSysBase;
-struct Library *UtilityBase, *NiKomBase;
+struct Library *UtilityBase, *LocaleBase, *NiKomBase;
 struct Window *NiKwind=NULL;
 struct MsgPort *rexxport, *nikomnodeport;
 
@@ -45,8 +47,8 @@ void freealiasmem(void) {
 		FreeMem(pekare,sizeof(struct Alias));
 }
 
-void cleanup(int kod,char *fel)
-{
+void cleanup(int kod,char *fel) {
+  CloseCatalog(g_Catalog);
 	shutdownnode(NODCON);
 	freealiasmem();
 	freeeditlist();
@@ -63,6 +65,7 @@ void cleanup(int kod,char *fel)
 	}
 	if(NiKomBase) CloseLibrary(NiKomBase);
 	if(UtilityBase) CloseLibrary(UtilityBase);
+	if(LocaleBase) CloseLibrary(LocaleBase);
 	if(IntuitionBase) CloseLibrary((struct Library *)IntuitionBase);
 	printf("%s",fel);
 	exit(kod);
@@ -79,6 +82,8 @@ void main(int argc, char **argv) {
     cleanup(EXIT_ERROR,"Kunde inte öppna intuition.library\n");
   if(!(UtilityBase=OpenLibrary("utility.library",37L)))
     cleanup(EXIT_ERROR,"Kunde inte öppna utility.library\n");
+  if(!(LocaleBase=OpenLibrary("locale.library",38L)))
+    cleanup(EXIT_ERROR,"Kunde inte öppna locale.library\n");
   if(!(NiKomBase=OpenLibrary("nikom.library",0L)))
     cleanup(EXIT_ERROR,"Kunde inte öppna nikom.linbrary");
   getnodeconfig("NiKom:Datocfg/ConNode.cfg");

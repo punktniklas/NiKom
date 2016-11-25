@@ -1,0 +1,13 @@
+all: svenska svenska/NiKom.catalog /Include/CatalogDefaults.h
+
+clean:
+	-delete svenska ALL
+	-delete /Include/CatalogDefaults.h
+
+svenska:
+	-makedir svenska
+svenska/NiKom.catalog:
+	CatComp NiKom.cd NiKom_svenska.ct CATALOG svenska/NiKom.catalog
+
+/Include/CatalogDefaults.h:
+	CatComp NiKom.cd CFILE /Include/CatalogDefaults.h

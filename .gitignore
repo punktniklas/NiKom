@@ -4,7 +4,9 @@ Debug
 NoDebug
 /InitNiKom/InitNiKom
 nikom_pragmas.h
+Include/CatalogDefaults.h
 /NiKomDev.lha
 Tools/SetNodeState/SetNodeState
 Tools/CryptPasswords/CryptPasswords
 Tools/NiKomFido/NiKomFido
+Catalogs/svenska/

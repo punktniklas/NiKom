@@ -1,0 +1,42 @@
+; ******** Command prompts **********
+MSG_PROMPT_GO_TO_NEXT_FORUM (100//)
+(Go to) next forum
+MSG_PROMPT_READ_NEXT_MAIL (101//)
+(Read) next mail
+MSG_PROMPT_READ_NEXT_TEXT (102//)
+(Read) next text
+MSG_PROMPT_READ_NEXT_REPLY (103//)
+(Read) next reply
+MSG_PROMPT_SEE_TIME (104//)
+(See) time
+MSG_PROMPT_GO_TO_MAILBOX (105//)
+Go (to) %s
+;
+; ******** Forums **********
+MSG_WHERE_YOU_ARE_IN (200//)
+\r\n\nYou are in %s.\r\n
+MSG_WHERE_NO_TEXTS (201//)
+There are no texts.\r\n
+MSG_WHERE_TEXTS_NUMBERED (202//)
+There are texts numbered from %d to %d.\r\n
+MSG_WHERE_NO_UNREAD_TEXTS (203//)
+You have no unread texts.\r\n
+MSG_WHERE_ONE_UNREAD_TEXT (204//)
+You have 1 unread text.\r\n
+MSG_WHERE_MANY_UNREAD_TEXTS (205//)
+You have %d unread texts.\r\n
+;
+MSG_ORG_TEXT_LINE1 (210//)
+\r\n\nText: %d  Forum: %s
+MSG_ORG_TEXT_LINE2 (211//)
+Written by %s\r\n
+MSG_ORG_TEXT_REPLY_TO (212//)
+Reply to text %d by %s\r\n
+MSG_ORG_TEXT_SUBJECT (213//)
+Subject: %s\r\n
+MSG_ORG_TEXT_END_OF_TEXT (214//)
+\n(End of text %d by %s)\r\n
+MSG_ORG_TEXT_REPLY_IN (215//)
+  (Reply in text %d by %s)\r\n
+MSG_ORG_TEXT_FOOTNOTE (216//)
+\r\nFootnote:\r\n

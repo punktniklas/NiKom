@@ -128,10 +128,6 @@ void rexxsysteminfo(struct RexxMsg *mess)
 			sprintf(str,"%d",(int) Servermem->cfg.defaultrader);
 			break;
 
-		case 'p' : case 'P' :
-			sprintf(str,"%d",(int) Servermem->cfg.defaultprotokoll);
-			break;
-
 		case 's' : case 'S' :
 			sprintf(str,"%d",(int) Servermem->cfg.defaultstatus);
 			break;

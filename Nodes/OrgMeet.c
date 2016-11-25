@@ -16,6 +16,7 @@
 #include "KOM.h"
 #include "ConfCommon.h"
 #include "ConfHeaderExtensions.h"
+#include "Languages.h"
 
 #include "OrgMeet.h"
 
@@ -249,17 +250,18 @@ int org_visatext(int textId, char verbose) {
     return 0;
   }
   ts = localtime(&readhead.tid);
-  SendString("\r\n\nText %d  Möte: %s    %4d%02d%02d %02d:%02d\r\n",
-             readhead.nummer, getmotnamn(readhead.mote),
+  SendString(CATSTR(MSG_ORG_TEXT_LINE1),
+             readhead.nummer, getmotnamn(readhead.mote));
+  SendString("    %4d%02d%02d %02d:%02d\r\n",
              ts->tm_year + 1900, ts->tm_mon + 1, ts->tm_mday, ts->tm_hour,
              ts->tm_min);
-  SendString("Skriven av %s\r\n", readhead.person !=-1
+  SendString(CATSTR(MSG_ORG_TEXT_LINE2), readhead.person !=-1
              ? getusername(readhead.person) : "<raderad användare>");
   if(readhead.kom_till_nr != -1) {
-    SendString("Kommentar till text %d av %s\r\n", readhead.kom_till_nr,
+    SendString(CATSTR(MSG_ORG_TEXT_REPLY_TO), readhead.kom_till_nr,
                getusername(readhead.kom_till_per));
   }
-  SendString("Ärende: %s\r\n", readhead.arende);
+  SendString(CATSTR(MSG_ORG_TEXT_SUBJECT), readhead.arende);
   if(Servermem->inne[nodnr].flaggor & STRECKRAD) {
     length = strlen(readhead.arende) + 8;
     for(i = 0; i < length; i++) {
@@ -280,13 +282,13 @@ int org_visatext(int textId, char verbose) {
     }
   }
   freeeditlist();
-  SendString("\n(Slut på text %d av %s)\r\n", readhead.nummer,
+  SendString(CATSTR(MSG_ORG_TEXT_END_OF_TEXT), readhead.nummer,
              getusername(readhead.person));
 
   for(i = 0; readhead.kom_i[i] != -1; i++) {
     confId = GetConferenceForText(readhead.kom_i[i]);
     if(confId != -1 && IsMemberConf(confId, inloggad, &Servermem->inne[nodnr])) {
-      SendString("  (Kommentar i text %d av %s)\r\n", readhead.kom_i[i],
+      SendString(CATSTR(MSG_ORG_TEXT_REPLY_IN), readhead.kom_i[i],
                  getusername(readhead.kom_av[i]));
     }
   }
@@ -300,7 +302,7 @@ int org_visatext(int textId, char verbose) {
       freeeditlist();
       return 0;
     }
-    SendString("\n\rFotnot:\n\r");
+    SendString(CATSTR(MSG_ORG_TEXT_FOOTNOTE));
     ITER_EL(el, edit_list, line_node, struct EditLine *) {
       if(SendString("  %s\r", el->text)) {
         break;

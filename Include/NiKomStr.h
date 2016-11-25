@@ -110,10 +110,6 @@
 #define LASER        5 /* Vilket möte finns i varmote */
 #define GORNGTANNAT  6 /* Lämplig sträng finns vilkastr */
 
-/* Protokoll */
-#define ZMODEM       1
-#define XMODEM       2
-
 /* Argumenttyper till kommandon */
 #define KOMARGINGET  0
 #define KOMARGNUM    1
@@ -190,7 +186,7 @@ struct Config {
    struct AutoRexxCfg ar;
    long defaultflags, diskfree, logmask, cfgflags;
    short maxtid[101],logintries;
-   char uldlratio[101], defaultrader, defaultprotokoll,defaultstatus, defaultcharset,
+   char uldlratio[101], defaultrader, defaultstatus, defaultcharset,
      brevnamn[41],ny[21],ultmp[100];
 };
 
@@ -257,7 +253,7 @@ struct User {
       grupper,defarea,downloadbytes,chrset,uploadbytes,reserv5,upload,download,
       loggin,shell;
    char namn[41],gata[41],postadress[41],land[41],telefon[21],
-      annan_info[61],losen[16],status,rader,protokoll,
+      annan_info[61],losen[16],status,rader,language,
       prompt[6],motratt[MAXMOTE/8],motmed[MAXMOTE/8],vote[MAXVOTE];
 };
 

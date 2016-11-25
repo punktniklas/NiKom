@@ -352,7 +352,6 @@ m - Vad som loggas till NiKoms loggfil. Här är de möjliga värdena:
 
 l - Maximalt antal inloggningsförsök man får.
 r - Default antal rader för nya användare
-p - Default xpr protokoll (ignorera denna options för tillfället)
 s - Default status nya användare får.
 n - Nya användares inloggningsnamn
 u - Upload temporärbibliotek
@@ -672,7 +671,6 @@ g - gata
 h - antal nerladdade byte
 j - antal uppladdade byte
 i - antal inloggningar
-k - protokoll inställt
 l - antal lästa texter
 m - prompten
 n - namn

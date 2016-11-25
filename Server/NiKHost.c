@@ -275,12 +275,6 @@ void userinfo(struct RexxMsg *mess) {
 			else
 				sprintf(str,"%d",userinfouser.loggin);
 			break;
-		case 'k' : case 'K' :
-			if(usrloggedin)
-				sprintf(str,"%d",Servermem->inne[nodnr].protokoll);
-			else
-				sprintf(str,"%d",userinfouser.protokoll);
-			break;
 		case 'l' : case 'L' :
 			if(usrloggedin)
 				sprintf(str,"%d",Servermem->inne[nodnr].read);
@@ -1256,10 +1250,6 @@ void chguser(struct RexxMsg *mess) {
 		case 'i' : case 'I' :
 			if(x==MAXNOD) chguseruser.loggin=atoi(mess->rm_Args[2]);
 			else Servermem->inne[x].loggin=atoi(mess->rm_Args[2]);
-			break;
-		case 'k' : case 'K' :
-			if(x==MAXNOD) chguseruser.protokoll=atoi(mess->rm_Args[2]);
-			else Servermem->inne[x].protokoll=atoi(mess->rm_Args[2]);
 			break;
 		case 'l' : case 'L' :
 			if(x==MAXNOD) chguseruser.read=atoi(mess->rm_Args[2]);

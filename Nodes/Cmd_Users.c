@@ -6,6 +6,8 @@
 #include "Terminal.h"
 #include "ServerMemUtils.h"
 #include "Logging.h"
+#include "BasicIO.h"
+#include "Languages.h"
 
 #include "NiKomLib.h"
 #include "NiKomStr.h"
@@ -350,4 +352,31 @@ int Cmd_ListUsers(void) {
     if(puttekn(outbuffer,-1)) break;
   }
   return(0);
+}
+
+static char *languages[] = {
+  "English",
+  "Svenska"
+};
+
+void Cmd_ChangeLanguage(void) {
+  int lang, i;
+
+  SendString("\n\n\rDessa språk finns.\n\r");
+  SendString("* markerar nuvarande val.\n\n\r");
+
+  SendString("  Nr Språk\n\r");
+  SendString("-----------------------------------------\n\r");
+  for(i = 0; i < 2; i++) {
+    SendString("%c %2d: %s\n\r", Servermem->inne[nodnr].language == i ? '*' : ' ', i, languages[i]);
+  }
+  
+  SendString("\n\rVal: ");
+  lang = GetNumber(0, 1, NULL);
+  if(ImmediateLogout()) {
+    return;
+  }
+  SendString("%s\n\r", languages[lang]);
+  Servermem->inne[nodnr].language = lang;
+  LoadCatalogForUser();
 }

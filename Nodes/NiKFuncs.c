@@ -20,6 +20,7 @@
 #include "NiKVersion.h"
 #include "BasicIO.h"
 #include "KOM.h"
+#include "Languages.h"
 
 #define EKO             1
 #define EJEKO   0
@@ -103,22 +104,21 @@ void varmote(int mote) {
   int cnt;
   struct Mote *conf;
   conf = getmotpek(mote);
-  SendString("\r\n\nDu befinner dig i %s.\r\n", conf->namn);
+  SendString(CATSTR(MSG_WHERE_YOU_ARE_IN), conf->namn);
   if(conf->type == MOTE_FIDO) {
     if(conf->lowtext > conf->texter) {
-      SendString("Det finns inga texter.\n\r");
+      SendString(CATSTR(MSG_WHERE_NO_TEXTS));
     } else {
-      SendString("Det finns texter numrerade från %d till %d.\n\r",
-                 conf->lowtext, conf->texter);
+      SendString(CATSTR(MSG_WHERE_TEXTS_NUMBERED), conf->lowtext, conf->texter);
     }
   }
   cnt = countunread(mote);
   if(cnt == 0) {
-    SendString("Du har inga olästa texter\r\n");
+    SendString(CATSTR(MSG_WHERE_NO_UNREAD_TEXTS));
   } else if(cnt == 1) {
-    SendString("Du har 1 oläst text\r\n");
+    SendString(CATSTR(MSG_WHERE_ONE_UNREAD_TEXT));
   } else {
-    SendString("Du har %d olästa texter\r\n", cnt);
+    SendString(CATSTR(MSG_WHERE_MANY_UNREAD_TEXTS), cnt);
   }
 }
 
@@ -705,6 +705,7 @@ void connection(void) {
   memset(&Statstr,0,sizeof(struct Inloggning));
   Statstr.anv=inloggad;
   mote2=-1;
+  LoadCatalogForUser();
   Servermem->action[nodnr]=GORNGTANNAT;
   strcpy(vilkabuf,"loggar in");
   Servermem->vilkastr[nodnr]=vilkabuf;

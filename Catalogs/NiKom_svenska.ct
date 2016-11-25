@@ -1,0 +1,80 @@
+## version $VER: NiKom.catalog 24.1 (11.24.16)
+## codeset 0
+## language svenska
+;
+MSG_PROMPT_GO_TO_NEXT_FORUM
+(Gå till) nästa möte
+; (Go to) next forum
+;
+MSG_PROMPT_READ_NEXT_MAIL
+(Läsa) nästa brev
+; (Read) next mail
+;
+MSG_PROMPT_READ_NEXT_TEXT
+(Läsa) nästa text
+; (Read) next text
+;
+MSG_PROMPT_READ_NEXT_REPLY
+(Läsa) nästa kommentar
+; (Read) next reply
+;
+MSG_PROMPT_SEE_TIME
+(Se) tiden
+; (See) time
+;
+MSG_PROMPT_GO_TO_MAILBOX
+Gå (till) %s
+; Go (to) %s
+;
+MSG_WHERE_YOU_ARE_IN
+\r\n\nDu befinner dig i %s.\r\n
+; You are in %s.
+;
+MSG_WHERE_NO_TEXTS
+Det finns inga texter.\r\n
+; There are no texts.
+;
+MSG_WHERE_TEXTS_NUMBERED
+Det finns texter numrerade från %d till %d.\r\n
+; There are texts numbered from %d to %d.
+;
+MSG_WHERE_NO_UNREAD_TEXTS
+Du har inga olästa texter.\r\n
+; You have no unread texts.
+;
+MSG_WHERE_ONE_UNREAD_TEXT
+Du har 1 oläst text.\r\n
+; You have 1 unread text.
+;
+MSG_WHERE_MANY_UNREAD_TEXTS
+Du har %d olästa texter.\r\n
+; You have %d unread texts.
+;
+MSG_ORG_TEXT_LINE1
+\r\n\nText %d  Möte: %s
+; Text: %d  Forum: %s
+;
+MSG_ORG_TEXT_LINE2
+Skriven av %s\r\n
+; Written by %s
+;
+MSG_ORG_TEXT_REPLY_TO
+Kommentar till text %d av %s\r\n
+; Reply to text %d by %s
+;
+MSG_ORG_TEXT_SUBJECT
+Ärende: %s\r\n
+; Subject: %s
+;
+MSG_ORG_TEXT_END_OF_TEXT
+\n(Slut på text %d av %s)\r\n
+; (End of text %d by %s)
+;
+MSG_ORG_TEXT_REPLY_IN
+  (Kommentar i text %d av %s)\r\n
+; (Reply in text %d by %s)
+;
+MSG_ORG_TEXT_FOOTNOTE
+\r\nFotnot:\r\n
+; Footnote
+;

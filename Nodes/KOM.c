@@ -16,6 +16,7 @@
 #include "NiKFiles.h"
 #include "NiKVersion.h"
 #include "BasicIO.h"
+#include "Languages.h"
 #include "NiKomFuncs.h"
 
 #include "KOM.h"
@@ -257,6 +258,7 @@ void DoExecuteCommand(struct Kommando *cmd) {
   case 326: bytnodtyp(); break;
   case 327: bytteckenset(); break;
   case 328: SaveCurrentUser(inloggad, nodnr); break;
+  case 329: Cmd_ChangeLanguage(); break;
   case 401: bytarea(); break;
   case 402: filinfo(); break;
   case 403: upload(); break;
@@ -326,39 +328,39 @@ void displayPrompt(int defaultCmd) {
     if(Servermem->cfg.ar.nextmeet) {
       sendautorexx(Servermem->cfg.ar.nextmeet);
     }
-    cmdStr = "(Gå till) nästa möte";
+    cmdStr = CATSTR(MSG_PROMPT_GO_TO_NEXT_FORUM);
     break;
   case CMD_NEXTTEXT:
     if(mote2 == MAILBOX_CONFID) {
       if(Servermem->cfg.ar.nextletter) {
         sendautorexx(Servermem->cfg.ar.nextletter);
       }
-      cmdStr = "(Läsa) nästa brev";
+      cmdStr = CATSTR(MSG_PROMPT_READ_NEXT_MAIL);
     } else {
       if(Servermem->cfg.ar.nexttext) {
         sendautorexx(Servermem->cfg.ar.nexttext);
       }
-      cmdStr = "(Läsa) nästa text";
+      cmdStr = CATSTR(MSG_PROMPT_READ_NEXT_TEXT);
     }
     break;
   case CMD_NEXTREPLY:
     if(Servermem->cfg.ar.nextkom) {
       sendautorexx(Servermem->cfg.ar.nextkom);
     }
-    cmdStr = "(Läsa) nästa kommentar";
+    cmdStr = CATSTR(MSG_PROMPT_READ_NEXT_REPLY);
     break;
   case CMD_SEETIME:
     Servermem->action[nodnr] = INGET;
     if(Servermem->cfg.ar.setid) {
       sendautorexx(Servermem->cfg.ar.setid);
     }
-    cmdStr = "(Se) tiden";
+    cmdStr = CATSTR(MSG_PROMPT_SEE_TIME);
     break;
   case CMD_GOMAIL:
     if(Servermem->cfg.ar.nextmeet) {
       sendautorexx(Servermem->cfg.ar.nextmeet);
     }
-    sprintf(goMailStr, "Gå (till) %s", Servermem->cfg.brevnamn);
+    sprintf(goMailStr, CATSTR(MSG_PROMPT_GO_TO_MAILBOX), Servermem->cfg.brevnamn);
     cmdStr = goMailStr;
     break;
   default:

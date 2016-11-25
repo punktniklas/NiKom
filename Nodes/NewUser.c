@@ -89,7 +89,7 @@ int RegisterNewUser(void) {
   user->defarea = 0L;
   user->shell = 0;
   user->status = Servermem->cfg.defaultstatus;
-  user->protokoll = Servermem->cfg.defaultprotokoll;
+  user->language = 0;
   user->brevpek = 0;
 
   initConfPermissions();

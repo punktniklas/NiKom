@@ -405,12 +405,6 @@ void filinfo(void) {
 		sprintf(outbuffer,"\r\n\nDu befinner dig i arean %s.\r\n\n",Servermem->areor[area2].namn);
 		puttekn(outbuffer,-1);
 	}
-	/*
-	if(Servermem->inne[nodnr].protokoll==ZMODEM) sprintf(outbuffer,"Du har Zmodem inställt som protokoll.\r\n");
-	else if(Servermem->inne[nodnr].protokoll==XMODEM) sprintf(outbuffer,"Du har Xmodem inställt som protokoll.\r\n");
-	else sprintf(outbuffer,"Du har inget protokoll inställt\r\n");
-	puttekn(outbuffer,-1);
-	*/
 }
 
 void radarea(void) {
