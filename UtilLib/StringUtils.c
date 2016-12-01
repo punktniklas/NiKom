@@ -76,3 +76,12 @@ int LenientFindSubString(char *hay, char *needle) {
   }
   return -1;
 }
+
+int CountWords(char *str) {
+  int cnt = 0;
+  while(*str) {
+    cnt++;
+    str = FindNextWord(str);
+  }
+  return cnt;
+}

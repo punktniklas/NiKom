@@ -38,6 +38,7 @@ int maybeConvertConferenceTextData(int numberOfTexts);
 void readIntoConfTextsArray(int arrayIndex, int fileIndex, int textsToRead,
                             BPTR file);
 void initNodes(void);
+void initLanguages(void);
 void openWindow(void);
 
 struct IntuitionBase *IntuitionBase;
@@ -69,6 +70,7 @@ void startupNiKom(void) {
   }
   openLibrariesAndPorts();
   setupServermem();
+  initLanguages();
   
   readSysInfo();
   readTextInfo();
@@ -677,6 +679,11 @@ void initNodes(void) {
     Servermem->maxinactivetime[i] = 5;
     Servermem->watchserial[i] = 1;
   }
+}
+
+void initLanguages(void) {
+  Servermem->languages[0] = "english";
+  Servermem->languages[1] = "svenska";
 }
 
 void openWindow(void) {

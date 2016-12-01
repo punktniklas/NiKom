@@ -36,8 +36,10 @@ extern long logintime, extratime;
 extern char inmat[], *argument;
 
 struct Kommando internalGoMailCommand = {
-  { NULL, NULL }, CMD_GOMAIL, 0, 0, 0, 0, 0, "Gå Brevlådan",
-  0, 2, 0, NULL, NULL, 0, NULL, NULL, NULL
+  { NULL, NULL },
+  { { "Go Mailbox", 2 }, { "Gå Brevlådan", 2} },
+  CMD_GOMAIL, 0, 0, 0, 0, 0,
+  0, 0, NULL, NULL, 0, NULL, NULL, NULL
 };
 
 int hasUnreadInConf(int confId) {

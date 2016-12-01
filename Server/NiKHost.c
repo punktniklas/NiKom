@@ -815,10 +815,10 @@ int parse(char *skri) {
 	else if(!arg2[0]) argtyp=KOMARGINGET;
 	else argtyp=KOMARGCHAR;
 	for(kompek=(struct Kommando *)Servermem->kom_list.mlh_Head;kompek->kom_node.mln_Succ;kompek=(struct Kommando *)kompek->kom_node.mln_Succ) {
-		if(matchar(skri,kompek->namn)) {
-			ord2=FindNextWord(kompek->namn);
-			if((kompek->antal_ord==2 && matchar(arg2,ord2) && arg2[0]) || kompek->antal_ord==1) {
-				if(kompek->antal_ord==1) {
+		if(matchar(skri,kompek->langCmd[0].name)) {
+			ord2=FindNextWord(kompek->langCmd[0].name);
+			if((kompek->langCmd[0].words == 2 && matchar(arg2,ord2) && arg2[0]) || kompek->langCmd[0].words == 1) {
+				if(kompek->langCmd[0].words == 1) {
 					if(kompek->argument==KOMARGNUM && argtyp==KOMARGCHAR) continue;
 					if(kompek->argument==KOMARGINGET && argtyp!=KOMARGINGET) continue;
 				}
@@ -1028,11 +1028,11 @@ void kominfo(struct RexxMsg *mess) {
 			sprintf(str,"%d",kompek->minlogg);
 			break;
 		case 'n' : case 'N' :
-			strcpy(str,kompek->namn);
+			strcpy(str,kompek->langCmd[0].name);
 			if(str[strlen(str)-1]=='\n') str[strlen(str)-1]=0;
 			break;
 		case 'o' : case 'O' :
-			sprintf(str,"%d",kompek->antal_ord);
+			sprintf(str,"%d",kompek->langCmd[0].words);
 			break;
 		case 's' : case 'S' :
 			sprintf(str,"%d",kompek->status);

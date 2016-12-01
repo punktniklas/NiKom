@@ -466,91 +466,102 @@ void listmot(char *foo)
         puttekn(outbuffer,-1);
 }
 
-int parse(char *skri) {
-        int nummer=0,argtyp, inloggtid;
-        char *arg2 = NULL,*ord2;
-        struct Kommando *kompek,*forst=NULL;
+struct LangCommand *chooseLangCommand(struct Kommando *cmd) {
+  return cmd->langCmd[Servermem->inne[nodnr].language].name[0]
+    ? &cmd->langCmd[Servermem->inne[nodnr].language] : &cmd->langCmd[0];
+}
 
-		inloggtid = time(NULL)-Servermem->inne[nodnr].forst_in;
-        if(skri[0]==0) return(-3);
-        if(skri[0]>='0' && skri[0]<='9') {
-                argument=skri;
-                return(212);
-        }
+int parse(char *str) {
+  int argType, timeSinceFirstLogin;
+  char *arg2 = NULL, *word2;
+  struct Kommando *cmd, *foundCmd = NULL;
+  struct LangCommand *langCmd;
 
-		arg2=hittaefter(skri);
-        if(IzDigit(arg2[0])) argtyp=KOMARGNUM;
-        else if(!arg2[0]) argtyp=KOMARGINGET;
-        else argtyp=KOMARGCHAR;
+  timeSinceFirstLogin = time(NULL) - Servermem->inne[nodnr].forst_in;
+  if(str[0] == 0) {
+    return -3;
+  }
+  if(str[0] >= '0' && str[0] <= '9') {
+    argument = str;
+    return 212;
+  }
 
-        for(kompek=(struct Kommando *)Servermem->kom_list.mlh_Head;kompek->kom_node.mln_Succ;kompek=(struct Kommando *)kompek->kom_node.mln_Succ)
-        {
-                if(kompek->secret)
-                {
-                        if(kompek->status > Servermem->inne[nodnr].status) continue;
-                        if(kompek->minlogg > Servermem->inne[nodnr].loggin) continue;
-                        if(kompek->mindays*86400 > inloggtid) continue;
-                        if(kompek->grupper && !(kompek->grupper & Servermem->inne[nodnr].grupper)) continue;
-                }
-                if(matchar(skri,kompek->namn))
-                {
-                        ord2=hittaefter(kompek->namn);
-                        if((kompek->antal_ord==2 && matchar(arg2,ord2) && arg2[0]) || kompek->antal_ord==1)
-                        {
-                                if(kompek->antal_ord==1)
-                                {
-                                        if(kompek->argument==KOMARGNUM && argtyp==KOMARGCHAR) continue;
-                                        if(kompek->argument==KOMARGINGET && argtyp!=KOMARGINGET) continue;
-                                }
-                                if(forst==NULL)
-                                {
-                                        forst=kompek;
-                                        nummer=kompek->nummer;
-                                }
-                                else if(forst==(struct Kommando *)1L)
-                                {
-                                        puttekn(kompek->namn,-1);
-                                        puttekn("\n\r",-1);
-                                }
-                                else
-                                {
-                                        puttekn("\r\n\nFLERTYDIGT KOMMANDO\r\n\n",-1);
-                                        puttekn(forst->namn,-1);
-                                        puttekn("\n\r",-1);
-                                        puttekn(kompek->namn,-1);
-                                        puttekn("\n\r",-1);
-                                        forst=(struct Kommando *)1L;
-                                }
-                        }
-                }
+  arg2 = FindNextWord(str);
+  if(IzDigit(arg2[0])) {
+    argType = KOMARGNUM;
+  } else if(!arg2[0]) {
+    argType = KOMARGINGET;
+  } else {
+    argType = KOMARGCHAR;
+  }
+
+  ITER_EL(cmd, Servermem->kom_list, kom_node, struct Kommando *) {
+    if(cmd->secret) {
+      if(cmd->status > Servermem->inne[nodnr].status) continue;
+      if(cmd->minlogg > Servermem->inne[nodnr].loggin) continue;
+      if(cmd->mindays * 86400 > timeSinceFirstLogin) continue;
+      if(cmd->grupper && !(cmd->grupper & Servermem->inne[nodnr].grupper)) continue;
+    }
+    langCmd = chooseLangCommand(cmd);
+    if(matchar(str, langCmd->name)) {
+      word2 = FindNextWord(langCmd->name);
+      if((langCmd->words == 2 && matchar(arg2, word2) && arg2[0]) || langCmd->words == 1) {
+        if(langCmd->words == 1) {
+          if(cmd->argument == KOMARGNUM && argType == KOMARGCHAR) continue;
+          if(cmd->argument == KOMARGINGET && argType != KOMARGINGET) continue;
         }
-        if(forst!=NULL && forst!=(struct Kommando *)1L)
-        {
-			argument=hittaefter(skri);
-			if(forst->antal_ord==2) argument=hittaefter(argument);
-            memset(argbuf,0,1080);
-            strncpy(argbuf,argument,1080);
-            argbuf[strlen(argument)]=0;
-            argument=argbuf;
+        if(foundCmd == NULL) {
+          foundCmd = cmd;
         }
-        if(forst==NULL) return(-1);
-        else if(forst==(struct Kommando *)1L) return(-2);
-        else
-        {
-			if(forst->status > Servermem->inne[nodnr].status || forst->minlogg > Servermem->inne[nodnr].loggin) return(-4);
-			if(forst->mindays*86400 > inloggtid) return(-4);
-			if(forst->grupper && !(forst->grupper & Servermem->inne[nodnr].grupper)) return(-4);
+        else if(foundCmd == (struct Kommando *)1L) {
+          SendString("%s\n\r", chooseLangCommand(cmd)->name);
+        } else {
+          SendString("\r\n\nFLERTYDIGT KOMMANDO\r\n\n");
+          SendString("%s\n\r", chooseLangCommand(foundCmd)->name);
+          SendString("%s\n\r", chooseLangCommand(cmd)->name);
+          foundCmd = (struct Kommando *)1L;
         }
-        if(forst->losen[0])
-        {
-                puttekn("\r\n\nLösen: ",-1);
-                if(Servermem->inne[nodnr].flaggor & STAREKOFLAG)
-	                getstring(STAREKO,20,NULL);
-				else
-					getstring(EJEKO,20,NULL);
-                if(strcmp(forst->losen,inmat)) return(-5);
-        }
-        return(nummer);
+      }
+    }
+  }
+  if(foundCmd != NULL && foundCmd != (struct Kommando *)1L) {
+    argument = FindNextWord(str);
+    if(chooseLangCommand(foundCmd)->words == 2) {
+      argument = FindNextWord(argument);
+    }
+    memset(argbuf, 0, 1080);
+    strncpy(argbuf, argument, 1080);
+    argbuf[strlen(argument)] = 0;
+    argument = argbuf;
+  }
+  if(foundCmd == NULL) {
+    return -1;
+  }
+  else if(foundCmd == (struct Kommando *)1L) {
+    return -2;
+  } else {
+    if(foundCmd->status > Servermem->inne[nodnr].status || foundCmd->minlogg > Servermem->inne[nodnr].loggin) {
+      return -4;
+    }
+    if(foundCmd->mindays * 86400 > timeSinceFirstLogin) {
+      return -4;
+    }
+    if(foundCmd->grupper && !(foundCmd->grupper & Servermem->inne[nodnr].grupper)) {
+      return -4;
+    }
+  }
+  if(foundCmd->losen[0]) {
+    SendString("\r\n\nLösen: ");
+    if(Servermem->inne[nodnr].flaggor & STAREKOFLAG) {
+      getstring(STAREKO,20,NULL);
+    } else {
+      getstring(EJEKO,20,NULL);
+    }
+    if(strcmp(foundCmd->losen, inmat)) {
+      return -5;
+    }
+  }
+  return foundCmd->nummer;
 }
 
 int parsemot(char *skri) {

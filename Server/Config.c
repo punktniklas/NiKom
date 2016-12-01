@@ -11,6 +11,7 @@
 #include "StringUtils.h"
 #include "ConfigUtils.h"
 #include "FidoUtils.h"
+#include "ServerMemUtils.h"
 
 #include "Config.h"
 
@@ -354,25 +355,26 @@ void ReadCommandConfig(void) {
   
   FreeCommandMem();
   
-  if(!(fh = Open("NiKom:DatoCfg/Kommandon.cfg", MODE_OLDFILE))) {
-    cleanup(EXIT_ERROR, "Kunde inte öppna NiKom:DatoCfg/Kommandon.cfg\n");
+  if(!(fh = Open("NiKom:DatoCfg/Commands.cfg", MODE_OLDFILE))) {
+    cleanup(EXIT_ERROR, "Kunde inte öppna NiKom:DatoCfg/Commands.cfg\n");
   }
 
   while(FGets(fh, buffer, 100)) {
     if(buffer[0] == '\n' || buffer[0] == '*') {
       continue;
     }
-    if(buffer[0] == 'N') {
+    if(buffer[0] == 'N' && buffer[1] == '=') {
       if(!(command = (struct Kommando *)AllocMem(sizeof(struct Kommando),
                                                  MEMF_CLEAR | MEMF_PUBLIC))) {
         Close(fh);
-        cleanup(EXIT_ERROR, "Out of memory while reading Kommandon.cfg\n");
+        cleanup(EXIT_ERROR, "Out of memory while reading Commands.cfg\n");
       }
       buffer[32] = '\0';
-      if(!GetStringCfgValue(buffer, command->namn, 30)) {
+      if(!GetStringCfgValue(buffer, command->langCmd[0].name, 30)) {
         Close(fh);
-        cleanup(EXIT_ERROR, "Invalid Kommandon.cfg");
+        cleanup(EXIT_ERROR, "Invalid Commands.cfg");
       }
+      command->langCmd[0].words = CountWords(command->langCmd[0].name);
       AddTail((struct List *)&Servermem->kom_list, (struct Node *)command);
       cnt++;
       continue;
@@ -381,30 +383,42 @@ void ReadCommandConfig(void) {
     if(command == NULL) {
       printf("Found command detail line before command start (\"N=\"): %s\n", buffer);
       Close(fh);
-      cleanup(EXIT_ERROR, "Invalid Kommandon.cfg");
+      cleanup(EXIT_ERROR, "Invalid Commands.cfg");
     }
     if(!handleCommandConfigLine(buffer, command)) {
       Close(fh);
-      cleanup(EXIT_ERROR, "Invalid Kommandon.cfg");
+      cleanup(EXIT_ERROR, "Invalid Commands.cfg");
     }
   }
   Close(fh);
   Servermem->info.kommandon = cnt;
-  printf("Read Kommandon.cfg, %d commands\n", cnt);
+  printf("Read Commands.cfg, %d commands\n", cnt);
 }
 
 int handleCommandConfigLine(char *line, struct Kommando *command) {
-  char tmp[100];
-  int group;
+  char tmp[100], *pos;
+  int group, langId;
 
   switch(line[0]) {
-  case '#' :
-    if(!GetLongCfgValue(line, &command->nummer)) {
+  case 'N':
+    if((pos = strchr(line, '=')) == NULL) {
+      printf("Can't find equals sign: '%s'\n", line);
       return 0;
     }
+    *pos = '\0';
+    langId = FindLanguageId(&line[1]);
+    *pos = '=';
+    if(langId == -1) {
+      printf("Unknown language: %s\n", line);
+      return 0;
+    }
+    if(!GetStringCfgValue(line, command->langCmd[langId].name, 30)) {
+      return 0;
+    }
+    command->langCmd[langId].words = CountWords(command->langCmd[langId].name);
     break;
-  case 'O' :
-    if(!GetCharCfgValue(line, &command->antal_ord)) {
+  case '#' :
+    if(!GetLongCfgValue(line, &command->nummer)) {
       return 0;
     }
     break;

@@ -9,11 +9,6 @@ extern struct System *Servermem;
 extern int nodnr, inloggad;
 struct Catalog *g_Catalog;
 
-static char *localeLang[] = {
-  "english",
-  "svenska"
-};
-
 void LoadCatalogForUser(void) {
   int lang = Servermem->inne[nodnr].language, err;
   
@@ -26,12 +21,12 @@ void LoadCatalogForUser(void) {
   if(lang == 0) {
     return;
   }
-  g_Catalog = OpenCatalog(NULL, "NiKom.catalog", OC_Language, localeLang[lang], TAG_DONE);
+  g_Catalog = OpenCatalog(NULL, "NiKom.catalog", OC_Language, Servermem->languages[lang], TAG_DONE);
   if(g_Catalog == NULL) {
     err = IoErr();
     if(err != 0) {
       LogEvent(SYSTEM_LOG, WARN, "Could not load catalog for language %s (err = %d).",
-               localeLang[lang], err);
+               Servermem->languages[lang], err);
     }
   }
 }

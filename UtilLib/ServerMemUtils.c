@@ -1,3 +1,4 @@
+#include <string.h>
 #include "NiKomStr.h"
 #include "ServerMemUtils.h"
 
@@ -23,4 +24,14 @@ struct UserGroup *FindUserGroup(int groupId) {
     }
   }
   return NULL;
+}
+
+int FindLanguageId(char *str) {
+  int i;
+  for(i = 0; i < NUM_LANGUAGES; i++) {
+    if(strcmp(str, Servermem->languages[i]) == 0) {
+      return i;
+    }
+  }
+  return -1;
 }

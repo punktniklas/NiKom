@@ -156,6 +156,8 @@
 
 #define NIKSEM_NOOF       13 /* Hur många det finns */
 
+#define NUM_LANGUAGES     2
+
 #define BAMTEST(a,b) (((char *)(a))[(b)/8] & 1 << 8-1-(b)%8)
 #define BAMSET(a,b) (((char *)(a))[(b)/8] |= 1 << 8-1-(b)%8)
 #define BAMCLEAR(a,b) (((char *)(a))[(b)/8] &= ~(1 << 8-1-(b)%8))
@@ -263,11 +265,15 @@ struct UnreadTexts {
   long lowestPossibleUnreadText[MAXMOTE];
 };
 
+struct LangCommand {
+  char name[31], words;
+};
+
 struct Kommando {
-   struct MinNode kom_node;
-   long nummer,minlogg,mindays,before,after,grupper;
-   char namn[31],status,antal_ord,argument,losen[20],beskr[70],secret,
-   		vilkainfo[50],logstr[50],menu[50];
+  struct MinNode kom_node;
+  struct LangCommand langCmd[NUM_LANGUAGES];
+  long nummer,minlogg,mindays,before,after,grupper;
+  char status, argument,losen[20],beskr[70],secret, vilkainfo[50],logstr[50],menu[50];
 };
 
 struct SysInfo {
@@ -393,6 +399,7 @@ struct System {
   struct NodeType nodetypes[MAXNODETYPES];
   struct SignalSemaphore semaphores[NIKSEM_NOOF];
   struct LegacyConversionData legacyConversionData;
+  char *languages[NUM_LANGUAGES];
 };
 
 struct NiKMess {
