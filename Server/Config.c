@@ -347,6 +347,18 @@ int handleSystemConfigLine(char *line, BPTR fh) {
   return 1;
 }
 
+int populateLangCommand(struct LangCommand *langCmd, char *str) {
+  if(!GetStringCfgValue(str, langCmd->name, 30)) {
+    return 0;
+  }
+  if(langCmd->name[0] == '-') {
+    langCmd->name[0] = '\0';
+  } else {
+    langCmd->words = CountWords(langCmd->name);
+  }
+  return 1;
+}
+
 void ReadCommandConfig(void) {
   BPTR fh;
   struct Kommando *command = NULL;
@@ -370,11 +382,10 @@ void ReadCommandConfig(void) {
         cleanup(EXIT_ERROR, "Out of memory while reading Commands.cfg\n");
       }
       buffer[32] = '\0';
-      if(!GetStringCfgValue(buffer, command->langCmd[0].name, 30)) {
+      if(!populateLangCommand(&command->langCmd[0], buffer)) {
         Close(fh);
         cleanup(EXIT_ERROR, "Invalid Commands.cfg");
       }
-      command->langCmd[0].words = CountWords(command->langCmd[0].name);
       AddTail((struct List *)&Servermem->kom_list, (struct Node *)command);
       cnt++;
       continue;
@@ -412,10 +423,9 @@ int handleCommandConfigLine(char *line, struct Kommando *command) {
       printf("Unknown language: %s\n", line);
       return 0;
     }
-    if(!GetStringCfgValue(line, command->langCmd[langId].name, 30)) {
+    if(!populateLangCommand(&command->langCmd[langId], line)) {
       return 0;
     }
-    command->langCmd[langId].words = CountWords(command->langCmd[langId].name);
     break;
   case '#' :
     if(!GetLongCfgValue(line, &command->nummer)) {

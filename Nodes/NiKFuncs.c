@@ -503,7 +503,7 @@ int parse(char *str) {
       if(cmd->grupper && !(cmd->grupper & Servermem->inne[nodnr].grupper)) continue;
     }
     langCmd = chooseLangCommand(cmd);
-    if(matchar(str, langCmd->name)) {
+    if(langCmd->name[0] && matchar(str, langCmd->name)) {
       word2 = FindNextWord(langCmd->name);
       if((langCmd->words == 2 && matchar(arg2, word2) && arg2[0]) || langCmd->words == 1) {
         if(langCmd->words == 1) {
