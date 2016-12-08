@@ -78,3 +78,67 @@ MSG_ORG_TEXT_FOOTNOTE
 \r\nFotnot:\r\n
 ; Footnote
 ;
+MSG_FLAG_ON
+På
+; On
+;
+MSG_FLAG_OFF
+Av
+; Off
+;
+MSG_FLAG_PROTECTED_STATUS
+Skyddad status
+; Protected status
+;
+MSG_FLAG_LINE_SUBJECT
+Streck under ärendet
+; Line under subject
+;
+MSG_FLAG_PASSWORD_STARS
+Skriv ut stjärnor vid lösenordspromptar
+; Print stars at password prompts
+;
+MSG_FLAG_NO_AUTO_HELP
+Ingen automagisk hjälptext
+; No automatic help texts
+;
+MSG_FLAG_ADVANCED_EDITOR
+Fullskärmseditor
+; Use advanced text editor
+;
+MSG_FLAG_FILES_AT_LIST_NEW
+Automatisk fillista vid lista nyheter
+; Show new files at List New
+;
+MSG_FLAG_SPACE_AS_PAUSE
+Mellanslag som paustangent
+; Use space as pause button
+;
+MSG_FLAG_NOTE_AT_MAIL
+Lapp vid brev
+; Display note at mail
+;
+MSG_FLAG_ANSI_SEQUENCES
+ANSI-sekvenser skickas (markörförflyttningar etc)
+; Send ANSI escape codes
+;
+MSG_FLAG_DISPLAY_FIDO_KLUDGE
+Visa FidoNet Kludge-rader
+; Display FidoNet kludge lines
+;
+MSG_FLAG_CLEAR_SCREEN_FIDO
+Töm skärmen innan en Fido-text
+; Clear screen before FidoNet text
+;
+MSG_FLAG_NO_LOGIN_NOTIFICATIONS
+Inga meddelanden om in/utloggningar
+; No notifications of logins/logouts
+;
+MSG_FLAG_COLORS
+Färger
+; Colors
+;
+MSG_FLAG_ASCII_7E_IS_DELETE
+ASCII 127 (0x7e) tolkas som delete
+;ASCII 127 (0x7e) is interpreted as delete.
+;

@@ -91,7 +91,6 @@ void listmed(void);
 void listratt(void);
 void listnyheter(void);
 void listflagg(void);
-int parseflagga(char *skri);
 void slaav(void);
 void slapa(void);
 int ropa(void);

@@ -15,6 +15,7 @@
 #include "NiKomFuncs.h"
 #include "NiKomLib.h"
 #include "Terminal.h"
+#include "Languages.h"
 
 extern struct System *Servermem;
 extern int nodnr,inloggad,senast_text_typ,rad,mote2,buftkn,senast_brev_nr,senast_brev_anv;
@@ -223,60 +224,39 @@ void listnyheter(void) {
 }
 
 void listflagg(void) {
-	int x;
-	puttekn("\r\n\n",-1);
-	for(x=31;x>(31-ANTFLAGG);x--) {
-		if(BAMTEST((char *)&Servermem->inne[nodnr].flaggor,x)) puttekn("<På>  ",-1);
-		else puttekn("<Av>  ",-1);
-		sprintf(outbuffer,"%s\r\n",Servermem->flaggnamn[31-x]);
-		puttekn(outbuffer,-1);
-	}
+  int i;
+  SendString("\r\n\n");
+  for(i = 31; i > (31 - ANTFLAGG); i--) {
+    SendString("%-4s %s\r\n",
+               BAMTEST((char *)&Servermem->inne[nodnr].flaggor, i)
+                 ? CATSTR(MSG_FLAG_ON) : CATSTR(MSG_FLAG_OFF),
+               g_FlagNames[31 - i]);
+  }
 }
 
-int parseflagga(skri)
-char *skri;
-{
-	int going=TRUE,going2=TRUE,count=0,found=-1;
-	char *faci,*skri2;
-	if(skri[0]==0 || skri[0]==' ') {
-		found=-3;
-		going=FALSE;
-	}
-	while(going) {
-		if(count==ANTFLAGG) going=FALSE;
-		faci=Servermem->flaggnamn[count];
-		skri2=skri;
-		going2=TRUE;
-		if(matchar(skri2,faci)) {
-			while(going2) {
-				skri2=hittaefter(skri2);
-				faci=hittaefter(faci);
-				if(skri2[0]==0) {
-					found=count;
-					going2=going=FALSE;
-				}
-				else if(faci[0]==0) going2=FALSE;
-				else if(!matchar(skri2,faci)) {
-					faci=hittaefter(faci);
-					if(faci[0]==0 || !matchar(skri2,faci)) going2=FALSE;
-				}
-			}
-		}
-		count++;
-	}
-	return(found);
+int parseFlagName(char *str) {
+  int i;
+  if(str[0] == '\0' || str[0] == ' ') {
+    return -3;
+  }
+  for(i = 0; i < ANTFLAGG; i++) {
+    if(InputMatchesSentence(str, g_FlagNames[i])) {
+      return i;
+    }
+  }
+  return -1;
 }
 
 void slaav(void) {
 	int flagga;
-	if((flagga=parseflagga(argument))==-1) {
+	if((flagga=parseFlagName(argument))==-1) {
 		puttekn("\r\n\nFinns ingen flagga som heter så!\r\n\n",-1);
 		return;
 	} else if(flagga==-3) {
 		puttekn("\r\n\nSkriv: Slå Av <flaggnamn>\r\n\n",-1);
 		return;
 	}
-	sprintf(outbuffer,"\r\n\nSlår av flaggan %s\r\n",Servermem->flaggnamn[flagga]);
+	sprintf(outbuffer,"\r\n\nSlår av flaggan %s\r\n", g_FlagNames[flagga]);
 	puttekn(outbuffer,-1);
 	if(BAMTEST((char *)&Servermem->inne[nodnr].flaggor,31-flagga)) puttekn("Den var påslagen.\r\n\n",-1);
 	else puttekn("Den var redan avslagen.\r\n\n",-1);
@@ -285,14 +265,14 @@ void slaav(void) {
 
 void slapa(void) {
 	int flagga;
-	if((flagga=parseflagga(argument))==-1) {
+	if((flagga=parseFlagName(argument))==-1) {
 		puttekn("\r\n\nFinns ingen flagga som heter så!\r\n\n",-1);
 		return;
 	} else if(flagga==-3) {
 		puttekn("\r\n\nSkriv: Slå På <flaggnamn>\r\n\n",-1);
 		return;
 	}
-	sprintf(outbuffer,"\r\n\nSlår på flaggan %s\r\n",Servermem->flaggnamn[flagga]);
+	sprintf(outbuffer,"\r\n\nSlår på flaggan %s\r\n", g_FlagNames[flagga]);
 	puttekn(outbuffer,-1);
 	if(!BAMTEST((char *)&Servermem->inne[nodnr].flaggor,31-flagga)) puttekn("Den var avslagen.\r\n\n",-1);
 	else puttekn("Den var redan påslagen.\r\n\n",-1);

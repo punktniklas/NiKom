@@ -40,3 +40,39 @@ MSG_ORG_TEXT_REPLY_IN (215//)
   (Reply in text %d by %s)\r\n
 MSG_ORG_TEXT_FOOTNOTE (216//)
 \r\nFootnote:\r\n
+;
+; ******** Dealing with flags **********
+MSG_FLAG_ON (1000//)
+On
+MSG_FLAG_OFF (1001//)
+Off
+;
+; ******** The flags **********
+MSG_FLAG_PROTECTED_STATUS (10000//)
+Protected status
+MSG_FLAG_LINE_SUBJECT (10001//)
+Line under subject
+MSG_FLAG_PASSWORD_STARS (10002//)
+Print stars at password prompts
+MSG_FLAG_NO_AUTO_HELP (10003//)
+No automatic help texts
+MSG_FLAG_ADVANCED_EDITOR (10004//)
+Use advanced text editor
+MSG_FLAG_FILES_AT_LIST_NEW (10005//)
+Show new files at List New
+MSG_FLAG_SPACE_AS_PAUSE (10006//)
+Use space as pause button
+MSG_FLAG_NOTE_AT_MAIL (10007//)
+Display note at mail
+MSG_FLAG_ANSI_SEQUENCES (10008//)
+Send ANSI escape codes
+MSG_FLAG_DISPLAY_FIDO_KLUDGE (10009//)
+Display FidoNet kludge lines
+MSG_FLAG_CLEAR_SCREEN_FIDO (10010//)
+Clear screen before FidoNet text
+MSG_FLAG_NO_LOGIN_NOTIFICATIONS (10011//)
+No notifications of logins/logouts
+MSG_FLAG_COLORS (10012//)
+Colors
+MSG_FLAG_ASCII_7E_IS_DELETE (10013//)
+ASCII 127 (0x7e) is interpreted as delete.

@@ -32,7 +32,6 @@ void readLastLogins(void);
 void readFileAreas(void);
 void readFileAreaFiles(void);
 void readSysInfo(void);
-void initflaggor(void);
 void scanFidoConferences(void);
 int maybeConvertConferenceTextData(int numberOfTexts);
 void readIntoConfTextsArray(int arrayIndex, int fileIndex, int textsToRead,
@@ -83,7 +82,6 @@ void startupNiKom(void) {
   ReadFidoConfig();
   ReadNodeTypesConfig();
   readLastLogins();
-  initflaggor();
   ReadFileKeyConfig();
   ReadStatusConfig();
   readFileAreas();
@@ -569,24 +567,6 @@ void readLastLogins(void) {
   Close(fh);
   printf("Read last login data.\n");
 }
-
-void initflaggor(void) {
-  strcpy(Servermem->flaggnamn[0],"Skyddad status");
-  strcpy(Servermem->flaggnamn[1],"Streck under ärendet");
-  strcpy(Servermem->flaggnamn[2],"Skriv ut stjärnor vid lösenordspromptar");
-  strcpy(Servermem->flaggnamn[3],"Ingen automagisk hjälptext");
-  strcpy(Servermem->flaggnamn[4],"Fullskärmseditor");
-  strcpy(Servermem->flaggnamn[5],"Automatisk fillista vid lista nyheter");
-  strcpy(Servermem->flaggnamn[6],"Mellanslag som paustangent");
-  strcpy(Servermem->flaggnamn[7],"Lapp vid brev");
-  strcpy(Servermem->flaggnamn[8],"ANSI-sekvenser skickas (markörförflyttningar etc)");
-  strcpy(Servermem->flaggnamn[9],"Visa FidoNet Kludge-rader");
-  strcpy(Servermem->flaggnamn[10],"Töm skärmen innan en Fido-text");
-  strcpy(Servermem->flaggnamn[11],"Inga meddelanden om in/utloggningar");
-  strcpy(Servermem->flaggnamn[12],"Färger");
-  strcpy(Servermem->flaggnamn[13],"ASCII 127 (0x7e) tolkas som delete.");
-}
-
 
 void readFileAreas(void) {
   BPTR fh;

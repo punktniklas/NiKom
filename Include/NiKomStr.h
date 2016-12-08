@@ -388,7 +388,6 @@ struct System {
   struct MinList user_list;
   struct MinList shell_list;
   struct MinList grupp_list;
-  char flaggnamn[32][51];
   struct Config cfg;
   struct SysInfo info;
   struct SayString *say[MAXNOD];
