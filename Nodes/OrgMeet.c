@@ -258,7 +258,7 @@ int org_visatext(int textId, char verbose) {
   SendString(CATSTR(MSG_ORG_TEXT_LINE2), readhead.person !=-1
              ? getusername(readhead.person) : "<raderad användare>");
   if(readhead.kom_till_nr != -1) {
-    SendString(CATSTR(MSG_ORG_TEXT_REPLY_TO), readhead.kom_till_nr,
+    SendString(CATSTR(MSG_ORG_TEXT_COMMENT_TO), readhead.kom_till_nr,
                getusername(readhead.kom_till_per));
   }
   SendString(CATSTR(MSG_ORG_TEXT_SUBJECT), readhead.arende);
@@ -288,7 +288,7 @@ int org_visatext(int textId, char verbose) {
   for(i = 0; readhead.kom_i[i] != -1; i++) {
     confId = GetConferenceForText(readhead.kom_i[i]);
     if(confId != -1 && IsMemberConf(confId, inloggad, &Servermem->inne[nodnr])) {
-      SendString(CATSTR(MSG_ORG_TEXT_REPLY_IN), readhead.kom_i[i],
+      SendString(CATSTR(MSG_ORG_TEXT_COMMENT_IN), readhead.kom_i[i],
                  getusername(readhead.kom_av[i]));
     }
   }

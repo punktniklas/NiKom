@@ -14,9 +14,9 @@ MSG_PROMPT_READ_NEXT_TEXT
 (Läsa) nästa text
 ; (Read) next text
 ;
-MSG_PROMPT_READ_NEXT_REPLY
+MSG_PROMPT_READ_NEXT_COMMENT
 (Läsa) nästa kommentar
-; (Read) next reply
+; (Read) next comment
 ;
 MSG_PROMPT_SEE_TIME
 (Se) tiden
@@ -58,9 +58,9 @@ MSG_ORG_TEXT_LINE2
 Skriven av %s\r\n
 ; Written by %s
 ;
-MSG_ORG_TEXT_REPLY_TO
+MSG_ORG_TEXT_COMMENT_TO
 Kommentar till text %d av %s\r\n
-; Reply to text %d by %s
+; Comment to text %d by %s
 ;
 MSG_ORG_TEXT_SUBJECT
 Ärende: %s\r\n
@@ -70,9 +70,9 @@ MSG_ORG_TEXT_END_OF_TEXT
 \n(Slut på text %d av %s)\r\n
 ; (End of text %d by %s)
 ;
-MSG_ORG_TEXT_REPLY_IN
+MSG_ORG_TEXT_COMMENT_IN
   (Kommentar i text %d av %s)\r\n
-; (Reply in text %d by %s)
+; (Comment in text %d by %s)
 ;
 MSG_ORG_TEXT_FOOTNOTE
 \r\nFotnot:\r\n

@@ -349,7 +349,7 @@ void displayPrompt(int defaultCmd) {
     if(Servermem->cfg.ar.nextkom) {
       sendautorexx(Servermem->cfg.ar.nextkom);
     }
-    cmdStr = CATSTR(MSG_PROMPT_READ_NEXT_REPLY);
+    cmdStr = CATSTR(MSG_PROMPT_READ_NEXT_COMMENT);
     break;
   case CMD_SEETIME:
     Servermem->action[nodnr] = INGET;
