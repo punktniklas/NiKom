@@ -10,6 +10,7 @@ int GetStringX(int echo, int maxchrs, char *defaultStr,
                void *customData);
 int GetNumber(int minvalue, int maxvalue, char *defaultStr);
 int SendString(char *fmt, ...);
+int SendStringCat(char *fmt, char *catStr, ...);
 int SendStringNoBrk(char *fmt, ...);
 int conputtekn(char *pekare,int size);
 void DisplayInternalError(void);

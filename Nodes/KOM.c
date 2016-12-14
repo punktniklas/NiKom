@@ -143,7 +143,7 @@ struct Kommando *getCommandToExecute(int defaultCmd) {
   parseRes = parse(inmat);
   switch(parseRes) {
   case -1:
-    SendString(CATSTR(MSG_KOM_INVALID_COMMAND));
+    SendString("\r\n\n%s\r\n", CATSTR(MSG_KOM_INVALID_COMMAND));
     if(++badCommandCnt >= 2 && !(Servermem->inne[nodnr].flaggor & INGENHELP)) {
       sendfile("NiKom:Texter/2fel.txt");
     }
@@ -157,14 +157,14 @@ struct Kommando *getCommandToExecute(int defaultCmd) {
     break;
 
   case -4:
-    SendString(CATSTR(MSG_KOM_NO_PERMISSION));
+    SendString("\r\n\n%s\r\n", CATSTR(MSG_KOM_NO_PERMISSION));
     if(Servermem->cfg.ar.noright) {
       sendautorexx(Servermem->cfg.ar.noright);
     }
     return NULL;
 
   case -5:
-    SendString(CATSTR(MSG_KOM_INVALID_PASSWORD));
+    SendString("\r\n\n%s\r\n", CATSTR(MSG_KOM_INVALID_PASSWORD));
     return NULL;
 
   default:

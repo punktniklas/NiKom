@@ -12,48 +12,48 @@ MSG_PROMPT_SEE_TIME (104//)
 MSG_PROMPT_GO_TO_MAILBOX (105//)
 Go (to) %s
 MSG_KOM_INVALID_COMMAND (106//)
-\r\n\nInvalid command\r\n
+Invalid command
 MSG_KOM_NO_PERMISSION (107//)
-\r\n\nYou don't have permission to execute that command.\r\n
+You don't have permission to execute that command.
 MSG_KOM_INVALID_PASSWORD (108//)
-\r\n\nInvalid password\r\n
+Invalid password
 MSG_KOM_TIME_NOW (109//)
-\r\n\nTime right now: %s %d %s %d  %d:%02d\r\n
+Time right now: %s %d %s %d  %d:%02d
 MSG_KOM_TIME_LEFT (110//)
-\nYou have %d minutes left.\r\n
+You have %d minutes left.
 MSG_KOM_AMBIGOUS_COMMAND (111//)
-\r\n\nAmbigous command\r\n\n
+Ambigous command
 MSG_KOM_COMMAND_PASSWORD (112//)
 Password
 ;
 ; ******** Forums **********
 MSG_WHERE_YOU_ARE_IN (200//)
-\r\n\nYou are in %s.\r\n
+You are in %s.
 MSG_WHERE_NO_TEXTS (201//)
-There are no texts.\r\n
+There are no texts.
 MSG_WHERE_TEXTS_NUMBERED (202//)
-There are texts numbered from %d to %d.\r\n
+There are texts numbered from %d to %d.
 MSG_WHERE_NO_UNREAD_TEXTS (203//)
-You have no unread texts.\r\n
+You have no unread texts.
 MSG_WHERE_ONE_UNREAD_TEXT (204//)
-You have 1 unread text.\r\n
+You have 1 unread text.
 MSG_WHERE_MANY_UNREAD_TEXTS (205//)
-You have %d unread texts.\r\n
+You have %d unread texts.
 ;
 MSG_ORG_TEXT_LINE1 (210//)
-\r\n\nText: %d  Forum: %s
+Text: %d  Forum: %s
 MSG_ORG_TEXT_LINE2 (211//)
-Written by %s\r\n
+Written by %s
 MSG_ORG_TEXT_COMMENT_TO (212//)
-Comment to text %d by %s\r\n
+Comment to text %d by %s
 MSG_ORG_TEXT_SUBJECT (213//)
-Subject: %s\r\n
+Subject: %s
 MSG_ORG_TEXT_END_OF_TEXT (214//)
-\n(End of text %d by %s)\r\n
+(End of text %d by %s)
 MSG_ORG_TEXT_COMMENT_IN (215//)
-  (Comment in text %d by %s)\r\n
+(Comment in text %d by %s)
 MSG_ORG_TEXT_FOOTNOTE (216//)
-\r\nFootnote:\r\n
+Footnote:
 ;
 ; ******** Dealing with flags **********
 MSG_FLAG_ON (1000//)

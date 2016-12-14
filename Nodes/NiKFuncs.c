@@ -109,21 +109,21 @@ void varmote(int mote) {
   int cnt;
   struct Mote *conf;
   conf = getmotpek(mote);
-  SendString(CATSTR(MSG_WHERE_YOU_ARE_IN), conf->namn);
+  SendStringCat("\r\n\n%s\r\n", CATSTR(MSG_WHERE_YOU_ARE_IN), conf->namn);
   if(conf->type == MOTE_FIDO) {
     if(conf->lowtext > conf->texter) {
-      SendString(CATSTR(MSG_WHERE_NO_TEXTS));
+      SendString("%s\r\n", CATSTR(MSG_WHERE_NO_TEXTS));
     } else {
-      SendString(CATSTR(MSG_WHERE_TEXTS_NUMBERED), conf->lowtext, conf->texter);
+      SendStringCat("%s\r\n", CATSTR(MSG_WHERE_TEXTS_NUMBERED), conf->lowtext, conf->texter);
     }
   }
   cnt = countunread(mote);
   if(cnt == 0) {
-    SendString(CATSTR(MSG_WHERE_NO_UNREAD_TEXTS));
+    SendString("%s\r\n", CATSTR(MSG_WHERE_NO_UNREAD_TEXTS));
   } else if(cnt == 1) {
-    SendString(CATSTR(MSG_WHERE_ONE_UNREAD_TEXT));
+    SendString("%s\r\n", CATSTR(MSG_WHERE_ONE_UNREAD_TEXT));
   } else {
-    SendString(CATSTR(MSG_WHERE_MANY_UNREAD_TEXTS), cnt);
+    SendStringCat("%s\r\n", CATSTR(MSG_WHERE_MANY_UNREAD_TEXTS), cnt);
   }
 }
 
@@ -132,13 +132,13 @@ void tiden(void) {
   struct tm *ts;
   time(&now);
   ts=localtime(&now);
-  SendString(CATSTR(MSG_KOM_TIME_NOW),
+  SendStringCat("\r\n\n%s\r\n", CATSTR(MSG_KOM_TIME_NOW),
           weekdayNames[Servermem->inne[nodnr].language][ts->tm_wday], ts->tm_mday,
           monthNames[Servermem->inne[nodnr].language][ts->tm_mon],
           1900 + ts->tm_year, ts->tm_hour, ts->tm_min);
   if(Servermem->cfg.maxtid[Servermem->inne[nodnr].status]) {
     timeLimitSeconds = 60 * (Servermem->cfg.maxtid[Servermem->inne[nodnr].status]) + extratime;
-    SendString(CATSTR(MSG_KOM_TIME_LEFT), (timeLimitSeconds - (now - logintime)) / 60);
+    SendStringCat("\n%s\r\n", CATSTR(MSG_KOM_TIME_LEFT), (timeLimitSeconds - (now - logintime)) / 60);
   }
 }
 
@@ -519,7 +519,7 @@ int parse(char *str) {
         else if(foundCmd == (struct Kommando *)1L) {
           SendString("%s\n\r", chooseLangCommand(cmd)->name);
         } else {
-          SendString(CATSTR(MSG_KOM_AMBIGOUS_COMMAND));
+          SendString("\r\n\n%s\r\n\n", CATSTR(MSG_KOM_AMBIGOUS_COMMAND));
           SendString("%s\n\r", chooseLangCommand(foundCmd)->name);
           SendString("%s\n\r", chooseLangCommand(cmd)->name);
           foundCmd = (struct Kommando *)1L;

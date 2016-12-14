@@ -18,6 +18,7 @@ extern char outbuffer[];
 extern struct System *Servermem;
 
 char inmat[1024];     /* Används av getstring() */
+char catoutbuf[1200];
 int radcnt = 0;
 
 char commandhistory[10][1025];
@@ -520,6 +521,11 @@ int conputtekn(char *pekare,int size)
 	return(aborted);
 }
 
+int vSendString(char *fmt, va_list arglist) {
+  vsprintf(outbuffer, fmt, arglist);
+  return puttekn(outbuffer, -1);
+}
+
 /*
  * Sends a string to the user. The arguments are compatible with printf().
  * The first argument is a char pointer to a format string and it's
@@ -544,10 +550,27 @@ int SendString(char *fmt, ...) {
   int ret;
 
   va_start(arglist, fmt);
-  vsprintf(outbuffer, fmt, arglist);
-  ret = puttekn(outbuffer, -1);
+  ret = vSendString(fmt, arglist);
   va_end(arglist);
   return ret;
+}
+
+/*
+ * Sends a string to the user, with special support for locale catalog strings.
+ * The format string should contain a single "%s" placeholder (surrounded by
+ * formatting and other characters) which will be resolved by catStr. The resulting
+ * string (which could contain foratting placeholder like normal) will then be
+ * formatted using the vararg list.
+ */
+int SendStringCat(char *fmt, char *catStr, ...) {
+  va_list arglist;
+  int ret;
+
+  sprintf(catoutbuf, fmt, catStr);
+  va_start(arglist, catStr);
+  ret = vSendString(catoutbuf, arglist);
+  va_end(arglist);
+  return ret;  
 }
 
 int SendStringNoBrk(char *fmt, ...) {

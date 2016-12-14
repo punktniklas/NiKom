@@ -27,83 +27,83 @@ Gå (till) %s
 ; Go (to) %s
 ;
 MSG_KOM_INVALID_COMMAND
-\r\n\nFelaktigt kommando\r\n
-; \r\n\nInvalid command\r\n
+Felaktigt kommando
+; Invalid command
 ;
 MSG_KOM_NO_PERMISSION
-\r\n\nDu har ingen rätt att utföra det kommandot.\r\n
-; \r\n\nYou don't have permission to execute that command.\r\n
+Du har ingen rätt att utföra det kommandot.
+; You don't have permission to execute that command.
 ;
 MSG_KOM_INVALID_PASSWORD
-\r\n\nFelaktigt lösen\r\n
-; \r\n\nInvalid password\r\n
+Felaktigt lösen
+; Invalid password
 ;
 MSG_KOM_TIME_NOW
-\r\n\nTiden just nu: %s %d %s %d  %d:%02d\r\n
-; \r\n\nTime right now: %s %d %s %d  %d:%02d\r\n
+Tiden just nu: %s %d %s %d  %d:%02d
+; Time right now: %s %d %s %d  %d:%02d
 ;
 MSG_KOM_TIME_LEFT
-\nDin tid tar slut om %d minuter.\r\n
-; \nYou have %d minutes left.\r\n
+Din tid tar slut om %d minuter.
+; You have %d minutes left.
 ;
 MSG_KOM_AMBIGOUS_COMMAND
-\r\n\nFlertydigt kommando\r\n\n
-; \r\n\nAmbigous command\r\n\n
+Flertydigt kommando
+; Ambigous command
 ;
 MSG_KOM_COMMAND_PASSWORD
 Lösen
 ; Password
 ;
 MSG_WHERE_YOU_ARE_IN
-\r\n\nDu befinner dig i %s.\r\n
+Du befinner dig i %s.
 ; You are in %s.
 ;
 MSG_WHERE_NO_TEXTS
-Det finns inga texter.\r\n
+Det finns inga texter.
 ; There are no texts.
 ;
 MSG_WHERE_TEXTS_NUMBERED
-Det finns texter numrerade från %d till %d.\r\n
+Det finns texter numrerade från %d till %d.
 ; There are texts numbered from %d to %d.
 ;
 MSG_WHERE_NO_UNREAD_TEXTS
-Du har inga olästa texter.\r\n
+Du har inga olästa texter.
 ; You have no unread texts.
 ;
 MSG_WHERE_ONE_UNREAD_TEXT
-Du har 1 oläst text.\r\n
+Du har 1 oläst text.
 ; You have 1 unread text.
 ;
 MSG_WHERE_MANY_UNREAD_TEXTS
-Du har %d olästa texter.\r\n
+Du har %d olästa texter.
 ; You have %d unread texts.
 ;
 MSG_ORG_TEXT_LINE1
-\r\n\nText %d  Möte: %s
+Text %d  Möte: %s
 ; Text: %d  Forum: %s
 ;
 MSG_ORG_TEXT_LINE2
-Skriven av %s\r\n
+Skriven av %s
 ; Written by %s
 ;
 MSG_ORG_TEXT_COMMENT_TO
-Kommentar till text %d av %s\r\n
+Kommentar till text %d av %s
 ; Comment to text %d by %s
 ;
 MSG_ORG_TEXT_SUBJECT
-Ärende: %s\r\n
+Ärende: %s
 ; Subject: %s
 ;
 MSG_ORG_TEXT_END_OF_TEXT
-\n(Slut på text %d av %s)\r\n
+(Slut på text %d av %s)
 ; (End of text %d by %s)
 ;
 MSG_ORG_TEXT_COMMENT_IN
-  (Kommentar i text %d av %s)\r\n
+(Kommentar i text %d av %s)
 ; (Comment in text %d by %s)
 ;
 MSG_ORG_TEXT_FOOTNOTE
-\r\nFotnot:\r\n
+Fotnot:
 ; Footnote
 ;
 MSG_FLAG_ON
