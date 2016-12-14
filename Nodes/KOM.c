@@ -143,7 +143,7 @@ struct Kommando *getCommandToExecute(int defaultCmd) {
   parseRes = parse(inmat);
   switch(parseRes) {
   case -1:
-    SendString("\r\n\nFelaktigt kommando!\r\n");
+    SendString(CATSTR(MSG_KOM_INVALID_COMMAND));
     if(++badCommandCnt >= 2 && !(Servermem->inne[nodnr].flaggor & INGENHELP)) {
       sendfile("NiKom:Texter/2fel.txt");
     }
@@ -157,14 +157,14 @@ struct Kommando *getCommandToExecute(int defaultCmd) {
     break;
 
   case -4:
-    SendString("\r\n\nDu har ingen rätt att utföra det kommandot!\r\n");
+    SendString(CATSTR(MSG_KOM_NO_PERMISSION));
     if(Servermem->cfg.ar.noright) {
       sendautorexx(Servermem->cfg.ar.noright);
     }
     return NULL;
 
   case -5:
-    SendString("\r\n\nFelaktigt lösen!\r\n");
+    SendString(CATSTR(MSG_KOM_INVALID_PASSWORD));
     return NULL;
 
   default:
@@ -256,7 +256,7 @@ void DoExecuteCommand(struct Kommando *cmd) {
   case 322: subtraheragruppmedlem(); break;
   case 323: DisplayVersionInfo(); break;
   case 324: alias(); break;
-  case 325: Cmd_ReLogin(); break; // nodestate |= NIKSTATE_RELOGIN; return(-3); }
+  case 325: Cmd_ReLogin(); break;
   case 326: bytnodtyp(); break;
   case 327: bytteckenset(); break;
   case 328: SaveCurrentUser(inloggad, nodnr); break;

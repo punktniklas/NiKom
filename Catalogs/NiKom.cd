@@ -11,6 +11,20 @@ MSG_PROMPT_SEE_TIME (104//)
 (See) time
 MSG_PROMPT_GO_TO_MAILBOX (105//)
 Go (to) %s
+MSG_KOM_INVALID_COMMAND (106//)
+\r\n\nInvalid command\r\n
+MSG_KOM_NO_PERMISSION (107//)
+\r\n\nYou don't have permission to execute that command.\r\n
+MSG_KOM_INVALID_PASSWORD (108//)
+\r\n\nInvalid password\r\n
+MSG_KOM_TIME_NOW (109//)
+\r\n\nTime right now: %s %d %s %d  %d:%02d\r\n
+MSG_KOM_TIME_LEFT (110//)
+\nYou have %d minutes left.\r\n
+MSG_KOM_AMBIGOUS_COMMAND (111//)
+\r\n\nAmbigous command\r\n\n
+MSG_KOM_COMMAND_PASSWORD (112//)
+Password
 ;
 ; ******** Forums **********
 MSG_WHERE_YOU_ARE_IN (200//)

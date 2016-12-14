@@ -26,6 +26,34 @@ MSG_PROMPT_GO_TO_MAILBOX
 Gå (till) %s
 ; Go (to) %s
 ;
+MSG_KOM_INVALID_COMMAND
+\r\n\nFelaktigt kommando\r\n
+; \r\n\nInvalid command\r\n
+;
+MSG_KOM_NO_PERMISSION
+\r\n\nDu har ingen rätt att utföra det kommandot.\r\n
+; \r\n\nYou don't have permission to execute that command.\r\n
+;
+MSG_KOM_INVALID_PASSWORD
+\r\n\nFelaktigt lösen\r\n
+; \r\n\nInvalid password\r\n
+;
+MSG_KOM_TIME_NOW
+\r\n\nTiden just nu: %s %d %s %d  %d:%02d\r\n
+; \r\n\nTime right now: %s %d %s %d  %d:%02d\r\n
+;
+MSG_KOM_TIME_LEFT
+\nDin tid tar slut om %d minuter.\r\n
+; \nYou have %d minutes left.\r\n
+;
+MSG_KOM_AMBIGOUS_COMMAND
+\r\n\nFlertydigt kommando\r\n\n
+; \r\n\nAmbigous command\r\n\n
+;
+MSG_KOM_COMMAND_PASSWORD
+Lösen
+; Password
+;
 MSG_WHERE_YOU_ARE_IN
 \r\n\nDu befinner dig i %s.\r\n
 ; You are in %s.

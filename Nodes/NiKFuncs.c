@@ -37,10 +37,15 @@ long logintime, extratime;
 int mote2,rad,senast_text_typ,nu_skrivs,area2,
         senast_brev_nr,senast_brev_anv,senast_text_nr,senast_text_mote;
 int g_lastKomTextType, g_lastKomTextNr, g_lastKomTextConf;
-char *month[] = { "januari","februari","mars","april","maj","juni",
-                "juli","augusti","september","oktober","november","december" },
-                *veckodag[] = { "Söndag","Måndag","Tisdag","Onsdag","Torsdag","Fredag",
-                "Lördag" },*argument,usernamebuf[50],argbuf[1081],vilkabuf[50];
+char *monthNames[2][12] =
+  {{ "January", "February", "March", "April", "May", "June",
+     "July", "August", "September", "October", "November", "December" },
+   { "januari", "februari", "mars", "april", "maj", "juni",
+     "juli", "augusti", "september", "oktober", "november", "december" }};
+char *weekdayNames[2][7] =
+  {{ "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" },
+   { "Söndag", "Måndag", "Tisdag", "Onsdag", "Torsdag", "Fredag", "Lördag" }};
+char *argument,usernamebuf[50],argbuf[1081],vilkabuf[50];
 struct Header sparhead,readhead;
 struct Inloggning Statstr;
 struct MinList aliaslist;
@@ -122,21 +127,19 @@ void varmote(int mote) {
   }
 }
 
-void tiden(void)
-{
-        long tid,tidgrans;
-        struct tm *ts;
-        time(&tid);
-        ts=localtime(&tid);
-        sprintf(outbuffer,"\r\n\nTiden just nu: %s %d %s %d  %d:%02d\r\n",
-                veckodag[ts->tm_wday],ts->tm_mday,month[ts->tm_mon],1900+ts->tm_year,
-                ts->tm_hour,ts->tm_min);
-        puttekn(outbuffer,-1);
-        if(Servermem->cfg.maxtid[Servermem->inne[nodnr].status]) {
-                tidgrans=60*(Servermem->cfg.maxtid[Servermem->inne[nodnr].status])+extratime;
-                sprintf(outbuffer,"\nDin tid tar slut om %d minuter.\r\n",(tidgrans-(tid-logintime))/60);
-                puttekn(outbuffer,-1);
-        }
+void tiden(void) {
+  long now, timeLimitSeconds;
+  struct tm *ts;
+  time(&now);
+  ts=localtime(&now);
+  SendString(CATSTR(MSG_KOM_TIME_NOW),
+          weekdayNames[Servermem->inne[nodnr].language][ts->tm_wday], ts->tm_mday,
+          monthNames[Servermem->inne[nodnr].language][ts->tm_mon],
+          1900 + ts->tm_year, ts->tm_hour, ts->tm_min);
+  if(Servermem->cfg.maxtid[Servermem->inne[nodnr].status]) {
+    timeLimitSeconds = 60 * (Servermem->cfg.maxtid[Servermem->inne[nodnr].status]) + extratime;
+    SendString(CATSTR(MSG_KOM_TIME_LEFT), (timeLimitSeconds - (now - logintime)) / 60);
+  }
 }
 
 int skapmot(void) {
@@ -516,7 +519,7 @@ int parse(char *str) {
         else if(foundCmd == (struct Kommando *)1L) {
           SendString("%s\n\r", chooseLangCommand(cmd)->name);
         } else {
-          SendString("\r\n\nFLERTYDIGT KOMMANDO\r\n\n");
+          SendString(CATSTR(MSG_KOM_AMBIGOUS_COMMAND));
           SendString("%s\n\r", chooseLangCommand(foundCmd)->name);
           SendString("%s\n\r", chooseLangCommand(cmd)->name);
           foundCmd = (struct Kommando *)1L;
@@ -551,7 +554,7 @@ int parse(char *str) {
     }
   }
   if(foundCmd->losen[0]) {
-    SendString("\r\n\nLösen: ");
+    SendString("\r\n\n%s: ", CATSTR(MSG_KOM_COMMAND_PASSWORD));
     if(Servermem->inne[nodnr].flaggor & STAREKOFLAG) {
       getstring(STAREKO,20,NULL);
     } else {
