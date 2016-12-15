@@ -524,14 +524,14 @@ int upload(void) {
     if(getstring(EKO,3,NULL)) { FreeMem(allokpek,sizeof(struct Fil)); return(1); }
     allokpek->status=atoi(inmat);
     if(Servermem->inne[nodnr].status >= Servermem->cfg.st.filer) {
-      if(GetYesOrNo("\n\rSka filen valideras?", 'j', 'n', "Ja", "Nej",
+      if(GetYesOrNo("\n\r", "Ska filen valideras?", NULL, NULL, "Ja", "Nej", NULL,
                     TRUE, &isCorrect)) {
         return 1;
       }
       if(!isCorrect) {
         allokpek->flaggor|=FILE_NOTVALID;
       }
-      if(GetYesOrNo("\n\rSka filen ha fri download?", 'j', 'n', "Ja", "Nej",
+      if(GetYesOrNo("\n\r", "Ska filen ha fri download?", NULL, NULL, "Ja", "Nej", NULL,
                     FALSE, &isCorrect)) {
         return 1;
       }
@@ -572,8 +572,8 @@ int upload(void) {
     }
     if(Servermem->cfg.ar.postup1) sendautorexx(Servermem->cfg.ar.postup1);
 
-    if(GetYesOrNo("\r\n\nVill du skriva en längre beskrivning?",
-                  'j', 'n', "\r\n\nOk, går in i editorn.\r\n", "Nej\r\n\n",
+    if(GetYesOrNo("\r\n\n", "Vill du skriva en längre beskrivning?",
+                  "j", "n", "Ok, går in i editorn.", "Nej", "\r\n\n",
                   TRUE, &writeLong)) {
       return 1;
     }

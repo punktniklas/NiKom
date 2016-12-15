@@ -14,8 +14,9 @@ int SendStringCat(char *fmt, char *catStr, ...);
 int SendStringNoBrk(char *fmt, ...);
 int conputtekn(char *pekare,int size);
 void DisplayInternalError(void);
-int GetYesOrNo(char *label, char yesChar, char noChar, char *yesStr, char *noStr,
-               int yesIsDefault, int *res);
+int GetYesOrNo(char *preStr, char *label,
+               char *yesChar, char *noChar, char *yesStr, char *noStr,
+               char *postStr, int yesIsDefault, int *res);
 int EditString(char *label, char *str, int maxlen, int nonEmpty);
 int MaybeEditString(char *label, char *str, int maxlen);
 int MaybeEditPassword(char *label1, char *label2, char *pwd, int maxlen);

@@ -103,7 +103,7 @@ int RegisterNewUser(void) {
   SendString("Annan info :  %s\r\n",user->annan_info);
   SendString("Prompt :      %s\r\n",user->prompt);
 
-  if(GetYesOrNo("\r\n\nStämmer detta?", 'j', 'n', "Ja\r\n\n", "Nej\r\n\n",
+  if(GetYesOrNo("\r\n\n", "Stämmer detta?", NULL, NULL, "Ja", "Nej", "\r\n\n",
                 TRUE, &isCorrect)) {
     return 1;
   }
@@ -134,7 +134,7 @@ int RegisterNewUser(void) {
     }
     if(MaybeEditString("Prompt", user->prompt, 5)) { return 1; }
 
-    if(GetYesOrNo("\r\n\nStämmer allt nu?", 'j', 'n', "Ja\r\n\n", "Nej\r\n\n",
+    if(GetYesOrNo("\r\n\n", "Stämmer allt nu?", NULL, NULL, "Ja", "Nej", "\r\n\n",
                   TRUE, &isCorrect)) {
       return 1;
     }

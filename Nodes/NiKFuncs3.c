@@ -179,7 +179,7 @@ int radmot(void) {
   }
 
   SendString("\r\n\nÄr du säker på att du vill radera mötet %s? ", conf->namn);
-  if(GetYesOrNo(NULL, 'j', 'n', "Ja\r\n", "Nej\r\n", FALSE, &isCorrect)) {
+  if(GetYesOrNo(NULL, NULL, NULL, NULL, "Ja", "Nej", "\r\n", FALSE, &isCorrect)) {
     return -8;
   }
   if(!isCorrect) {
@@ -363,7 +363,7 @@ int andmot(void) {
     }
   }
   
-  if(GetYesOrNo("\r\n\nÄr allt korrekt?", 'j', 'n', "Ja\r\n\n", "Nej\r\n\n",
+  if(GetYesOrNo("\r\n\n", "Är allt korrekt?", NULL, NULL, "Ja", "Nej", "\r\n\n",
                 TRUE, &isCorrect)) {
     return 1;
   }
@@ -379,9 +379,8 @@ int andmot(void) {
   if(permissionsNarrowed) {
     SendString("Users.dat kommer nu att gås igenom för att nollställa medlemskap\n\r");
     SendString("och rättigheter som om mötet var nyskapat.\n\n\r");
-    SendString("Är ändringarna fortfarande korrekta? ");
-    if(GetYesOrNo("Är ändringarna fortfarande korrekta?", 'j', 'n',
-                  "Ja\r\n", "Nej\r\n", TRUE, &isCorrect)) {
+    if(GetYesOrNo(NULL, "Är ändringarna fortfarande korrekta?", NULL, NULL,
+                  "Ja", "Nej", "\r\n", TRUE, &isCorrect)) {
       return 1;
     }
     if(!isCorrect) {

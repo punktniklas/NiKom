@@ -212,7 +212,7 @@ void rexxyesno(struct RexxMsg *mess) {
     }
   }
 
-  if(GetYesOrNo(NULL, ja, nej, NULL, NULL, def == 1, &isYes)) {
+  if(GetYesOrNo(NULL, NULL, &ja, &nej, NULL, NULL, NULL, def == 1, &isYes)) {
     SetRexxErrorResult(mess, 100);
     return;
   }

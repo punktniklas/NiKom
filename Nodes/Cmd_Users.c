@@ -233,7 +233,7 @@ int Cmd_ChangeUser(void) {
     if(MaybeEditNumber("Antal ulbytes", (int *)&user.uploadbytes, 8, 0, INT_MAX)) { return 1; }
     if(MaybeEditNumber("Antal inloggningar", (int *)&user.loggin, 8, 0, INT_MAX)) { return 1; }
   }
-  if(GetYesOrNo("\r\n\nÄr allt korrekt?", 'j', 'n', "Ja\r\n\n", "Nej\r\n\n",
+  if(GetYesOrNo("\r\n\n", "Är allt korrekt?", NULL, NULL, "Ja", "Nej", "\r\n\n",
                 TRUE, &isCorrect)) {
     return 1;
   }
@@ -289,7 +289,7 @@ void Cmd_DeleteUser(void) {
   }
   SendString("\r\n\nÄr du säker på att du vill radera %s?",
              getusername(userId));
-  if(GetYesOrNo(NULL, 'j', 'n', "Ja\r\n\n", "Nej\r\n\n", FALSE, &isCorrect)) {
+  if(GetYesOrNo(NULL, NULL, NULL, NULL, "Ja", "Nej", "\r\n\n", FALSE, &isCorrect)) {
     return;
   }
   if(!isCorrect) {

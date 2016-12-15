@@ -152,7 +152,7 @@ void Cmd_CreateArea(void) {
     }
   }
   
-  if(GetYesOrNo("\n\rSka uploads till arean tillåtas?", 'j', 'n', "Ja", "Nej",
+  if(GetYesOrNo("\n\r", "Ska uploads till arean tillåtas?", NULL, NULL, "Ja", "Nej", NULL,
                 TRUE, &isCorrect)) {
     return;
   }
@@ -161,8 +161,8 @@ void Cmd_CreateArea(void) {
     tmpArea.flaggor |= AREA_NOUPLOAD;
   }
   
-  if(GetYesOrNo("\n\rSka downloads från arean tillåtas?", 'j', 'n',
-                "Ja", "Nej", TRUE, &isCorrect)) {
+  if(GetYesOrNo("\n\r", "Ska downloads från arean tillåtas?", NULL, NULL,
+                "Ja", "Nej", NULL, TRUE, &isCorrect)) {
     return;
   }
   
@@ -421,7 +421,7 @@ void radarea(void) {
 
   SendString("\n\n\rÄr du säker på att du vill radera arean %s?",
              Servermem->areor[areaId].namn);
-  if(GetYesOrNo(NULL, 'j', 'n', "Ja\r\n", "Nej\r\n",
+  if(GetYesOrNo(NULL, NULL, NULL, NULL, "Ja", "Nej", "\r\n",
                 FALSE, &isCorrect)) {
     return;
   }
@@ -548,8 +548,8 @@ int andraarea(void) {
 		editkey(tempar.nycklar[dir]);
 	}
 
-        if(GetYesOrNo("\r\n\nÄr allt korrekt?",
-                      'j', 'n', "Ja\r\n", "Nej\r\n",
+        if(GetYesOrNo("\r\n\n", "Är allt korrekt?",
+                      NULL, NULL, "Ja", "Nej", "\r\n",
                       TRUE, &isCorrect)) {
           return 1;
         }
@@ -639,14 +639,14 @@ int skapafil(void) {
 	if(getstring(EKO,3,NULL)) { FreeMem(allokpek,sizeof(struct Fil)); return(1); }
 	allokpek->status=atoi(inmat);
 	if(Servermem->inne[nodnr].status >= Servermem->cfg.st.filer) {
-            if(GetYesOrNo("\n\rSka filen valideras?", 'j', 'n', "Ja", "Nej",
-                          TRUE, &isCorrect)) {
+          if(GetYesOrNo("\n\r", "Ska filen valideras?", NULL, NULL, "Ja", "Nej", NULL,
+                        TRUE, &isCorrect)) {
               return 1;
             }
             if(!isCorrect) {
               allokpek->flaggor|=FILE_NOTVALID;
             }
-            if(GetYesOrNo("\n\rSka filen ha fri download?", 'j', 'n', "Ja", "Nej",
+            if(GetYesOrNo("\n\r", "Ska filen ha fri download?", NULL, NULL, "Ja", "Nej", NULL,
                           FALSE, &isCorrect)) {
               return 1;
             }
@@ -667,8 +667,8 @@ int skapafil(void) {
 	Servermem->inne[nodnr].upload++;
 	Statstr.ul++;
 
-        if(GetYesOrNo("\r\n\nVill du skriva en längre beskrivning?",
-                      'j', 'n', "Ja\r\n\n", "Nej\r\n\n", TRUE, &isCorrect)) {
+        if(GetYesOrNo("\r\n\n", "Vill du skriva en längre beskrivning?",
+                      NULL, NULL, "Ja", "Nej", "\r\n\n", TRUE, &isCorrect)) {
           return 1;
         }
         if(!isCorrect) {
@@ -723,7 +723,7 @@ void radfil(void) {
 	}
 
         SendString("\r\n\nRadera filen %s?");
-        if(GetYesOrNo(NULL, 'j', 'n', "Ja\r\n", "Nej\r\n", FALSE, &isCorrect)) {
+        if(GetYesOrNo(NULL, NULL, NULL, NULL, "Ja", "Nej", "\r\n", FALSE, &isCorrect)) {
           return;
         }
         if(!isCorrect) {
@@ -742,7 +742,7 @@ void radfil(void) {
 	if((letpek->flaggor & FILE_LONGDESC) && remove(filnamn)) puttekn("\r\nKunde inte radera långa beskrivningen!",-1);
 	if(Servermem->inne[nodnr].status>=Servermem->cfg.st.filer && userexists(letpek->uppladdare)) {
           SendString("\r\nSka %s diskrediteras?", getusername(letpek->uppladdare));
-          if(GetYesOrNo(NULL, 'j', 'n', "Ja\r\n", "Nej\r\n", FALSE, &isCorrect)) {
+          if(GetYesOrNo(NULL, NULL, NULL, NULL, "Ja", "Nej", "\r\n", FALSE, &isCorrect)) {
             return;
           }
           if(isCorrect) {
@@ -848,7 +848,7 @@ int andrafil(void) {
 		tmpvalidtime=filpek->validtime;
 	}
 
-        if(GetYesOrNo("\r\n\nÄr allt korrekt?", 'j', 'n', "Ja\r\n\n", "Nej\r\n\n",
+        if(GetYesOrNo("\r\n\n", "Är allt korrekt?", NULL, NULL, "Ja", "Nej", "\r\n\n",
                       TRUE, &isCorrect)) {
           return 1;
         }
@@ -901,14 +901,14 @@ int sokfil(void) {
 	}
 	pat=ParsePatternNoCase(sokstring,token,150);
 	if(pat) {
-          if(GetYesOrNo("\r\nSöka på filnamn eller beskrivning?",
-                        'f', 'b', "Filnamn", "Beskrivning",
+          if(GetYesOrNo("\r\n", "Söka på filnamn eller beskrivning?",
+                        NULL, NULL, "Filnamn", "Beskrivning", NULL,
                         TRUE, &searchOnFilename)) {
             return 1;
           }
 	}
 
-        if(GetYesOrNo("\r\nVill du söka globalt?", 'j', 'n', "Ja\r\n", "Nej\r\n",
+        if(GetYesOrNo("\r\n", "Vill du söka globalt?", NULL, NULL, "Ja", "Nej", "\r\n",
                       FALSE, &globalSearch)) {
           return 1;
         }

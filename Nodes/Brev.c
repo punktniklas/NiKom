@@ -556,8 +556,8 @@ int fido_brev(char *tillpers,char *adr,struct Mote *motpek) {
                    ft.touser, ft.tozone, ft.tonet, ft.tonode, ft.topoint);
 	}
 
-        if(GetYesOrNo("Vill du ha en kopia av brevet i din egen brevlåda?",
-                      'j', 'n', "Ja\r\n\n", "Nej\r\n\n",
+        if(GetYesOrNo(NULL, "Vill du ha en kopia av brevet i din egen brevlåda?",
+                      NULL, NULL, "Ja", "Nej", "\r\n\n",
                       FALSE, &wantCopy)) {
           return 1;
         }

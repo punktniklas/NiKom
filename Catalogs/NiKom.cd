@@ -55,6 +55,22 @@ MSG_ORG_TEXT_COMMENT_IN (215//)
 MSG_ORG_TEXT_FOOTNOTE (216//)
 Footnote:
 ;
+MSG_GO_SYNTAX (250//)
+Syntax: Go <forum name>
+MSG_GO_NO_SUCH_FORUM (251//)
+There is no such forum.
+MSG_GO_NOT_MEMBER_WANT_TO (252//)
+You are not a member of %s, would you like to be?
+MSG_GO_NOT_MEMBER_NO_PERMS (253//)
+You are not a member of %s.
+MSG_NEXT_CONF_NO_MORE_FORUM (260//)
+No more forum with unread texts.
+MSG_SKIP_NO_TEXT_READ (270//)
+You haven't read any texts yet.
+MSG_SKIP_ONLY_LOCAL (271//)
+You can only use 'Skip' on texts in local forums.
+MSG_SKIP_SKIPPED_TEXTS (272//)
+You skipped %d texts.
 ; ******** Dealing with flags **********
 MSG_FLAG_ON (1000//)
 On

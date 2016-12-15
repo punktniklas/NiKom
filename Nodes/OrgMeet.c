@@ -68,9 +68,8 @@ void org_kommentera(void) {
         SendString("\r\n\nDu får inte kommentera i kommentarsskyddade möten.\r\n");
         return;
       } else {
-        if(GetYesOrNo(
-           "\r\n\nVill du verkligen kommentera i ett kommentarsskyddat möte? ",
-           'j', 'n', "Ja\r\n", "Nej\r\n", FALSE, &isCorrect)) {
+        if(GetYesOrNo("\r\n\n", "Vill du verkligen kommentera i ett kommentarsskyddat möte? ",
+                      NULL, NULL, "Ja", "Nej", "\r\n", FALSE, &isCorrect)) {
           return;
         }
         if(!isCorrect) {

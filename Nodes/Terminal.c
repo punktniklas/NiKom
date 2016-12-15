@@ -13,6 +13,10 @@
 #include "Terminal.h"
 #include "BasicIO.h"
 
+#define CASE_BIT      0x20
+#define LOWERCASE(ch) (ch | CASE_BIT)
+#define UPPERCASE(ch) (ch & ~CASE_BIT)
+
 extern int nodnr, rxlinecount;
 extern char outbuffer[];
 extern struct System *Servermem;
@@ -588,20 +592,24 @@ void DisplayInternalError(void) {
 }
 
 /*
- * Displays a yes/no question and waits for an answer. yesChar and
- * noChar must be lowercase (but can be 8-bit non-ASCII). Result
+ * Displays a yes/no question and waits for an answer. Result
  * is returned in res. 1 if yesChar was selected, 0 otherwise.
  * Function return 0 normally or 1 if carrier is dropped.
  */
-int GetYesOrNo(char *label, char yesChar, char noChar, char *yesStr, char *noStr,
-               int yesIsDefault, int *res) {
+int GetYesOrNo(char *preStr, char *label,
+               char *yesChar, char *noChar, char *yesStr, char *noStr,
+               char *postStr, int yesIsDefault, int *res) {
   int ch;
-  char *response;
+  char *response, yes, no;
+
+  yes = yesChar != NULL ? *yesChar : *yesStr;
+  no = noChar != NULL ? *noChar : *noStr;
 
   radcnt = 0;
-  SendString("%s (%c/%c) ", label != NULL ? label : "",
-             yesIsDefault ? yesChar - 32 : yesChar,
-             yesIsDefault ? noChar : noChar - 32);
+  SendString("%s%s", preStr != NULL ? preStr : "", label != NULL ? label : "");
+  SendString(" (%c/%c) ",
+             yesIsDefault ? UPPERCASE(yes) : LOWERCASE(yes),
+             yesIsDefault ? LOWERCASE(no) : UPPERCASE(no));
   for(;;) {
     ch = GetChar();
     if(ch == GETCHAR_LOGOUT) {
@@ -609,16 +617,16 @@ int GetYesOrNo(char *label, char yesChar, char noChar, char *yesStr, char *noStr
     }
     if(ch == GETCHAR_RETURN) {
       *res = yesIsDefault ? 1 : 0;
-    } else if(ch == yesChar || ch == yesChar - 32) {
+    } else if(LOWERCASE(ch) == LOWERCASE(yes)) {
       *res = 1;
-    } else if(ch == noChar || ch == noChar - 32) {
+    } else if(LOWERCASE(ch) == LOWERCASE(no)) {
       *res = 0;
     } else {
       continue;
     }
     response = *res ? yesStr : noStr;
     if(response != NULL)  {
-      SendString(response);
+      SendString("%s%s", response, postStr != NULL ? postStr : "");
     }
     return 0;
   }
@@ -715,7 +723,7 @@ int MaybeEditNumberChar(char *label, char *number, int maxlen, int minVal,
 int EditBitFlag(char *label, char yesChar, char noChar, char *yesStr, char *noStr,
                 long *value, long bitmask) {
   int setFlag;
-  if(GetYesOrNo(label, yesChar, noChar, yesStr, noStr, *value & bitmask, &setFlag)) {
+  if(GetYesOrNo(NULL, label, &yesChar, &noChar, yesStr, noStr, NULL, *value & bitmask, &setFlag)) {
     return 1;
   }
   if(setFlag) {

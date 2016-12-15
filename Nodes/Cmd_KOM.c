@@ -8,6 +8,7 @@
 #include "OrgMeet.h"
 #include "FidoMeet.h"
 #include "Brev.h"
+#include "Languages.h"
 
 extern struct System *Servermem;
 extern int inloggad, nodnr, mote2, nodestate, senast_text_typ, senast_text_nr;
@@ -25,11 +26,11 @@ void Cmd_GoConf(void) {
   } else {
     parsedConfId = parsemot(argument);
     if(parsedConfId == -3) {
-      SendString("\r\n\nSkriv: Gå <mötesnamn>\r\n\n");
+      SendString("\r\n\n%s\r\n\n", CATSTR(MSG_GO_SYNTAX));
       return;
     }
     if(parsedConfId == -1) {
-      SendString("\r\n\nFinns inget sådant möte!\r\n\n");
+      SendString("\r\n\n%s\r\n\n", CATSTR(MSG_GO_NO_SUCH_FORUM));
       return;
     }
     newConfId = parsedConfId;
@@ -38,9 +39,9 @@ void Cmd_GoConf(void) {
       conf = getmotpek(newConfId);
       if(MayBeMemberConf(conf->nummer, inloggad, &Servermem->inne[nodnr])) {
 
-        sprintf(buffer, "\r\n\nDu är inte medlem i mötet %s, vill du bli medlem?",
-                conf->namn);
-        if(GetYesOrNo(buffer, 'j', 'n', "Ja\r\n", "Nej\r\n", TRUE, &becomeMember)) {
+        sprintf(buffer, CATSTR(MSG_GO_NOT_MEMBER_WANT_TO), conf->namn);
+        if(GetYesOrNo("\r\n\n", buffer, NULL, NULL, "Ja", "Nej", "\r\n",
+                      TRUE, &becomeMember)) {
           return;
         }
         if(!becomeMember) {
@@ -54,8 +55,7 @@ void Cmd_GoConf(void) {
           unreadTexts->lowestPossibleUnreadText[parsedConfId] = conf->lowtext;
         }
       } else {
-        SendString("\r\n\nDu är inte medlem och har inte rätt att "
-                   "gå med i %s.\r\n\n", conf->namn);
+        SendStringCat("\r\n\n%s\r\n\n", CATSTR(MSG_GO_NOT_MEMBER_NO_PERMS), conf->namn);
         return;
       }
     }
@@ -101,7 +101,7 @@ void Cmd_NextConf(void) {
 
   newConfId = FindNextUnreadConf(mote2);
   if(newConfId == -2) {
-    SendString("\n\n\rFinns inget mer möte med olästa texter!\n\r");
+    SendString("\n\n\r%s\n\r", CATSTR(MSG_NEXT_CONF_NO_MORE_FORUM));
     return;
   }
   mote2 = newConfId;
@@ -123,11 +123,11 @@ void Cmd_SkipReplies(void) {
   int textId, i, cnt = 0;
 
   if(senast_text_typ == 0) {
-    SendString("\r\n\nDu har inte läst någon text ännu.\r\n");
+    SendString("\r\n\n%s\r\n", CATSTR(MSG_SKIP_NO_TEXT_READ));
     return;
   }
   if(senast_text_typ != TEXT) {
-    SendString("\r\n\nDu kan bara använda 'Hoppa Över' på texter i vanliga möten.\r\n");
+    SendString("\r\n\n%s\r\n", CATSTR(MSG_SKIP_ONLY_LOCAL));
     return;
   }
   
@@ -160,5 +160,5 @@ void Cmd_SkipReplies(void) {
       break;
     }
   }
-  SendString("\r\n\nDu hoppade över %d texter.\r\n", cnt);
+  SendStringCat("\r\n\n%s\r\n", CATSTR(MSG_SKIP_SKIPPED_TEXTS), cnt);
 }

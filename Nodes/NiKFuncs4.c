@@ -410,7 +410,7 @@ int andragrupp(void) {
     }
   }
 
-  if(GetYesOrNo("\r\n\nÄr allt korrekt?", 'j', 'n', "Ja\r\n", "Nej\r\n",
+  if(GetYesOrNo("\r\n\n", "Är allt korrekt?", NULL, NULL, "Ja", "Nej", "\r\n",
                 TRUE, &isCorrect)) {
     return 1;
   }
@@ -446,7 +446,7 @@ void raderagrupp(void) {
     return;
   }
   SendString("\r\n\nRadera gruppen %s?",userGroup->namn);
-  if(GetYesOrNo(NULL, 'j', 'n', "Ja\r\n", "Nej\r\n", FALSE, &isCorrect)) {
+  if(GetYesOrNo(NULL, NULL, NULL, NULL, "Ja", "Nej", "\r\n", FALSE, &isCorrect)) {
     return;
   }
   if(!isCorrect) {

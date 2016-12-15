@@ -41,9 +41,8 @@ void Cmd_Reply(void) {
         return;
       }
       if(conf->status & KOMSKYDD) {
-        if(GetYesOrNo(
-           "\r\n\nVill du verkligen kommentera i ett kommentarsskyddat möte? ",
-           'j', 'n', "Ja\r\n", "Nej\r\n", FALSE, &isCorrect)) {
+        if(GetYesOrNo("\r\n\n", "Vill du verkligen kommentera i ett kommentarsskyddat möte?",
+                      NULL, NULL, "Ja", "Nej", "\r\n", FALSE, &isCorrect)) {
           return;
         }
         if(!isCorrect) {
@@ -76,9 +75,8 @@ void Cmd_Reply(void) {
     return;
   }
   if(conf->status & KOMSKYDD) {
-    if(GetYesOrNo(
-       "\r\n\nVill du verkligen kommentera i ett kommentarsskyddat möte? ",
-       'j', 'n', "Ja\r\n", "Nej\r\n", FALSE, &isCorrect)) {
+    if(GetYesOrNo("\r\n\n", "Vill du verkligen kommentera i ett kommentarsskyddat möte?",
+                  NULL, NULL, "Ja", "Nej", "\r\n", FALSE, &isCorrect)) {
       return;
     }
     if(!isCorrect) {

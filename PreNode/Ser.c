@@ -150,8 +150,8 @@ struct NodeType *selectNodeType(void) {
         going=FALSE;
       }
     }
-    if(GetYesOrNo("\n\n\rVill du använda denna nodtyp varje gång du loggar in?",
-                  'j', 'n', "Ja\r\n", "Nej\r\n", TRUE, &isCorrect)) {
+    if(GetYesOrNo("\n\n\r", "Vill du använda denna nodtyp varje gång du loggar in?",
+                  NULL, NULL, "Ja", "Nej", "\r\n", TRUE, &isCorrect)) {
       return NULL;
     }
     if(isCorrect) {

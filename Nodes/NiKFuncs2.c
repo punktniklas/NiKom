@@ -112,8 +112,8 @@ void listmed(void) {
     return;
   }
   
-  if(GetYesOrNo("\r\n\nLista medlemmar eller icke medlemmar?",
-                'm', 'i', "Medlemmar\r\n\n", "Icke medlemmar\r\n\n",
+  if(GetYesOrNo("\r\n\n", "Lista medlemmar eller icke medlemmar?",
+                NULL, NULL, "Medlemmar", "Icke medlemmar", "\r\n\n",
                 TRUE, &listMembers)) {
     return;
   }
@@ -155,8 +155,8 @@ void listratt(void) {
     return;
   }
 
-  if(GetYesOrNo("\r\n\nLista rättigheter eller icke rättigheter?",
-                'r', 'i', "Rättigheter\r\n\n", "Icke rättigheter\r\n\n",
+  if(GetYesOrNo("\r\n\n", "Lista rättigheter eller icke rättigheter?",
+                NULL, NULL, "Rättigheter", "Icke rättigheter", "\r\n\n",
                 TRUE, &listPerm)) {
     return;
   }
