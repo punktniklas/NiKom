@@ -54,29 +54,9 @@ MSG_KOM_COMMAND_PASSWORD
 Lösen
 ; Password
 ;
-MSG_WHERE_YOU_ARE_IN
-Du befinner dig i %s.
-; You are in %s.
-;
-MSG_WHERE_NO_TEXTS
-Det finns inga texter.
-; There are no texts.
-;
-MSG_WHERE_TEXTS_NUMBERED
-Det finns texter numrerade från %d till %d.
-; There are texts numbered from %d to %d.
-;
-MSG_WHERE_NO_UNREAD_TEXTS
-Du har inga olästa texter.
-; You have no unread texts.
-;
-MSG_WHERE_ONE_UNREAD_TEXT
-Du har 1 oläst text.
-; You have 1 unread text.
-;
-MSG_WHERE_MANY_UNREAD_TEXTS
-Du har %d olästa texter.
-; You have %d unread texts.
+MSG_FORUMS_NO_SUCH_TEXT
+Finns ingen sådan text.
+; There is no such text.
 ;
 MSG_ORG_TEXT_LINE1
 Text %d  Möte: %s
@@ -106,6 +86,38 @@ MSG_ORG_TEXT_FOOTNOTE
 Fotnot:
 ; Footnote
 ;
+MSG_TEXT_DELETED
+Text %d är raderad.
+; Text %d is deleted.
+;
+MSG_TEXT_NO_PERM
+Du har inte rätt att läsa den texten.
+; You don't have permissions to read that text.
+;
+MSG_WHERE_YOU_ARE_IN
+Du befinner dig i %s.
+; You are in %s.
+;
+MSG_WHERE_NO_TEXTS
+Det finns inga texter.
+; There are no texts.
+;
+MSG_WHERE_TEXTS_NUMBERED
+Det finns texter numrerade från %d till %d.
+; There are texts numbered from %d to %d.
+;
+MSG_WHERE_NO_UNREAD_TEXTS
+Du har inga olästa texter.
+; You have no unread texts.
+;
+MSG_WHERE_ONE_UNREAD_TEXT
+Du har 1 oläst text.
+; You have 1 unread text.
+;
+MSG_WHERE_MANY_UNREAD_TEXTS
+Du har %d olästa texter.
+; You have %d unread texts.
+;
 MSG_GO_SYNTAX
 Skriv: Gå <mötesnamn>
 ;Syntax: Go <forum name>
@@ -126,6 +138,14 @@ MSG_NEXT_CONF_NO_MORE_FORUM
 Finns inget mer möte med olästa texter.
 ; No more forum with unread texts.
 ;
+MSG_NEXT_TEXT_NO_TEXTS
+Finns inga olästa texter i detta möte.
+; You have no unread texts in this forum.
+;
+MSG_NEXT_COMMENT_NO_COMMENTS
+Finns inga fler olästa kommentarer.
+; You have no more unread comments.
+;
 MSG_SKIP_NO_TEXT_READ
 Du har inte läst någon text ännu.
 ; You haven't read any texts yet.
@@ -137,6 +157,54 @@ Du kan bara använda 'Hoppa Över' på texter i vanliga möten.
 MSG_SKIP_SKIPPED_TEXTS
 Du hoppade över %d texter.
 ; You skipped %d texts.
+;
+MSG_COMMENT_NO_PERMISSIONS
+Du har inga rättigheter i mötet där texten finns.
+; You don't have permissions in the forum of that text.
+;
+MSG_COMMENT_NO_COMMENT_IN_FORUM
+Du får inte kommentera i kommentarsskyddade möten.
+; You can't comment in comment protected forums.
+;
+MSG_COMMENT_REALLY_COMMENT
+Vill du verkligen kommentera i ett kommentarsskyddat möte?
+; Do you really want to comment in a comment protected forum?
+;
+MSG_REACTION_PRAISED
+hyllats
+; praised
+;
+MSG_REACTION_DISSED
+dissats
+; dissed
+;
+MSG_REACTION_TEXT_VERBOSE
+Texten har %s av %s
+; The text has been %s by %s
+;
+MSG_REACTION_TEXT_PRAISED
+Texten har hyllats av %d personer
+; The text has been praised by %d persons
+;
+MSG_REACTION_TEXT_DISSED
+Texten har dissats av %d personer
+; The text has been dissed by %d persons
+;
+MSG_WRITE_TEXT_GOT_NUMBER
+Texten fick nummer %d.
+; The text got number %d.
+;
+MSG_WRITE_TOO_MANY_COMMENTS
+Redan maximalt med kommentarer till den texten, sparar texten i alla fall.
+; The commented text has maximum number of comments. No forward link created.
+;
+MSG_WRITE_FORUM
+Möte: %s
+; Forum: %s
+;
+MSG_WRITE_SUBJECT
+Ärende:
+; Subject:
 ;
 MSG_FLAG_ON
 På

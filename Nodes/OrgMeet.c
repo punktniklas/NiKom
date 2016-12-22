@@ -48,12 +48,12 @@ void org_kommentera(void) {
   if(argument[0]) {
     textId = parseTextNumber(argument, TEXT);
     if(textId < Servermem->info.lowtext || textId > Servermem->info.hightext) {
-      SendString("\r\n\nFinns ingen sådan text.\r\n");
+      SendString("\r\n\n%s\r\n", CATSTR(MSG_FORUMS_NO_SUCH_TEXT));
       return;
     }
     confId = GetConferenceForText(textId);
     if(!MayBeMemberConf(confId, inloggad, &Servermem->inne[nodnr])) {
-      SendString("\r\n\nDu har inga rättigheter i mötet där texten finns.\r\n");
+      SendString("\r\n\n%s\r\n", CATSTR(MSG_COMMENT_NO_PERMISSIONS));
       return;
     }
     conf = getmotpek(confId);
@@ -65,10 +65,10 @@ void org_kommentera(void) {
     }
     if(conf->status & KOMSKYDD) {
       if(!MayReplyConf(conf->nummer, inloggad, &Servermem->inne[nodnr])) {
-        SendString("\r\n\nDu får inte kommentera i kommentarsskyddade möten.\r\n");
+        SendString("\r\n\n%s\r\n", CATSTR(MSG_COMMENT_NO_COMMENT_IN_FORUM));
         return;
       } else {
-        if(GetYesOrNo("\r\n\n", "Vill du verkligen kommentera i ett kommentarsskyddat möte? ",
+        if(GetYesOrNo("\r\n\n", CATSTR(MSG_COMMENT_REALLY_COMMENT),
                       NULL, NULL, "Ja", "Nej", "\r\n", FALSE, &isCorrect)) {
           return;
         }
@@ -108,11 +108,11 @@ void org_kommentera(void) {
 }
 
 void org_lasa(int tnr, char verbose) {
-	if(tnr<Servermem->info.lowtext || tnr>Servermem->info.hightext) {
-		puttekn("\r\n\nTexten finns inte!\r\n",-1);
-		return;
-	}
-	org_visatext(tnr, verbose);
+  if(tnr < Servermem->info.lowtext || tnr > Servermem->info.hightext) {
+    SendString("\r\n\n%s\r\n", CATSTR(MSG_FORUMS_NO_SUCH_TEXT));
+    return;
+  }
+  org_visatext(tnr, verbose);
 }
 
 int HasUnreadInOrgConf(int conf) {
@@ -159,7 +159,7 @@ void NextTextInOrgConf(void) {
 
   textId = FindNextUnreadText(0, mote2, &Servermem->unreadTexts[nodnr]);
   if(textId == -1) {
-    SendString("\n\n\rFinns inga olästa texter i detta möte.\n\r");
+    SendString("\n\n\r%s\n\r", CATSTR(MSG_NEXT_TEXT_NO_TEXTS));
     return;
   }
   StackClear(g_unreadRepliesStack);
@@ -168,7 +168,7 @@ void NextTextInOrgConf(void) {
 
 void NextReplyInOrgConf(void) {
   if(StackSize(g_unreadRepliesStack) == 0) {
-    SendString("\n\n\rFinns inga fler olästa kommentarer\n\r");
+    SendString("\n\n\r%s\n\r", CATSTR(MSG_NEXT_COMMENT_NO_COMMENTS));
     return;
   }
   displayTextAndClearUnread(StackPop(g_unreadRepliesStack));
@@ -202,27 +202,28 @@ void displayReactions(int textId, int index, char verbose) {
         switch(*reactionData & 0xff000000) {
         case EXT_REACTION_LIKE:
           likeCnt++;
-          reactionStr = "hyllats";
+          reactionStr = CATSTR(MSG_REACTION_PRAISED);
           break;
         case EXT_REACTION_DISLIKE:
           dislikeCnt++;
-          reactionStr = "dissats";
+          reactionStr = CATSTR(MSG_REACTION_DISSED);
           break;
         default:
           reactionStr = "fluppats";
         }
         if(verbose) {
-          SendString("  - Texten har %s av %s\r\n", reactionStr, getusername(userId));
+          SendStringCat("  - %s\r\n", CATSTR(MSG_REACTION_TEXT_VERBOSE),
+                        reactionStr, getusername(userId));
         }
       }
     }
   }
   DeleteMemHeaderExtension(ext);
   if(likeCnt > 0) {
-    SendString("(Texten har hyllats av %d personer)\r\n", likeCnt);
+    SendStringCat("(%s)\r\n", CATSTR(MSG_REACTION_TEXT_PRAISED), likeCnt);
   }
   if(dislikeCnt > 0) {
-    SendString("(Texten har dissats av %d personer)\r\n", dislikeCnt);
+    SendStringCat("(%s)\r\n", CATSTR(MSG_REACTION_TEXT_DISSED), dislikeCnt);
   }
 }
 
@@ -236,7 +237,7 @@ int org_visatext(int textId, char verbose) {
   Statstr.read++;
 
   if(GetConferenceForText(textId) == -1) {
-    SendString("\n\n\rText %d är raderad.\n\n\r", textId);
+    SendStringCat("\n\n\r%s\n\n\r", CATSTR(MSG_TEXT_DELETED), textId);
     if(Servermem->inne[nodnr].status < Servermem->cfg.st.medmoten) {
       return 0;
     }
@@ -245,7 +246,7 @@ int org_visatext(int textId, char verbose) {
     return 0;
   }
   if(!MayReadConf(readhead.mote, inloggad, &Servermem->inne[nodnr])) {
-    SendString("\r\n\nDu har inte rätt att läsa den texten!\r\n\n");
+    SendString("\r\n\n%s\r\n\n", CATSTR(MSG_TEXT_NO_PERM));
     return 0;
   }
   ts = localtime(&readhead.tid);
@@ -254,8 +255,7 @@ int org_visatext(int textId, char verbose) {
   SendString("    %4d%02d%02d %02d:%02d\r\n",
              ts->tm_year + 1900, ts->tm_mon + 1, ts->tm_mday, ts->tm_hour,
              ts->tm_min);
-  SendStringCat("%s\r\n", CATSTR(MSG_ORG_TEXT_LINE2), readhead.person !=-1
-             ? getusername(readhead.person) : "<raderad användare>");
+  SendStringCat("%s\r\n", CATSTR(MSG_ORG_TEXT_LINE2), getusername(readhead.person));
   if(readhead.kom_till_nr != -1) {
     SendStringCat("%s\r\n", CATSTR(MSG_ORG_TEXT_COMMENT_TO), readhead.kom_till_nr,
                getusername(readhead.kom_till_per));
@@ -320,89 +320,96 @@ int org_visatext(int textId, char verbose) {
 }
 
 void org_sparatext(void) {
-	int x, nummer;
-	Servermem->inne[nodnr].skrivit++;
-	Servermem->info.skrivna++;
-	Statstr.write++;
-	sparhead.rader=rad;
-	for(x=0;x<MAXKOM;x++) {
-		sparhead.kom_i[x]=-1;
-		sparhead.kom_av[x]=-1;
-	}
-	nummer = sendservermess(SPARATEXTEN,(long)&sparhead);
-	sprintf(outbuffer,"\r\nTexten fick nummer %d\r\n",nummer);
-	puttekn(outbuffer,-1);
-	if(Servermem->cfg.logmask & LOG_TEXT) {
-          LogEvent(USAGE_LOG, INFO, "%s skriver text %d i %s",
-                   getusername(inloggad), nummer, getmotnamn(sparhead.mote));
-	}
-	freeeditlist();
+  int i, nummer;
+  Servermem->inne[nodnr].skrivit++;
+  Servermem->info.skrivna++;
+  Statstr.write++;
+  sparhead.rader=rad;
+  for(i = 0; i < MAXKOM; i++) {
+    sparhead.kom_i[i] = -1;
+    sparhead.kom_av[i] = -1;
+  }
+  nummer = sendservermess(SPARATEXTEN, (long)&sparhead);
+  SendStringCat("\r\n%s\r\n", CATSTR(MSG_WRITE_TEXT_GOT_NUMBER), nummer);
+  if(Servermem->cfg.logmask & LOG_TEXT) {
+    LogEvent(USAGE_LOG, INFO, "%s skriver text %d i %s",
+             getusername(inloggad), nummer, getmotnamn(sparhead.mote));
+  }
+  freeeditlist();
 }
 
 void org_linkkom(void) {
-	int x=0;
-	struct Header linkhead;
-	if(readtexthead(readhead.nummer,&linkhead)) return;
-	while(linkhead.kom_i[x]!=-1 && x<MAXKOM) x++;
-	if(x==MAXKOM) {
-		puttekn("\r\n\nRedan maximalt med kommentarer till den texten, sparar texten i alla fall.\r\n\n",-1);
-		return;
-	}
-	linkhead.kom_i[x]=Servermem->info.hightext+1;
-	linkhead.kom_av[x]=sparhead.person;
-	writetexthead(readhead.nummer,&linkhead);
+  int i = 0;
+  struct Header linkhead;
+  if(readtexthead(readhead.nummer, &linkhead)) {
+    return;
+  }
+  while(linkhead.kom_i[i] != -1 && i < MAXKOM) {
+    i++;
+  }
+  if(i == MAXKOM) {
+    SendString("\r\n\n%s\r\n\n", CATSTR(MSG_WRITE_TOO_MANY_COMMENTS));
+    return;
+  }
+  linkhead.kom_i[i] = Servermem->info.hightext+1;
+  linkhead.kom_av[i] = sparhead.person;
+  writetexthead(readhead.nummer, &linkhead);
 }
 
 int org_initheader(int komm) {
-	int length=0,x=0;
-	long tid;
-	struct tm *ts;
-	sparhead.person=inloggad;
-	if(komm) {
-          sparhead.kom_till_nr = readhead.nummer;
-          sparhead.kom_till_per = readhead.person;
-          sparhead.mote = readhead.mote;
-          sparhead.root_text = readhead.root_text;
-	} else {
-          sparhead.kom_till_nr = -1;
-          sparhead.kom_till_per = -1;
-          sparhead.mote = mote2;
-          sparhead.root_text = 0;
-	}
-	Servermem->action[nodnr] = SKRIVER;
-	Servermem->varmote[nodnr] = sparhead.mote;
-	time(&tid);
-	ts=localtime(&tid);
-	sparhead.tid=tid;
-	sparhead.textoffset=(long)&edit_list;
-        sparhead.extensionIndex = 0;
-	sprintf(outbuffer,"\r\n\nMöte: %s    %4d%02d%02d %02d:%02d\r\n",
-                getmotnamn(sparhead.mote), ts->tm_year + 1900, ts->tm_mon + 1,
-                ts->tm_mday, ts->tm_hour, ts->tm_min);
-	puttekn(outbuffer,-1);
-	sprintf(outbuffer,"Skriven av %s\r\n",getusername(inloggad));
-	puttekn(outbuffer,-1);
-	if(komm) {
-		sprintf(outbuffer,"Kommentar till text %d av %s\r\n",sparhead.kom_till_nr,getusername(sparhead.kom_till_per));
-		puttekn(outbuffer,-1);
-	}
-	puttekn("Ärende: ",-1);
-	if(komm) {
-		strcpy(sparhead.arende,readhead.arende);
-		puttekn(sparhead.arende,-1);
-	} else {
-		if(getstring(EKO,40,NULL)) return(1);
-		strcpy(sparhead.arende,inmat);
-	}
-	puttekn("\r\n",-1);
-	if(Servermem->inne[nodnr].flaggor & STRECKRAD) {
-		length=strlen(sparhead.arende);
-		for(x=0;x<length+8;x++) outbuffer[x]='-';
-		outbuffer[x]=0;
-		puttekn(outbuffer,-1);
-		puttekn("\r\n\n",-1);
-	} else puttekn("\n",-1);
-	return(0);
+  int length = 0, i = 0;
+  long tid;
+  struct tm *ts;
+  sparhead.person = inloggad;
+  if(komm) {
+    sparhead.kom_till_nr = readhead.nummer;
+    sparhead.kom_till_per = readhead.person;
+    sparhead.mote = readhead.mote;
+    sparhead.root_text = readhead.root_text;
+  } else {
+    sparhead.kom_till_nr = -1;
+    sparhead.kom_till_per = -1;
+    sparhead.mote = mote2;
+    sparhead.root_text = 0;
+  }
+  Servermem->action[nodnr] = SKRIVER;
+  Servermem->varmote[nodnr] = sparhead.mote;
+  time(&tid);
+  ts = localtime(&tid);
+  sparhead.tid = tid;
+  sparhead.textoffset = (long)&edit_list;
+  sparhead.extensionIndex = 0;
+  SendStringCat("\r\n\n%s", CATSTR(MSG_WRITE_FORUM), getmotnamn(sparhead.mote));
+  SendString("    %4d%02d%02d %02d:%02d\r\n",
+             ts->tm_year + 1900, ts->tm_mon + 1, ts->tm_mday, ts->tm_hour,
+             ts->tm_min);
+  SendStringCat("%s\r\n", CATSTR(MSG_ORG_TEXT_LINE2), getusername(inloggad));
+  if(komm) {
+    SendStringCat("%s\r\n", CATSTR(MSG_ORG_TEXT_COMMENT_TO), sparhead.kom_till_nr,
+                  getusername(sparhead.kom_till_per));
+  }
+  SendString("%s ", CATSTR(MSG_WRITE_SUBJECT));
+  if(komm) {
+    strcpy(sparhead.arende, readhead.arende);
+    SendString(sparhead.arende);
+  } else {
+    if(getstring(EKO, 40, NULL)) {
+      return 1;
+    }
+    strcpy(sparhead.arende,inmat);
+  }
+  SendString("\r\n");
+  if(Servermem->inne[nodnr].flaggor & STRECKRAD) {
+    length = strlen(sparhead.arende);
+    for(i = 0; i < length + 8; i++) {
+      outbuffer[i] = '-';
+    }
+    outbuffer[i] = 0;
+    SendString("%s\r\n\n", outbuffer);
+  } else {
+    SendString("\n");
+  }
+  return 0;
 }
 
 void org_endast(int conf,int amount) {
