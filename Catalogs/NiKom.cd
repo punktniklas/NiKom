@@ -25,6 +25,8 @@ MSG_KOM_AMBIGOUS_COMMAND (111//)
 Ambigous command
 MSG_KOM_COMMAND_PASSWORD (112//)
 Password
+MSG_KOM_INVALID_SWITCH (113//)
+Invalid command switch
 ;
 ; ******** Forums **********
 MSG_FORUMS_NO_SUCH_TEXT (200//)
@@ -101,6 +103,16 @@ MSG_REACTION_TEXT_PRAISED (293//)
 The text has been praised by %d persons.
 MSG_REACTION_TEXT_DISSED (294//)
 The text has been dissed by %d persons.
+MSG_REACTION_NO_MAIL (295//)
+You can not praise/diss mail.
+MSG_REACTION_ONLY_LOCAL (296//)
+You can only praise/diss local texts.
+MSG_REACTION_NO_PERMISSION (297//)
+You don't have permission to praise/diss that text.
+MSG_REACTION_ALREADY (298//)
+You already have %s text %d.
+MSG_REACTION_DONE (299//)
+You have %s text %d.
 ;
 MSG_WRITE_TEXT_GOT_NUMBER (300//)
 The text got number %d.
@@ -110,6 +122,32 @@ MSG_WRITE_FORUM (302//)
 Forum: %s
 MSG_WRITE_SUBJECT (303//)
 Subject:
+;
+MSG_READ_SYNTAX (310//)
+Syntax: Read <text number>
+;
+MSG_FOOTNOTE_SYNTAX (320//)
+Syntax: Footnote <text number>
+MSG_FOOTNOTE_ONLY_OWN_TEXTS (321//)
+You can only add footnotes to your own texts.
+MSG_FOOTNOTE_ALREADY_HAS (322//)
+The text already has a footnote.
+MSG_FOOTNOTE_PRE_EDIT (323//)
+Footnote to text %d by %s
+;
+MSG_SEARCH_SYNTAX (330//)
+Syntax: Search [-g] <search string>
+MSG_SEARCH_NOT_MAILBOX (331//)
+You can't search in %s.
+MSG_SEARCH_NOT_FIDO (332//)
+Search doesn't work in Fido forums.
+MSG_SEARCH_NO_TEXTS_FOUND (333//)
+No texts found.
+MSG_SEARCH_RESULT_LINE1 (334//)
+Text: %d written %02d%02d%02d by %s
+MSG_SEARCH_RESULT_LINE2 (335//)
+Forum: %s
+;
 ; ******** Dealing with flags **********
 MSG_FLAG_ON (1000//)
 On
@@ -145,3 +183,9 @@ MSG_FLAG_COLORS (10012//)
 Colors
 MSG_FLAG_ASCII_7E_IS_DELETE (10013//)
 ASCII 127 (0x7e) is interpreted as delete.
+;
+; ******** Common strings **********
+MSG_COMMON_YES (20000//)
+Yes
+MSG_COMMON_NO (20001//)
+No

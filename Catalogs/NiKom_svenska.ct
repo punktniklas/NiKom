@@ -54,6 +54,10 @@ MSG_KOM_COMMAND_PASSWORD
 Lösen
 ; Password
 ;
+MSG_KOM_INVALID_SWITCH
+Felaktig kommandoflagga.
+; Invalid command switch
+;
 MSG_FORUMS_NO_SUCH_TEXT
 Finns ingen sådan text.
 ; There is no such text.
@@ -190,6 +194,26 @@ MSG_REACTION_TEXT_DISSED
 Texten har dissats av %d personer
 ; The text has been dissed by %d persons
 ;
+MSG_REACTION_NO_MAIL
+Du kan inte hylla/dissa brev.
+; You can not praise/diss mail.
+;
+MSG_REACTION_ONLY_LOCAL
+Du kan bara hylla/dissa lokala texter.
+; You can only praise/diss local texts.
+;
+MSG_REACTION_NO_PERMISSION
+Du har ingen rätt att hylla/dissa den texten.
+; You don't have permission to praise/diss that text.
+;
+MSG_REACTION_ALREADY
+Du har redan %s text %d.
+; You already have %s text %d.
+;
+MSG_REACTION_DONE
+Du har %s text %d.
+; You have %s text %d.
+;
 MSG_WRITE_TEXT_GOT_NUMBER
 Texten fick nummer %d.
 ; The text got number %d.
@@ -205,6 +229,50 @@ Möte: %s
 MSG_WRITE_SUBJECT
 Ärende:
 ; Subject:
+;
+MSG_READ_SYNTAX
+Skriv: Läsa <textnr>
+; Syntax: Read <text number>
+;
+MSG_FOOTNOTE_SYNTAX
+Skriv: Fotnot <textnr>
+; Syntax: Footnote <text number>
+;
+MSG_FOOTNOTE_ONLY_OWN_TEXTS
+Du kan bara lägga till fotnoter på dina egna texter.
+; You can only add footnotes to your own texts.
+;
+MSG_FOOTNOTE_ALREADY_HAS
+Texten har redan en fotnot.
+; The text already has a footnote.
+;
+MSG_FOOTNOTE_PRE_EDIT
+Fotnot till text %d av %s
+; Footnote to text %d by %s
+;
+MSG_SEARCH_SYNTAX
+Skriv: Sök [-g] <söksträng>
+; Syntax: Search [-g] <search string>
+;
+MSG_SEARCH_NOT_MAILBOX
+Du kan inte söka i %s.
+; You can't search in %s.
+;
+MSG_SEARCH_NOT_FIDO
+Sök fungerar inte i FidoNet-möten.
+; Search doesn't work in Fido forums.
+;
+MSG_SEARCH_NO_TEXTS_FOUND
+Inga texter hittades.
+; No texts found.
+;
+MSG_SEARCH_RESULT_LINE1
+Text: %d skriven %02d%02d%02d av %s
+; Text: %d written %02d%02d%02d by %s
+;
+MSG_SEARCH_RESULT_LINE2
+Möte: %s
+; Forum: %s
 ;
 MSG_FLAG_ON
 På
@@ -269,4 +337,12 @@ Färger
 MSG_FLAG_ASCII_7E_IS_DELETE
 ASCII 127 (0x7e) tolkas som delete
 ;ASCII 127 (0x7e) is interpreted as delete.
+;
+MSG_COMMON_YES
+Ja
+; Yes
+;
+MSG_COMMON_NO
+Nej
+; No
 ;

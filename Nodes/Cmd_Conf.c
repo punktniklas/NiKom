@@ -9,6 +9,7 @@
 #include "ConfCommon.h"
 #include "StringUtils.h"
 #include "ConfHeaderExtensions.h"
+#include "Languages.h"
 
 #include "Cmd_Conf.h"
 
@@ -37,12 +38,13 @@ void Cmd_Reply(void) {
     }
     if(conf->type == MOTE_FIDO) {
       if(!MayReplyConf(mote2, inloggad, &Servermem->inne[nodnr])) {
-        SendString("\r\n\nDu får inte kommentera den texten!\r\n\n");
+        SendString("\r\n\n%s\r\n\n", CATSTR(MSG_COMMENT_NO_COMMENT_IN_FORUM));
         return;
       }
       if(conf->status & KOMSKYDD) {
-        if(GetYesOrNo("\r\n\n", "Vill du verkligen kommentera i ett kommentarsskyddat möte?",
-                      NULL, NULL, "Ja", "Nej", "\r\n", FALSE, &isCorrect)) {
+        if(GetYesOrNo("\r\n\n", CATSTR(MSG_COMMENT_REALLY_COMMENT),
+                      NULL, NULL, CATSTR(MSG_COMMON_YES), CATSTR(MSG_COMMON_NO),
+                      "\r\n", FALSE, &isCorrect)) {
           return;
         }
         if(!isCorrect) {
@@ -55,7 +57,7 @@ void Cmd_Reply(void) {
   }
 
   if(!senast_text_typ) {
-    SendString("\n\n\rDu har inte läst någon text ännu.\n\r");
+    SendString("\n\n\r%s\n\r", CATSTR(MSG_SKIP_NO_TEXT_READ));
     return;
   }
   if(senast_text_typ == BREV) {
@@ -71,12 +73,13 @@ void Cmd_Reply(void) {
     return;
   }
   if(!MayReplyConf(senast_text_mote, inloggad, &Servermem->inne[nodnr])) {
-    SendString("\r\n\nDu får inte kommentera den texten!\r\n\n");
+    SendString("\r\n\n%s\r\n\n", CATSTR(MSG_COMMENT_NO_COMMENT_IN_FORUM));
     return;
   }
   if(conf->status & KOMSKYDD) {
-    if(GetYesOrNo("\r\n\n", "Vill du verkligen kommentera i ett kommentarsskyddat möte?",
-                  NULL, NULL, "Ja", "Nej", "\r\n", FALSE, &isCorrect)) {
+    if(GetYesOrNo("\r\n\n", CATSTR(MSG_COMMENT_REALLY_COMMENT),
+                  NULL, NULL, CATSTR(MSG_COMMON_YES), CATSTR(MSG_COMMON_NO),
+                  "\r\n", FALSE, &isCorrect)) {
       return;
     }
     if(!isCorrect) {
@@ -95,12 +98,12 @@ void Cmd_Read(void) {
   struct Mote *conf;
   char verbose = FALSE, *flag;
   if(argument[0] == '\0') {
-    SendString("\r\n\nSkriv: Läsa <textnr>\r\n");
+    SendString("\r\n\n%s\r\n", CATSTR(MSG_READ_SYNTAX));
     return;
   }
   textId = parseTextNumber(argument, mote2 == -1 ? BREV : 0);
   if(textId == -1) {
-    SendString("\r\n\nFinns ingen sådan text.\r\n");
+    SendString("\r\n\n%s\r\n", CATSTR(MSG_FORUMS_NO_SUCH_TEXT));
     return;
   }
   flag = hittaefter(argument);
@@ -132,13 +135,13 @@ void Cmd_FootNote(void) {
   struct Header textHeader;
 
   if(argument[0] == '\0') {
-    SendString("\n\n\rSkriv: Fotnot <text nummer>\n\r");
+    SendString("\n\n\r%s\n\r", CATSTR(MSG_FOOTNOTE_SYNTAX));
     return;
   }
   textId = atoi(argument);
   confId = GetConferenceForText(textId);
   if(confId == -1) {
-    SendString("\n\n\rFinns ingen sådan text.\n\r");
+    SendString("\n\n\r%s\n\r", CATSTR(MSG_FORUMS_NO_SUCH_TEXT));
     return;
   }
   if(readtexthead(textId,&textHeader)) {
@@ -146,15 +149,15 @@ void Cmd_FootNote(void) {
   }
   if(textHeader.person != inloggad
      && !MayAdminConf(confId, inloggad, &Servermem->inne[nodnr])) {
-    SendString("\r\n\nDu kan bara lägga till fotnoter på dina egna texter.\r\n\n");
+    SendString("\r\n\n%s\r\n\n", CATSTR(MSG_FOOTNOTE_ONLY_OWN_TEXTS));
     return;
   }
   if(textHeader.footNote != 0) {
-    SendString("\n\n\rTexten har redan en fotnot.\n\r");
+    SendString("\n\n\r%s\n\r", CATSTR(MSG_FOOTNOTE_ALREADY_HAS));
     return;
   }
 
-  SendString("\n\n\rFotnot till text %d av %s\n\r",
+  SendStringCat("\n\n\r%s\n\r", CATSTR(MSG_FOOTNOTE_PRE_EDIT),
              textId, getusername(textHeader.person));
   if((editRet = edittext(NULL)) != 0) {
     return;
@@ -216,13 +219,13 @@ void Cmd_Search(void) {
     if(argptr[1] == 'g') {
       global = TRUE;
     } else {
-      SendString("\r\n\nFelaktig flagga.\r\n\n");
+      SendString("\r\n\n%s\r\n\n", CATSTR(MSG_KOM_INVALID_SWITCH));
       return;
     }
     argptr = FindNextWord(argptr);
   }
   if(argptr[0] == '\0') {
-    SendString("\r\n\nSkriv: Sök [-g] <söksträng>\r\n\n");
+    SendString("\r\n\n%s\r\n\n", CATSTR(MSG_SEARCH_SYNTAX));
     return;
   }
   searchstr = argptr;
@@ -230,12 +233,12 @@ void Cmd_Search(void) {
 
   if(!global) {
     if(mote2 == -1) {
-      SendString("\r\n\nDu kan inte söka i %s.\r\n\n", Servermem->cfg.brevnamn);
+      SendStringCat("\r\n\n%s\r\n\n", CATSTR(MSG_SEARCH_NOT_MAILBOX), Servermem->cfg.brevnamn);
       return;
     }
     conf = getmotpek(mote2);
     if(conf->type == MOTE_FIDO) {
-      SendString("\r\n\n Sök fungerar inte i FidoNet-möten.\r\n\n");
+      SendString("\r\n\n%s\r\n\n", CATSTR(MSG_SEARCH_NOT_FIDO));
       return;
     }
   }
@@ -266,7 +269,7 @@ void Cmd_Search(void) {
     if(currentText == -1) {
       SendString("\r\x1b\x5b\x4b");
       if(!foundsomething) {
-        SendString("Inga texter hittades.\r\n\n");
+        SendString("%s\r\n\n", CATSTR(MSG_SEARCH_NO_TEXTS_FOUND));
       }
       return;
     }
@@ -283,7 +286,7 @@ void Cmd_Search(void) {
       }
       foundsomething = 1;
       ts = localtime(&textHeader.tid);
-      if(SendString("\r\x1b\x5b\x4bText: %d skriven %02d%02d%02d av %s\r\n",
+      if(SendStringCat("\r\x1b\x5b\x4b%s\r\n", CATSTR(MSG_SEARCH_RESULT_LINE1),
                     currentText, ts->tm_year % 100, ts->tm_mon + 1,
                     ts->tm_mday, getusername(textHeader.person))) {
         freeeditlist();
@@ -291,7 +294,7 @@ void Cmd_Search(void) {
       }
       if(global) {
         conf = getmotpek(textHeader.mote);
-        if(SendString("Möte: %s\r\n", conf->namn)) {
+        if(SendStringCat("%s\r\n", CATSTR(MSG_SEARCH_RESULT_LINE2), conf->namn)) {
           freeeditlist();
           return;
         }
@@ -374,30 +377,30 @@ void cmd_Reaction(long reaction) {
   
   if(argument[0]) {
     if(mote2 == -1) {
-      SendString("\r\n\nDu kan inte hylla/dissa brev.\r\n");
+      SendString("\r\n\n%s\r\n", CATSTR(MSG_REACTION_NO_MAIL));
       return;
     }
     conf = getmotpek(mote2);
     if(conf->type != MOTE_ORGINAL) {
-      SendString("\r\n\nDu kan bara hylla/dissa lokala texter.\r\n\n");
+      SendString("\r\n\n%s\r\n\n", CATSTR(MSG_REACTION_ONLY_LOCAL));
       return;
     }
     textId = parseTextNumber(argument, TEXT);
     if(textId == -1 || (confId = GetConferenceForText(textId)) == -1) {
-      SendString("\r\n\nFinns ingen sådan text.\r\n");
+      SendString("\r\n\n%s\r\n", CATSTR(MSG_FORUMS_NO_SUCH_TEXT));
       return;
     }
     if(!MayReadConf(confId, inloggad, &Servermem->inne[nodnr])) {
-      SendString("\r\n\nDu har ingen rätt att hylla/dissa den texten.\r\n");
+      SendString("\r\n\n%s\r\n", CATSTR(MSG_REACTION_NO_PERMISSION));
       return;
     }
   } else {
     if(!senast_text_typ) {
-      SendString("\n\n\rDu har inte läst någon text ännu.\n\r");
+      SendString("\n\n\r%s\n\r", CATSTR(MSG_SKIP_NO_TEXT_READ));
       return;
     }
     if(senast_text_typ == BREV) {
-      SendString("\r\n\nDu kan inte hylla/dissa brev.\r\n");
+      SendString("\r\n\n%s\r\n", CATSTR(MSG_REACTION_NO_MAIL));
       return;
     }
     conf = getmotpek(senast_text_mote);
@@ -409,7 +412,7 @@ void cmd_Reaction(long reaction) {
       return;
     }
     if(conf->type != MOTE_ORGINAL) {
-      SendString("\r\n\nDu kan bara hylla/dissa lokala texter.\r\n\n");
+      SendString("\r\n\n%s\r\n\n", CATSTR(MSG_REACTION_ONLY_LOCAL));
       return;
     }
     textId = senast_text_nr;
@@ -433,14 +436,16 @@ void cmd_Reaction(long reaction) {
     }
   }
   if(!setReactionInExtension(ext, reaction)) {
-    SendString("\r\n\nDu har redan %s text %d.\r\n",
-               reaction == EXT_REACTION_LIKE ? "hyllat" : "dissat", textId);
+    SendStringCat("\r\n\n%s\r\n", CATSTR(MSG_REACTION_ALREADY),
+                  reaction == EXT_REACTION_LIKE ? CATSTR(MSG_REACTION_PRAISED) : CATSTR(MSG_REACTION_DISSED),
+                  textId);
   } else {
     if(SaveHeaderExtension(ext)) {
       DisplayInternalError();
     }
-    SendString("\r\n\nDu har %s text %d.\r\n",
-               reaction == EXT_REACTION_LIKE ? "hyllat" : "dissat", textId);
+    SendStringCat("\r\n\n%s\r\n", CATSTR(MSG_REACTION_DONE),
+                  reaction == EXT_REACTION_LIKE ? CATSTR(MSG_REACTION_PRAISED) : CATSTR(MSG_REACTION_DISSED),
+                  textId);
   }
   DeleteMemHeaderExtension(ext);
 }
