@@ -274,6 +274,134 @@ MSG_SEARCH_RESULT_LINE2
 Möte: %s
 ; Forum: %s
 ;
+MSG_MAIL_NO_SUCH_MAIL
+Finns inget sådant brev.
+; There is no such mail.
+;
+MSG_MAIL_NO_COMMENT_PERM
+Du har inte rätt att kommentera det brevet.
+; You don't have permissions to comment that mail.
+;
+MSG_MAIL_NOT_WRITTEN
+Du har inte skrivit det brevet.
+; You have not written that mail.
+;
+MSG_MAIL_NO_UNREAD
+Du har inga olästa brev.
+; You have no unread mail.
+;
+MSG_MAIL_ONE_UNREAD
+Du har 1 oläst brev.
+; You have 1 unread mail.
+;
+MSG_MAIL_MANY_UNREAD
+Du har %d olästa brev.
+; You have %d unread mail.
+;
+MSG_MAIL_YOU_ARE
+Du befinner dig i %s.
+; You are in %s.
+;
+MSG_MAIL_NO_READ_PERM
+Du har inte rätt att läsa det brevet.
+; You don't have permissions to read that mail.
+;
+MSG_MAIL_LINE1
+Brev %d  i %s hos %s
+; Mail %d in %s at %s
+;
+MSG_MAIL_LOCAL_MAIL
+Lokalt brev,  %s
+; Local mail,  %s
+;
+MSG_MAIL_UNKNOWN_MAIL
+<Okänd brevtyp>  %s
+; <Unknown mail type>,  %s
+;
+MSG_MAIL_FROM
+Avsändare: %s
+; From: %s
+;
+MSG_MAIL_COMMENT
+Kommentar till en text av %s
+; Comment to a mail by %s
+;
+MSG_MAIL_TO
+Mottagare: %s
+; To: %s
+;
+MSG_MAIL_END
+(Slut på brev %d av %s)
+; (End of mail %d by %s)
+;
+MSG_MAIL_FIDO_MAIL
+FIdo-nätbrev,  %s
+; Fido netmail,  %s
+;
+MSG_MAIL_FIDO_BAD_ZONE
+Du kan inte skriva brev till zon %d.
+; You can not send a mail to zone %d.
+;
+MSG_MAIL_FIDO_WHAT_CHARSET
+Vilken teckenkodning ska användas för brevet?
+; What character encoding should be used for the netmail?
+;
+MSG_MAIL_FIDO_WANT_COPY
+Vill du ha en kopia av brevet i din egen brevlåda?
+; Do you want a copy of the mail in your own mailbox?
+;
+MSG_MAIL_GOT_NUMBER
+Brevet fick nummer %d
+; The mail got number %d.
+;
+MSG_MAIL_GOT_NUMBER_AT_USER
+Brevet fick nummer %d hos %s
+; The mail got number %d at %s.
+;
+MSG_MAIL_LOCAL_SYNTAX
+Skriv: Brev <användare>
+; Syntax: Mail <user>
+;
+MSG_MAIL_FIDO_SYNTAX
+Skriv: Brev <användare>@<zon>:<nät>/<nod>[.<point>]
+; Syntax: Mail <user>@<zone>:<net>/<node>[.<point>]
+;
+MSG_MAIL_LIST_SUMMARY
+
+; Lowest mail: %d  Highest mail: %d
+;
+MSG_MAIL_LIST_HEAD
+Namn                              Text   Date   Subject
+; From                              Text   Date   Subject
+;
+MSG_MAIL_LIST_UNKNOWN
+<Okänd brevtyp>                   %5d
+; <Unknown mail type>               %5d
+;
+MSG_MAIL_PURGE_SYNTAX
+Skriv: Rensa Brev <antal brev att radera>
+; Syntax: Purge Mail <number of mail>
+;
+MSG_MAIL_PURGE_ABOVE_ZERO
+Antalet brev måste vara större än noll.
+; The number of mail must be larger than zero.
+;
+MSG_MAIL_PURGE_ONLY_X_MAIL
+Du har bara %d brev.
+; You only have %d mail.
+;
+MSG_MAIL_PURGE_SUMMARY
+Lägsta brev: %d  Högsta brev: %d  Antal att radera: %d
+; Lowest mail: %d  Highest mail: %d  Mail to delete: %d
+;
+MSG_MAIL_PURGE_PURGING
+Rensar...
+; Purging...
+;
+MSG_MAIL_PURGE_RESULT
+%d brev raderade.
+; %d mail purged.
+;
 MSG_FLAG_ON
 På
 ; On
@@ -345,4 +473,12 @@ Ja
 MSG_COMMON_NO
 Nej
 ; No
+;
+MSG_COMMON_NO_SUCH_USER
+Användaren finns inte.
+; There is no such user.
+;
+MSG_COMMON_CHOICE
+Val:
+; Choice:
 ;

@@ -148,6 +148,71 @@ Text: %d written %02d%02d%02d by %s
 MSG_SEARCH_RESULT_LINE2 (335//)
 Forum: %s
 ;
+MSG_MAIL_NO_SUCH_MAIL (340//)
+There is no such mail.
+MSG_MAIL_NO_COMMENT_PERM (341//)
+You don't have permissions to comment that mail.
+MSG_MAIL_NOT_WRITTEN (342//)
+You have not written that mail.
+MSG_MAIL_NO_UNREAD (343//)
+You have no unread mail.
+MSG_MAIL_ONE_UNREAD (344//)
+You have 1 unread mail.
+MSG_MAIL_MANY_UNREAD (345//)
+You have %d unread mail.
+MSG_MAIL_YOU_ARE (346//)
+You are in %s.
+MSG_MAIL_NO_READ_PERM (347//)
+You don't have permissions to read that mail.
+MSG_MAIL_LINE1 (348//)
+Mail %d in %s at %s
+MSG_MAIL_LOCAL_MAIL (349//)
+Local mail,  %s
+MSG_MAIL_UNKNOWN_MAIL (350//)
+<Unknown mail type>,  %s
+MSG_MAIL_FROM (351//)
+From: %s
+MSG_MAIL_COMMENT (352//)
+Comment to a mail by %s
+MSG_MAIL_TO (353//)
+To: %s
+MSG_MAIL_END (354//)
+(End of mail %d by %s)
+MSG_MAIL_FIDO_MAIL (355//)
+Fido netmail,  %s
+MSG_MAIL_FIDO_BAD_ZONE (356//)
+You can not send a mail to zone %d.
+MSG_MAIL_FIDO_WHAT_CHARSET (357//)
+What character encoding should be used for the netmail?
+MSG_MAIL_FIDO_WANT_COPY (358//)
+Do you want a copy of the mail in your own mailbox?
+MSG_MAIL_GOT_NUMBER (359//)
+The mail got number %d.
+MSG_MAIL_GOT_NUMBER_AT_USER (360//)
+The mail got number %d at %s.
+MSG_MAIL_LOCAL_SYNTAX (361//)
+Syntax: Mail <user>
+MSG_MAIL_FIDO_SYNTAX (362//)
+Syntax: Mail <user>@<zone>:<net>/<node>[.<point>]
+MSG_MAIL_LIST_SUMMARY (363//)
+Lowest mail: %d  Highest mail: %d
+MSG_MAIL_LIST_HEAD (364//)
+From                              Text  Date   Subject
+MSG_MAIL_LIST_UNKNOWN (365//)
+<Unknown mail type>               %5d
+MSG_MAIL_PURGE_SYNTAX (370//)
+Syntax: Purge Mail <number of mail>
+MSG_MAIL_PURGE_ABOVE_ZERO (371//)
+The number of mail must be larger than zero.
+MSG_MAIL_PURGE_ONLY_X_MAIL (372//)
+You only have %d mail.
+MSG_MAIL_PURGE_SUMMARY (373//)
+Lowest mail: %d  Highest mail: %d  Mail to delete: %d
+MSG_MAIL_PURGE_PURGING (374//)
+Purging...
+MSG_MAIL_PURGE_RESULT (375//)
+%d mail purged.
+;
 ; ******** Dealing with flags **********
 MSG_FLAG_ON (1000//)
 On
@@ -189,3 +254,7 @@ MSG_COMMON_YES (20000//)
 Yes
 MSG_COMMON_NO (20001//)
 No
+MSG_COMMON_NO_SUCH_USER (20002//)
+There is no such user.
+MSG_COMMON_CHOICE (20003//)
+Choice:
