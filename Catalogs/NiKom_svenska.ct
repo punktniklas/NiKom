@@ -367,7 +367,7 @@ Skriv: Brev <användare>@<zon>:<nät>/<nod>[.<point>]
 ; Syntax: Mail <user>@<zone>:<net>/<node>[.<point>]
 ;
 MSG_MAIL_LIST_SUMMARY
-
+Lägsta brev: %d  Högsta brev: %d
 ; Lowest mail: %d  Highest mail: %d
 ;
 MSG_MAIL_LIST_HEAD
@@ -401,6 +401,10 @@ Rensar...
 MSG_MAIL_PURGE_RESULT
 %d brev raderade.
 ; %d mail purged.
+;
+MSG_INFO_NO_SUCH_FILE
+Finns ingen sådan info-fil.
+; There is no such info file.
 ;
 MSG_FLAG_ON
 På

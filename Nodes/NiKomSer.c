@@ -13,6 +13,7 @@
 #include "NiKomStr.h"
 #include "NiKomFuncs.h"
 #include "NiKomLib.h"
+#include "InfoFiles.h"
 #include "Logging.h"
 #include "Terminal.h"
 #include "BasicIO.h"
@@ -146,9 +147,7 @@ void main(int argc,char *argv[]) {
              "Can't read unread text info for user %d", inloggad);
     cleanup(EXIT_ERROR, "Error reading unread text info.\n");
   }
-  if(getft("NiKom:Texter/Bulletin.txt")>Servermem->inne[nodnr].senast_in) {
-    sendfile("NiKom:Texter/Bulletin.txt");
-  }
+  SendInfoFile("Bulletin.txt", Servermem->inne[nodnr].senast_in);
 
   connection();
 
@@ -168,7 +167,7 @@ void main(int argc,char *argv[]) {
     radcnt=-174711;
     if(Servermem->say[nodnr]) displaysay();
     if(Servermem->cfg.ar.utlogg) sendautorexx(Servermem->cfg.ar.utlogg);
-    sendfile("NiKom:Texter/Utlogg.txt");
+    SendInfoFile("Logout.txt", 0);
   }
   Servermem->inloggad[nodnr]=-1;
   if(Servermem->cfg.logmask & LOG_UTLOGG) {

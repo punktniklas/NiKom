@@ -17,6 +17,7 @@
 #include "Logging.h"
 #include "StringUtils.h"
 #include "Stack.h"
+#include "Languages.h"
 
 #define EKO		1
 #define EJEKO	0
@@ -554,26 +555,6 @@ void vilka(void) {
 		strcat(outbuffer, "\n");
 		puttekn(outbuffer,-1);
 	}
-}
-
-void visainfo(void) {
-   struct AnchorPath *anchor;
-   char filnamn[100],pattern[100];
-	if(!argument[0]) {
-		sendfile("NiKom:Texter/Info.txt");
-		return;
-	}
-	if(anchor = AllocMem(sizeof(struct AnchorPath),MEMF_CLEAR)) {
-	   sprintf(pattern,"NiKom:Texter/%s#?.txt",argument);
-	   if(MatchFirst(pattern,anchor)) {
-	      puttekn("\r\n\nFinns ingen sådan fil!\r\n",-1);
-			return;
-		}
-	   sprintf(filnamn,"NiKom:Texter/%s",anchor->ap_Info.fib_FileName);
-	   MatchEnd(anchor);
-	   FreeMem(anchor,sizeof(struct AnchorPath));
-   	sendfile(filnamn);
-   } else puttekn("\n\n\rKunde inte allokera en Anchorpath\n\r",-1);
 }
 
 int readtexthead(int nummer,struct Header *head) {

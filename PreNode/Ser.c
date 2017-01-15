@@ -221,7 +221,7 @@ void main(int argc,char *argv[]) {
     if(!getty) Delay(100);
     Servermem->inne[nodnr].rader=0;
     Servermem->inne[nodnr].chrset = CHRS_LATIN1;
-    sendfile("NiKom:Texter/Inlogg.txt");
+    sendfile("NiKom:Texter/Login.txt");
     if(Servermem->cfg.ar.preinlogg) sendrexx(Servermem->cfg.ar.preinlogg);
     car=TRUE;
     Servermem->inne[nodnr].chrset = 0;

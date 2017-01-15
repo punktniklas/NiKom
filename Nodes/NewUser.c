@@ -12,6 +12,7 @@
 #include "Terminal.h"
 #include "Logging.h"
 #include "CharacterSets.h"
+#include "InfoFiles.h"
 
 void initConfPermissions(void);
 int createUserDirectory(int newUserId);
@@ -38,7 +39,7 @@ int RegisterNewUser(void) {
 
   SendString("\r\n\n");
   user->rader = Servermem->cfg.defaultrader;
-  sendfile("NiKom:Texter/NyAnv.txt");
+  SendInfoFile("NewUser.txt", 0);
 
   for(;;) {
     do {

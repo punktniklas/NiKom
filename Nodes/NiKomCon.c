@@ -13,6 +13,7 @@
 #include "NiKomStr.h"
 #include "NiKomFuncs.h"
 #include "NiKomLib.h"
+#include "InfoFiles.h"
 #include "Logging.h"
 #include "Terminal.h"
 #include "NewUser.h"
@@ -134,7 +135,7 @@ void main(int argc, char **argv) {
     Servermem->idletime[nodnr] = time(NULL);
     memset(commandhistory,0,1024);
     Servermem->inne[nodnr].rader=0;
-    sendfile("NiKom:Texter/Inlogg.txt");
+    sendfile("NiKom:Texter/Login.txt");
     if(Servermem->cfg.ar.preinlogg) sendautorexx(Servermem->cfg.ar.preinlogg);
     going=TRUE;
     while(going) {
@@ -181,7 +182,7 @@ void main(int argc, char **argv) {
     }
     Servermem->inloggad[nodnr]=inloggad;
     Servermem->idletime[nodnr] = time(NULL);
-    if(getft("NiKom:Texter/Bulletin.txt")>Servermem->inne[nodnr].senast_in) sendfile("NiKom:Texter/Bulletin.txt");
+    SendInfoFile("Bulletin.txt", Servermem->inne[nodnr].senast_in);
 
     connection();
 
@@ -191,7 +192,7 @@ void main(int argc, char **argv) {
     }
     if(Servermem->say[nodnr]) displaysay();
     if(Servermem->cfg.ar.utlogg) sendautorexx(Servermem->cfg.ar.utlogg);
-    sendfile("NiKom:Texter/Utlogg.txt");
+    SendInfoFile("Logout.txt", 0);
     sprintf(titel,"Nod #%d CON: <Ingen inloggad>",nodnr);
     SetWindowTitles(NiKwind,titel,(UBYTE *)-1L);
     Servermem->inloggad[nodnr]=-1;

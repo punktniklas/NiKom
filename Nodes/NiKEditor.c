@@ -10,6 +10,7 @@
 #include "NiKomStr.h"
 #include "NiKomFuncs.h"
 #include "NiKomLib.h"
+#include "InfoFiles.h"
 #include "Terminal.h"
 #include "Logging.h"
 
@@ -193,7 +194,7 @@ int lineedit(char *filename) {
           if(letmp[2] == 'i' || letmp[2] == 'I') linequote();
           else if(letmp[2] == 'r' || letmp[2] == 'R') linecrash();
         }
-        else if(letmp[1] == '?') sendfile("NiKom:Texter/EditorHelp.txt");
+        else if(letmp[1] == '?') SendInfoFile("EditorHelp.txt", 0);
       } else {
         if(!(el=allocEditLine())) {
           return 0;

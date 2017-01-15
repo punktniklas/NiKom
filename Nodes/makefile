@@ -4,8 +4,8 @@ FLAGS   = NMINC STRMERGE CPU=$(CPU) DEBUG=FULL GST=Include:all.gst ERROR=ALL \
 OBJS    = ServerComm.o Terminal.o NiKFuncs.o NiKFuncs2.o NiKFuncs3.o NiKFuncs4.o \
           NiKFuncs5.o NiKEditor.o NiKRexx.o NiKFiles.o NiKVersion.o Brev.o \
           OrgMeet.o FidoMeet.o NewUser.o CharacterSets.o KOM.o ConfCommon.o \
-          ConfHeaderExtensions.o Languages.o _tzset.o \
-	  Cmd_KOM.o Cmd_Users.o Cmd_Conf.o
+          ConfHeaderExtensions.o Languages.o InfoFIles.o _tzset.o \
+	  Cmd_KOM.o Cmd_Users.o Cmd_Conf.o Cmd_Misc.o
 CONOBJS = NiKomCon.o ConsoleIO.o NiKConTrans.o NiKConOffline.o
 SEROBJS = NiKomSer.o SerialIO.o NiKTransfer.o NiKOffline.o
 
@@ -125,6 +125,9 @@ ConfHeaderExtensions.o: ConfHeaderExtensions.c /Include/NiKomStr.h ConfHeaderExt
 Languages.o: Languages.c /Include/NiKomStr.h Languages.h
   sc $(FLAGS) Languages.c OBJNAME=Languages.o
 
+InfoFiles.o: InfoFiles.c /Include/NiKomStr.h InfoFiles.h
+  sc $(FLAGS) InfoFiles.c OBJNAME=InfoFiles.o
+
 Cmd_Kom.o: Cmd_KOM.c /Include/NiKomStr.h /Include/NiKomLib.h Cmd_KOM.h
   sc $(FLAGS) Cmd_KOM.c OBJNAME=Cmd_KOM.o
 
@@ -133,6 +136,9 @@ Cmd_Users.o: Cmd_Users.c /Include/NiKomStr.h /Include/NiKomLib.h Cmd_Users.h
 
 Cmd_Conf.o: Cmd_Conf.c /Include/NiKomStr.h /Include/NiKomLib.h Cmd_Conf.h
   sc $(FLAGS) Cmd_Conf.c OBJNAME=Cmd_Conf.o
+
+Cmd_Misc.o: Cmd_Misc.c /Include/NiKomStr.h /Include/NiKomLib.h Cmd_Misc.h
+  sc $(FLAGS) Cmd_Misc.c OBJNAME=Cmd_Misc.o
 
 _tzset.o: sc:source/_tzset.c
   sc $(FLAGS) PARM=BOTH DEFINE=LESS_GETENV=1 OBJNAME=_tzset.o sc:source/_tzset.c

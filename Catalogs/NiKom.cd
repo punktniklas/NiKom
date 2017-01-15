@@ -213,6 +213,9 @@ Purging...
 MSG_MAIL_PURGE_RESULT (375//)
 %d mail purged.
 ;
+MSG_INFO_NO_SUCH_FILE (400//)
+There is no such info file.
+;
 ; ******** Dealing with flags **********
 MSG_FLAG_ON (1000//)
 On

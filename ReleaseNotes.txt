@@ -1,4 +1,55 @@
 ---------------------------------------------------------------------------
+                         NiKom v2.3.0, 2017-xx-yy
+---------------------------------------------------------------------------
+NiKom now supports multiple languages. Initially the two available
+langauges are English and Swedish which are selected for each induvidual
+user. The default language is English which means that when 2.3 is
+installed each user will be using English. They can easily switch back
+to Swedish with the command "Change Language". Also if translations
+are missing for any string it will be displayed in English.
+
+A number of things must be perfomed in an existing installation.
+
+- The new command "Change Language" ("Byt Språk") must be installed.
+
+- Kommandon.cfg has been renamed to Commands.cfg and must be updated
+  to contain both English and Swedish versions of the command names.
+  The "N=" line for each command contains the default (English) name
+  for the command. This can be "-" if no default name should be available.
+  Additional (optional) "N<language>=" lines can be added for each
+  language. E.g.
+
+  N=WRITE
+  Nsvenska=SKRIV
+
+  The language name should be the same as used for AmigaOS locales.
+
+  Also, the "O=" lines are not valid anymore and should be deleted. NiKom
+  will count the number of words automatically.
+
+  For examples see Commands.cfg in the full distribution.
+
+- For each language a catalog file needs to be installed in a system
+  locale directory. This is typically Sys:Locale.
+  E.g. Catalogs/svenska/NiKom.catalog should be installed to
+  Sys:Locale/Catalogs/svenska/.
+
+- The files in NiKom:Texter need to be rearranged. All Swedish files
+  except Inlogg.txt need to be moved into a newly created directory
+  "svenska". (At login NiKom doesn't know which user it us and can't
+  display a translated login text.) Also some of the files need to
+  be renamed:
+  - 2Fel.txt -> 2Errors.txt
+  - ListaKommandon.txt -> ListCommands.txt
+  - Utlogg.txt -> Logout.txt
+  - NyAnv.txt -> NewUser.txt
+  - TidenSlut.txt -> OutOfTime.txt
+  - Inlogg.txt -> Login.txt
+
+  Finally, default English versions of these files can be found in
+  the full NiKom distribution and should be placed in a directory
+  "english".
+---------------------------------------------------------------------------
                          NiKom v2.2.0, 2016-10-04
 ---------------------------------------------------------------------------
 

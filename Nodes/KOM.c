@@ -13,6 +13,8 @@
 #include "Cmd_KOM.h"
 #include "Cmd_Users.h"
 #include "Cmd_Conf.h"
+#include "Cmd_Misc.h"
+#include "InfoFiles.h"
 #include "NiKFiles.h"
 #include "NiKVersion.h"
 #include "BasicIO.h"
@@ -112,7 +114,7 @@ int isUserOutOfTime(void) {
   if(Servermem->cfg.maxtid[Servermem->inne[nodnr].status] != 0) {
     secondsLoggedIn = time(NULL) - logintime;
     if(secondsLoggedIn > limitSeconds) {
-      sendfile("NiKom:Texter/TidenSlut.txt");
+      SendInfoFile("OutOfTime.txt", 0);
       nodestate = NIKSTATE_OUTOFTIME;
       return -1;
     }
@@ -145,7 +147,7 @@ struct Kommando *getCommandToExecute(int defaultCmd) {
   case -1:
     SendString("\r\n\n%s\r\n", CATSTR(MSG_KOM_INVALID_COMMAND));
     if(++badCommandCnt >= 2 && !(Servermem->inne[nodnr].flaggor & INGENHELP)) {
-      sendfile("NiKom:Texter/2fel.txt");
+      SendInfoFile("2Errors.txt", 0);
     }
     return NULL;
 
@@ -189,7 +191,7 @@ void DoExecuteCommand(struct Kommando *cmd) {
   case 101: listmot(argument); break;
   case 102: Cmd_ListUsers(); break;
   case 103: listmed(); break;
-  case 104: sendfile("NiKom:Texter/ListaKommandon.txt"); break;
+  case 104: SendInfoFile("ListCommands.txt", 0); break;
   case 105: listratt(); break;
   case 106: listasenaste(); break;
   case 107: listnyheter(); break;
@@ -233,7 +235,7 @@ void DoExecuteCommand(struct Kommando *cmd) {
   case 236: Cmd_Search(); break;
   case 237: Cmd_Like(); break;
   case 238: Cmd_Dislike(); break;
-  case 302: sendfile("NiKom:Texter/Help.txt"); break;
+  case 302: SendInfoFile("Help.txt", 0); break;
   case 303: Cmd_ChangeUser(); break;
   case 304: slaav(); break;
   case 305: slapa(); break;
@@ -242,7 +244,7 @@ void DoExecuteCommand(struct Kommando *cmd) {
   case 308: Cmd_Status(); break;
   case 309: Cmd_DeleteUser(); break;
   case 310: vilka(); break;
-  case 311: visainfo(); break;
+  case 311: Cmd_ShowInfo(); break;
   case 312: getconfig(); break;
   case 313: writeinfo(); break;
   case 314: sag(); break;
