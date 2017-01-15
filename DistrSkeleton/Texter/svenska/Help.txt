@@ -1,5 +1,3 @@
-
-
 NiKom är ett KOM-system som huvudsakligen styrs genom att ge olika
 kommandon. Dessa kommandon kan bestå antingen av ett eller två ord. För
 att få upp en lista på alla kommandon så ger man kommandot

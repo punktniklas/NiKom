@@ -1,5 +1,3 @@
-
-
 I fullskärmseditorn kan man gå runt med piltangenterna precis som man kan
 i alla vanliga editorer. Det finns även ett par andra saker man kan göra
 genom att trycka Ctrl och någon tangent.

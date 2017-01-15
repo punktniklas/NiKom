@@ -1,5 +1,3 @@
-
-
 Tillgängliga kommandon i NiKom. Siffra inom parentes anger vilken status
 som behövs för att utföra kommandot.
 

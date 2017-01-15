@@ -1,5 +1,3 @@
-
-
 Alla textnummer i NiKom globala. Detta gör det väldigt lätt att flytta
 texter mellan möten om tex om diskussionen spårar ur. Man ger då kommandot
 '!flytta <mötesnamn>' i radeditorn. (Qtrl-Q, Flytta <möte> i

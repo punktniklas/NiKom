@@ -1,5 +1,3 @@
-
-
 Följande kommandon finns att tillgå i radeditorn:
 
 !radera <radnr>      Raderar den angivna raden

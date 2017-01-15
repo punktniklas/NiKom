@@ -1,20 +1,17 @@
-
-
 Följande info-filer finns:
 
 Tips             - En del tips över finesser som gör livet lättare
 Fullskärmseditor - Text om fullskärmseditorn.
 ----------------------------------------------------------------------------
                 Följande texter kommer fram när
-2fel            -  man har skrivit två fel i rad
+2Errors         -  man har skrivit två fel i rad
 Help            -  man ger kommandot 'HJÄLP' eller '?'
-ListaKommandon  -  man ger kommandot 'LISTA KOMMANDON'
-TidenSlut       -  tiden tar slut
+ListCommands    -  man ger kommandot 'LISTA KOMMANDON'
+OutOfTime       -  tiden tar slut
 EditorHelp      -  man ger kommandot '!?' i editorn
-Inlogg          -  man loggar in
 Bulletin        -  man har angivit korrekt namn och lösen
-NyAnv           -  man registrerar sig som ny användare
-Utlogg          -  man loggar ut
+NewUser         -  man registrerar sig som ny användare
+Logout          -  man loggar ut
 Info            -  man ger kommandot 'INFO' utan argument
 ----------------------------------------------------------------------------
 

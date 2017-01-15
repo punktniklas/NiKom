@@ -1,5 +1,3 @@
-
-
 Nu ska du ställa in vilka söknycklar som filen ska ha. För att få fram en
 lista på alla säknycklar, skriv '?'. Sedan räcker det att skriva början av
 ett nyckelnamn och trycka return så fyller NiKom i resten. För att se vilka

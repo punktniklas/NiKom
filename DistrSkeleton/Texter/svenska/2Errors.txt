@@ -1,5 +1,3 @@
-
-
 Hmm, du har problem verkar det som. För att göra saker i denna BBS så ger
 man kommandon. Dessa kommandon kan bestå antingen av ett eller två ord. För
 att få upp en lista på alla kommandon så ger man kommandot
