@@ -111,7 +111,7 @@ void grabfidobrev(struct ReadLetter *brevread, BPTR fh, int brev, FILE *fpgrab) 
 	Servermem->inne[nodnr].read++;
 	Servermem->info.lasta++;
 	Statstr.read++;
-	fprintf(fpgrab,"\n\nText %d  i %s hos %s\n",brev,Servermem->cfg.brevnamn,getusername(inloggad));
+	fprintf(fpgrab,"\n\nText %d  i brevlådan hos %s\n",brev,getusername(inloggad));
 	fprintf(fpgrab,"Fido-nätbrev,  %s\n",brevread->date);
 	fprintf(fpgrab,"Avsändare: %s\n",brevread->from);
 	fprintf(fpgrab,"Mottagare: %s\n",brevread->to);
@@ -155,7 +155,7 @@ int grabbrev(int text, FILE *fpgrab) {
 		grabfidobrev(&brevgrab,fh,text,fpgrab);
 		return(0);
 	}
-	fprintf(fpgrab,"\n\nText %d  i %s hos %s\n",text,Servermem->cfg.brevnamn,getusername(inloggad));
+	fprintf(fpgrab,"\n\nText %d  i brevlådan hos %s\n",text, getusername(inloggad));
 	if(!strncmp(brevgrab.systemid,"NiKom",5)) fprintf(fpgrab,"Lokalt brev,  %s\n",brevgrab.date);
 	else fprintf(fpgrab,"<Okänd brevtyp>  %s\n",brevgrab.date);
 	fprintf(fpgrab,"Avsändare: %s\n",getusername(atoi(brevgrab.from)));
@@ -215,7 +215,7 @@ void grab(void) {
     WaitIO((struct IORequest *)inactivereq);
   }
   radcnt=-9999;
-  sprintf(outbuffer,"\r\nRensar %s..",Servermem->cfg.brevnamn);
+  sprintf(outbuffer,"\r\nRensar brevlådan..");
   puttekn(outbuffer,-1);
   y=getnextletter(inloggad);
   for(x=Servermem->inne[nodnr].brevpek;x<y;x++) {

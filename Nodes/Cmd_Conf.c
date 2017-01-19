@@ -233,7 +233,7 @@ void Cmd_Search(void) {
 
   if(!global) {
     if(mote2 == -1) {
-      SendStringCat("\r\n\n%s\r\n\n", CATSTR(MSG_SEARCH_NOT_MAILBOX), Servermem->cfg.brevnamn);
+      SendString("\r\n\n%s\r\n\n", CATSTR(MSG_SEARCH_NOT_MAILBOX));
       return;
     }
     conf = getmotpek(mote2);

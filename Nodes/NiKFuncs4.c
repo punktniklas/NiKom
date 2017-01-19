@@ -598,7 +598,7 @@ void hoppaarende(void) {
 		} else argument=readhead.arende;
 	}
 	if(mote2==-1) {
-		sprintf(outbuffer,"\r\n\nDu kan inte utföra Hoppa Ärende i %s!\r\n",Servermem->cfg.brevnamn);
+		sprintf(outbuffer,"\r\n\nDu kan inte utföra Hoppa Ärende i brevlådan.\r\n");
 		puttekn(outbuffer,-1);
 		return;
 	}

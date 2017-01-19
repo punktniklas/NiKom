@@ -314,7 +314,7 @@ void executeCommand(struct Kommando *cmd) {
 
 void displayPrompt(int defaultCmd) {
   int minutesLeft;
-  char *cmdStr, goMailStr[50];
+  char *cmdStr;
   struct Kommando *cmd;
 
   if(Servermem->say[nodnr]) {
@@ -364,8 +364,7 @@ void displayPrompt(int defaultCmd) {
     if(Servermem->cfg.ar.nextmeet) {
       sendautorexx(Servermem->cfg.ar.nextmeet);
     }
-    sprintf(goMailStr, CATSTR(MSG_PROMPT_GO_TO_MAILBOX), Servermem->cfg.brevnamn);
-    cmdStr = goMailStr;
+    cmdStr = CATSTR(MSG_PROMPT_GO_TO_MAILBOX);
     break;
   default:
     cmdStr = "*** Undefined default command ***";

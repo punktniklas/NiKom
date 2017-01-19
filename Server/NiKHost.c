@@ -368,11 +368,9 @@ void motesinfo(struct RexxMsg *mess) {
 		return;
 	}
 	motpek=getmotpek(nummer=atoi(mess->rm_Args[1]));
-	if(!motpek && nummer != -1) {
-		if(!(mess->rm_Result2=(long)CreateArgstring("-1",strlen("-1"))))
-		printf("Kunde inte allokera en ArgString\n");
-		mess->rm_Result1=0;
-		return;
+	if(!motpek) {
+          SetRexxResultString(mess, "-1");
+          return;
 	}
 
 	switch(mess->rm_Args[2][0]) {
@@ -401,10 +399,7 @@ void motesinfo(struct RexxMsg *mess) {
 			sprintf(str,"%d",motpek->mad);
 			break;
 		case 'n' : case 'N' :
-			if(nummer != -1)
-				strcpy(str,motpek->namn);
-			else
-				strcpy(str,Servermem->cfg.brevnamn);
+			strcpy(str,motpek->namn);
 			break;
 		case 'o' : case 'O' :
 			strcpy(str,motpek->origin);
@@ -431,9 +426,7 @@ void motesinfo(struct RexxMsg *mess) {
 			str[0]=0;
 			break;
 	}
-	if(!(mess->rm_Result2=(long)CreateArgstring(str,strlen(str))))
-		printf("Kunde inte allokera en ArgString\n");
-	mess->rm_Result1=0;
+        SetRexxResultString(mess, str);
 }
 
 void chgmote(struct RexxMsg *mess)

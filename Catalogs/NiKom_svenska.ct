@@ -23,8 +23,8 @@ MSG_PROMPT_SEE_TIME
 ; (See) time
 ;
 MSG_PROMPT_GO_TO_MAILBOX
-Gå (till) %s
-; Go (to) %s
+Gå (till) brevlådan
+; Go (to) mailbox
 ;
 MSG_KOM_INVALID_COMMAND
 Felaktigt kommando
@@ -255,8 +255,8 @@ Skriv: Sök [-g] <söksträng>
 ; Syntax: Search [-g] <search string>
 ;
 MSG_SEARCH_NOT_MAILBOX
-Du kan inte söka i %s.
-; You can't search in %s.
+Du kan inte söka i brevlådan.
+; You can't search in the mailbox.
 ;
 MSG_SEARCH_NOT_FIDO
 Sök fungerar inte i FidoNet-möten.
@@ -299,16 +299,16 @@ Du har %d olästa brev.
 ; You have %d unread mail.
 ;
 MSG_MAIL_YOU_ARE
-Du befinner dig i %s.
-; You are in %s.
+Du befinner dig i brevlådan.
+; You are in the mailbox.
 ;
 MSG_MAIL_NO_READ_PERM
 Du har inte rätt att läsa det brevet.
 ; You don't have permissions to read that mail.
 ;
 MSG_MAIL_LINE1
-Brev %d  i %s hos %s
-; Mail %d in %s at %s
+Brev %d i brevlådan hos %s
+; Mail %d in the mailbox at %s
 ;
 MSG_MAIL_LOCAL_MAIL
 Lokalt brev,  %s
@@ -401,6 +401,10 @@ Rensar...
 MSG_MAIL_PURGE_RESULT
 %d brev raderade.
 ; %d mail purged.
+;
+MSG_MAIL_MAILBOX
+Brevlådan
+; Mailbox
 ;
 MSG_INFO_NO_SUCH_FILE
 Finns ingen sådan info-fil.

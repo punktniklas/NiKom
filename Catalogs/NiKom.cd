@@ -10,7 +10,7 @@ MSG_PROMPT_READ_NEXT_COMMENT (103//)
 MSG_PROMPT_SEE_TIME (104//)
 (See) time
 MSG_PROMPT_GO_TO_MAILBOX (105//)
-Go (to) %s
+Go (to) mailbox
 MSG_KOM_INVALID_COMMAND (106//)
 Invalid command
 MSG_KOM_NO_PERMISSION (107//)
@@ -138,7 +138,7 @@ Footnote to text %d by %s
 MSG_SEARCH_SYNTAX (330//)
 Syntax: Search [-g] <search string>
 MSG_SEARCH_NOT_MAILBOX (331//)
-You can't search in %s.
+You can't search in the mailbox.
 MSG_SEARCH_NOT_FIDO (332//)
 Search doesn't work in Fido forums.
 MSG_SEARCH_NO_TEXTS_FOUND (333//)
@@ -161,11 +161,11 @@ You have 1 unread mail.
 MSG_MAIL_MANY_UNREAD (345//)
 You have %d unread mail.
 MSG_MAIL_YOU_ARE (346//)
-You are in %s.
+You are in the mailbox.
 MSG_MAIL_NO_READ_PERM (347//)
 You don't have permissions to read that mail.
 MSG_MAIL_LINE1 (348//)
-Mail %d in %s at %s
+Mail %d in the mailbox at %s
 MSG_MAIL_LOCAL_MAIL (349//)
 Local mail,  %s
 MSG_MAIL_UNKNOWN_MAIL (350//)
@@ -212,6 +212,8 @@ MSG_MAIL_PURGE_PURGING (374//)
 Purging...
 MSG_MAIL_PURGE_RESULT (375//)
 %d mail purged.
+MSG_MAIL_MAILBOX (376//)
+Mailbox
 ;
 MSG_INFO_NO_SUCH_FILE (400//)
 There is no such info file.

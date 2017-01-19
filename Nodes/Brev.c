@@ -175,7 +175,7 @@ int countmail(int user,int brevpek) {
 void varmail(void) {
   int antal;
   antal = countmail(inloggad,Servermem->inne[nodnr].brevpek);
-  SendStringCat("\r\n\n%s\r\n", CATSTR(MSG_MAIL_YOU_ARE), Servermem->cfg.brevnamn);
+  SendString("\r\n\n%s\r\n", CATSTR(MSG_MAIL_YOU_ARE));
   if(antal == 0) {
     SendString("%s\r\n\n", CATSTR(MSG_MAIL_NO_UNREAD));
   } else if(antal==1) {
@@ -219,7 +219,7 @@ void visabrev(int brev,int anv) {
   Servermem->info.lasta++;
   Statstr.read++;
 
-  SendStringCat("\r\n\n%s\r\n", CATSTR(MSG_MAIL_LINE1), brev, Servermem->cfg.brevnamn, getusername(anv));
+  SendStringCat("\r\n\n%s\r\n", CATSTR(MSG_MAIL_LINE1), brev, getusername(anv));
   if(!strncmp(brevread.systemid, "NiKom", 5)) {
     SendStringCat("%s\n\r", CATSTR(MSG_MAIL_LOCAL_MAIL), brevread.date);
   } else {
@@ -269,7 +269,7 @@ void visafidobrev(struct ReadLetter *brevread, BPTR fh, int brev, int anv) {
   Servermem->inne[nodnr].read++;
   Servermem->info.lasta++;
   Statstr.read++;
-  SendStringCat("\r\n\n%s\r\n", CATSTR(MSG_MAIL_LINE1), brev,Servermem->cfg.brevnamn,getusername(anv));
+  SendStringCat("\r\n\n%s\r\n", CATSTR(MSG_MAIL_LINE1), brev, getusername(anv));
   SendStringCat("%s\n\r", CATSTR(MSG_MAIL_FIDO_MAIL), brevread->date);
   SendStringCat("%s\r\n", CATSTR(MSG_MAIL_FROM), brevread->from);
   SendStringCat("%s\n\r", CATSTR(MSG_MAIL_TO), brevread->to);
@@ -360,7 +360,7 @@ int initbrevheader(int tillpers) {
   sprintf(brevspar.date, "%02d%02d%02d %02d:%02d", ts->tm_year % 100,
           ts->tm_mon + 1, ts->tm_mday, ts->tm_hour, ts->tm_min);
   strcpy(brevspar.systemid, "NiKom");
-  SendStringCat("\r\n\n%s\r\n", CATSTR(MSG_WRITE_FORUM), Servermem->cfg.brevnamn);
+  SendString("\r\n\n%s\r\n", CATSTR(MSG_MAIL_MAILBOX));
   SendStringCat("%s\n\r", CATSTR(MSG_MAIL_LOCAL_MAIL), brevspar.date);
   SendStringCat("%s\r\n", CATSTR(MSG_MAIL_FROM), getusername(inloggad));
   if(brevspar.reply[0]) {
@@ -496,7 +496,7 @@ int fido_brev(char *tillpers,char *adr,struct Mote *motpek) {
   ft.attribut = FIDOT_PRIVATE | FIDOT_LOCAL;
   makefidousername(ft.fromuser, inloggad);
   makefidodate(ft.date);
-  SendStringCat("\r\n\%s\r\n", CATSTR(MSG_WRITE_FORUM), Servermem->cfg.brevnamn);
+  SendString("\r\n\%s\r\n", CATSTR(MSG_MAIL_MAILBOX));
   SendStringCat("%s\n\r", CATSTR(MSG_MAIL_FIDO_MAIL), ft.date);
   SendString(CATSTR(MSG_MAIL_FROM), ft.fromuser);
   SendString(CATSTR(MSG_MAIL_FROM), ft.fromuser);
@@ -840,7 +840,7 @@ void initpersheader(void) {
   sprintf(brevspar.date,"%02d%02d%02d %02d:%02d", ts->tm_year % 100,
           ts->tm_mon + 1, ts->tm_mday, ts->tm_hour, ts->tm_min);
   strcpy(brevspar.systemid, "NiKom");
-  SendStringCat("\r\n\n%s\r\n", CATSTR(MSG_WRITE_FORUM), Servermem->cfg.brevnamn);
+  SendString("\r\n\n%s\r\n", CATSTR(MSG_MAIL_MAILBOX));
   SendStringCat("%s\n\r", CATSTR(MSG_MAIL_LOCAL_MAIL), brevspar.date);
   SendStringCat("%s\r\n", CATSTR(MSG_MAIL_FROM), getusername(inloggad));
   SendStringCat("%s\n\r", CATSTR(MSG_MAIL_TO), getusername(readhead.person));

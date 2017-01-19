@@ -320,7 +320,6 @@ SysSettings(subject)
 
 Där följande subject kan användas:
 
-b - Namnet på brevlådan
 d - Såhär många bytes krävs för att kunna ladda upp i ULTMP biblioteket.
 f - Default flaggor för nya användare. Här är de möjliga värdena:
 	Skyddad status:                        1

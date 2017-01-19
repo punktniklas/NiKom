@@ -44,7 +44,7 @@ void endast(void) {
   amount = atoi(argument);
   argument = hittaefter(argument);
   if(argument[0]) {
-    if(matchar(argument, Servermem->cfg.brevnamn)) {
+    if(matchar(argument, CATSTR(MSG_MAIL_MAILBOX))) {
       confId = -1;
     } else {
       confId = parsemot(argument);
@@ -521,7 +521,7 @@ void vilka(void) {
 					if(!MaySeeConf(motpek->nummer, inloggad, &Servermem->inne[nodnr]))
 						sprintf(outbuffer,"%-32s Läser texter\r\n",bps);
 					else sprintf(outbuffer,"%-32s Läser i %s\r\n",bps,motpek->namn);
-				} else sprintf(outbuffer,"%-32s Läser i %s\r\n",bps,Servermem->cfg.brevnamn);
+				} else sprintf(outbuffer,"%-32s Läser i brevlådan\r\n",bps);
 				break;
 			case GORNGTANNAT :
 				sprintf(outbuffer,"%-32s %s\r\n",bps,Servermem->vilkastr[x]);
@@ -921,7 +921,7 @@ void listaarende(void) {
   struct Header lahead;
   struct tm *ts;
   if(mote2==-1) {
-    sprintf(outbuffer,"\n\n\rAnvänd 'Lista Brev' i %s\n\r",Servermem->cfg.brevnamn);
+    sprintf(outbuffer,"\n\n\rAnvänd 'Lista Brev' i brevlådan.\n\r");
     puttekn(outbuffer,-1);
     return;
   }

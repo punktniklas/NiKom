@@ -132,10 +132,6 @@ void rexxsysteminfo(struct RexxMsg *mess)
 			sprintf(str,"%d",(int) Servermem->cfg.defaultstatus);
 			break;
 
-		case 'b' : case 'B' :
-			strcpy(str,Servermem->cfg.brevnamn);
-			break;
-
 		case 'n' : case 'N' :
 			strcpy(str,Servermem->cfg.ny);
 			break;

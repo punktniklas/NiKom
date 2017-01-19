@@ -82,7 +82,7 @@ void igen(void) {
 int skriv(void) {
         struct Mote *motpek;
         if(mote2==-1) {
-                sprintf(outbuffer,"\r\n\nAnvänd kommandot 'Brev' i %s.\r\n",Servermem->cfg.brevnamn);
+                sprintf(outbuffer,"\r\n\nAnvänd kommandot 'Brev' i brevlådan.\r\n");
                 puttekn(outbuffer,-1);
                 return(0);
         }

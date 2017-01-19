@@ -116,7 +116,7 @@ void Cmd_Status(void) {
     SendString("\n");
   }
   if(cnt = countmail(userId, readuserstr.brevpek)) {
-    if(SendString("%4d %s\r\n", cnt, Servermem->cfg.brevnamn)) { return; }
+    if(SendString("%4d Brevlådan\r\n", cnt)) { return; }
     sumUnread += cnt;
   }
   ITER_EL(conf, Servermem->mot_list, mot_node, struct Mote *) {

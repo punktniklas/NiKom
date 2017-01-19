@@ -108,7 +108,7 @@ void listmed(void) {
     return;
   }
   if(mote2 == -1) {
-    SendString("\r\n\nAlla är medlemmar i %s\r\n\n", Servermem->cfg.brevnamn);
+    SendString("\r\n\nAlla är medlemmar i brevlådan\r\n\n");
     return;
   }
   
@@ -140,8 +140,7 @@ void listratt(void) {
   struct User listuser;
 
   if(mote2 == -1) {
-    SendString("\r\n\nAlla har fullständiga rättigheter i %s\r\n\n",
-               Servermem->cfg.brevnamn);
+    SendString("\r\n\nAlla har fullständiga rättigheter i brevlådan\r\n\n");
     return;
   }
   conf = getmotpek(mote2);
@@ -181,7 +180,7 @@ void listnyheter(void) {
 	struct Fil *sokpek;
 	puttekn("\r\n\n",-1);
 	if(cnt=countmail(inloggad,Servermem->inne[nodnr].brevpek)) {
-		sprintf(outbuffer,"%4d %s\r\n",cnt,Servermem->cfg.brevnamn);
+		sprintf(outbuffer,"%4d Brevlådan\r\n", cnt);
 		puttekn(outbuffer,-1);
 		olasta=TRUE;
 		tot+=cnt;

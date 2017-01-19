@@ -125,7 +125,6 @@ void initSystemConfigDefaults() {
     Servermem->cfg.uldlratio[i] = 0;
   }
   Servermem->cfg.cfgflags = NICFG_VALIDATEFILES | NICFG_CRYPTEDPASSWORDS;
-  strcpy(Servermem->cfg.brevnamn, "Brevlådan");
   strcpy(Servermem->cfg.ny, "NY");
   Servermem->cfg.diskfree = 100000;
   strcpy(Servermem->cfg.ultmp, "T:");
@@ -220,10 +219,6 @@ int handleSystemConfigLine(char *line, BPTR fh) {
     }
   } else if(isMatchingConfigLine(line, "CLOSEDBBS")) {
     if(!GetBoolCfgFlag(line, &Servermem->cfg.cfgflags, NICFG_CLOSEDBBS)) {
-      return 0;
-    }
-  } else if(isMatchingConfigLine(line, "BREVLÅDA") || isMatchingConfigLine(line, "MAILBOX")) {
-    if(!GetStringCfgValue(line, Servermem->cfg.brevnamn, 40)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "NY") || isMatchingConfigLine(line, "NEWUSERLOGIN")) {

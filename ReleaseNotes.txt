@@ -49,6 +49,10 @@ A number of things must be perfomed in an existing installation.
   Finally, default English versions of these files can be found in
   the full NiKom distribution and should be placed in a directory
   "english".
+
+- The System.cfg entry "MAILBOX" ("BREVLÅDA") has been discontinued
+  and must be removed from the config file. The mailbox will be called
+  "mailbox" in English and "brevlåda" in Swedish.
 ---------------------------------------------------------------------------
                          NiKom v2.2.0, 2016-10-04
 ---------------------------------------------------------------------------

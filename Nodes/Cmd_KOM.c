@@ -21,7 +21,7 @@ void Cmd_GoConf(void) {
   char buffer[121];
   struct Mote *conf;
 
-  if(matchar(argument, Servermem->cfg.brevnamn)) {
+  if(matchar(argument, CATSTR(MSG_MAIL_MAILBOX))) {
     newConfId = -1;
   } else {
     parsedConfId = parsemot(argument);

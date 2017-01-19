@@ -189,7 +189,7 @@ struct Config {
    long defaultflags, diskfree, logmask, cfgflags;
    short maxtid[101],logintries;
    char uldlratio[101], defaultrader, defaultstatus, defaultcharset,
-     brevnamn[41],ny[21],ultmp[100];
+     ny[21],ultmp[100];
 };
 
 struct ReadLetter {
