@@ -436,15 +436,15 @@ void cmd_Reaction(long reaction) {
     }
   }
   if(!setReactionInExtension(ext, reaction)) {
-    SendStringCat("\r\n\n%s\r\n", CATSTR(MSG_REACTION_ALREADY),
-                  reaction == EXT_REACTION_LIKE ? CATSTR(MSG_REACTION_PRAISED) : CATSTR(MSG_REACTION_DISSED),
+    SendStringCat("\r\n\n%s\r\n", reaction == EXT_REACTION_LIKE
+                  ? CATSTR(MSG_REACTION_ALREADY_PRS) : CATSTR(MSG_REACTION_ALREADY_DIS),
                   textId);
   } else {
     if(SaveHeaderExtension(ext)) {
       DisplayInternalError();
     }
-    SendStringCat("\r\n\n%s\r\n", CATSTR(MSG_REACTION_DONE),
-                  reaction == EXT_REACTION_LIKE ? CATSTR(MSG_REACTION_PRAISED) : CATSTR(MSG_REACTION_DISSED),
+    SendStringCat("\r\n\n%s\r\n", reaction == EXT_REACTION_LIKE
+                  ? CATSTR(MSG_REACTION_DONE_PRS) : CATSTR(MSG_REACTION_DONE_DIS),
                   textId);
   }
   DeleteMemHeaderExtension(ext);

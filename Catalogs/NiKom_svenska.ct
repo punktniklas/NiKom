@@ -174,17 +174,13 @@ MSG_COMMENT_REALLY_COMMENT
 Vill du verkligen kommentera i ett kommentarsskyddat möte?
 ; Do you really want to comment in a comment protected forum?
 ;
-MSG_REACTION_PRAISED
-hyllats
-; praised
+MSG_REACTION_TEXT_VERBOSE_PRS
+Texten har hyllats av %s
+; The text has been praised by %s
 ;
-MSG_REACTION_DISSED
-dissats
-; dissed
-;
-MSG_REACTION_TEXT_VERBOSE
-Texten har %s av %s
-; The text has been %s by %s
+MSG_REACTION_TEXT_VERBOSE_DIS
+Texten har dissats av %s
+; The text has been dissed by %s
 ;
 MSG_REACTION_TEXT_PRAISED
 Texten har hyllats av %d personer
@@ -206,13 +202,21 @@ MSG_REACTION_NO_PERMISSION
 Du har ingen rätt att hylla/dissa den texten.
 ; You don't have permission to praise/diss that text.
 ;
-MSG_REACTION_ALREADY
-Du har redan %s text %d.
-; You already have %s text %d.
+MSG_REACTION_ALREADY_PRS
+Du har redan hyllat text %d.
+; You already have praised text %d.
 ;
-MSG_REACTION_DONE
-Du har %s text %d.
-; You have %s text %d.
+MSG_REACTION_DONE_PRS
+Du har hyllat text %d.
+; You have praised text %d.
+;
+MSG_REACTION_ALREADY_DIS
+Du har redan dissat text %d.
+; You already have dissed text %d.
+;
+MSG_REACTION_DONE_DIS
+Du har dissat text %d.
+; You have dissed text %d.
 ;
 MSG_WRITE_TEXT_GOT_NUMBER
 Texten fick nummer %d.

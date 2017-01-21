@@ -179,7 +179,6 @@ void displayReactions(int textId, int index, char verbose) {
   struct MemHeaderExtensionNode *node;
   int i, j, likeCnt = 0, dislikeCnt = 0;
   long *reactionData, userId;
-  char *reactionStr;
 
   if(index == 0) {
     return;
@@ -202,18 +201,18 @@ void displayReactions(int textId, int index, char verbose) {
         switch(*reactionData & 0xff000000) {
         case EXT_REACTION_LIKE:
           likeCnt++;
-          reactionStr = CATSTR(MSG_REACTION_PRAISED);
+          if(verbose) {
+            SendStringCat("  - %s\r\n", CATSTR(MSG_REACTION_TEXT_VERBOSE_PRS),
+                          getusername(userId));
+          }
           break;
         case EXT_REACTION_DISLIKE:
           dislikeCnt++;
-          reactionStr = CATSTR(MSG_REACTION_DISSED);
+          if(verbose) {
+            SendStringCat("  - %s\r\n", CATSTR(MSG_REACTION_TEXT_VERBOSE_DIS),
+                          getusername(userId));
+          }
           break;
-        default:
-          reactionStr = "fluppats";
-        }
-        if(verbose) {
-          SendStringCat("  - %s\r\n", CATSTR(MSG_REACTION_TEXT_VERBOSE),
-                        reactionStr, getusername(userId));
         }
       }
     }

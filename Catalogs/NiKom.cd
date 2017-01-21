@@ -93,34 +93,36 @@ You can't comment in comment protected forums.
 MSG_COMMENT_REALLY_COMMENT (282//)
 Do you really want to comment in a comment protected forum?
 ;
-MSG_REACTION_PRAISED (290//)
-praised
-MSG_REACTION_DISSED (291//)
-dissed
-MSG_REACTION_TEXT_VERBOSE (292//)
-The text has been %s by %s
-MSG_REACTION_TEXT_PRAISED (293//)
+MSG_REACTION_TEXT_VERBOSE_PRS (290//)
+The text has been praised by %s
+MSG_REACTION_TEXT_VERBOSE_DIS (291//)
+The text has been dissed by %s
+MSG_REACTION_TEXT_PRAISED (292//)
 The text has been praised by %d persons.
-MSG_REACTION_TEXT_DISSED (294//)
+MSG_REACTION_TEXT_DISSED (293//)
 The text has been dissed by %d persons.
-MSG_REACTION_NO_MAIL (295//)
+MSG_REACTION_NO_MAIL (294//)
 You can not praise/diss mail.
-MSG_REACTION_ONLY_LOCAL (296//)
+MSG_REACTION_ONLY_LOCAL (295//)
 You can only praise/diss local texts.
-MSG_REACTION_NO_PERMISSION (297//)
+MSG_REACTION_NO_PERMISSION (296//)
 You don't have permission to praise/diss that text.
-MSG_REACTION_ALREADY (298//)
-You already have %s text %d.
-MSG_REACTION_DONE (299//)
-You have %s text %d.
+MSG_REACTION_ALREADY_PRS (297//)
+You already have praised text %d.
+MSG_REACTION_DONE_PRS (298//)
+You have praised text %d.
+MSG_REACTION_ALREADY_DIS (299//)
+You already have dissed text %d.
+MSG_REACTION_DONE_DIS (300//)
+You have dissed text %d.
 ;
-MSG_WRITE_TEXT_GOT_NUMBER (300//)
+MSG_WRITE_TEXT_GOT_NUMBER (305//)
 The text got number %d.
-MSG_WRITE_TOO_MANY_COMMENTS (301//)
+MSG_WRITE_TOO_MANY_COMMENTS (306//)
 The commented text has maximum number of comments. No forward link created.
-MSG_WRITE_FORUM (302//)
+MSG_WRITE_FORUM (307//)
 Forum: %s
-MSG_WRITE_SUBJECT (303//)
+MSG_WRITE_SUBJECT (308//)
 Subject:
 ;
 MSG_READ_SYNTAX (310//)
