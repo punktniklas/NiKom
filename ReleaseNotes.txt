@@ -53,6 +53,16 @@ A number of things must be perfomed in an existing installation.
 - The System.cfg entry "MAILBOX" ("BREVLÅDA") has been discontinued
   and must be removed from the config file. The mailbox will be called
   "mailbox" in English and "brevlåda" in Swedish.
+
+- There is no longer a separate command for "Review Commented"/"Återse
+  Kommenterad". Instead it has been rolled in the Read/Läsa command.
+  Just like you can type "Read latest"/"Läs senaste" to get the latest
+  text given by a KOM prompt you can now type "Read commented"/"Läs
+  kommenterad" to read the text that the last read text was a comment
+  of. To remain compatible with the old Swedish "Återse Kommenterad"
+  command "Återse" is now a synonym to the "Läsa" command (in Swedish
+  only since there is no such legacy in English). You need to edit
+  your Command.cfg accordingly.
 ---------------------------------------------------------------------------
                          NiKom v2.2.0, 2016-10-04
 ---------------------------------------------------------------------------

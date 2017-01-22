@@ -50,24 +50,6 @@ struct Header sparhead,readhead;
 struct Inloggning Statstr;
 struct MinList aliaslist;
 
-void atersekom(void) {
-        struct Mote *motpek;
-        if(senast_text_typ==BREV) {
-                if(!brevread.reply[0]) puttekn("\r\n\nTexten är inte någon kommentar!\r\n\n",-1);
-                else visabrev(atoi(hittaefter(brevread.reply)),atoi(brevread.reply));
-        }
-        else if(senast_text_typ==TEXT) {
-                motpek=getmotpek(senast_text_mote);
-                if(motpek->type==MOTE_ORGINAL) {
-                        if(readhead.kom_till_nr==-1) puttekn("\r\n\nTexten är inte någon kommentar!\r\n\n",-1);
-                        else if(readhead.kom_till_nr<Servermem->info.lowtext) puttekn("\r\n\nTexten finns inte!\r\n\n",-1);
-                        else org_visatext(readhead.kom_till_nr, FALSE);
-                }
-                else if(motpek->type==MOTE_FIDO) puttekn("\n\n\rÅterse Kommenterade kan inte användas på Fido-texter\n\r",-1);
-        }
-        else puttekn("\r\n\nDu har inte läst någon text ännu!\r\n\n",-1);
-}
-
 void igen(void) {
         struct Mote *motpek;
         if(senast_text_typ==BREV) visabrev(senast_brev_nr,senast_brev_anv);

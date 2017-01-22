@@ -1,13 +1,20 @@
 
 
-Läsa
-----
+Läsa (Återse)
+-------------
 
 Synopsis: [Läsa] <textnummer> [-v]
+          [Återse] <textnummer> [-v]
 
 Beskrivning:
 Visar den angivna texten. Observera att man inte behöver skriva 'Läsa' utan
-det räcker med bara textnummret.
+det räcker med bara textnummret om man anger ett numeriskt textnummer.
+
+Istället för ett textnummer kan man även ange följande specialord:
+  - senaste -    Refererar till den senaste texten som man läst genom att
+                 följa en KOM-prompt. (Tex. "(Läsa) nästa text")
+  - kommenterad  Refererar till den text som den senast lästa texten
+                 var en kommentar till.
 
 Anges flaggan -v så visas extra information om texten, tex vilka personer
 som har hyllat eller dissat den.

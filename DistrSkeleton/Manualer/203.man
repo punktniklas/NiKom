@@ -9,5 +9,11 @@ Beskrivning:
 Påbörjar en kommentar till den senast lästa texten. Om man ger ett textnummer
 som argument kommenteras denna text istället.
 
+Istället för ett textnummer kan man även ange följande specialord:
+  - senaste -    Refererar till den senaste texten som man läst genom att
+                 följa en KOM-prompt. (Tex. "(Läsa) nästa text")
+  - kommenterad  Refererar till den text som den senast lästa texten
+                 var en kommentar till.
+
 Se Även: Radera Text
 

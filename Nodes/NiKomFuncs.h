@@ -76,7 +76,6 @@ void connection(void);
 void varmote(int mote);
 int skriv(void);
 void igen(void);
-void atersekom(void);
 
 /* Prototypes for functions defined in NiKFuncs2.c */
 int countmail(int user,int brevpek);

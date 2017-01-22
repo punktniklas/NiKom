@@ -127,6 +127,10 @@ Subject:
 ;
 MSG_READ_SYNTAX (310//)
 Syntax: Read <text number>
+MSG_TEXT_PARSE_LATEST (311//)
+latest
+MSG_TEXT_PARSE_COMMENTED (312//)
+commented
 ;
 MSG_FOOTNOTE_SYNTAX (320//)
 Syntax: Footnote <text number>

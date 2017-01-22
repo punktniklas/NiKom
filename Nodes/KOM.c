@@ -208,7 +208,6 @@ void DoExecuteCommand(struct Kommando *cmd) {
   case 204: personlig(); break;
   case 205: skickabrev(); break;
   case 206: igen(); break;
-  case 207: atersekom(); break;
   case 208: medlem(argument); break;
   case 209: uttrad(argument); break;
   case 212: Cmd_Read(); break;

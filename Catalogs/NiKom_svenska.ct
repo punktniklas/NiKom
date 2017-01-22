@@ -238,6 +238,14 @@ MSG_READ_SYNTAX
 Skriv: Läsa <textnr>
 ; Syntax: Read <text number>
 ;
+MSG_TEXT_PARSE_LATEST
+senaste
+; latest
+;
+MSG_TEXT_PARSE_COMMENTED
+kommenterad
+; commented
+;
 MSG_FOOTNOTE_SYNTAX
 Skriv: Fotnot <textnr>
 ; Syntax: Footnote <text number>
