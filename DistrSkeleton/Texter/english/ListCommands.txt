@@ -23,7 +23,7 @@ Next Comment           - Read the next comment
 Next Forum             - Move to the next forum with unread texts
 Next Text              - Read the next text
 Personal               - Send a comment as a mail
---Radera Brev            - Delete a letter
+Purge Mail             - Delete mail
 Delete Forum           - Delete a forum
 Delete Text            - Delete a text
 Create Forum           - Create a new forum

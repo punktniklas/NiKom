@@ -10,7 +10,6 @@ is matching more than one command, a list of possible commands will be
 shown.
 
 
-
 All discussions are done in forums. There are many different forums for
 various subjects. To get a list of all forums type 'LIST FORUMS' at the
 prompt. Some forums have a star in front of them. This means that you are
@@ -19,7 +18,7 @@ you are a member of. Most of the forums are open for everyone. A few are
 "closed" forums and are only available for certain users, those forums have
 the text (closed) after their name. To become a member of a forum, simply 
 type 'MEMBER <FORUM>' at the prompt. All forum names can also be shortened,
-so instead of typing 'Open Forum' you can just type 'Op Fo'.
+so instead of typing 'OPEN FORUM' you can just type 'OP FO'.
 To leave a forum, type 'LEAVE <FORUM>'.
 
 When you have become a member of a forum with unread texts, the prompt will

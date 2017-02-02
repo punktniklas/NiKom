@@ -1,12 +1,12 @@
 
 
-Hmm, you seem to be having problems. To use things on this BBS you give
+Hmm, you seem to be having problems. To do things on this BBS you give
 commands. These commands can be either one or two words. To display a
 list of all usable commands, type 'LIST COMMANDS'.
 
-All commands can be shortened to it's shortest unique ***. Intstead of
-typing 'LIST COMMANDS' you could type 'LI COM'. If what you typed matches
-more than one command, a list of all possabilities will be shown.
+All commands can be shortened to it's shortest unique part. Instead of
+typing 'LIST COMMANDS' you can type 'LI COM'. If what you typed matches
+more than one command a list of all possibilities will be shown.
 
 All user names, forum names and flag names can also be shortened. 
 Instead of typing 'John Doe' you can just type 'jo do'. It's also possible
