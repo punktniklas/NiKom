@@ -1,1 +1,66 @@
-English placeholder for Help.txt.
+
+
+NiKom is a KOM-system, that is mainly controlled by feeding it different
+commands. These commands are made up of either one or two words. To get
+a list of all commands, type 'LIST COMMANDS' at the prompt.
+
+All commands can be shortened to their shortest unique part. Instead of
+typing 'LIST COMMANDS' you can just type 'LI COM'. If what you're typing
+is matching more than one command, a list of possible commands will be
+shown.
+
+
+
+All discussions are done in forums. There are many different forums for
+various subjects. To get a list of all forums type 'LIST FORUMS' at the
+prompt. Some forums have a star in front of them. This means that you are
+not a member of that forum. You can only read and write texts in forums 
+you are a member of. Most of the forums are open for everyone. A few are
+"closed" forums and are only available for certain users, those forums have
+the text (closed) after their name. To become a member of a forum, simply 
+type 'MEMBER <FORUM>' at the prompt. All forum names can also be shortened,
+so instead of typing 'Open Forum' you can just type 'Op Fo'.
+To leave a forum, type 'LEAVE <FORUM>'.
+
+When you have become a member of a forum with unread texts, the prompt will
+change to '(Go to) next forum'. This is a suggestion from NiKom and by just
+pressing return NiKom will take you to the next forum with unread texts. 
+Now the prompt will change to '(Read) next text'. By just pressing return
+now, the next unread text will be displayed. If this text has any comments,
+their number and the user that wrote them will be shown. The prompt will
+change to '(Read) next comment'. Comments to a text will be shown following
+their parent even if they are newer than other texts in the forum.
+
+This way you can step through all unread texts by just keep pressing return.
+If you want to comment on a text you just read, just give the command
+'COMMENT'. Comment always comments the last read text. If you want to 
+comment on another text, you can give the text number as an argument. For
+example: 'COMMENT 45'. You can also give a personal comment on a text
+which will only be sent to the author of the original text, this is done
+by using the command 'PERSONAL'.
+When commenting on a text you will encounter the text editor. For basic
+operation you simply type your text and save it with Ctrl-Z, to throw the
+text away - press Ctrl-C. For more information about the text editor, use 
+the 'INFO'-command.
+
+To write a completely new text, first go to the correct forum with the
+'GO <Forum>'-command. To check which forum you're currently in, use the
+'WHERE'-command. When you are sure you are in the correct forum, simply use
+the 'WRITE' command. First you get to write the subject for your text, then
+you get to use the editor as normal. 
+
+If you have many unread texts in a forum and don't want to read them all, 
+you can use the command 'ONLY <Number>' where <Number> is the amount of
+texts you want to read. If <Number> is bigger than the amount of texts in
+the forum all texts will be marked as unread.
+
+Other useful commands
+---------------------
+List Commands    -  Lists all commands
+Page             -  Page the sysop
+Skip             -  Skip all comments to a text
+Mail <user>      -  Send a mail to the user
+Logout           -  Log out of the BBS
+Info             -  Display various informational texts
+
+To pause output, press space.

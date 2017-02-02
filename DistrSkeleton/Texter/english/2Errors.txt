@@ -1,1 +1,25 @@
-English placeholder for 2Errors.txt.
+
+
+Hmm, you seem to be having problems. To use things on this BBS you give
+commands. These commands can be either one or two words. To display a
+list of all usable commands, type 'LIST COMMANDS'.
+
+All commands can be shortened to it's shortest unique ***. Intstead of
+typing 'LIST COMMANDS' you could type 'LI COM'. If what you typed matches
+more than one command, a list of all possabilities will be shown.
+
+All user names, forum names and flag names can also be shortened. 
+Instead of typing 'John Doe' you can just type 'jo do'. It's also possible
+to use a users number instead of a users name.
+
+The prompt always has a next command suggested for you, to execute this
+command just press <RETURN> without typing anything.
+
+Use the command 'HELP' or '?' to get even more help (both commands do the
+same thing)
+
+Type 'PAGE' to page the sysop.
+If you don't want to see this text in the future, type 'ENABLE ***'. This
+enables the flag "No automatic help". Use the command 'LIST FLAGS' to see
+all available flags.
+
