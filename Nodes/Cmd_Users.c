@@ -23,7 +23,7 @@ extern char outbuffer[],inmat[], *argument;
 void Cmd_Status(void) {
   struct User readuserstr;
   struct Mote *conf;
-  int userId, nod, cnt = 0, sumUnread = 0, showAllConf = FALSE;
+  int userId, nod, cnt = 0, sumUnread = 0, showAllConf = FALSE, kb;
   struct tm *ts;
   struct UserGroup *listpek;
   char filnamn[100];
@@ -60,48 +60,47 @@ void Cmd_Status(void) {
       unreadTexts = &unreadTextsBuf;
     }
   }
-  if(SendString("\r\n\nStatus för %s #%d\r\n\n", readuserstr.namn,userId)) { return; }
-  if(SendString("Status               : %d\r\n", readuserstr.status)) { return; }
+  if(SendStringCat("\r\n\n%s\r\n\n", CATSTR(MSG_USER_STATUS_HEADER), readuserstr.namn,userId)) { return; }
+  if(SendString("%-21s: %d\r\n", CATSTR(MSG_USER_LEVEL), readuserstr.status)) { return; }
   if(!((readuserstr.flaggor & SKYDDAD)
        && Servermem->inne[nodnr].status < Servermem->cfg.st.sestatus
        && inloggad != userId)) {
-    if(SendString("Gatuadress           : %s\r\n", readuserstr.gata)) { return; }
-    if(SendString("Postadress           : %s\r\n", readuserstr.postadress)) { return; }
-    if(SendString("Land                 : %s\r\n", readuserstr.land)) { return; }
-    if(SendString("Telefon              : %s\r\n", readuserstr.telefon)) { return; }
+    if(SendString("%-21s: %s\r\n", CATSTR(MSG_USER_STREET), readuserstr.gata)) { return; }
+    if(SendString("%-21s: %s\r\n", CATSTR(MSG_USER_CITY), readuserstr.postadress)) { return; }
+    if(SendString("%-21s: %s\r\n", CATSTR(MSG_USER_COUNTRY), readuserstr.land)) { return; }
+    if(SendString("%-21s: %s\r\n", CATSTR(MSG_USER_PHONE), readuserstr.telefon)) { return; }
   }
-  if(SendString("Annan info           : %s\r\n", readuserstr.annan_info)) { return; }
-  if(SendString("Antal rader          : %d\r\n", readuserstr.rader)) { return; }
+  if(SendString("%-21s: %s\r\n", CATSTR(MSG_USER_MISCINFO), readuserstr.annan_info)) { return; }
+  if(SendString("%-21s: %d\r\n", CATSTR(MSG_USER_LINES), readuserstr.rader)) { return; }
   ts = localtime(&readuserstr.forst_in);
-  if(SendString("Först inloggad       : %4d%02d%02d  %02d:%02d\r\n",
+  if(SendString("%-21s: %4d%02d%02d  %02d:%02d\r\n", CATSTR(MSG_USER_FIRST_LOGIN),
           ts->tm_year + 1900, ts->tm_mon + 1, ts->tm_mday, ts->tm_hour,
           ts->tm_min)) { return; }
   ts = localtime(&readuserstr.senast_in);
-  if(SendString("Senast inloggad      : %4d%02d%02d  %02d:%02d\r\n",
+  if(SendString("%-21s: %4d%02d%02d  %02d:%02d\r\n", CATSTR(MSG_USER_LAST_LOGIN),
           ts->tm_year + 1900, ts->tm_mon + 1, ts->tm_mday, ts->tm_hour,
           ts->tm_min)) { return; }
-  if(SendString("Total tid inloggad   : %d:%02d\r\n", readuserstr.tot_tid / 3600,
+  if(SendString("%-21s: %d:%02d\r\n", CATSTR(MSG_USER_TOTAL_TIME), readuserstr.tot_tid / 3600,
           (readuserstr.tot_tid % 3600) / 60)) { return; }
-  if(SendString("Antal inloggningar   : %d\r\n", readuserstr.loggin)) { return; }
-  if(SendString("Antal lästa texter   : %d\r\n", readuserstr.read)) { return; }
-  if(SendString("Antal skrivna texter : %d\r\n", readuserstr.skrivit)) { return; }
-  if(SendString("Antal downloads      : %d\r\n", readuserstr.download)) { return; }
-  if(SendString("Antal uploads        : %d\r\n", readuserstr.upload)) { return; }
+  if(SendString("%-21s: %d\r\n", CATSTR(MSG_USER_LOGINS), readuserstr.loggin)) { return; }
+  if(SendString("%-21s: %d\r\n", CATSTR(MSG_USER_READ), readuserstr.read)) { return; }
+  if(SendString("%-21s: %d\r\n", CATSTR(MSG_USER_WRITTEN), readuserstr.skrivit)) { return; }
+  if(SendString("%-21s: %d\r\n", CATSTR(MSG_USER_DL_FILES), readuserstr.download)) { return; }
+  if(SendString("%-21s: %d\r\n", CATSTR(MSG_USER_UL_FILES), readuserstr.upload)) { return; }
 
-  if(readuserstr.downloadbytes < 90000)	{
-    if(SendString("Antal downloaded B   : %d\r\n", readuserstr.downloadbytes)) { return; }
-  } else {
-    if(SendString("Antal downloaded KB  : %d\r\n", readuserstr.downloadbytes / 1024)) { return; }
-  }
-
-  if(readuserstr.uploadbytes < 90000) {
-    if(SendString("Antal uploaded B     : %d\r\n\n", readuserstr.uploadbytes)) { return; }
-  } else {
-    if(SendString("Antal uploaded KB    : %d\r\n\n", readuserstr.uploadbytes / 1024)) { return; }
-  }
+  kb = readuserstr.downloadbytes > 90000;
+  if(SendString("%-21s: %d %s\r\n", CATSTR(MSG_USER_DL_BYTES),
+                kb ? readuserstr.downloadbytes / 1024 : readuserstr.downloadbytes,
+                kb ? "KB" : "B"))
+    { return; }
+  kb = readuserstr.uploadbytes > 90000;
+  if(SendString("%-21s: %d %s\r\n\n", CATSTR(MSG_USER_UL_BYTES),
+                kb ? readuserstr.uploadbytes / 1024 : readuserstr.uploadbytes,
+                kb ? "KB" : "B"))
+    { return; }
 
   if(readuserstr.grupper) {
-    SendString("Grupper:\r\n");
+    SendString("%s:\r\n", CATSTR(MSG_USER_USER_GROUPS));
     ITER_EL(listpek, Servermem->grupp_list, grupp_node, struct UserGroup *) {
       if(!BAMTEST((char *)&readuserstr.grupper, listpek->nummer)) {
         continue;
@@ -116,7 +115,7 @@ void Cmd_Status(void) {
     SendString("\n");
   }
   if(cnt = countmail(userId, readuserstr.brevpek)) {
-    if(SendString("%4d Brevlådan\r\n", cnt)) { return; }
+    if(SendString("%4d %s\r\n", cnt, CATSTR(MSG_MAIL_MAILBOX))) { return; }
     sumUnread += cnt;
   }
   ITER_EL(conf, Servermem->mot_list, mot_node, struct Mote *) {
@@ -140,16 +139,7 @@ void Cmd_Status(void) {
       sumUnread += cnt;
     }
   }
-  if(sumUnread == 0) {
-    if(userId == inloggad) {
-      SendString("\r\nDu har inga olästa texter.");
-    } else {
-      if(SendString("\r\n%s har inga olästa texter.",readuserstr.namn)) { return; }
-    }
-  } else {
-    if(SendString("\r\nSammanlagt %d olästa.",sumUnread)) { return; }
-  }
-  SendString("\r\n\n");
+  if(SendString("\r\n%s: %d\r\n\n", CATSTR(MSG_USER_UNREAD_TEXTS), sumUnread)) { return; }
   sprintf(filnamn, "NiKom:Users/%d/%d/Lapp", userId / 100, userId);
   if(!access(filnamn,0)) {
     sendfile(filnamn);
@@ -162,11 +152,11 @@ int Cmd_ChangeUser(void) {
   struct ShortUser *shortUser;
   if(argument[0]) {
     if(Servermem->inne[nodnr].status < Servermem->cfg.st.anv) {
-      SendString("\r\n\nDu kan inte ändra andra användare än dig själv!\r\n\n");
+      SendString("\r\n\n%s\r\n\n", CATSTR(MSG_USER_CHANGE_NO_OTHER));
       return 0;
     }
     if((userId = parsenamn(argument)) == -1) {
-      SendString("\r\n\nFinns ingen som heter så eller har det numret!\r\n\n");
+      SendString("\r\n\n%s\r\n\n", CATSTR(MSG_COMMON_NO_SUCH_USER));
       return 0;
     } else if(userId == -3) {
       LogEvent(SYSTEM_LOG, ERROR,
@@ -188,16 +178,16 @@ int Cmd_ChangeUser(void) {
         DisplayInternalError();
         return 0;
       }
-      SendString("\r\n\nÄndrar användare %s\r\n", getusername(userId));
+      SendStringCat("\r\n\n%s\r\n", CATSTR(MSG_USER_CHANGING_USER), getusername(userId));
     }
   } else {
     memcpy(&user, &Servermem->inne[nodnr], sizeof(struct User));
     userId = inloggad;
-    SendString("\r\n\nÄndrar egen användarinformation\r\n");
+    SendString("\r\n\n%s\r\n", CATSTR(MSG_USER_CHANGING_SELF));
   }
 
   for(;;) {
-    SendString("\r\nNamn : (%s) ", user.namn);
+    SendString("\r\n%s : (%s) ", CATSTR(MSG_USER_NAME), user.namn);
     if(GetString(40,NULL)) {
       return 1;
     }
@@ -205,7 +195,7 @@ int Cmd_ChangeUser(void) {
       break;
     }
     if((tmp = parsenamn(inmat)) != -1 && tmp != userId) {
-      SendString("\r\n\nDet finns redan en användare med det namnet.\r\n");
+      SendString("\r\n\n%s\r\n", CATSTR(MSG_USER_ALREADY_EXISTS));
     } else {
       strncpy(user.namn, inmat, 41);
       break;
@@ -213,27 +203,28 @@ int Cmd_ChangeUser(void) {
   }
 
   if(Servermem->inne[nodnr].status >= Servermem->cfg.st.chgstatus) {
-    if(MaybeEditNumberChar("Status", &user.status, 3, 0, 100)) { return 1; }
+    if(MaybeEditNumberChar(CATSTR(MSG_USER_LEVEL), &user.status, 3, 0, 100)) { return 1; }
   }
-  if(MaybeEditString("Gatuadress", user.gata, 40)) { return 1; }
-  if(MaybeEditString("Postadress", user.postadress, 40)) { return 1; }
-  if(MaybeEditString("Land", user.land, 40)) { return 1; }
-  if(MaybeEditString("Telefon", user.telefon, 20)) { return 1; }
-  if(MaybeEditString("Annan info", user.annan_info, 60)) { return 1; }
-  if(MaybeEditPassword("Lösenord", "Bekräfta lösenord", user.losen, 15)) { return 1; }
-  if(MaybeEditString("Prompt", user.prompt, 5)) { return 1; }
-  if(MaybeEditNumberChar("Antal rader", &user.rader, 5, 0, 127)) { return 1; }
+  if(MaybeEditString(CATSTR(MSG_USER_STREET), user.gata, 40)) { return 1; }
+  if(MaybeEditString(CATSTR(MSG_USER_CITY), user.postadress, 40)) { return 1; }
+  if(MaybeEditString(CATSTR(MSG_USER_COUNTRY), user.land, 40)) { return 1; }
+  if(MaybeEditString(CATSTR(MSG_USER_PHONE), user.telefon, 20)) { return 1; }
+  if(MaybeEditString(CATSTR(MSG_USER_MISCINFO), user.annan_info, 60)) { return 1; }
+  if(MaybeEditPassword(CATSTR(MSG_USER_PASSWORD), CATSTR(MSG_USER_PASSWORD_CONFIRM), user.losen, 15)) { return 1; }
+  if(MaybeEditString(CATSTR(MSG_USER_PROMPT), user.prompt, 5)) { return 1; }
+  if(MaybeEditNumberChar(CATSTR(MSG_USER_LINES), &user.rader, 5, 0, 127)) { return 1; }
 
   if(Servermem->inne[nodnr].status>=Servermem->cfg.st.anv) {
-    if(MaybeEditNumber("Antal lästa", (int *)&user.read, 8, 0, INT_MAX)) { return 1; }
-    if(MaybeEditNumber("Antal skrivna", (int *)&user.skrivit, 8, 0, INT_MAX)) { return 1; }
-    if(MaybeEditNumber("Antal downloads", (int *)&user.download, 8, 0, INT_MAX)) { return 1; }
-    if(MaybeEditNumber("Antal uploads", (int *)&user.upload, 8, 0, INT_MAX)) { return 1; }
-    if(MaybeEditNumber("Antal dlbytes", (int *)&user.downloadbytes, 8, 0, INT_MAX)) { return 1; }
-    if(MaybeEditNumber("Antal ulbytes", (int *)&user.uploadbytes, 8, 0, INT_MAX)) { return 1; }
-    if(MaybeEditNumber("Antal inloggningar", (int *)&user.loggin, 8, 0, INT_MAX)) { return 1; }
+    if(MaybeEditNumber(CATSTR(MSG_USER_READ), (int *)&user.read, 8, 0, INT_MAX)) { return 1; }
+    if(MaybeEditNumber(CATSTR(MSG_USER_WRITTEN), (int *)&user.skrivit, 8, 0, INT_MAX)) { return 1; }
+    if(MaybeEditNumber(CATSTR(MSG_USER_DL_FILES), (int *)&user.download, 8, 0, INT_MAX)) { return 1; }
+    if(MaybeEditNumber(CATSTR(MSG_USER_UL_FILES), (int *)&user.upload, 8, 0, INT_MAX)) { return 1; }
+    if(MaybeEditNumber(CATSTR(MSG_USER_DL_BYTES), (int *)&user.downloadbytes, 8, 0, INT_MAX)) { return 1; }
+    if(MaybeEditNumber(CATSTR(MSG_USER_UL_BYTES), (int *)&user.uploadbytes, 8, 0, INT_MAX)) { return 1; }
+    if(MaybeEditNumber(CATSTR(MSG_USER_LOGINS), (int *)&user.loggin, 8, 0, INT_MAX)) { return 1; }
   }
-  if(GetYesOrNo("\r\n\n", "Är allt korrekt?", NULL, NULL, "Ja", "Nej", "\r\n\n",
+  if(GetYesOrNo("\r\n\n", CATSTR(MSG_COMMON_IS_CORRECT), NULL, NULL,
+                CATSTR(MSG_COMMON_YES), CATSTR(MSG_COMMON_NO), "\r\n\n",
                 TRUE, &isCorrect)) {
     return 1;
   }
@@ -280,16 +271,16 @@ void Cmd_DeleteUser(void) {
   struct ShortUser *shortUser;
   int userId, isCorrect;
   if(!argument[0]) {
-    SendString("\r\n\nSkriv: Radera Användare <användare>\r\n\n");
+    SendString("\r\n\n%s\r\n\n", CATSTR(MSG_USER_DELETE_SYNTAX));
     return;
   }
   if((userId = parsenamn(argument)) == -1) {
-    SendString("\r\n\nFinns ingen som heter så eller har det numret\r\n\n");
+    SendString("\r\n\n%s\r\n\n", CATSTR(MSG_COMMON_NO_SUCH_USER));
     return;
   }
-  SendString("\r\n\nÄr du säker på att du vill radera %s?",
-             getusername(userId));
-  if(GetYesOrNo(NULL, NULL, NULL, NULL, "Ja", "Nej", "\r\n\n", FALSE, &isCorrect)) {
+  SendStringCat("\r\n\n%s", CATSTR(MSG_USER_DELETE_CONFIRM), getusername(userId));
+  if(GetYesOrNo(NULL, NULL, NULL, NULL, CATSTR(MSG_COMMON_YES), CATSTR(MSG_COMMON_NO),
+                "\r\n\n", FALSE, &isCorrect)) {
     return;
   }
   if(!isCorrect) {
@@ -362,16 +353,16 @@ static char *languages[] = {
 void Cmd_ChangeLanguage(void) {
   int lang, i;
 
-  SendString("\n\n\rDessa språk finns.\n\r");
-  SendString("* markerar nuvarande val.\n\n\r");
+  SendString("\n\n\rThese are the available languages.\n\r");
+  SendString("* indicates current choice.\n\n\r");
 
-  SendString("  Nr Språk\n\r");
+  SendString("  #  Language\n\r");
   SendString("-----------------------------------------\n\r");
   for(i = 0; i < 2; i++) {
     SendString("%c %2d: %s\n\r", Servermem->inne[nodnr].language == i ? '*' : ' ', i, languages[i]);
   }
   
-  SendString("\n\rVal: ");
+  SendString("\n\rChoice: ");
   lang = GetNumber(0, 1, NULL);
   if(ImmediateLogout()) {
     return;

@@ -224,6 +224,67 @@ Mailbox
 MSG_INFO_NO_SUCH_FILE (400//)
 There is no such info file.
 ;
+MSG_USER_STATUS_HEADER (410//)
+Status for %s #%d
+MSG_USER_LEVEL (411//)
+Status
+MSG_USER_STREET (412//)
+Street address
+MSG_USER_CITY (413//)
+City
+MSG_USER_COUNTRY (414//)
+Country
+MSG_USER_PHONE (415//)
+Phone
+MSG_USER_MISCINFO (416//)
+Misc info
+MSG_USER_LINES (417//)
+Number of lines
+MSG_USER_FIRST_LOGIN (418//)
+First login
+MSG_USER_LAST_LOGIN (419//)
+Latest login
+MSG_USER_TOTAL_TIME (420//)
+Time logged in
+MSG_USER_LOGINS (421//)
+Number of logins
+MSG_USER_READ (422//)
+Texts read
+MSG_USER_WRITTEN (423//)
+Texts written
+MSG_USER_DL_FILES (424//)
+Files downloaded
+MSG_USER_UL_FILES (425//)
+Files uploaded
+MSG_USER_DL_BYTES (426//)
+Data downloaded
+MSG_USER_UL_BYTES (427//)
+Data uploaded
+MSG_USER_USER_GROUPS (428//)
+User groups
+MSG_USER_UNREAD_TEXTS (429//)
+Unread texts
+MSG_USER_CHANGE_NO_OTHER (430//)
+You can not change other users.
+MSG_USER_CHANGING_USER (431//)
+Changing user %s.
+MSG_USER_CHANGING_SELF (432//)
+Changing your own user information.
+MSG_USER_NAME (433//)
+Name
+MSG_USER_ALREADY_EXISTS (434//)
+There already exists a user with that name.
+MSG_USER_PASSWORD (435//)
+Password
+MSG_USER_PASSWORD_CONFIRM (436//)
+Confirm password
+MSG_USER_PROMPT (437//)
+Prompt
+MSG_USER_DELETE_SYNTAX (450//)
+Syntax: Delete User <user>
+MSG_USER_DELETE_CONFIRM (451//)
+Are you sure you want to delete %s?
+;
 ; ******** Dealing with flags **********
 MSG_FLAG_ON (1000//)
 On
@@ -269,3 +330,5 @@ MSG_COMMON_NO_SUCH_USER (20002//)
 There is no such user.
 MSG_COMMON_CHOICE (20003//)
 Choice:
+MSG_COMMON_IS_CORRECT (20004//)
+Is everything correct?

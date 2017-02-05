@@ -422,6 +422,67 @@ MSG_INFO_NO_SUCH_FILE
 Finns ingen sådan info-fil.
 ; There is no such info file.
 ;
+MSG_USER_STATUS_HEADER
+Status för %s #%d
+MSG_USER_LEVEL
+Status
+MSG_USER_STREET
+Gatuadress
+MSG_USER_CITY 
+Postadress
+MSG_USER_COUNTRY
+Land
+MSG_USER_PHONE
+Telefon
+MSG_USER_MISCINFO
+Annan info
+MSG_USER_LINES
+Antal rader
+MSG_USER_FIRST_LOGIN
+Först inloggad
+MSG_USER_LAST_LOGIN
+Senast inloggad
+MSG_USER_TOTAL_TIME
+Total tid inloggad
+MSG_USER_LOGINS
+Antal inloggningar
+MSG_USER_READ
+Antal lästa texter
+MSG_USER_WRITTEN
+Antal skrivna texter
+MSG_USER_DL_FILES
+Antal nedladdningar
+MSG_USER_UL_FILES
+Antal uppladdningar
+MSG_USER_DL_BYTES
+Mängd nedladdat
+MSG_USER_UL_BYTES
+Mängd uppladdat
+MSG_USER_USER_GROUPS
+Grupper
+MSG_USER_UNREAD_TEXTS
+Olästa texter
+MSG_USER_CHANGE_NO_OTHER
+Du kan inte ändra andra användare än dig själv.
+MSG_USER_CHANGING_USER
+Ändrar användare %s.
+MSG_USER_CHANGING_SELF
+Ändrar egen användarinformation.
+MSG_USER_NAME
+Namn
+MSG_USER_ALREADY_EXISTS
+Det finns redan en användare med det namnet.
+MSG_USER_PASSWORD
+Lösenord
+MSG_USER_PASSWORD_CONFIRM
+Bekräfta lösenord
+MSG_USER_PROMPT
+Prompt
+MSG_USER_DELETE_SYNTAX
+Skriv: Radera Användare <användare>
+MSG_USER_DELETE_CONFIRM
+Är du säker på att du vill radera %s?
+;
 MSG_FLAG_ON
 På
 ; On
@@ -500,5 +561,5 @@ Användaren finns inte.
 ;
 MSG_COMMON_CHOICE
 Val:
-; Choice:
-;
+MSG_COMMON_IS_CORRECT
+Är allt korrekt?
