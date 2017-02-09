@@ -285,6 +285,33 @@ Syntax: Delete User <user>
 MSG_USER_DELETE_CONFIRM (451//)
 Are you sure you want to delete %s?
 ;
+MSG_CHRS_CON_WARNING_1 (500//)
+Note! You are running on a CON node. Examples for all character sets
+MSG_CHRS_CON_WARNING_2 (501//)
+will look the same.
+MSG_CHRS_AVAILABLE (502//)
+The following character sets are available.
+MSG_CHARS_EXAMPLE_DESC (503//)
+Choose the alternative where Swedish characters look good.
+MSG_CHRS_CURRENT_CHOICE (504//)
+* indicates current choice.
+MSG_CHRS_HEAD_WITH_EXAMPLE (505//)
+Nr Name                                          Example
+MSG_CHRS_HEAD_WO_EXAMPLE (506//)
+Nr Name
+MSG_CHRS_ISO88591 (507//)
+ISO 8859-1 (ISO Latin 1)
+MSG_CHRS_CP437 (508//)
+IBM CodePage 437 (PC8)
+MSG_CHRS_MAC (509//)
+Mac OS Roman (old Mac OS, before OS X)
+MSG_CHRS_SIS7 (510//)
+SIS-7 (Swedish 7 bit encoding)
+MSG_CHRS_NEW (511//)
+New character set
+MSG_CHRS_BAD (512//)
+Bad character set. Choice must be between 1 and 4.
+;
 ; ******** Dealing with flags **********
 MSG_FLAG_ON (1000//)
 On
@@ -332,3 +359,5 @@ MSG_COMMON_CHOICE (20003//)
 Choice:
 MSG_COMMON_IS_CORRECT (20004//)
 Is everything correct?
+MSG_COMMON_ABORTING (20005//)
+Aborting

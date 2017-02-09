@@ -587,6 +587,16 @@ int SendStringNoBrk(char *fmt, ...) {
   return 0;
 }
 
+int SendRepeatedChr(char c, int count) {
+  char buf[80];
+  int i;
+  for(i = 0; i < count; i++) {
+    buf[i] = c;
+  }
+  buf[count] = '\0';
+  return SendString(buf);
+}
+
 void DisplayInternalError(void) {
   SendString("\r\n\n*** Internal error ***\r\n\n");
 }

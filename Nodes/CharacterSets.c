@@ -1,6 +1,7 @@
 #include "NiKomStr.h"
 #include "NiKomLib.h"
 #include "Terminal.h"
+#include "Languages.h"
 
 extern struct System *Servermem;
 extern int nodnr;
@@ -11,43 +12,43 @@ int AskUserForCharacterSet(int forceChoice, int showExamples) {
 
   chrsetbup = Servermem->inne[nodnr].chrset;
   if(Servermem->nodtyp[nodnr] == NODCON || showExamples) {
-    SendString("\n\n\r*** OBS! Du kör på en CON-nod, exemplen för alla teckenset\n\r");
-    SendString("***      kommer se likadana ut!!");
+    SendString("\n\n\r*** %s\n\r", CATSTR(MSG_CHRS_CON_WARNING_1));
+    SendString("*** %s", CATSTR(MSG_CHRS_CON_WARNING_2));
   }
-  SendString("\n\n\rDessa teckenset finns.\n\r");
+  SendString("\n\n\r%s\n\r", CATSTR(MSG_CHRS_AVAILABLE));
   if(showExamples) {
-    SendString("Välj det alternativ vars svenska tecken ser bra ut.\n\r");
+    SendString("%s\n\r", CATSTR(MSG_CHARS_EXAMPLE_DESC));
   }
   SendString("\n\r");
   if(chrsetbup != 0) {
-    SendString("* markerar nuvarande val.\n\n\r");
+    SendString("%s\n\n\r", CATSTR(MSG_CHRS_CURRENT_CHOICE));
   }
 
   if(showExamples) {
-    SendString("  Nr Namn                                  Exempel\n\r");
-    SendString("--------------------------------------------------\n\r");
+    SendString("  %s\n\r", CATSTR(MSG_CHRS_HEAD_WITH_EXAMPLE));
+    SendString("----------------------------------------------------------\n\r");
   } else {
-    SendString("  Nr Namn\n\r");
-    SendString("-----------------------------------------\n\r");
+    SendString("  %s\n\r", CATSTR(MSG_CHRS_HEAD_WO_EXAMPLE));
+    SendString("-------------------------------------------------\n\r");
   }
 
   example = showExamples ? "åäö ÅÄÖ" : "";
 
   Servermem->inne[nodnr].chrset = CHRS_LATIN1;
-  SendString("%c 1: ISO 8859-1 (ISO Latin 1)              %s\n\r",
-             chrsetbup == CHRS_LATIN1 ? '*' : ' ', example);
+  SendString("%c 1: %-45s %s\n\r",
+             chrsetbup == CHRS_LATIN1 ? '*' : ' ', CATSTR(MSG_CHRS_ISO88591), example);
   Servermem->inne[nodnr].chrset = CHRS_CP437;
-  SendString("%c 2: IBM CodePage 437 (PC8)                %s\n\r",
-             chrsetbup == CHRS_CP437 ? '*' : ' ', example);
+  SendString("%c 2: %-45s %s\n\r",
+             chrsetbup == CHRS_CP437 ? '*' : ' ', CATSTR(MSG_CHRS_CP437), example);
   Servermem->inne[nodnr].chrset = CHRS_MAC;
-  SendString("%c 3: Mac OS Roman (gamla Mac, innan OS X)  %s\n\r",
-             chrsetbup == CHRS_MAC ? '*' : ' ', example);
+  SendString("%c 3: %-45s %s\n\r",
+             chrsetbup == CHRS_MAC ? '*' : ' ', CATSTR(MSG_CHRS_MAC), example);
   Servermem->inne[nodnr].chrset = CHRS_SIS7;
-  SendString("%c 4: SIS-7 (SF7, måsvingar)                %s\n\r",
-             chrsetbup == CHRS_SIS7 ? '*' : ' ', example);
+  SendString("%c 4: %-45s %s\n\r",
+             chrsetbup == CHRS_SIS7 ? '*' : ' ', CATSTR(MSG_CHRS_SIS7), example);
 
   Servermem->inne[nodnr].chrset = chrsetbup;
-  SendString("\n\rVal: ");
+  SendString("\n\r%s ", CATSTR(MSG_COMMON_CHOICE));
   for(;;) {
     ch = GetChar();
     switch(ch) {
@@ -55,23 +56,23 @@ int AskUserForCharacterSet(int forceChoice, int showExamples) {
       return 1;
     case '1' :
       Servermem->inne[nodnr].chrset = CHRS_LATIN1;
-      SendString("ISO 8859-1\n\r");
+      SendString("%s\n\r", CATSTR(MSG_CHRS_ISO88591));
       return 0;
     case '2' :
       Servermem->inne[nodnr].chrset = CHRS_CP437;
-      SendString("IBM CodePage 437\n\r");
+      SendString("%s\n\r", CATSTR(MSG_CHRS_CP437));
       return 0;
     case '3' :
       Servermem->inne[nodnr].chrset = CHRS_MAC;
-      SendString("Mac OS Roman\n\r");
+      SendString("%s\n\r", CATSTR(MSG_CHRS_MAC));
       return 0;
     case '4' :
       Servermem->inne[nodnr].chrset = CHRS_SIS7;
-      SendString("SIS-7\n\r");
+      SendString("%s\n\r", CATSTR(MSG_CHRS_SIS7));
       return 0;
     case GETCHAR_RETURN :
       if(!forceChoice) {
-        SendString("Avbryter\n\r");
+        SendString("%s\n\r", CATSTR(MSG_COMMON_ABORTING));
         return 0;
       }
     }

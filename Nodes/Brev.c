@@ -530,7 +530,7 @@ int fido_brev(char *tillpers,char *adr,struct Mote *motpek) {
     tmpfrom[i] = 0;
     SendString("%s\r\n\n", tmpfrom);
   } else {
-    puttekn("\n",-1);
+    SendString("\n");
   }
   crashmail = FALSE;
   editret = edittext(NULL);

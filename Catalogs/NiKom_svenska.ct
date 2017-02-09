@@ -289,6 +289,33 @@ Skriv: Radera Användare <användare>
 MSG_USER_DELETE_CONFIRM
 Är du säker på att du vill radera %s?
 ;
+MSG_CHRS_CON_WARNING_1
+OBS! Du kör på en CON-nod, exemplen för alla teckenset
+MSG_CHRS_CON_WARNING_2
+kommer se likadana ut.
+MSG_CHRS_AVAILABLE
+Dessa teckenset finns.
+MSG_CHARS_EXAMPLE_DESC
+Välj det alternativ vars svenska tecken ser bra ut.
+MSG_CHRS_CURRENT_CHOICE
+* markerar nuvarande val.
+MSG_CHRS_HEAD_WITH_EXAMPLE
+Nr Namn                                          Exempel
+MSG_CHRS_HEAD_WO_EXAMPLE
+Nr Namn
+MSG_CHRS_ISO88591
+ISO 8859-1 (ISO Latin 1)
+MSG_CHRS_CP437
+IBM CodePage 437 (PC8)
+MSG_CHRS_MAC
+Mac OS Roman (gamla Mac, innan OS X)
+MSG_CHRS_SIS7
+SIS-7 (Svensk 7-bit, måsvingar)
+MSG_CHRS_NEW
+Nytt teckenset
+MSG_CHRS_BAD
+Felaktig teckenuppsättning, ska vara mellan 1 och 4.
+;
 ; ******** Dealing with flags **********
 MSG_FLAG_ON
 På
@@ -336,3 +363,5 @@ MSG_COMMON_CHOICE
 Val:
 MSG_COMMON_IS_CORRECT
 Är allt korrekt?
+MSG_COMMON_ABORTING
+Avbryter

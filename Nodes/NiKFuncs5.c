@@ -12,6 +12,7 @@
 #include "NiKomFuncs.h"
 #include "Terminal.h"
 #include "CharacterSets.h"
+#include "Languages.h"
 
 #define EKO		1
 #define EJEKO	0
@@ -89,30 +90,30 @@ void bytteckenset(void) {
     switch(argument[0]) {
     case '1' :
       Servermem->inne[nodnr].chrset = CHRS_LATIN1;
-      SendString("\n\n\rNytt teckenset: ISO 8859-1\n\r");
+      SendString("\n\n\r%s: %s\n\r", CATSTR(MSG_CHRS_NEW), CATSTR(MSG_CHRS_ISO88591));
       return;
     case '2' :
       Servermem->inne[nodnr].chrset = CHRS_CP437;
-      SendString("\n\n\rNytt teckenset: IBM CodePage 437\n\r");
+      SendString("\n\n\r%s: %s\n\r", CATSTR(MSG_CHRS_NEW), CATSTR(MSG_CHRS_CP437));
       return;
     case '3' :
       Servermem->inne[nodnr].chrset = CHRS_MAC;
-      SendString("\n\n\rNytt teckenset: Mac OS Roman\n\r");
+      SendString("\n\n\r%s: %s\n\r", CATSTR(MSG_CHRS_NEW), CATSTR(MSG_CHRS_MAC));
       return;
     case '4' :
       Servermem->inne[nodnr].chrset = CHRS_SIS7;
-      SendString("\n\n\rNytt teckenset: SIS-7\n\r");
+      SendString("\n\n\r%s: %s\n\r", CATSTR(MSG_CHRS_NEW), CATSTR(MSG_CHRS_SIS7));
       return;
     case '-':
       if(argument[1] == 'e' || argument[1] == 'E') {
         showExample = TRUE;
       } else {
-        SendString("\n\n\rFelaktigt alternativ.\n\r");
+        SendString("\n\n\r%s\n\r", CATSTR(MSG_KOM_INVALID_SWITCH));
         return;
       }
       break;
     default :
-      SendString("\n\n\rFelaktig teckenuppsättning, ska vara mellan 1 och 4.\n\r");
+      SendString("\n\n\r%s\n\r", CATSTR(MSG_CHRS_BAD));
       return;
     }
   }
