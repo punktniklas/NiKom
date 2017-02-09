@@ -2,425 +2,231 @@
 ## codeset 0
 ## language svenska
 ;
+; ******** Command prompts **********
 MSG_PROMPT_GO_TO_NEXT_FORUM
 (Gå till) nästa möte
-; (Go to) next forum
-;
 MSG_PROMPT_READ_NEXT_MAIL
 (Läsa) nästa brev
-; (Read) next mail
-;
 MSG_PROMPT_READ_NEXT_TEXT
 (Läsa) nästa text
-; (Read) next text
-;
 MSG_PROMPT_READ_NEXT_COMMENT
 (Läsa) nästa kommentar
-; (Read) next comment
-;
 MSG_PROMPT_SEE_TIME
 (Se) tiden
-; (See) time
-;
 MSG_PROMPT_GO_TO_MAILBOX
 Gå (till) brevlådan
-; Go (to) mailbox
-;
 MSG_KOM_INVALID_COMMAND
 Felaktigt kommando
-; Invalid command
-;
 MSG_KOM_NO_PERMISSION
 Du har ingen rätt att utföra det kommandot.
-; You don't have permission to execute that command.
-;
 MSG_KOM_INVALID_PASSWORD
 Felaktigt lösen
-; Invalid password
-;
 MSG_KOM_TIME_NOW
 Tiden just nu: %s %d %s %d  %d:%02d
-; Time right now: %s %d %s %d  %d:%02d
-;
 MSG_KOM_TIME_LEFT
 Din tid tar slut om %d minuter.
-; You have %d minutes left.
-;
 MSG_KOM_AMBIGOUS_COMMAND
 Flertydigt kommando
-; Ambigous command
-;
 MSG_KOM_COMMAND_PASSWORD
 Lösen
-; Password
-;
 MSG_KOM_INVALID_SWITCH
 Felaktig kommandoflagga.
-; Invalid command switch
 ;
+; ******** Forums **********
 MSG_FORUMS_NO_SUCH_TEXT
 Finns ingen sådan text.
-; There is no such text.
-;
 MSG_ORG_TEXT_LINE1
 Text %d  Möte: %s
-; Text: %d  Forum: %s
-;
 MSG_ORG_TEXT_LINE2
 Skriven av %s
-; Written by %s
-;
 MSG_ORG_TEXT_COMMENT_TO
 Kommentar till text %d av %s
-; Comment to text %d by %s
-;
 MSG_ORG_TEXT_SUBJECT
 Ärende: %s
-; Subject: %s
-;
 MSG_ORG_TEXT_END_OF_TEXT
 (Slut på text %d av %s)
-; (End of text %d by %s)
-;
 MSG_ORG_TEXT_COMMENT_IN
 (Kommentar i text %d av %s)
-; (Comment in text %d by %s)
-;
 MSG_ORG_TEXT_FOOTNOTE
 Fotnot:
-; Footnote
-;
 MSG_TEXT_DELETED
 Text %d är raderad.
-; Text %d is deleted.
-;
 MSG_TEXT_NO_PERM
 Du har inte rätt att läsa den texten.
-; You don't have permissions to read that text.
 ;
 MSG_WHERE_YOU_ARE_IN
 Du befinner dig i %s.
-; You are in %s.
-;
 MSG_WHERE_NO_TEXTS
 Det finns inga texter.
-; There are no texts.
-;
 MSG_WHERE_TEXTS_NUMBERED
 Det finns texter numrerade från %d till %d.
-; There are texts numbered from %d to %d.
-;
 MSG_WHERE_NO_UNREAD_TEXTS
 Du har inga olästa texter.
-; You have no unread texts.
-;
 MSG_WHERE_ONE_UNREAD_TEXT
 Du har 1 oläst text.
-; You have 1 unread text.
-;
 MSG_WHERE_MANY_UNREAD_TEXTS
 Du har %d olästa texter.
-; You have %d unread texts.
 ;
 MSG_GO_SYNTAX
 Skriv: Gå <mötesnamn>
-;Syntax: Go <forum name>
-;
 MSG_GO_NO_SUCH_FORUM
 Finns inget sådant möte.
-;There is no such forum.
-;
 MSG_GO_NOT_MEMBER_WANT_TO
 Du är inte medlem i mötet %s, vill du bli medlem?
-;You are not a member of %s, would you like to be?
-;
 MSG_GO_NOT_MEMBER_NO_PERMS
 Du är inte medlem och har inte rätt att gå med i %s.
-; You are not a member of %s.
 ;
 MSG_NEXT_CONF_NO_MORE_FORUM
 Finns inget mer möte med olästa texter.
-; No more forum with unread texts.
-;
 MSG_NEXT_TEXT_NO_TEXTS
 Finns inga olästa texter i detta möte.
-; You have no unread texts in this forum.
-;
 MSG_NEXT_COMMENT_NO_COMMENTS
 Finns inga fler olästa kommentarer.
-; You have no more unread comments.
 ;
 MSG_SKIP_NO_TEXT_READ
 Du har inte läst någon text ännu.
-; You haven't read any texts yet.
-;
 MSG_SKIP_ONLY_LOCAL
 Du kan bara använda 'Hoppa Över' på texter i vanliga möten.
-; You can only use 'Skip' on texts in local forums.
-;
 MSG_SKIP_SKIPPED_TEXTS
 Du hoppade över %d texter.
-; You skipped %d texts.
 ;
 MSG_COMMENT_NO_PERMISSIONS
 Du har inga rättigheter i mötet där texten finns.
-; You don't have permissions in the forum of that text.
-;
 MSG_COMMENT_NO_COMMENT_IN_FORUM
 Du får inte kommentera i kommentarsskyddade möten.
-; You can't comment in comment protected forums.
-;
 MSG_COMMENT_REALLY_COMMENT
 Vill du verkligen kommentera i ett kommentarsskyddat möte?
-; Do you really want to comment in a comment protected forum?
 ;
 MSG_REACTION_TEXT_VERBOSE_PRS
 Texten har hyllats av %s
-; The text has been praised by %s
-;
 MSG_REACTION_TEXT_VERBOSE_DIS
 Texten har dissats av %s
-; The text has been dissed by %s
-;
 MSG_REACTION_TEXT_PRAISED
 Texten har hyllats av %d personer
-; The text has been praised by %d persons
-;
 MSG_REACTION_TEXT_DISSED
 Texten har dissats av %d personer
-; The text has been dissed by %d persons
-;
 MSG_REACTION_NO_MAIL
 Du kan inte hylla/dissa brev.
-; You can not praise/diss mail.
-;
 MSG_REACTION_ONLY_LOCAL
 Du kan bara hylla/dissa lokala texter.
-; You can only praise/diss local texts.
-;
 MSG_REACTION_NO_PERMISSION
 Du har ingen rätt att hylla/dissa den texten.
-; You don't have permission to praise/diss that text.
-;
 MSG_REACTION_ALREADY_PRS
 Du har redan hyllat text %d.
-; You already have praised text %d.
-;
 MSG_REACTION_DONE_PRS
 Du har hyllat text %d.
-; You have praised text %d.
-;
 MSG_REACTION_ALREADY_DIS
 Du har redan dissat text %d.
-; You already have dissed text %d.
-;
 MSG_REACTION_DONE_DIS
 Du har dissat text %d.
-; You have dissed text %d.
 ;
 MSG_WRITE_TEXT_GOT_NUMBER
 Texten fick nummer %d.
-; The text got number %d.
-;
 MSG_WRITE_TOO_MANY_COMMENTS
 Redan maximalt med kommentarer till den texten, sparar texten i alla fall.
-; The commented text has maximum number of comments. No forward link created.
-;
 MSG_WRITE_FORUM
 Möte: %s
-; Forum: %s
-;
 MSG_WRITE_SUBJECT
 Ärende:
-; Subject:
 ;
 MSG_READ_SYNTAX
 Skriv: Läsa <textnr>
-; Syntax: Read <text number>
-;
 MSG_TEXT_PARSE_LATEST
 senaste
-; latest
-;
 MSG_TEXT_PARSE_COMMENTED
 kommenterad
-; commented
 ;
 MSG_FOOTNOTE_SYNTAX
 Skriv: Fotnot <textnr>
-; Syntax: Footnote <text number>
-;
 MSG_FOOTNOTE_ONLY_OWN_TEXTS
 Du kan bara lägga till fotnoter på dina egna texter.
-; You can only add footnotes to your own texts.
-;
 MSG_FOOTNOTE_ALREADY_HAS
 Texten har redan en fotnot.
-; The text already has a footnote.
-;
 MSG_FOOTNOTE_PRE_EDIT
 Fotnot till text %d av %s
-; Footnote to text %d by %s
 ;
 MSG_SEARCH_SYNTAX
 Skriv: Sök [-g] <söksträng>
-; Syntax: Search [-g] <search string>
-;
 MSG_SEARCH_NOT_MAILBOX
 Du kan inte söka i brevlådan.
-; You can't search in the mailbox.
-;
 MSG_SEARCH_NOT_FIDO
 Sök fungerar inte i FidoNet-möten.
-; Search doesn't work in Fido forums.
-;
 MSG_SEARCH_NO_TEXTS_FOUND
 Inga texter hittades.
-; No texts found.
-;
 MSG_SEARCH_RESULT_LINE1
 Text: %d skriven %02d%02d%02d av %s
-; Text: %d written %02d%02d%02d by %s
-;
 MSG_SEARCH_RESULT_LINE2
 Möte: %s
-; Forum: %s
 ;
 MSG_MAIL_NO_SUCH_MAIL
 Finns inget sådant brev.
-; There is no such mail.
-;
 MSG_MAIL_NO_COMMENT_PERM
 Du har inte rätt att kommentera det brevet.
-; You don't have permissions to comment that mail.
-;
 MSG_MAIL_NOT_WRITTEN
 Du har inte skrivit det brevet.
-; You have not written that mail.
-;
 MSG_MAIL_NO_UNREAD
 Du har inga olästa brev.
-; You have no unread mail.
-;
 MSG_MAIL_ONE_UNREAD
 Du har 1 oläst brev.
-; You have 1 unread mail.
-;
 MSG_MAIL_MANY_UNREAD
 Du har %d olästa brev.
-; You have %d unread mail.
-;
 MSG_MAIL_YOU_ARE
 Du befinner dig i brevlådan.
-; You are in the mailbox.
-;
 MSG_MAIL_NO_READ_PERM
 Du har inte rätt att läsa det brevet.
-; You don't have permissions to read that mail.
-;
 MSG_MAIL_LINE1
 Brev %d i brevlådan hos %s
-; Mail %d in the mailbox at %s
-;
 MSG_MAIL_LOCAL_MAIL
 Lokalt brev,  %s
-; Local mail,  %s
-;
 MSG_MAIL_UNKNOWN_MAIL
 <Okänd brevtyp>  %s
-; <Unknown mail type>,  %s
-;
 MSG_MAIL_FROM
 Avsändare: %s
-; From: %s
-;
 MSG_MAIL_COMMENT
 Kommentar till en text av %s
-; Comment to a mail by %s
-;
 MSG_MAIL_TO
 Mottagare: %s
-; To: %s
-;
 MSG_MAIL_END
 (Slut på brev %d av %s)
-; (End of mail %d by %s)
-;
 MSG_MAIL_FIDO_MAIL
-FIdo-nätbrev,  %s
-; Fido netmail,  %s
-;
+Fido-nätbrev,  %s
 MSG_MAIL_FIDO_BAD_ZONE
 Du kan inte skriva brev till zon %d.
-; You can not send a mail to zone %d.
-;
 MSG_MAIL_FIDO_WHAT_CHARSET
 Vilken teckenkodning ska användas för brevet?
-; What character encoding should be used for the netmail?
-;
 MSG_MAIL_FIDO_WANT_COPY
 Vill du ha en kopia av brevet i din egen brevlåda?
-; Do you want a copy of the mail in your own mailbox?
-;
 MSG_MAIL_GOT_NUMBER
 Brevet fick nummer %d
-; The mail got number %d.
-;
 MSG_MAIL_GOT_NUMBER_AT_USER
 Brevet fick nummer %d hos %s
-; The mail got number %d at %s.
-;
 MSG_MAIL_LOCAL_SYNTAX
 Skriv: Brev <användare>
-; Syntax: Mail <user>
-;
 MSG_MAIL_FIDO_SYNTAX
 Skriv: Brev <användare>@<zon>:<nät>/<nod>[.<point>]
-; Syntax: Mail <user>@<zone>:<net>/<node>[.<point>]
-;
 MSG_MAIL_LIST_SUMMARY
 Lägsta brev: %d  Högsta brev: %d
-; Lowest mail: %d  Highest mail: %d
-;
 MSG_MAIL_LIST_HEAD
 Namn                              Text   Date   Subject
-; From                              Text   Date   Subject
-;
 MSG_MAIL_LIST_UNKNOWN
 <Okänd brevtyp>                   %5d
-; <Unknown mail type>               %5d
-;
 MSG_MAIL_PURGE_SYNTAX
 Skriv: Rensa Brev <antal brev att radera>
-; Syntax: Purge Mail <number of mail>
-;
 MSG_MAIL_PURGE_ABOVE_ZERO
 Antalet brev måste vara större än noll.
-; The number of mail must be larger than zero.
-;
 MSG_MAIL_PURGE_ONLY_X_MAIL
 Du har bara %d brev.
-; You only have %d mail.
-;
 MSG_MAIL_PURGE_SUMMARY
 Lägsta brev: %d  Högsta brev: %d  Antal att radera: %d
-; Lowest mail: %d  Highest mail: %d  Mail to delete: %d
-;
 MSG_MAIL_PURGE_PURGING
 Rensar...
-; Purging...
-;
 MSG_MAIL_PURGE_RESULT
 %d brev raderade.
-; %d mail purged.
-;
 MSG_MAIL_MAILBOX
 Brevlådan
-; Mailbox
 ;
 MSG_INFO_NO_SUCH_FILE
 Finns ingen sådan info-fil.
-; There is no such info file.
 ;
 MSG_USER_STATUS_HEADER
 Status för %s #%d
@@ -483,82 +289,49 @@ Skriv: Radera Användare <användare>
 MSG_USER_DELETE_CONFIRM
 Är du säker på att du vill radera %s?
 ;
+; ******** Dealing with flags **********
 MSG_FLAG_ON
 På
-; On
-;
 MSG_FLAG_OFF
 Av
-; Off
 ;
+; ******** The flags **********
 MSG_FLAG_PROTECTED_STATUS
 Skyddad status
-; Protected status
-;
 MSG_FLAG_LINE_SUBJECT
 Streck under ärendet
-; Line under subject
-;
 MSG_FLAG_PASSWORD_STARS
 Skriv ut stjärnor vid lösenordspromptar
-; Print stars at password prompts
-;
 MSG_FLAG_NO_AUTO_HELP
 Ingen automagisk hjälptext
-; No automatic help texts
-;
 MSG_FLAG_ADVANCED_EDITOR
 Fullskärmseditor
-; Use advanced text editor
-;
 MSG_FLAG_FILES_AT_LIST_NEW
 Automatisk fillista vid lista nyheter
-; Show new files at List New
-;
 MSG_FLAG_SPACE_AS_PAUSE
 Mellanslag som paustangent
-; Use space as pause button
-;
 MSG_FLAG_NOTE_AT_MAIL
 Lapp vid brev
-; Display note at mail
-;
 MSG_FLAG_ANSI_SEQUENCES
 ANSI-sekvenser skickas (markörförflyttningar etc)
-; Send ANSI escape codes
-;
 MSG_FLAG_DISPLAY_FIDO_KLUDGE
 Visa FidoNet Kludge-rader
-; Display FidoNet kludge lines
-;
 MSG_FLAG_CLEAR_SCREEN_FIDO
 Töm skärmen innan en Fido-text
-; Clear screen before FidoNet text
-;
 MSG_FLAG_NO_LOGIN_NOTIFICATIONS
 Inga meddelanden om in/utloggningar
-; No notifications of logins/logouts
-;
 MSG_FLAG_COLORS
 Färger
-; Colors
-;
 MSG_FLAG_ASCII_7E_IS_DELETE
 ASCII 127 (0x7e) tolkas som delete
-;ASCII 127 (0x7e) is interpreted as delete.
 ;
+; ******** Common strings **********
 MSG_COMMON_YES
 Ja
-; Yes
-;
 MSG_COMMON_NO
 Nej
-; No
-;
 MSG_COMMON_NO_SUCH_USER
 Användaren finns inte.
-; There is no such user.
-;
 MSG_COMMON_CHOICE
 Val:
 MSG_COMMON_IS_CORRECT
