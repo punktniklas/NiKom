@@ -67,6 +67,21 @@ Du har 1 oläst text.
 MSG_WHERE_MANY_UNREAD_TEXTS
 Du har %d olästa texter.
 ;
+MSG_FIDO_TEXT_LINE_1
+Text %d  Möte: %s    %s
+MSG_FIDO_TEXT_LINE_2
+Skriven av %s (%d:%d/%d.%d)
+MSG_FIDO_TEXT_TO
+Till: %s
+MSG_FIDO_WRITE_FORUM_DATE
+Möte: %s    %s
+MSG_FIDO_WRITE_WRITTEN_BY
+Skriven av %s (%d:%d/%d.%d)
+MSG_FIDO_WRITE_TO
+Till: (Return='All')
+MSG_FIDO_LIST_TEST_HEAD
+Namn                              Text   Datum  Ärende
+;
 MSG_GO_SYNTAX
 Skriv: Gå <mötesnamn>
 MSG_GO_NO_SUCH_FORUM

@@ -2,7 +2,7 @@ CPU=68020
 FLAGS = NMINC STRMERGE CPU=$(CPU) DEBUG=FULL GST=Include:all.gst ERROR=ALL \
 	IDIR=/Include IDIR=/UtilLib IDIR=/Nodes
 OBJS = Ser.o SerialIO.o Terminal.o ServerComm.o Modem.o Rexx.o Stuff.o \
-       NiKVersion.o NewUser.o CharacterSets.o InfoFiles.o
+       NiKVersion.o NewUser.o CharacterSets.o InfoFiles.o Languages.o
 
 all: PreNode
 
@@ -59,3 +59,6 @@ CharacterSets.o: /Nodes/CharacterSets.c /Include/NiKomStr.h
 
 InfoFiles.o: /Nodes/InfoFiles.c /Include/NiKomStr.h
   sc $(FLAGS) OBJNAME=InfoFiles.o /Nodes/InfoFiles.c
+
+Languages.o: /Nodes/Languages.c /Include/NiKomStr.h
+  sc $(FLAGS) OBJNAME=Languages.o /Nodes/Languages.c

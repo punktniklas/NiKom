@@ -14,6 +14,7 @@
 #include "VersionStrings.h"
 #include "Logging.h"
 #include "Terminal.h"
+#include "Languages.h"
 
 #include "FidoMeet.h"
 
@@ -29,11 +30,11 @@ extern struct Inloggning Statstr;
 extern struct MinList edit_list;
 
 void fido_lasa(int tnr,struct Mote *motpek) {
-	if(tnr<motpek->lowtext || tnr>motpek->texter) {
-		puttekn("\r\n\nTexten finns inte!\r\n",-1);
-		return;
-	}
-	fido_visatext(tnr,motpek);
+  if(tnr < motpek->lowtext || tnr > motpek->texter) {
+    SendString("\r\n\n%s\r\n", CATSTR(MSG_FORUMS_NO_SUCH_TEXT));
+    return;
+  }
+  fido_visatext(tnr,motpek);
 }
 
 int HasUnreadInFidoConf(struct Mote *conf) {
@@ -48,7 +49,7 @@ void NextTextInFidoConf(struct Mote *conf) {
     unreadTexts->lowestPossibleUnreadText[conf->nummer] = conf->lowtext;
   }
   if(unreadTexts->lowestPossibleUnreadText[conf->nummer] > conf->texter) {
-    SendString("\n\n\rFinns inga olästa texter i detta möte.\n\r");
+    SendString("\n\n\r%s\n\r", CATSTR(MSG_NEXT_TEXT_NO_TEXTS));
     return;
   }
   fido_visatext(unreadTexts->lowestPossibleUnreadText[conf->nummer], conf);
@@ -65,57 +66,50 @@ int countfidomote(struct Mote *motpek) {
 }
 
 void fido_visatext(int text,struct Mote *motpek) {
-	int x,length;
-	struct FidoText *ft;
-	struct FidoLine *fl;
-	char filnamn[20],fullpath[100];
-	Servermem->inne[nodnr].read++;
-	Servermem->info.lasta++;
-	Statstr.read++;
-	sprintf(filnamn,"%d.msg",text - motpek->renumber_offset);
-	strcpy(fullpath,motpek->dir);
-	AddPart(fullpath,filnamn,99);
-	if(Servermem->inne[nodnr].flaggor & SHOWKLUDGE) ft=ReadFidoTextTags(fullpath,TAG_DONE);
-	else ft=ReadFidoTextTags(fullpath,RFT_NoKludges,TRUE,RFT_NoSeenBy,TRUE,TAG_DONE);
-	if(!ft) {
-          LogEvent(SYSTEM_LOG, ERROR, "Can't read fido text %s.", fullpath);
-          DisplayInternalError();
-          return;
-	}
+  int length;
+  struct FidoText *ft;
+  struct FidoLine *fl;
+  char filnamn[20],fullpath[100];
+  Servermem->inne[nodnr].read++;
+  Servermem->info.lasta++;
+  Statstr.read++;
+  sprintf(filnamn,"%d.msg",text - motpek->renumber_offset);
+  strcpy(fullpath,motpek->dir);
+  AddPart(fullpath,filnamn,99);
+  if(Servermem->inne[nodnr].flaggor & SHOWKLUDGE) ft=ReadFidoTextTags(fullpath,TAG_DONE);
+  else ft=ReadFidoTextTags(fullpath,RFT_NoKludges,TRUE,RFT_NoSeenBy,TRUE,TAG_DONE);
+  if(!ft) {
+    LogEvent(SYSTEM_LOG, ERROR, "Can't read fido text %s.", fullpath);
+    DisplayInternalError();
+    return;
+  }
 
-	if(Servermem->inne[nodnr].flaggor & CLEARSCREEN)
-		eka('\f');
-	else
-		puttekn("\r\n\n", -1);
+  SendString(Servermem->inne[nodnr].flaggor & CLEARSCREEN ? "\f" : "\r\n\n");
 
-	sprintf(outbuffer,"Text %d  Möte: %s    %s\r\n",text,motpek->namn,ft->date);
-	puttekn(outbuffer,-1);
-	sprintf(outbuffer,"Skriven av %s (%d:%d/%d.%d)\r\n",ft->fromuser,ft->fromzone,ft->fromnet,ft->fromnode,ft->frompoint);
-	puttekn(outbuffer,-1);
-	sprintf(outbuffer,"Till: %s\r\n",ft->touser);
-	puttekn(outbuffer,-1);
-	sprintf(outbuffer,"Ärende: %s\r\n",ft->subject);
-	puttekn(outbuffer,-1);
-	if(Servermem->inne[nodnr].flaggor & STRECKRAD) {
-		length=strlen(outbuffer);
-		for(x=0;x<length-2;x++) outbuffer[x]='-';
-		outbuffer[x]=0;
-		puttekn(outbuffer,-1);
-		puttekn("\r\n\n",-1);
-	} else puttekn("\n",-1);
-	for(fl=(struct FidoLine *)ft->text.mlh_Head;fl->line_node.mln_Succ;fl=(struct FidoLine *)fl->line_node.mln_Succ) {
-		if(fl->text[0] == 1) {
-			puttekn("^A",-1);
-			if(puttekn(&fl->text[1],-1)) break;
-		} else if(puttekn(fl->text,-1)) break;
-		if(puttekn("\r\n",-1)) break;
-	}
-	sprintf(outbuffer,"\n(Slut på text %d av %s)\r\n",text,ft->fromuser);
-	puttekn(outbuffer,-1);
-	FreeFidoText(ft);
-	senast_text_typ=TEXT;
-	senast_text_nr=text;
-	senast_text_mote=motpek->nummer;
+  SendStringCat("%s\r\n", CATSTR(MSG_FIDO_TEXT_LINE_1), text, motpek->namn, ft->date);
+  SendStringCat("%s\r\n", CATSTR(MSG_FIDO_TEXT_LINE_2),
+             ft->fromuser,ft->fromzone,ft->fromnet,ft->fromnode,ft->frompoint);
+  SendStringCat("%s\r\n", CATSTR(MSG_FIDO_TEXT_TO), ft->touser);
+  SendStringCat("%s\r\n", CATSTR(MSG_ORG_TEXT_SUBJECT), ft->subject);
+  if(Servermem->inne[nodnr].flaggor & STRECKRAD) {
+    length=strlen(outbuffer);
+    SendRepeatedChr('-', length - 2);
+    SendString("\r\n\n");
+  } else {
+    SendString("\n");
+  }
+  ITER_EL(fl, ft->text, line_node, struct FidoLine *) {
+    if(fl->text[0] == 1) {
+      if(SendString("^A%s\r\n", &fl->text[1])) { break; }
+    } else {
+      if(SendString("%s\r\n", fl->text)) break;
+    }
+  }
+  SendStringCat("\n%s\r\n", CATSTR(MSG_ORG_TEXT_END_OF_TEXT), text,ft->fromuser);
+  FreeFidoText(ft);
+  senast_text_typ=TEXT;
+  senast_text_nr=text;
+  senast_text_mote=motpek->nummer;
 }
 
 void makefidodate(char *str) {
@@ -177,114 +171,132 @@ struct FidoDomain *getfidodomain(int nr,int zone) {
 
 
 int fido_skriv(int komm,int komtill) {
-	int length=0,x=0,editret,nummer;
-	struct MinNode *first,*last;
-	struct FidoText ft,*komft;
-	struct FidoDomain *fd;
-	struct Mote *motpek;
-	struct FidoLine *fl;
-	char filnamn[15],fullpath[100],msgid[50];
-	Servermem->action[nodnr] = SKRIVER;
-	Servermem->varmote[nodnr] = mote2;
-	motpek = getmotpek(mote2);
-	memset(&ft,0,sizeof(struct FidoText));
-	if(komm) {
-		strcpy(fullpath,motpek->dir);
-		sprintf(filnamn,"%d.msg",komtill - motpek->renumber_offset);
-		AddPart(fullpath,filnamn,99);
-		komft = ReadFidoTextTags(fullpath,RFT_HeaderOnly,TRUE,TAG_DONE);
-		if(!komft) {
-                  LogEvent(SYSTEM_LOG, ERROR, "Can't read fido text %s.", fullpath);
-                  DisplayInternalError();
-                  return 0;
-		}
-		strcpy(ft.touser,komft->fromuser);
-		if(!strncmp(komft->subject,"Re:",3)) strcpy(ft.subject,komft->subject);
-		else sprintf(ft.subject,"Re: %s",komft->subject);
-		strcpy(msgid,komft->msgid);
-		FreeFidoText(komft);
-	}
-	makefidousername(ft.fromuser,inloggad);
-	makefidodate(ft.date);
-	fd = getfidodomain(motpek->domain,0);
-	if(!fd) {
-		puttekn("\n\n\rHmm.. Det här mötets domän finns inte.\n\r",-1);
-		return(0);
-	}
-	ft.fromzone = fd->zone;
-	ft.fromnet = fd->net;
-	ft.fromnode = fd->node;
-	ft.frompoint = fd->point;
-	ft.attribut = FIDOT_LOCAL;
-	sprintf(outbuffer,"\r\n\nMöte: %s    %s\r\n",motpek->namn,ft.date);
-	puttekn(outbuffer,-1);
-	sprintf(outbuffer,"Skriven av %s (%d:%d/%d.%d)\r\n",ft.fromuser,ft.fromzone,ft.fromnet,ft.fromnode,ft.frompoint);
-	puttekn(outbuffer,-1);
-	if(!komm) {
-		puttekn("Till: (Return='All') ",-1);
-		if(getstring(EKO,35,NULL)) return(1);
-		if(!inmat[0]) strcpy(ft.touser,"All");
-		else {
-			strcpy(ft.touser,inmat);
-			sprattgok(ft.touser);
-		}
-		puttekn("\n\rÄrende: ",-1);
-		if(getstring(EKO,71,NULL)) return(1);
-		strcpy(ft.subject,inmat);
-		puttekn("\r\n",-1);
-	} else {
-		sprintf(outbuffer,"Till: %s\n\r",ft.touser);
-		puttekn(outbuffer,-1);
-		sprintf(outbuffer,"Ärende: %s\n\r",ft.subject);
-		puttekn(outbuffer,-1);
-	}
-	if(Servermem->inne[nodnr].flaggor & STRECKRAD) {
-		length=strlen(ft.subject);
-		for(x=0;x<length+8;x++) outbuffer[x]='-';
-		outbuffer[x]=0;
-		puttekn(outbuffer,-1);
-		puttekn("\r\n\n",-1);
-	} else puttekn("\n",-1);
-	editret = edittext(NULL);
-	if(editret==1) return(1);
-	if(editret==2) return(0);
-	Servermem->inne[nodnr].skrivit++;
-	Servermem->info.skrivna++;
-	Statstr.write++;
-	NewList((struct List *)&ft.text);
-	first =  edit_list.mlh_Head;
-	last = edit_list.mlh_TailPred;
-	ft.text.mlh_Head = first;
-	ft.text.mlh_TailPred = last;
-	last->mln_Succ = (struct MinNode *)&ft.text.mlh_Tail;
-	first->mln_Pred = (struct MinNode *)&ft.text;
-	fl = AllocMem(sizeof(struct FidoLine),MEMF_CLEAR);
-	AddTail((struct List *)&ft.text,(struct Node *)fl);
-	fl = AllocMem(sizeof(struct FidoLine),MEMF_CLEAR);
-	strcpy(fl->text,"--- NiKom " NIKRELEASE);
-	AddTail((struct List *)&ft.text,(struct Node *)fl);
-	fl = AllocMem(sizeof(struct FidoLine),MEMF_CLEAR);
-	sprintf(fl->text," * Origin: %s (%d:%d/%d.%d)",motpek->origin,ft.fromzone,ft.fromnet,ft.fromnode,ft.frompoint);
-	AddTail((struct List *)&ft.text,(struct Node *)fl);
-	if(!komm) nummer = motpek->renumber_offset + WriteFidoTextTags(&ft,WFT_MailDir,motpek->dir,
-	                                                                   WFT_Domain,fd->domain,
-	                                                                   WFT_CharSet,motpek->charset,
-	                                                                   TAG_DONE);
-	else nummer = motpek->renumber_offset + WriteFidoTextTags(&ft,WFT_MailDir,motpek->dir,
-	                                                              WFT_Domain,fd->domain,
-	                                                              WFT_Reply,msgid,
-	                                                              WFT_CharSet,motpek->charset,
-	                                                              TAG_DONE);
-	if(motpek->texter < nummer) motpek->texter = nummer;
-	sprintf(outbuffer,"Texten fick nummer %d\r\n\n",nummer);
-	puttekn(outbuffer,-1);
-	if(Servermem->cfg.logmask & LOG_BREV) {
-          LogEvent(USAGE_LOG, INFO, "%s skriver text %d i %s",
-                   getusername(inloggad), nummer, motpek->namn);
-	}
-	while(first=(struct MinNode *)RemHead((struct List *)&ft.text)) FreeMem(first,sizeof(struct EditLine));
-	NewList((struct List *)&edit_list);
-	return(0);
+  int length = 0, editret, nummer;
+  struct MinNode *first, *last;
+  struct FidoText ft, *komft;
+  struct FidoDomain *fd;
+  struct Mote *motpek;
+  struct FidoLine *fl;
+  char filnamn[15], fullpath[100], msgid[50];
+
+  Servermem->action[nodnr] = SKRIVER;
+  Servermem->varmote[nodnr] = mote2;
+  motpek = getmotpek(mote2);
+  memset(&ft, 0, sizeof(struct FidoText));
+  if(komm) {
+    strcpy(fullpath, motpek->dir);
+    sprintf(filnamn, "%d.msg", komtill - motpek->renumber_offset);
+    AddPart(fullpath, filnamn, 99);
+    komft = ReadFidoTextTags(fullpath, RFT_HeaderOnly, TRUE, TAG_DONE);
+    if(!komft) {
+      LogEvent(SYSTEM_LOG, ERROR, "Can't read fido text %s.", fullpath);
+      DisplayInternalError();
+      return 0;
+    }
+    strcpy(ft.touser, komft->fromuser);
+    if(!strncmp(komft->subject, "Re:", 3)) {
+      strcpy(ft.subject, komft->subject);
+    } else {
+      sprintf(ft.subject, "Re: %s", komft->subject);
+    }
+    strcpy(msgid, komft->msgid);
+    FreeFidoText(komft);
+  }
+  makefidousername(ft.fromuser, inloggad);
+  makefidodate(ft.date);
+  fd = getfidodomain(motpek->domain, 0);
+  if(!fd) {
+    LogEvent(SYSTEM_LOG, ERROR, "Can't find the Fido domain with id %d.", motpek->domain);
+    DisplayInternalError();
+    return 0;
+  }
+  ft.fromzone = fd->zone;
+  ft.fromnet = fd->net;
+  ft.fromnode = fd->node;
+  ft.frompoint = fd->point;
+  ft.attribut = FIDOT_LOCAL;
+  SendStringCat("\r\n\n%s\r\n", CATSTR(MSG_FIDO_WRITE_FORUM_DATE), motpek->namn, ft.date);
+  SendStringCat("%s\r\n", CATSTR(MSG_FIDO_WRITE_WRITTEN_BY),
+             ft.fromuser, ft.fromzone, ft.fromnet, ft.fromnode, ft.frompoint);
+  if(!komm) {
+    SendString("%s ", CATSTR(MSG_FIDO_WRITE_TO));
+    if(getstring(EKO, 35, NULL)) {
+      return 1;
+    }
+    if(!inmat[0]) {
+      strcpy(ft.touser, "All");
+    } else {
+      strcpy(ft.touser, inmat);
+      sprattgok(ft.touser);
+    }
+    SendString("\n\r%s ", CATSTR(MSG_WRITE_SUBJECT));
+    if(getstring(EKO,71,NULL)) {
+      return 1;
+    }
+    strcpy(ft.subject,inmat);
+    SendString("\r\n");
+  } else {
+    SendStringCat("%s\n\r", CATSTR(MSG_FIDO_TEXT_TO), ft.touser);
+    SendStringCat("%s\n\r", CATSTR(MSG_ORG_TEXT_SUBJECT), ft.subject);
+  }
+  if(Servermem->inne[nodnr].flaggor & STRECKRAD) {
+    length=strlen(ft.subject);
+    SendRepeatedChr('-', length);
+    SendString("\r\n\n");
+  } else {
+    SendString("\n");
+  }
+  editret = edittext(NULL);
+  if(editret == 1) {
+    return 1;
+  }
+  if(editret ==2 ) {
+    return 0;
+  }
+  Servermem->inne[nodnr].skrivit++;
+  Servermem->info.skrivna++;
+  Statstr.write++;
+  NewList((struct List *)&ft.text);
+  first =  edit_list.mlh_Head;
+  last = edit_list.mlh_TailPred;
+  ft.text.mlh_Head = first;
+  ft.text.mlh_TailPred = last;
+  last->mln_Succ = (struct MinNode *)&ft.text.mlh_Tail;
+  first->mln_Pred = (struct MinNode *)&ft.text;
+  fl = AllocMem(sizeof(struct FidoLine), MEMF_CLEAR);
+  AddTail((struct List *)&ft.text, (struct Node *)fl);
+  fl = AllocMem(sizeof(struct FidoLine), MEMF_CLEAR);
+  strcpy(fl->text,"--- NiKom " NIKRELEASE);
+  AddTail((struct List *)&ft.text, (struct Node *)fl);
+  fl = AllocMem(sizeof(struct FidoLine), MEMF_CLEAR);
+  sprintf(fl->text, " * Origin: %s (%d:%d/%d.%d)",
+          motpek->origin, ft.fromzone, ft.fromnet, ft.fromnode, ft.frompoint);
+  AddTail((struct List *)&ft.text, (struct Node *)fl);
+  if(!komm) {
+    nummer = motpek->renumber_offset + WriteFidoTextTags(&ft,WFT_MailDir, motpek->dir,
+                                                         WFT_Domain, fd->domain,
+                                                         WFT_CharSet, motpek->charset,
+                                                         TAG_DONE);
+  } else {
+    nummer = motpek->renumber_offset + WriteFidoTextTags(&ft,WFT_MailDir, motpek->dir,
+                                                         WFT_Domain, fd->domain,
+                                                         WFT_Reply, msgid,
+                                                         WFT_CharSet, motpek->charset,
+                                                         TAG_DONE);
+  }
+  if(motpek->texter < nummer) {
+    motpek->texter = nummer;
+  }
+  SendStringCat("%s\r\n\n", CATSTR(MSG_WRITE_TEXT_GOT_NUMBER), nummer);
+  if(Servermem->cfg.logmask & LOG_BREV) {
+    LogEvent(USAGE_LOG, INFO, "%s skriver text %d i %s",
+             getusername(inloggad), nummer, motpek->namn);
+  }
+  while(first = (struct MinNode *)RemHead((struct List *)&ft.text)) {
+    FreeMem(first,sizeof(struct EditLine));
+  }
+  NewList((struct List *)&edit_list);
+  return 0;
 }
 
 void fido_endast(struct Mote *motpek,int antal) {
@@ -296,24 +308,31 @@ void fido_endast(struct Mote *motpek,int antal) {
 }
 
 void fidolistaarende(struct Mote *motpek,int dir) {
-	int from, x,bryt;
-	struct FidoText *ft;
-	char fullpath[100],filnamn[20];
-	if(dir>0) from = motpek->lowtext;
-	else from = motpek->texter;
-	puttekn("\r\n\nNamn                              Text   Datum  Ärende",-1);
-	puttekn("\r\n-------------------------------------------------------------------------\r\n",-1);
-	for(x=from;x>=motpek->lowtext && x<=motpek->texter;x+=dir) {
-		strcpy(fullpath,motpek->dir);
-		sprintf(filnamn,"%d.msg",x - motpek->renumber_offset);
-		AddPart(fullpath,filnamn,99);
-		ft = ReadFidoTextTags(fullpath,RFT_HeaderOnly,TRUE,TAG_DONE);
-		if(!ft) continue;
-		ft->date[6]=0;
-		ft->subject[27]=0;
-		sprintf(outbuffer,"%-34s%5d %s %s\r\n",ft->fromuser,x,ft->date,ft->subject);
-		bryt=puttekn(outbuffer,-1);
-		FreeFidoText(ft);
-		if(bryt) break;
-	}
+  int from, i, bryt;
+  struct FidoText *ft;
+  char fullpath[100], filnamn[20];
+  
+  if(dir > 0) {
+    from = motpek->lowtext;
+  } else {
+    from = motpek->texter;
+  }
+  SendString("\r\n\n%s", CATSTR(MSG_FIDO_LIST_TEST_HEAD));
+  SendString("\r\n-------------------------------------------------------------------------\r\n");
+  for(i = from; i >= motpek->lowtext && i <= motpek->texter; i += dir) {
+    strcpy(fullpath, motpek->dir);
+    sprintf(filnamn, "%d.msg", i - motpek->renumber_offset);
+    AddPart(fullpath, filnamn, 99);
+    ft = ReadFidoTextTags(fullpath, RFT_HeaderOnly, TRUE, TAG_DONE);
+    if(!ft) {
+      continue;
+    }
+    ft->date[6] = 0;
+    ft->subject[27] = 0;
+    bryt = SendString("%-34s%5d %s %s\r\n", ft->fromuser, i, ft->date, ft->subject);
+    FreeFidoText(ft);
+    if(bryt) {
+      break;
+    }
+  }
 }

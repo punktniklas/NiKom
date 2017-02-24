@@ -63,6 +63,21 @@ You have 1 unread text.
 MSG_WHERE_MANY_UNREAD_TEXTS (225//)
 You have %d unread texts.
 ;
+MSG_FIDO_TEXT_LINE_1 (230//)
+Text: %d  Forum: %s    %s
+MSG_FIDO_TEXT_LINE_2 (231//)
+Written by %s (%d:%d/%d.%d)
+MSG_FIDO_TEXT_TO (232//)
+To: %s
+MSG_FIDO_WRITE_FORUM_DATE (233//)
+Forum: %s    %s
+MSG_FIDO_WRITE_WRITTEN_BY (234//)
+Written by %s (%d:%d/%d.%d)
+MSG_FIDO_WRITE_TO (235//)
+To: (Return='All')
+MSG_FIDO_LIST_TEST_HEAD (236//)
+Name                              Text   Date   Subject
+;
 MSG_GO_SYNTAX (250//)
 Syntax: Go <forum name>
 MSG_GO_NO_SUCH_FORUM (251//)
