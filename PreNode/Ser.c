@@ -17,6 +17,7 @@
 #include "Terminal.h"
 #include "NewUser.h"
 #include "BasicIO.h"
+#include "Languages.h"
 
 #define EXIT_ERROR	10
 #define EXIT_OK	0
@@ -27,7 +28,7 @@ int CXBRK(void) { return(0); }
 
 struct IntuitionBase *IntuitionBase=NULL;
 struct RsxLib *RexxSysBase;
-struct Library *UtilityBase, *NiKomBase;
+struct Library *UtilityBase, *NiKomBase, *LocaleBase;
 struct Window *NiKwind=NULL;
 struct MsgPort *rexxport, *nikomnodeport;
 
@@ -70,10 +71,14 @@ void cleanup(int errorCode, char *text) {
   LogEvent(SYSTEM_LOG, ERROR, "PreNode (%d) is exiting with error code %d: %s",
            nodnr, errorCode, text);
 
+  CloseCatalog(g_Catalog);
   shutdownnode(NODSER);
   CloseIO();
   if(NiKwind) {
     CloseWindow(NiKwind);
+  }
+  if(LocaleBase) {
+    CloseLibrary(LocaleBase);
   }
   if(RexxSysBase) {
     CloseLibrary((struct Library *)RexxSysBase);
@@ -177,6 +182,8 @@ void main(int argc,char *argv[]) {
     cleanup(EXIT_ERROR,"Kunde inte öppna intuition.library\n");
   if(!(UtilityBase=OpenLibrary("utility.library",37L)))
     cleanup(EXIT_ERROR,"Kunde inte öppna utility.library\n");
+  if(!(LocaleBase=OpenLibrary("locale.library",38L)))
+    cleanup(EXIT_ERROR,"Kunde inte öppna locale.library\n");
   if(!(NiKomBase=OpenLibrary("nikom.library",0L)))
     cleanup(EXIT_ERROR,"Kunde inte öppna nikom.library\n");
   if(!initnode(NODSER)) cleanup(EXIT_ERROR,"Kunde inte registrera noden i Servern\n");

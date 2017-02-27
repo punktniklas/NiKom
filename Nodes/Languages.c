@@ -2,6 +2,8 @@
 
 #include "NiKomStr.h"
 #include "Logging.h"
+#include "Terminal.h"
+#include "BasicIO.h"
 
 #include "Languages.h"
 
@@ -54,4 +56,32 @@ void LoadCatalogForUser(void) {
 
   loadNewCatalog(lang);
   initFlagNames();
+}
+
+static char *languages[] = {
+  "English",
+  "Svenska"
+};
+
+
+void AskUserForLanguage(struct User *user) {
+  int lang, i;
+
+  SendString("\n\n\rThese are the available languages.\n\r");
+  SendString("* indicates current choice.\n\n\r");
+
+  SendString("  #  Language\n\r");
+  SendString("-----------------------------------------\n\r");
+  for(i = 0; i < 2; i++) {
+    SendString("%c %2d: %s\n\r", user->language == i ? '*' : ' ', i, languages[i]);
+  }
+  
+  SendString("\n\rChoice: ");
+  lang = GetNumber(0, 1, NULL);
+  if(ImmediateLogout()) {
+    return;
+  }
+  SendString("\r\n\n%s\n\r", languages[lang]);
+  user->language = lang;
+  LoadCatalogForUser();
 }

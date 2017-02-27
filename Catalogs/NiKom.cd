@@ -299,6 +299,8 @@ MSG_USER_DELETE_SYNTAX (450//)
 Syntax: Delete User <user>
 MSG_USER_DELETE_CONFIRM (451//)
 Are you sure you want to delete %s?
+MSG_USER_YOU_GET_ID (452//)
+You get user number %d.
 ;
 MSG_CHRS_CON_WARNING_1 (500//)
 Note! You are running on a CON node. Examples for all character sets

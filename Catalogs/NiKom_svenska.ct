@@ -303,6 +303,8 @@ MSG_USER_DELETE_SYNTAX
 Skriv: Radera Användare <användare>
 MSG_USER_DELETE_CONFIRM
 Är du säker på att du vill radera %s?
+MSG_USER_YOU_GET_ID
+Du får användarnumret %d.
 ;
 MSG_CHRS_CON_WARNING_1
 OBS! Du kör på en CON-nod, exemplen för alla teckenset

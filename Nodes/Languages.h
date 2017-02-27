@@ -7,3 +7,4 @@ extern struct Catalog *g_Catalog;
 extern char *g_FlagNames[];
 
 void LoadCatalogForUser(void);
+void AskUserForLanguage(struct User *user);

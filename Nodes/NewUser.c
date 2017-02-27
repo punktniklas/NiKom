@@ -13,6 +13,7 @@
 #include "Logging.h"
 #include "CharacterSets.h"
 #include "InfoFiles.h"
+#include "Languages.h"
 
 void initConfPermissions(void);
 int createUserDirectory(int newUserId);
@@ -29,6 +30,7 @@ int RegisterNewUser(void) {
 
   memset(user, 0, sizeof(struct User));
 
+  AskUserForLanguage(user);
   if(Servermem->cfg.defaultcharset == 0) {
     if(AskUserForCharacterSet(TRUE, FALSE)) {
       return 1;
@@ -43,38 +45,38 @@ int RegisterNewUser(void) {
 
   for(;;) {
     do {
-      SendString("\r\n\nNamn: ");
+      SendString("\r\n\n%s: ", CATSTR(MSG_USER_NAME));
       if(GetString(40, NULL)) { return 1; }
     } while(inmat[0] == '\0');
     if(parsenamn(inmat) == -1) {
       break;
     }
-    SendString("\r\n\nDet finns redan en användare med det namnet.\r\n\n",-1);
+    SendString("\r\n\n%s\r\n\n", CATSTR(MSG_USER_ALREADY_EXISTS));
   }
   strncpy(user->namn, inmat, 41);
-  SendString("\r\nGatuadress: ");
+  SendString("\r\n%s: ", CATSTR(MSG_USER_STREET));
   if(GetString(40, NULL)) { return 1; }
   strncpy(user->gata, inmat, 41);
-  SendString("\r\nPostadress: ");
+  SendString("\r\n%s: ", CATSTR(MSG_USER_CITY));
   if(GetString(40, NULL)) { return 1; }
   strncpy(user->postadress, inmat, 41);
-  SendString("\r\nLand: ");
+  SendString("\r\n%s: ", CATSTR(MSG_USER_COUNTRY));
   if(GetString(40, NULL)) { return 1; }
   strncpy(user->land, inmat, 41);
-  SendString("\r\nTelefon: ");
+  SendString("\r\n%s: ", CATSTR(MSG_USER_PHONE));
   if(GetString(20, NULL)) { return 1; }
   strncpy(user->telefon, inmat, 21);
-  SendString("\r\nAnnan info: ");
+  SendString("\r\n%s: ", CATSTR(MSG_USER_MISCINFO));
   if(GetString(60, NULL)) { return 1; }
   strncpy(user->annan_info, inmat, 61);
   do {
-    if(MaybeEditPassword("Lösenord", "Bekräfta lösenord",
+    if(MaybeEditPassword(CATSTR(MSG_USER_PASSWORD), CATSTR(MSG_USER_PASSWORD_CONFIRM),
                          user->losen, 15)) {
       return 1;
     }
   } while(user->losen[0] == '\0');
   strcpy(user->prompt, "-->");
-  if(MaybeEditString("Prompt", user->prompt, 5)) { return 1; }
+  if(MaybeEditString(CATSTR(MSG_USER_PROMPT), user->prompt, 5)) { return 1; }
 
   user->tot_tid = 0L;
   time(&tid);
@@ -90,27 +92,27 @@ int RegisterNewUser(void) {
   user->defarea = 0L;
   user->shell = 0;
   user->status = Servermem->cfg.defaultstatus;
-  user->language = 0;
   user->brevpek = 0;
 
   initConfPermissions();
   InitUnreadTexts(&Servermem->unreadTexts[nodnr]);
 
-  SendString("\r\n\nNamn :        %s\r\n", user->namn);
-  SendString("Gatuadress :  %s\r\n",user->gata);
-  SendString("Postadress :  %s\r\n",user->postadress);
-  SendString("Land :        %s\r\n",user->land);
-  SendString("Telefon :     %s\r\n",user->telefon);
-  SendString("Annan info :  %s\r\n",user->annan_info);
-  SendString("Prompt :      %s\r\n",user->prompt);
+  SendString("\r\n\n%s : %s\r\n", CATSTR(MSG_USER_NAME), user->namn);
+  SendString("%-20s : %s\r\n", CATSTR(MSG_USER_STREET), user->gata);
+  SendString("%-20s : %s\r\n", CATSTR(MSG_USER_CITY), user->postadress);
+  SendString("%-20s : %s\r\n", CATSTR(MSG_USER_COUNTRY), user->land);
+  SendString("%-20s : %s\r\n", CATSTR(MSG_USER_PHONE), user->telefon);
+  SendString("%-20s : %s\r\n", CATSTR(MSG_USER_MISCINFO), user->annan_info);
+  SendString("%-20s : %s\r\n", CATSTR(MSG_USER_PROMPT), user->prompt);
 
-  if(GetYesOrNo("\r\n\n", "Stämmer detta?", NULL, NULL, "Ja", "Nej", "\r\n\n",
+  if(GetYesOrNo("\r\n\n", CATSTR(MSG_COMMON_IS_CORRECT), NULL, NULL,
+                CATSTR(MSG_COMMON_YES), CATSTR(MSG_COMMON_NO), "\r\n\n",
                 TRUE, &isCorrect)) {
     return 1;
   }
   while(!isCorrect) {
     for(;;) {
-      SendString("\r\nNamn : (%s) ", user->namn);
+      SendString("\r\n%s : (%s) ", CATSTR(MSG_USER_NAME), user->namn);
       if(GetString(40,NULL)) {
         return 1;
       }
@@ -118,24 +120,25 @@ int RegisterNewUser(void) {
         break;
       }
       if((tmp = parsenamn(inmat)) != -1) {
-        SendString("\r\n\nDet finns redan en användare med det namnet.\r\n");
+        SendString("\r\n\n%s\r\n", CATSTR(MSG_USER_ALREADY_EXISTS));
       } else {
         strncpy(user->namn, inmat, 41);
         break;
       }
     }
 
-    if(MaybeEditString("Gatuadress", user->gata, 40)) { return 1; }
-    if(MaybeEditString("Postadress", user->postadress, 40)) { return 1; }
-    if(MaybeEditString("Land", user->land, 40)) { return 1; }
-    if(MaybeEditString("Telefon", user->telefon, 20)) { return 1; }
-    if(MaybeEditString("Annan info", user->annan_info, 60)) { return 1; }
-    if(MaybeEditPassword("Lösenord", "Bekräfta lösenord", user->losen, 15)) {
+    if(MaybeEditString(CATSTR(MSG_USER_STREET), user->gata, 40)) { return 1; }
+    if(MaybeEditString(CATSTR(MSG_USER_CITY), user->postadress, 40)) { return 1; }
+    if(MaybeEditString(CATSTR(MSG_USER_COUNTRY), user->land, 40)) { return 1; }
+    if(MaybeEditString(CATSTR(MSG_USER_PHONE), user->telefon, 20)) { return 1; }
+    if(MaybeEditString(CATSTR(MSG_USER_MISCINFO), user->annan_info, 60)) { return 1; }
+    if(MaybeEditPassword(CATSTR(MSG_USER_PASSWORD), CATSTR(MSG_USER_PASSWORD_CONFIRM), user->losen, 15)) {
       return 1;
     }
-    if(MaybeEditString("Prompt", user->prompt, 5)) { return 1; }
+    if(MaybeEditString(CATSTR(MSG_USER_PROMPT), user->prompt, 5)) { return 1; }
 
-    if(GetYesOrNo("\r\n\n", "Stämmer allt nu?", NULL, NULL, "Ja", "Nej", "\r\n\n",
+    if(GetYesOrNo("\r\n\n", CATSTR(MSG_COMMON_IS_CORRECT), NULL, NULL,
+                  CATSTR(MSG_COMMON_YES), CATSTR(MSG_COMMON_NO), "\r\n\n",
                   TRUE, &isCorrect)) {
       return 1;
     }
@@ -158,7 +161,7 @@ int RegisterNewUser(void) {
     return 2;
   }
   inloggad = newUserId;
-  SendString("\r\n\nDu får användarnumret %d\r\n",inloggad);
+  SendStringCat("\r\n\n%s\r\n", CATSTR(MSG_USER_YOU_GET_ID), inloggad);
   if(Servermem->cfg.ar.nyanv) sendrexx(Servermem->cfg.ar.nyanv);
   return 0;
 }

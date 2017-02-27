@@ -345,29 +345,6 @@ int Cmd_ListUsers(void) {
   return(0);
 }
 
-static char *languages[] = {
-  "English",
-  "Svenska"
-};
-
 void Cmd_ChangeLanguage(void) {
-  int lang, i;
-
-  SendString("\n\n\rThese are the available languages.\n\r");
-  SendString("* indicates current choice.\n\n\r");
-
-  SendString("  #  Language\n\r");
-  SendString("-----------------------------------------\n\r");
-  for(i = 0; i < 2; i++) {
-    SendString("%c %2d: %s\n\r", Servermem->inne[nodnr].language == i ? '*' : ' ', i, languages[i]);
-  }
-  
-  SendString("\n\rChoice: ");
-  lang = GetNumber(0, 1, NULL);
-  if(ImmediateLogout()) {
-    return;
-  }
-  SendString("%s\n\r", languages[lang]);
-  Servermem->inne[nodnr].language = lang;
-  LoadCatalogForUser();
+  AskUserForLanguage(&Servermem->inne[nodnr]);
 }
