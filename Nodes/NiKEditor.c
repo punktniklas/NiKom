@@ -13,6 +13,7 @@
 #include "InfoFiles.h"
 #include "Terminal.h"
 #include "Logging.h"
+#include "Languages.h"
 
 extern struct System *Servermem;
 extern char inmat[], crashmail;
@@ -147,8 +148,8 @@ int lineedit(char *filename) {
 
   NewList((struct List *)&edit_list);
   if(!(Servermem->inne[nodnr].flaggor & INGENHELP)) {
-    SendStringNoBrk("Tryck Ctrl-Z på en tom rad för att spara texten.\n\r");
-    SendStringNoBrk("Skriv !? på en tom rad för att få en hjälptext\n\n\r");
+    SendStringNoBrk("%s\n\r", CATSTR(MSG_EDIT_LINE_HELP1));
+    SendStringNoBrk("%s\n\n\r", CATSTR(MSG_EDIT_LINE_HELP2));
   }
   if(filename) {
     lineloadfile(filename);
@@ -255,7 +256,7 @@ int linegetline(char *str, char *wrap, int linenr) {
       if(col != 0) {
         SendStringNoBrk("\r\n");
       }
-      SendStringNoBrk("!Spara\r\n\n");
+      SendStringNoBrk("%s\r\n\n", CATSTR(MSG_EDIT_LINE_SAVING));
       return 3;
     }
   }
@@ -558,10 +559,8 @@ int fulledit(char *filename) {
   NewList((struct List *)&edit_list);
   yankbuffer[0] = 0;
   if(!(Servermem->inne[nodnr].flaggor & INGENHELP)) {
-    SendStringNoBrk("\r\nTryck Ctrl-Z för att spara texten, "
-                    "Ctrl-C för att kasta bort den.\n\r");
-    SendStringNoBrk("Ge kommandot 'Info Full' ute i KOM-systemet"
-                    " för en hjälptext\n\n\r");
+    SendStringNoBrk("\r\n%s\n\r", CATSTR(MSG_EDIT_FULL_HELP1));
+    SendStringNoBrk("%s\n\n\r", CATSTR(MSG_EDIT_FULL_HELP2));
   }
   if(!(curline = allocEditLine())) {
     return 2;
@@ -597,10 +596,10 @@ int fulledit(char *filename) {
     else if(ch == GETCHAR_DELETELINE) fullctrlx();
     else if(ch == 25) fullctrly();
     else if(ch == 26) {
-      SendStringNoBrk("\r\n\nSparar!\r\n");
+      SendStringNoBrk("\r\n\n%s\r\n", CATSTR(MSG_EDIT_FULL_SAVING));
       return 0;
     } else if(ch == 3) {
-      SendStringNoBrk("\r\n\nKastar bort texten\r\n");
+      SendStringNoBrk("\r\n\n%s\r\n", CATSTR(MSG_EDIT_FULL_THROWING));
       return 2;
     }
   }

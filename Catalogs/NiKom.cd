@@ -329,6 +329,21 @@ New character set
 MSG_CHRS_BAD (512//)
 Bad character set. Choice must be between 1 and 4.
 ;
+MSG_EDIT_LINE_HELP1 (600//)
+Press Ctrl-Z on an empty line to save the text.
+MSG_EDIT_LINE_HELP2 (601//)
+Enter '!?' on an empty line to display a help text.
+MSG_EDIT_LINE_SAVING (602//)
+!Save
+MSG_EDIT_FULL_HELP1 (650//)
+Press Ctrl-Z to save the text, Ctrl-C to throw it away.
+MSG_EDIT_FULL_HELP2 (651//)
+Give the command 'Info Editor' at the KOM prompt for a help text.
+MSG_EDIT_FULL_SAVING (652//)
+Saving
+MSG_EDIT_FULL_THROWING (653//)
+Throwing away the text
+;
 ; ******** Dealing with flags **********
 MSG_FLAG_ON (1000//)
 On

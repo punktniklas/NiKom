@@ -333,6 +333,21 @@ Nytt teckenset
 MSG_CHRS_BAD
 Felaktig teckenuppsättning, ska vara mellan 1 och 4.
 ;
+MSG_EDIT_LINE_HELP1
+Tryck Ctrl-Z på en tom rad för att spara texten.
+MSG_EDIT_LINE_HELP2
+Skriv '!?' på en tom rad för att få en hjälptext.
+MSG_EDIT_LINE_SAVING
+!Spara
+MSG_EDIT_FULL_HELP1
+Tryck Ctrl-Z för att spara texten, Ctrl-C för att kasta bort den.
+MSG_EDIT_FULL_HELP2
+Ge kommandot 'Info Full' ute i KOM-systemet för en hjälptext
+MSG_EDIT_FULL_SAVING
+Sparar
+MSG_EDIT_FULL_THROWING
+Kastar bort texten
+;
 ; ******** Dealing with flags **********
 MSG_FLAG_ON
 På
