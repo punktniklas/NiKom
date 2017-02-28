@@ -600,19 +600,19 @@ void medlem(char *args) {
 
   confId = parsemot(args);
   if(confId == -3) {
-    SendString("\r\n\nSkriv: Medlem <mötesnamn>\r\neller: Medlem -a för att bli med i alla möten.\r\n\n");
+    SendString("\r\n\n%s\r\n\n", CATSTR(MSG_MEMBER_SYNTAX));
     return;
   }
   if(confId == -1) {
-    SendString("\r\n\nFinns inget sådant möte!\r\n\n");
+    SendString("\r\n\n%s\r\n\n", CATSTR(MSG_GO_NO_SUCH_FORUM));
     return;
   }
   if(!MayBeMemberConf(confId, inloggad, &Servermem->inne[nodnr])) {
-    SendString("\r\n\nDu har inte rätt att vara med i det mötet!\r\n\n");
+    SendString("\r\n\n%s\r\n\n", CATSTR(MSG_MEMBER_NO_PERM));
     return;
   }
   BAMSET(Servermem->inne[nodnr].motmed, confId);
-  SendString("\r\n\nDu är nu med i mötet %s.\r\n\n", getmotnamn(confId));
+  SendStringCat("\r\n\n%s\r\n\n", CATSTR(MSG_MEMBER_NOW_MEMBER), getmotnamn(confId));
   conf = getmotpek(confId);
   if(conf->type == MOTE_ORGINAL) {
     unreadTexts->lowestPossibleUnreadText[confId] = 0;
@@ -641,27 +641,27 @@ void uttrad(char *args) {
 
   confId = parsemot(args);
   if(confId == -3) {
-    SendString("\r\n\nSkriv: Utträd <mötesnamn>\r\n\n");
+    SendString("\r\n\n%s\r\n\n", CATSTR(MSG_LEAVE_SYNTAX));
     return;
   }
   if(confId == -1) {
-    SendString("\r\n\nFinns inget sådant möte!\r\n\n");
+    SendString("\r\n\n%s\r\n\n", CATSTR(MSG_GO_NO_SUCH_FORUM));
     return;
   }
   conf = getmotpek(confId);
   if(conf->status & AUTOMEDLEM) {
-    SendString("\n\n\rDu kan inte utträda ur det mötet!\n\r");
+    SendString("\n\n\r%s\n\r", CATSTR(MSG_LEAVE_CAN_NOT));
     return;
   }
   if(!IsMemberConf(confId, inloggad, &Servermem->inne[nodnr])) {
-    SendString("\r\n\nDu är inte medlem i det mötet!\r\n\n");
+    SendString("\r\n\n%s\r\n\n", CATSTR(MSG_LEAVE_NOT_MEMBER));
     return;
   }
   if(confId == mote2) {
     mote2 = -1;
   }
   BAMCLEAR(Servermem->inne[nodnr].motmed, confId);
-  SendString("\r\n\nDu har nu utträtt ur mötet %s.\r\n\n", getmotnamn(confId));
+  SendStringCat("\r\n\n%s\r\n\n", CATSTR(MSG_LEAVE_HAVE_LEFT), getmotnamn(confId));
 }
 
 int countunread(int conf) {

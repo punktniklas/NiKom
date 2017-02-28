@@ -344,6 +344,21 @@ Saving
 MSG_EDIT_FULL_THROWING (653//)
 Throwing away the text
 ;
+MSG_MEMBER_SYNTAX (700//)
+Syntax: 'Member <forum>' or 'Member -a' to join all forums.
+MSG_MEMBER_NO_PERM (701//)
+You don't have permissions to become member of that forum.
+MSG_MEMBER_NOW_MEMBER (702//)
+You are now a member of the forum %s.
+MSG_LEAVE_SYNTAX (703//)
+Syntax: Leave <forum>
+MSG_LEAVE_CAN_NOT (704//)
+You can not leave that forum.
+MSG_LEAVE_NOT_MEMBER (705//)
+YOu are not a member of that forum.
+MSG_LEAVE_HAVE_LEFT (706//)
+You have now left the forum %s.
+;
 ; ******** Dealing with flags **********
 MSG_FLAG_ON (1000//)
 On

@@ -348,6 +348,21 @@ Sparar
 MSG_EDIT_FULL_THROWING
 Kastar bort texten
 ;
+MSG_MEMBER_SYNTAX
+Skriv: 'Medlem <möte>' eller 'Medlem -a' för att gå med i alla möten.
+MSG_MEMBER_NO_PERM
+Du har inte rätt att vara med i det mötet.
+MSG_MEMBER_NOW_MEMBER
+Du är nu med i mötet %s.
+MSG_LEAVE_SYNTAX
+Skriv: Utträd <mötesnamn>
+MSG_LEAVE_CAN_NOT
+Du kan inte utträda ur det mötet.
+MSG_LEAVE_NOT_MEMBER
+Du är inte medlem i det mötet.
+MSG_LEAVE_HAVE_LEFT
+Du har nu utträtt ur mötet %s.
+;
 ; ******** Dealing with flags **********
 MSG_FLAG_ON
 På
