@@ -20,6 +20,7 @@
 #include "Logging.h"
 #include "BasicIO.h"
 #include "KOM.h"
+#include "Fifo.h"
 
 #define EKO             1
 #define EJEKO   0
@@ -608,12 +609,12 @@ void rexxvisabrev(struct RexxMsg *mess) {
 }
 
 void rxrunfifo(struct RexxMsg *mess) {
-  execfifo(hittaefter(mess->rm_Args[0]),TRUE);
+  ExecFifo(hittaefter(mess->rm_Args[0]),TRUE);
   SetRexxErrorResult(mess, 0);
 }
 
 void rxrunrawfifo(struct RexxMsg *mess) {
-  execfifo(hittaefter(mess->rm_Args[0]),FALSE);
+  ExecFifo(hittaefter(mess->rm_Args[0]),FALSE);
   SetRexxErrorResult(mess, 0);
 }
 

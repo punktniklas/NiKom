@@ -1,7 +1,6 @@
 #include <exec/types.h>
 #include <exec/memory.h>
 #include <dos/dos.h>
-#include <dos/dostags.h>
 #include <proto/exec.h>
 #include <proto/dos.h>
 #include <proto/intuition.h>
@@ -9,8 +8,6 @@
 #include <string.h>
 #include <stdio.h>
 #include <time.h>
-#include <fifoproto.h>
-#include <fifo.h>
 #include "NiKomStr.h"
 #include "NiKomFuncs.h"
 #include "NiKomLib.h"
@@ -29,7 +26,6 @@ extern struct Inloggning Statstr;
 extern struct Header readhead;
 extern struct MinList aliaslist, edit_list;
 
-struct Library *FifoBase;
 char gruppnamebuf[41];
 
 int movetext(void) {
@@ -813,150 +809,3 @@ void flyttagren(void) {
 	puttekn(outbuffer,-1);
 }
 
-#define FIFOEVENT_FROMUSER  1
-#define FIFOEVENT_FROMFIFO  2
-#define FIFOEVENT_CLOSEW    4
-#define FIFOEVENT_NOCARRIER 8
-
-int execfifo(char *command,int cooked) {
-	struct MsgPort *fifoport;
-	void *fiforead, *fifowrite;
-	BPTR fh;
-	int avail=0,going=TRUE,event;
-	char fifonamn[40],*buffer=NULL,userchar,topsbuf[200];
-	struct Message fiforeadmess,fifowritemess,*backmess;
-	fiforeadmess.mn_Node.ln_Type=NT_MESSAGE;
-	fiforeadmess.mn_Length=sizeof(struct Message);
-	fifowritemess.mn_Node.ln_Type=NT_MESSAGE;
-	fifowritemess.mn_Length=sizeof(struct Message);
-	if(!(FifoBase=OpenLibrary("fifo.library",0L))) {
-		puttekn("\n\n\rKunde inte öppna fifo.library\n\r",-1);
-		return(0);
-	}
-	if(!(fifoport=CreateMsgPort())) {
-		puttekn("\n\n\rKunde inte skapa en MsgPort\n\r",-1);
-		CloseLibrary(FifoBase);
-		return(0);
-	}
-	fiforeadmess.mn_ReplyPort=fifoport;
-	fifowritemess.mn_ReplyPort=fifoport;
-	sprintf(fifonamn,"NiKomFifo%d_s",nodnr);
-	if(!(fiforead=OpenFifo(fifonamn,2048,FIFOF_READ|FIFOF_NORMAL|FIFOF_NBIO))) {
-		puttekn("\n\n\rKunde inte öppna fiforead\n\r",-1);
-		DeleteMsgPort(fifoport);
-		CloseLibrary(FifoBase);
-		return(0);
-	}
-	sprintf(fifonamn,"NiKomFifo%d_m",nodnr);
-	if(!(fifowrite=OpenFifo(fifonamn,2048,FIFOF_WRITE|FIFOF_NORMAL))) {
-		puttekn("\n\n\rKunde inte öppna fiforead\n\r",-1);
-		CloseFifo(fiforead,FIFOF_EOF);
-		DeleteMsgPort(fifoport);
-		CloseLibrary(FifoBase);
-		return(0);
-	}
-	if(cooked) sprintf(fifonamn,"FIFO:NiKomFifo%d/rwkecs",nodnr);
-	else sprintf(fifonamn,"FIFO:NiKomFifo%d/rwkes",nodnr);
-	if(!(fh=Open(fifonamn,MODE_OLDFILE))) {
-		puttekn("\n\n\rKunde inte öppna fifo-filen\n\r",-1);
-		CloseFifo(fifowrite,FIFOF_EOF);
-		CloseFifo(fiforead,FIFOF_EOF);
-		DeleteMsgPort(fifoport);
-		CloseLibrary(FifoBase);
-		return(0);
-	}
-	if(SystemTags(command,SYS_Asynch,TRUE,
-	                      SYS_Input,fh,
-	                      SYS_Output,NULL,
-	                      SYS_UserShell,TRUE)==-1) {
-		puttekn("\n\n\rKunde inte utföra kommandot\n\r",-1);
-		Close(fh);
-		CloseFifo(fifowrite,FIFOF_EOF);
-		CloseFifo(fiforead,FIFOF_EOF);
-		DeleteMsgPort(fifoport);
-		CloseLibrary(FifoBase);
-		return(0);
-	}
-	puttekn("\n\n\r",-1);
-	AbortInactive();
-	RequestFifo(fiforead,&fiforeadmess,FREQ_RPEND);
-	while(going) {
-		event=getfifoevent(fifoport,&userchar);
-		if(event & FIFOEVENT_FROMFIFO) {
-			while(avail=ReadFifo(fiforead,&buffer,avail)) {
-				if(avail==-1) {
-					going=FALSE;
-					break;
-				} else {
-					if(avail>199) avail=199;
-					strncpy(topsbuf,buffer,avail);
-					topsbuf[avail] = 0;
-					putstring(topsbuf,-1,0);
-				}
-			}
-			RequestFifo(fiforead,&fiforeadmess,FREQ_RPEND);
-		}
-		if(event & FIFOEVENT_FROMUSER) {
-			while(WriteFifo(fifowrite,&userchar,1)==-2) {
-				RequestFifo(fiforead,&fifowritemess,FREQ_WAVAIL);
-				WaitPort(fifoport);
-				while((backmess=GetMsg(fifoport))!=&fifowritemess) if(backmess==&fiforeadmess) {
-					while(avail=ReadFifo(fiforead,&buffer,avail)) {
-						if(avail==-1) {
-							going=FALSE;
-							break;
-						} else {
-							if(avail>199) avail=199;
-							strncpy(topsbuf,buffer,avail);
-							topsbuf[avail] = 0;
-							putstring(topsbuf,-1,0);
-						}
-					}
-					RequestFifo(fiforead,&fiforeadmess,FREQ_RPEND);
-					WaitPort(fifoport);
-				}
-			}
-		}
-		if(event & FIFOEVENT_CLOSEW) {
-			RequestFifo(fiforead,&fiforeadmess,FREQ_ABORT);
-			WaitPort(fifoport);
-			GetMsg(fifoport);
-			sprintf(fifonamn,"FIFO:NiKomFifo%d/C",nodnr);
-			if(fh=Open(fifonamn,MODE_OLDFILE)) Close(fh);
-else printf("Ajajajaj!\n");
-			CloseFifo(fifowrite,FIFOF_EOF);
-			CloseFifo(fiforead,FIFOF_EOF);
-			DeleteMsgPort(fifoport);
-			CloseLibrary(FifoBase);
-			cleanup(0, "");
-		}
-		if(event & FIFOEVENT_NOCARRIER || ImmediateLogout()) {
-                  going = FALSE;
-                }
-	}
-	RequestFifo(fiforead,&fiforeadmess,FREQ_ABORT);
-	WaitPort(fifoport);
-	GetMsg(fifoport);
-
-/* Att skicka ett Ctrl-C funkade inge vidare. Det hamnade hos NiKom själv
-*  istället för hos dörren.
-*
-*	sprintf(fifonamn,"FIFO:NiKomFifo%d/C",nodnr);
-*	if(fh=Open(fifonamn,MODE_OLDFILE)) Close(fh); */
-
-	if(ImmediateLogout()) {
-          WriteFifo(fifowrite, " ", 1);
-          sprintf(fifonamn,"FIFO:NiKomFifo%d/C",nodnr);
-          if(fh=Open(fifonamn,MODE_OLDFILE)) Close(fh);
-	}
-	CloseFifo(fifowrite,FIFOF_EOF);
-	/* Changed FIFOF_EOF --> FALSE */
-	CloseFifo(fiforead,FALSE);
-	DeleteMsgPort(fifoport);
-	CloseLibrary(FifoBase);
-	if(ImmediateLogout()) {
-          return 1;
-        }
-	UpdateInactive();
-	return(0);
-}

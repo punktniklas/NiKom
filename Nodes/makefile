@@ -4,7 +4,7 @@ FLAGS   = NMINC STRMERGE CPU=$(CPU) DEBUG=FULL GST=Include:all.gst ERROR=ALL \
 OBJS    = ServerComm.o Terminal.o NiKFuncs.o NiKFuncs2.o NiKFuncs3.o NiKFuncs4.o \
           NiKFuncs5.o NiKEditor.o NiKRexx.o NiKFiles.o NiKVersion.o Brev.o \
           OrgMeet.o FidoMeet.o NewUser.o CharacterSets.o KOM.o ConfCommon.o \
-          ConfHeaderExtensions.o Languages.o InfoFIles.o _tzset.o \
+          ConfHeaderExtensions.o Languages.o InfoFiles.o Fifo.o _tzset.o \
 	  Cmd_KOM.o Cmd_Users.o Cmd_Conf.o Cmd_Misc.o
 CONOBJS = NiKomCon.o ConsoleIO.o NiKConTrans.o NiKConOffline.o
 SEROBJS = NiKomSer.o SerialIO.o NiKTransfer.o NiKOffline.o
@@ -127,6 +127,9 @@ Languages.o: Languages.c /Include/NiKomStr.h Languages.h
 
 InfoFiles.o: InfoFiles.c /Include/NiKomStr.h InfoFiles.h
   sc $(FLAGS) InfoFiles.c OBJNAME=InfoFiles.o
+
+Fifo.o: Fifo.c /Include/NiKomStr.h Fifo.h
+  sc $(FLAGS) Fifo.c OBJNAME=Fifo.o
 
 Cmd_Kom.o: Cmd_KOM.c /Include/NiKomStr.h /Include/NiKomLib.h Cmd_KOM.h
   sc $(FLAGS) Cmd_KOM.c OBJNAME=Cmd_KOM.o

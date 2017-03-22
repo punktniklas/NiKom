@@ -165,7 +165,6 @@ void listabrev(void);
 void rensabrev(void);
 int rek_flyttagren(int rot,int ack,int tomeet);
 void flyttagren(void);
-int execfifo(char *command,int cooked);
 
 /* Prototypes for functions defined in NiKFuncs5.c */
 struct Mote *getmotpek(int);
