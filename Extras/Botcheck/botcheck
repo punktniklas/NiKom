@@ -1,0 +1,43 @@
+#!/bin/bash
+
+# This script is used as a simple but effective way to get rid of bots
+# attempting to connect.
+#
+# Requirements:
+# - The readline.py script must be found on the system path.
+#
+# It's intended to be launched by inetd. Example configuration file
+# additions are shown below.
+#
+# /etc/services:
+# mybbs	2323/tcp
+# /etc/inetd.conf:
+# mybbs	stream	tcp	nowait	nobody	/path/to/botcheck	botcheck 1234 amiga4000 23
+#
+# In the above example the external port you connect to is 2323, the expected
+# answer on the botcheck question is "1234" and if you answer "1234", you will
+# be forwarded to the host amiga4000 on port 23.
+
+
+if [[ $# -ne 3 ]]; then
+    echo "Usage: $(basename "$0") expectedAnswer bbsHost bbsPort"
+    exit 1
+fi
+
+expectedAnswer="$1"
+bbsHost="$2"
+bbsPort="$3"
+
+# All echos are explicitly ended with CRLF to be compatible with various telnet
+# clients.
+echo -e -n "Welcome to botcheck!\r\n\r\n"
+echo -e -n "Prove you're not a bot by entering \"$expectedAnswer\": "
+answer="$(readline.py --timeout 30)"
+echo -e -n "\r\n"
+if [[ "$answer" == "$expectedAnswer" ]]; then
+    nc "$bbsHost" "$bbsPort"
+else
+    echo -e -n "You're obviously a bot, bye!\r\n"
+    sleep 5 # Make it impossible to hammer
+fi
+
