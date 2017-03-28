@@ -13,18 +13,21 @@ parser = optparse.OptionParser(
     usage = "Usage: %prog [options]",
     description = "Read a line of text and print it",
     option_list = [
-        optparse.make_option("-t", "--timeout", type = "int", help = "Timeout to read a line in seconds")])
+        optparse.make_option("-t", "--timeout", type = "int", help = "Timeout to read a line in seconds"),
+        optparse.make_option("-n", "--numChars", type = "int", help = "Maximum number of characters to read")
+    ])
 
 options, args = parser.parse_args()
 
 timeout = timedelta(seconds = options.timeout) if options.timeout else timedelta.max
+numChars = options.numChars if options.numChars else sys.maxsize
 returnValue = 0
 chars = []
 
 unbufferedStdin = os.fdopen(sys.stdin.fileno(), "rb", 0)
 
 startDatetime = datetime.now()
-while True:
+while len(chars) < numChars:
     readable, writeable, exceptions = select.select([unbufferedStdin], [], [], 1)
     if unbufferedStdin in readable:
         timeoutCount = 0
