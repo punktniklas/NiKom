@@ -235,7 +235,7 @@ void main(int argc,char *argv[]) {
     memset(commandhistory,0,1000);
     going=1;
     while(going && going<=Servermem->cfg.logintries) {
-      putstring("\r\nNamn: ",-1,0);
+      SendStringNoBrk("\r\nName: ");
       if(getstring(EKO,40,NULL)) { car=FALSE; break; }
       if(!stricmp(inmat,Servermem->cfg.ny)
          && !(Servermem->cfg.cfgflags & NICFG_CLOSEDBBS)) {
@@ -247,13 +247,12 @@ void main(int argc,char *argv[]) {
         going=FALSE;
       } else if((inloggad=parsenamn(inmat))>=0) {
         if(readuser(inloggad,&Servermem->inne[nodnr])) {
-          puttekn("Error reading user data.\r\n", -1);
           goto panik;
         }
         // TODO: Extract password loop. Should be identical to in NiKomCon.c
         forsok=2;
         while(forsok) {
-          puttekn("\r\nLösen: ",-1);
+          SendStringNoBrk("\r\nPassword: ");
           if(Servermem->inne[nodnr].flaggor & STAREKOFLAG)
             {
               if(getstring(STAREKO,15,NULL)) { car=FALSE; break; }
@@ -273,7 +272,9 @@ void main(int argc,char *argv[]) {
                    nodnr, getusername(inloggad));
         }
         if(going) going++;
-      } else if(inloggad==-1) puttekn("\r\nHittar ej namnet\r\n",-1);
+      } else if(inloggad==-1) {
+        SendStringNoBrk("\r\nNo such user\r\n");
+      }
     }
     if(!car) {
       if(getty) cleanup(EXIT_OK,"");

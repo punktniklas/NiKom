@@ -31,6 +31,10 @@ MSG_KOM_COMMAND_PASSWORD
 Lösen
 MSG_KOM_INVALID_SWITCH
 Felaktig kommandoflagga.
+MSG_KOM_AUTO_LOGOUT
+Automagisk utloggning
+MSG_KOM_INACTIVITY_LOGOUT
+Utloggning p.g.a inaktivitet
 ;
 ; ******** Forums **********
 MSG_FORUMS_NO_SUCH_TEXT

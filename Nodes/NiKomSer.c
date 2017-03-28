@@ -142,9 +142,9 @@ void main(int argc,char *argv[]) {
   sprintf(titel,"Nod #%d SER: %s #%d",nodnr,Servermem->inne[nodnr].namn,inloggad);
   SetWindowTitles(NiKwind,titel,(char *)-1L);
   if(!ReadUnreadTexts(&Servermem->unreadTexts[nodnr], inloggad)) {
-    puttekn("Error reading unread text info.\r\n", -1);
     LogEvent(SYSTEM_LOG, ERROR,
              "Can't read unread text info for user %d", inloggad);
+    DisplayInternalError();
     cleanup(EXIT_ERROR, "Error reading unread text info.\n");
   }
   SendInfoFile("Bulletin.txt", Servermem->inne[nodnr].senast_in);
@@ -160,9 +160,9 @@ void main(int argc,char *argv[]) {
     if(Servermem->cfg.ar.cardropped) sendautorexx(Servermem->cfg.ar.cardropped);
   } else {
     if(nodestate & NIKSTATE_AUTOLOGOUT) {
-      puttekn("\n\n\r*** Automagisk utloggning ***\n\n\r",-1);
+      SendString("\n\n\r*** %s ***\n\n\r", CATSTR(MSG_KOM_AUTO_LOGOUT));
     } else if(nodestate & NIKSTATE_INACTIVITY) {
-      puttekn("\n\n\r*** Utloggning p.g.a inaktivitet ***\n\n\r",-1);
+      SendString("\n\n\r*** %s ***\n\n\r", CATSTR(MSG_KOM_INACTIVITY_LOGOUT));
     }
     radcnt=-174711;
     if(Servermem->say[nodnr]) displaysay();

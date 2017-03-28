@@ -21,8 +21,6 @@
 
 #define EXIT_ERROR	10
 #define EXIT_OK	0
-#define coneka	eka
-#define conputtekn puttekn
 
 int CXBRK(void) { return(0); }
 
@@ -140,7 +138,7 @@ void main(int argc, char **argv) {
     going=TRUE;
     while(going) {
       Servermem->idletime[nodnr] = time(NULL);
-      puttekn("\r\nNamn: ",-1);
+      SendStringNoBrk("\r\nName: ");
       getstring(EKO,40,NULL);
       if(!stricmp(inmat,Servermem->cfg.ny)) {
         tmp = RegisterNewUser();
@@ -152,13 +150,12 @@ void main(int argc, char **argv) {
       }
       else if((inloggad=parsenamn(inmat))>=0) {
         if(readuser(inloggad,&Servermem->inne[nodnr])) {
-          puttekn("Error reading user data.\r\n", -1);
           goto panik;
         }
         // TODO: Extract password loop. Should be identical to in PreNode/Ser.c
         forsok=2;
         while(forsok) {
-          puttekn("\r\nLösen: ",-1);
+          SendStringNoBrk("\r\nPassword: ");
           if(Servermem->inne[nodnr].flaggor & STAREKOFLAG)
             getstring(STAREKO,15,NULL);
           else
@@ -170,14 +167,16 @@ void main(int argc, char **argv) {
             forsok--;
           }
         }
-      } else if(inloggad==-1) puttekn("\r\nHittar ej namnet\r\n",-1);
+      } else if(inloggad==-1) {
+        SendStringNoBrk("\r\nNo such user\r\n");
+      }
     }
     sprintf(titel,"Nod #%d CON: %s #%d",nodnr,Servermem->inne[nodnr].namn,inloggad);
     SetWindowTitles(NiKwind,titel,(UBYTE *)-1L);
     if(!ReadUnreadTexts(&Servermem->unreadTexts[nodnr], inloggad)) {
-      puttekn("Error reading unread text info.\r\n", -1);
       LogEvent(SYSTEM_LOG, ERROR,
                "Can't read unread text info for user %d", inloggad);
+      DisplayInternalError();
       goto panik;
     }
     Servermem->inloggad[nodnr]=inloggad;
@@ -212,7 +211,7 @@ void main(int argc, char **argv) {
     tellallnodes(tellstr);
   panik:
     nodestate = 0;
-    puttekn("\r\n\nEn inloggning till? (J/n)",-1);
+    SendString("\r\n\nOne more login? (Y/n)",-1);
   } while((ch = GetChar()) != 'n' && ch != 'N');
   cleanup(EXIT_OK,"");
 }

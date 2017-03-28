@@ -27,6 +27,10 @@ MSG_KOM_COMMAND_PASSWORD (112//)
 Password
 MSG_KOM_INVALID_SWITCH (113//)
 Invalid command switch
+MSG_KOM_AUTO_LOGOUT (114//)
+Automatic logout
+MSG_KOM_INACTIVITY_LOGOUT (115//)
+Logout due to inactivity
 ;
 ; ******** Forums **********
 MSG_FORUMS_NO_SUCH_TEXT (200//)
