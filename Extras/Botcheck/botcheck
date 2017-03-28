@@ -32,7 +32,7 @@ bbsPort="$3"
 # clients.
 echo -e -n "Welcome to botcheck!\r\n\r\n"
 echo -e -n "Prove you're not a bot by entering \"$expectedAnswer\": "
-answer="$(readline.py --timeout 30)"
+answer="$(readline.py --timeout 30 --numChars $[${#expectedAnswer} * 2])"
 echo -e -n "\r\n"
 if [[ "$answer" == "$expectedAnswer" ]]; then
     nc "$bbsHost" "$bbsPort"
