@@ -1,1 +1,4 @@
-English placeholder for OutOfTime.txt.
+
+
+Sorry, but you're time is up!
+

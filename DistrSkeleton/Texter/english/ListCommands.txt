@@ -1,1 +1,85 @@
-English placeholder for ListCommands.txt.
+Available commands in NiKom.
+
+Forum commands:
+---------------
+Add Permissions        - Add permissions in a closed forum
+Mail                   - Send a mail
+Only                   - Sets the number of unread texts in a forum
+Move Text              - Move a text to another forum
+Go                     - Move to another forum
+Skip                   - Skip comments to a text
+Again                  - Display the last read text again
+Post                   - Write a new text
+Comment                - Comment the last read text
+List Members           - Lists all members of a forum
+List Forums            - Lists all forums
+List New               - Shows forums with unread texts
+List Authorized        - Lists who can be a member of a closed forum
+List Texts             - Lists texts in a forum
+Read                   - Read a text
+Mark Text              - Mark a text for reading it later
+Member                 - Become a member of a forum
+Next Comment           - Read the next comment
+Next Forum             - Move to the next forum with unread texts
+Next Text              - Read the next text
+Personal               - Send a comment as a mail
+Purge Mail             - Delete mail
+Delete Forum           - Delete a forum
+Delete Text            - Delete a text
+Create Forum           - Create a new forum
+Write                  - Write a new post
+Remove Permissions     - Remove permissions in a closed forum
+Leave                  - Leave a forum
+Where                  - Display the forum you are currently in
+Display Marked         - Display 'marked' texts
+Review Commented       - Display the parent text of a comment
+Edit Forum             - Edit forum information
+
+
+File commands
+-------------
+Areas                  - List all file areas
+Change Area            - Change current file area
+Download               - Download a file from the current file area
+Files                  - List all files in the current file area
+Filestatus             - Display detailed information about a file
+List Areas             - List all file areas
+List Files             - List all files in the current area
+List Keys              - List all search keys
+List Private           - List all files in the private file area
+New Files              - List new files since your last login
+Private Download       - Download a file from the private file area
+Private Upload         - Upload a file to the private file area
+Delete File            - Delete a file from the current file area
+Delete Private         - Delete a file from the private file area
+Search                 - Search for files
+Upload                 - Upload a file to the current file area
+Edit File              - Change a files details
+
+Other commands:
+---------------
+?                      - Display a help-text
+Execute Profile        - Execute the personal profile
+Help                   - Display a help-text
+Info                   - Display information about various things
+List Users             - List all registered users
+List Flags             - List all personal flags
+List Commands          - List all commands
+List Logins            - List the latest logins
+Logout                 - Logout from the BBS
+Manual                 - Display detailed information about a command
+Delete Note            - Delete the personal note
+Page                   - Page the sysop for a conversation
+Exit                   - Logout from the BBS
+Disable                - Disable a personal flag
+Enable                 - Enable a personal flag
+Status                 - Display detailed information about a user
+SysInfo                - Display detailed information about the system
+Say                    - Send a message to another node
+Time                   - Display date, time and remaining time
+Who                    - Display 'logged in' users
+Display Profile        - Display the personal profile
+Edit User              - Change users details
+Edit Note              - Change the personal note
+Edit Profile           - Change the personal profile
+

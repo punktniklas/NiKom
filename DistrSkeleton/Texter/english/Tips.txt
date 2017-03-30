@@ -1,0 +1,38 @@
+
+
+All text numbers in NiKom are global. This makes it very easy to move
+texts between forums if a discussion derails. You then give the command
+'!MOVE <Forum>' in the line editor. (Ctrl-Q, MOVE <Forum> in the
+fullscreen editor). The linking of comments are maintained and you get
+to read comments even if they are moved as long as you're a member of the
+forum they are moved to.
+
+If you want to you can pause screen output with space, to be able to
+do this make sure the flag 'Space as pause' is enabled. You can always
+pause the output with Ctrl-S.
+You can also select if you want <RETURN> to show now and then. By setting
+'Lines:' in your status to 0 these will never show.
+
+All textfiles that you can access with the 'INFO'-command can be shortened
+to its shortest unique part. Instead of typing 'INFO GENERALLISTING' you 
+can just type 'INF GEN'.
+
+You can define your own profile, it works like the startup-sequence, and is
+executed automatically when you log in. In the profile you can have normal
+NiKom-commands such as 'LIST NEW'. The commands 'EDIT PROFILE', 'DISPLAY
+PROFILE' and 'EXECUTE PROFILE' can be used for this.
+
+You can write a note that is shown whenever someone looks you up with the
+'STATUS' command. You write this with the 'EDIT NOTE' command, and delete
+it with 'DELETE NOTE'. If you want this note to show upp whenever someone
+writes a mail to you, just enable the flag 'Note ?*by?* mail'.
+
+If you want more information about a command, type 'MANUAL <Command>'. For
+example 'MANUAL LIST FORUMS'.
+
+NiKom has a fullscreen editor. To use this you must enable the 'Fullscreen
+Editor' flag. There is more info about the fullscreen editor in a separate
+info-file.
+
+You can define your own aliases. Instead of typing 'LIST FILES' you can 
+create an alias called 'F'. Type 'MANUAL ALIAS' for more information.
