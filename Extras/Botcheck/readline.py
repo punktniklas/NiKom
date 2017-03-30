@@ -32,10 +32,10 @@ while len(chars) < numChars:
     if unbufferedStdin in readable:
         timeoutCount = 0
         c = unbufferedStdin.read(1)
-        if not c in ("\r", "\n"):
-            chars.append(c)
-        else:
+        if 0 == len(c) or c in ("\r", "\n"):
             break
+        else:
+            chars.append(c)
 
     if datetime.now() - startDatetime > timeout:
         returnValue = 128 # Same as bash read when it times out
