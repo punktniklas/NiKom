@@ -6,7 +6,7 @@
 #include <string.h>
 #include <limits.h>
 #include "NiKomLib.h"
-#include "nikombase.h"
+#include "NiKomBase.h"
 #include "Funcs.h"
 
 /* Namn: ConvChrsToAmiga
