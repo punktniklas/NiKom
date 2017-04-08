@@ -164,7 +164,7 @@ int skapagrupp(void) {
   SendString("-1 = ingen blir automatiskt medlem.\r\n");
   newUserGroup->autostatus = GetNumber(-1, 100, NULL);
 
-  if(EditBitFlagChar("\r\nSka gruppen vara hemlig?", 'j', 'n', "Ja\r\n", "Nej\r\n",
+  if(EditBitFlagChar("\r\n", "Ska gruppen vara hemlig?", "j", "n", "Ja\r\n", "Nej\r\n",
                      &newUserGroup->flaggor, HEMLIGT)) {
     return 1;
   }
@@ -385,7 +385,7 @@ int andragrupp(void) {
   SendString("-1 = ingen blir automatiskt medlem.\r\n");
   MaybeEditNumberChar("Status", &tmpUserGroup.autostatus, 3, -1, 100);
 
-  if(EditBitFlagChar("\r\nSka gruppen vara hemlig?", 'j', 'n', "Ja", "Nej",
+  if(EditBitFlagChar("\r\n", "Ska gruppen vara hemlig?", "j", "n", "Ja", "Nej",
                      &tmpUserGroup.flaggor, HEMLIGT)) {
     return 1;
   }

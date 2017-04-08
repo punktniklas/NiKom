@@ -135,6 +135,8 @@ You already have dissed text %d.
 MSG_REACTION_DONE_DIS (300//)
 You have dissed text %d.
 ;
+MSG_WRITE_NO_MAIL (304//)
+Use the command 'Mail' in the mailbox.
 MSG_WRITE_TEXT_GOT_NUMBER (305//)
 The text got number %d.
 MSG_WRITE_TOO_MANY_COMMENTS (306//)
@@ -143,6 +145,8 @@ MSG_WRITE_FORUM (307//)
 Forum: %s
 MSG_WRITE_SUBJECT (308//)
 Subject:
+MSG_WRITE_NO_PERM_IN_FORUM (309//)
+You are not allowed to write in this forum.
 ;
 MSG_READ_SYNTAX (310//)
 Syntax: Read <text number>
@@ -362,6 +366,92 @@ MSG_LEAVE_NOT_MEMBER (705//)
 YOu are not a member of that forum.
 MSG_LEAVE_HAVE_LEFT (706//)
 You have now left the forum %s.
+;
+MSG_FORUM_CREATE_NAME (800//)
+Name of the forum
+MSG_FORUM_CREATE_ALREADY_EXISTS (801//)
+There already is a forum like that.
+MSG_FORUM_CREATE_ADMIN (802//)
+Forum administrator
+MSG_FORUM_CREATE_SORT (803//)
+Sort order value
+MSG_FORUM_CREATE_CLOSED (804//)
+Should the forum be closed?
+MSG_FORUM_CREATE_CLOSED_YES (805//)
+Closed
+MSG_FORUM_CREATE_CLOSED_NO (806//)
+Open
+MSG_FORUM_CREATE_GROUPS (807//)
+WHat groups should have access to the forum? (? for a list)
+MSG_FORUM_CREATE_WRITE (808//)
+Should the forum be write protected?
+MSG_FORUM_CREATE_PROTECTED (809//)
+Protected
+MSG_FORUM_CREATE_UNPROTECTED (810//)
+Unprotected
+MSG_FORUM_CREATE_COMMENT (811//)
+Should the forum be comment protected?
+MSG_FORUM_CREATE_SECRET (812//)
+Should the forum be secret?
+MSG_FORUM_CREATE_SECRET_YES (813//)
+Secret
+MSG_FORUM_CREATE_SECRET_NO (814//)
+Not secret
+MSG_FORUM_CREATE_AUTO (815//)
+Should all user have automatic membership?
+MSG_FORUM_CREATE_PERMWRITE (816//)
+Should the permissions control write access?
+MSG_FORUM_CREATE_AREXX (817//)
+Should the forum only be accessible from ARexx?
+MSG_FORUM_CREATE_TYPE_HEAD (818//)
+WHat type of forum should it be?
+MSG_FORUM_CREATE_TYPE_LOCAL (819//)
+Local forum
+MSG_FORUM_CREATE_TYPE_FIDO (820//)
+Fido forum
+MSG_FORUM_CREATE_FIDO_DIR (821//)
+Directory for .msg files
+MSG_FORUM_CREATE_FIDO_DIR_ERROR (822//)
+Could not create the directory.
+MSG_FORUM_CREATE_FIDO_TAG (823//)
+FidoNet tag name
+MSG_FORUM_CREATE_FIDO_ORIGIN (824//)
+Origin line
+MSG_FORUM_CREATE_FIDO_CHR (825//)
+WHat character encoding should be used for outgoing texts?
+MSG_FORUM_CREATE_DOMAIN (826//)
+Which Fido domain is the forum in?
+MSG_FORUM_CREATE_NO_DOMAIN (827//)
+There must be a domain configured in NiKomFido.cfg first.
+MSG_FORUM_CREATE_DOMAIN_CHOICE (828//)
+Domain
+MSG_FORUM_CREATE_DOMAIN_NF (829//)
+There is no such domain.
+MSG_FORUM_CREATE_NO_ROOM (830//)
+There is no room for any more forums.
+MSG_FORUM_CREATE_CHANGING (831//)
+Changing user data...
+;
+MSG_FORUM_LIST_PATTERN (850//)
+You have to provide an argument containing wildcards.
+MSG_FORUM_LIST_CLOSED (851//)
+Closed
+MSG_FORUM_LIST_WRITEPROT (852//)
+Write protected
+MSG_FORUM_LIST_COMMPROT (853//)
+Comment protected
+MSG_FORUM_LIST_SECRET (854//)
+Secret
+MSG_FORUM_LIST_AUTO (855//)
+Auto
+MSG_FORUM_LIST_WRITECTRL (856//)
+Write controlled
+MSG_FORUM_LIST_AREXX (857//)
+ARexx controlled
+MSG_FORUM_LIST_SUMMARY (858//)
+Global texts: Lowest text: %d  Highest text: %d
+MSG_FORUM_LIST_NOTEXTS (859//)
+You have no unread texts.
 ;
 ; ******** Dealing with flags **********
 MSG_FLAG_ON (1000//)

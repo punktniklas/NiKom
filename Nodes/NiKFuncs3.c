@@ -256,7 +256,7 @@ int andmot(void) {
   if(MaybeEditNumber("Sorteringsvärde", (int *)&tmpConf.sortpri, 8, 0, LONG_MAX)) {
     return 1;
   }
-  if(EditBitFlagShort("\r\nSka mötet vara slutet?", 'j', 'n', "Slutet", "Öppet",
+  if(EditBitFlagShort("\r\n", "Ska mötet vara slutet?", "j", "n", "Slutet", "Öppet",
                  &tmpConf.status, SLUTET)) {
     return 1;
   }
@@ -266,24 +266,24 @@ int andmot(void) {
       return 1;
     }
   }
-  if(EditBitFlagShort("\r\nSka mötet vara skrivskyddat?", 'j', 'n',
+  if(EditBitFlagShort("\r\n", "Ska mötet vara skrivskyddat?", "j", "n",
                  "Skyddat", "Oskyddat", &tmpConf.status, SKRIVSKYDD)) {
     return 1;
   }
-  if(EditBitFlagShort("\r\nSka mötet vara kommentarsskyddat?", 'j', 'n',
+  if(EditBitFlagShort("\r\n", "Ska mötet vara kommentarsskyddat?", "j", "n",
                  "Skyddat", "Oskyddat", &tmpConf.status, KOMSKYDD)) {
     return 1;
   }
-  if(EditBitFlagShort("\r\nSka mötet vara hemligt?", 'j', 'n',
+  if(EditBitFlagShort("\r\n", "Ska mötet vara hemligt?", "j", "n",
                  "Hemligt", "Ej hemligt", &tmpConf.status, HEMLIGT)) {
     return 1;
   }
   if(!(tmpConf.status & SLUTET)) {
-    if(EditBitFlagShort("\r\nSka alla användare bli medlemmar automagiskt?", 'j', 'n',
+    if(EditBitFlagShort("\r\n", "Ska alla användare bli medlemmar automagiskt?", "j", "n",
                    "Ja", "Nej", &tmpConf.status, AUTOMEDLEM)) {
       return 1;
     }
-    if(EditBitFlagShort("\r\nSka rättigheterna styra skrivmöjlighet?", 'j', 'n',
+    if(EditBitFlagShort("\r\n", "Ska rättigheterna styra skrivmöjlighet?", "j", "n",
                    "Ja", "Nej", &tmpConf.status, SKRIVSTYRT)) {
       return 1;
     }
@@ -296,7 +296,7 @@ int andmot(void) {
   } else {
     tmpConf.status &= ~(AUTOMEDLEM | SKRIVSTYRT);
   }
-  if(EditBitFlagShort("\r\nSka mötet bara vara åtkomligt från ARexx?", 'j', 'n',
+  if(EditBitFlagShort("\r\n", "Ska mötet bara vara åtkomligt från ARexx?", "j", "n",
                  "Ja", "Nej", &tmpConf.status, SUPERHEMLIGT)) {
     return 1;
   }

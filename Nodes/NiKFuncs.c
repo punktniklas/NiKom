@@ -29,7 +29,7 @@
 
 extern struct System *Servermem;
 extern int nodnr,inloggad,radcnt,rxlinecount, nodestate;
-extern char outbuffer[],inmat[],backspace[],commandhistory[][1024];
+extern char inmat[],backspace[],commandhistory[][1024];
 extern struct ReadLetter brevread;
 extern struct MinList edit_list;
 
@@ -51,40 +51,52 @@ struct Inloggning Statstr;
 struct MinList aliaslist;
 
 void igen(void) {
-        struct Mote *motpek;
-        if(senast_text_typ==BREV) visabrev(senast_brev_nr,senast_brev_anv);
-        else if(senast_text_typ==TEXT) {
-                motpek=getmotpek(senast_text_mote);
-                if(motpek->type==MOTE_ORGINAL) org_visatext(senast_text_nr, FALSE);
-                else if(motpek->type==MOTE_FIDO) fido_visatext(senast_text_nr,motpek);
-        }
-        else puttekn("\r\n\nDu har inte läst någon text ännu!\r\n\n",-1);
+  struct Mote *conf;
+  if(senast_text_typ == BREV) {
+    visabrev(senast_brev_nr, senast_brev_anv);
+  } else if(senast_text_typ == TEXT) {
+    conf = getmotpek(senast_text_mote);
+    if(conf->type == MOTE_ORGINAL) {
+      org_visatext(senast_text_nr, FALSE);
+    } else if(conf->type == MOTE_FIDO) {
+      fido_visatext(senast_text_nr, conf);
+    }
+  }
+  else {
+    SendString("\r\n\n%s\r\n\n", CATSTR(MSG_SKIP_NO_TEXT_READ));
+  }
 }
 
 int skriv(void) {
-        struct Mote *motpek;
-        if(mote2==-1) {
-                sprintf(outbuffer,"\r\n\nAnvänd kommandot 'Brev' i brevlådan.\r\n");
-                puttekn(outbuffer,-1);
-                return(0);
-        }
-        motpek=getmotpek(mote2);
-        if(!motpek) {
-                puttekn("\n\n\rHmm.. Mötet du befinner dig i finns inte.\n\r",-1);
-                return(0);
-        }
-        if(!MayWriteConf(motpek->nummer, inloggad, &Servermem->inne[nodnr])) {
-                puttekn("\r\n\nDu får inte skriva i det här mötet!\r\n\n",-1);
-                return(0);
-        }
-        if(motpek->type==MOTE_ORGINAL) return(org_skriv());
-        else if(motpek->type==MOTE_FIDO) return(fido_skriv(EJKOM,0));
-        return(0);
+  struct Mote *conf;
+  if(mote2 == -1) {
+    SendString("\r\n\n%s\r\n", CATSTR(MSG_WRITE_NO_MAIL));
+    return 0;
+  }
+  conf = getmotpek(mote2);
+  if(!conf) {
+    LogEvent(SYSTEM_LOG, ERROR, "User is in conf %d which doesn't seem to exist.", mote2);
+    DisplayInternalError();
+    return 0;
+  }
+  if(!MayWriteConf(conf->nummer, inloggad, &Servermem->inne[nodnr])) {
+    SendString("\r\n\n%s\r\n\n", CATSTR(MSG_WRITE_NO_PERM_IN_FORUM));
+    return 0;
+  }
+  if(conf->type == MOTE_ORGINAL) {
+    return org_skriv();
+  } else if(conf->type == MOTE_FIDO) {
+    return fido_skriv(EJKOM,0);
+  }
+  return 0;
 }
 
 void var(int mot) {
-        if(mot==-1) varmail();
-        else varmote(mot);
+  if(mot == -1) {
+    varmail();
+  } else {
+    varmote(mot);
+  }
 }
 
 void varmote(int mote) {
@@ -134,7 +146,7 @@ int skapmot(void) {
 
   memset(&tmpConf, 0, sizeof(struct Mote));
   if(argument[0] == '\0') {
-    SendString("\r\n\nNamn på mötet: ");
+    SendString("\r\n\n%s: ", CATSTR(MSG_FORUM_CREATE_NAME));
     if(GetString(40,NULL)) {
       return 1;
     }
@@ -143,74 +155,85 @@ int skapmot(void) {
     strcpy(tmpConf.namn, argument);
   }
   if(parsemot(tmpConf.namn) != -1) {
-    SendString("\r\n\nFinns redan ett sådant möte!\r\n");
+    SendString("\r\n\n%s\r\n", CATSTR(MSG_FORUM_CREATE_ALREADY_EXISTS));
     return 0;
   }
   tmpConf.skapat_tid = time(NULL);;
   tmpConf.skapat_av = inloggad;
   for(;;) {
-    SendString("\r\nMötesAdministratör (MAD) : ");
+    SendString("\r\n%s: ", CATSTR(MSG_FORUM_CREATE_ADMIN));
     if(GetString(5,NULL)) {
       return 1;
     }
     if(inmat[0]) {
       if((mad = parsenamn(inmat)) == -1) {
-        SendString("\r\nFinns ingen sådan användare!");
+        SendString("\r\n%s", CATSTR(MSG_COMMON_NO_SUCH_USER));
       } else {
         tmpConf.mad = mad;
         break;
       }
     }
   }
-  SendString("\n\rSorteringsvärde: ");
+  SendString("\n\r%s: ", CATSTR(MSG_FORUM_CREATE_SORT));
   tmpConf.sortpri = GetNumber(0, LONG_MAX, NULL);
 
-  if(EditBitFlagShort("\r\nSka mötet vara slutet?", 'j', 'n', "Slutet", "Öppet",
-                     &tmpConf.status, SLUTET)) {
+  if(EditBitFlagShort("\r\n", CATSTR(MSG_FORUM_CREATE_CLOSED),
+                      CATSTR(MSG_COMMON_YES), CATSTR(MSG_COMMON_NO),
+                      CATSTR(MSG_FORUM_CREATE_CLOSED_YES), CATSTR(MSG_FORUM_CREATE_CLOSED_NO),
+                      &tmpConf.status, SLUTET)) {
     return 1;
   }
   if(tmpConf.status & SLUTET) {
-    SendString("\r\nVilka grupper ska ha tillgång till mötet? (? för lista)\r\n");
+    SendString("\r\n%s\r\n", CATSTR(MSG_FORUM_CREATE_GROUPS));
     if(editgrupp((char *)&tmpConf.grupper)) {
       return 1;
     }
   }
-  if(EditBitFlagShort("\r\nSka mötet vara skrivskyddat?", 'j', 'n',
-                     "Skyddat", "Oskyddat", &tmpConf.status, SKRIVSKYDD)) {
+  if(EditBitFlagShort("\r\n", CATSTR(MSG_FORUM_CREATE_WRITE),
+                      CATSTR(MSG_COMMON_YES), CATSTR(MSG_COMMON_NO),
+                      CATSTR(MSG_FORUM_CREATE_PROTECTED), CATSTR(MSG_FORUM_CREATE_UNPROTECTED),
+                      &tmpConf.status, SKRIVSKYDD)) {
     return 1;
   }
-  if(EditBitFlagShort("\r\nSka mötet vara kommentarsskyddat?", 'j', 'n',
-                     "Skyddat", "Oskyddat", &tmpConf.status, KOMSKYDD)) {
+  if(EditBitFlagShort("\r\n", CATSTR(MSG_FORUM_CREATE_COMMENT),
+                      CATSTR(MSG_COMMON_YES), CATSTR(MSG_COMMON_NO),
+                      CATSTR(MSG_FORUM_CREATE_PROTECTED), CATSTR(MSG_FORUM_CREATE_UNPROTECTED),
+                      &tmpConf.status, KOMSKYDD)) {
     return 1;
   }
-  if(EditBitFlagShort("\r\nSka mötet vara hemligt?", 'j', 'n',
-                     "Hemligt", "Ej hemligt", &tmpConf.status, HEMLIGT)) {
+  if(EditBitFlagShort("\r\n", CATSTR(MSG_FORUM_CREATE_SECRET),
+                      CATSTR(MSG_COMMON_YES), CATSTR(MSG_COMMON_NO),
+                      CATSTR(MSG_FORUM_CREATE_SECRET_YES), CATSTR(MSG_FORUM_CREATE_SECRET_NO),
+                      &tmpConf.status, HEMLIGT)) {
     return 1;
   }
   if(!(tmpConf.status & SLUTET)) {
-    if(EditBitFlagShort("\r\nSka alla användare bli medlemmar automagiskt?", 'j', 'n',
-                       "Ja", "Nej", &tmpConf.status, AUTOMEDLEM)) {
+    if(EditBitFlagShort("\r\n", CATSTR(MSG_FORUM_CREATE_AUTO),
+                        NULL, NULL, CATSTR(MSG_COMMON_YES), CATSTR(MSG_COMMON_NO),
+                        &tmpConf.status, AUTOMEDLEM)) {
       return 1;
     }
-    if(EditBitFlagShort("\r\nSka rättigheterna styra skrivmöjlighet?", 'j', 'n',
-                       "Ja", "Nej", &tmpConf.status, SKRIVSTYRT)) {
+    if(EditBitFlagShort("\r\n", CATSTR(MSG_FORUM_CREATE_PERMWRITE),
+                        NULL, NULL, CATSTR(MSG_COMMON_YES), CATSTR(MSG_COMMON_NO),
+                        &tmpConf.status, SKRIVSTYRT)) {
       return 1;
     }
     if(tmpConf.status & SKRIVSTYRT) {
-      SendString("\r\nVilka grupper ska ha tillgång till mötet? (? för lista)\r\n");
+      SendString("\r\n%s\r\n", CATSTR(MSG_FORUM_CREATE_GROUPS));
       if(editgrupp((char *)&tmpConf.grupper)) {
         return 1;
       }
     }
   }
-  if(EditBitFlagShort("\r\nSka mötet enbart kommas åt från ARexx?", 'j', 'n',
-                     "Ja", "Nej", &tmpConf.status, SUPERHEMLIGT)) {
+  if(EditBitFlagShort("\r\n", CATSTR(MSG_FORUM_CREATE_AREXX),
+                      NULL, NULL, CATSTR(MSG_COMMON_YES), CATSTR(MSG_COMMON_NO),
+                      &tmpConf.status, SUPERHEMLIGT)) {
     return 1;
   }
 
-  SendString("\n\n\rVilken typ av möte ska det vara?\n\r");
-  SendString("1: Lokalt möte\n\r");
-  SendString("2: Fido-möte\n\n\r");
+  SendString("\n\n\r%s\n\r", CATSTR(MSG_FORUM_CREATE_TYPE_HEAD));
+  SendString("1: %s\n\r", CATSTR(MSG_FORUM_CREATE_TYPE_LOCAL));
+  SendString("2: %s\n\n\r", CATSTR(MSG_FORUM_CREATE_TYPE_FIDO));
   SendString("Val: ");
   for(;;) {
     ch = GetChar();
@@ -222,35 +245,35 @@ int skapmot(void) {
     }
   }
   if(ch == '1') {
-    SendString("Lokalt möte\n\n\r");
+    SendString("%s\n\n\r", CATSTR(MSG_FORUM_CREATE_TYPE_LOCAL));
     tmpConf.type = MOTE_ORGINAL;
   } else {
-    SendString("Fido-möte\n\n\r");
+    SendString("%s\n\n\r", CATSTR(MSG_FORUM_CREATE_TYPE_FIDO));
     tmpConf.type = MOTE_FIDO;
-    if(EditString("Katalog for .msg-filerna", tmpConf.dir, 79, TRUE)) {
+    if(EditString(CATSTR(MSG_FORUM_CREATE_FIDO_DIR), tmpConf.dir, 79, TRUE)) {
       return 1;
     }
     if(!(lock = Lock(tmpConf.dir, SHARED_LOCK))) {
       if(!(lock = CreateDir(tmpConf.dir)))
-        SendString("\n\rKunde inte skapa katalogen\n\r");
+        SendString("\n\r%s\n\r", CATSTR(MSG_FORUM_CREATE_FIDO_DIR_ERROR));
     }
     if(lock) {
       UnLock(lock);
     }
-    if(EditString("FidoNet tag-namn", tmpConf.tagnamn, 49, TRUE)) {
+    if(EditString(CATSTR(MSG_FORUM_CREATE_FIDO_TAG), tmpConf.tagnamn, 49, TRUE)) {
       return 1;
     }
     strcpy(tmpConf.origin, Servermem->fidodata.defaultorigin);
-    if(MaybeEditString("Origin-rad", tmpConf.origin, 69)) {
+    if(MaybeEditString(CATSTR(MSG_FORUM_CREATE_FIDO_ORIGIN), tmpConf.origin, 69)) {
       return 1;
     }
     
-    SendString("\n\n\rVilken teckenuppsättning ska användas för utgående texter?\n\r");
-    SendString("1: ISO Latin 1 (ISO 8859-1)\n\r");
-    SendString("2: SIS-7 (SF7, 'Måsvingar')\n\r");
-    SendString("3: IBM CodePage\n\r");
-    SendString("4: Mac\n\n\r");
-    SendString("Val: ");
+    SendString("\n\n\r%s\n\r", CATSTR(MSG_FORUM_CREATE_FIDO_CHR));
+    SendString("1: %s\n\r", CATSTR(MSG_CHRS_ISO88591));
+    SendString("2: %s\n\r", CATSTR(MSG_CHRS_SIS7));
+    SendString("3: %s\n\r", CATSTR(MSG_CHRS_CP437));
+    SendString("4: %s\n\n\r", CATSTR(MSG_CHRS_MAC));
+    SendString("%s ", CATSTR(MSG_COMMON_CHOICE));
     for(;;) {
       ch = GetChar();
       if(ch == GETCHAR_LOGOUT) {
@@ -262,23 +285,23 @@ int skapmot(void) {
     }
     switch(ch) {
     case '1':
-      SendString("ISO Latin 1\n\n\r");
+      SendString("%s\n\n\r", CATSTR(MSG_CHRS_ISO88591));
       tmpConf.charset = CHRS_LATIN1;
       break;
     case '2':
-      SendString("SIS-7\n\n\r");
+      SendString("%s\n\n\r", CATSTR(MSG_CHRS_SIS7));
       tmpConf.charset = CHRS_SIS7;
       break;
     case '3':
-      SendString("IBM CodePage\n\n\r");
+      SendString("%s\n\n\r", CATSTR(MSG_CHRS_CP437));
       tmpConf.charset = CHRS_CP437;
       break;
     case '4':
-      SendString("Mac\n\n\r");
+      SendString("%s\n\n\r", CATSTR(MSG_CHRS_MAC));
       tmpConf.charset = CHRS_MAC;
       break;
     }
-    SendString("Vilken domän är mötet i?\n\r");
+    SendString("%s\n\r", CATSTR(MSG_FORUM_CREATE_DOMAIN));
     highestId = 0;
     for(i = 0; i < 10; i++) {
       if(!Servermem->fidodata.fd[i].domain[0]) {
@@ -294,11 +317,11 @@ int skapmot(void) {
                  Servermem->fidodata.fd[i].point);
     }
     if(i == 0) {
-      SendString("\n\rDu måste definiera en domän i NiKomFido.cfg först!\n\r");
+      SendString("\n\r%s\n\r", CATSTR(MSG_FORUM_CREATE_NO_DOMAIN));
       return 0;
     }
     for(;;) {
-      SendString("\r\nDomän: ");
+      SendString("\r\n%s: ", CATSTR(MSG_FORUM_CREATE_DOMAIN_CHOICE));
       if(GetString(5, NULL)) {
         return 1;
       }
@@ -306,7 +329,7 @@ int skapmot(void) {
       if(fidoDomain = getfidodomain(fidoDomainId, 0)) {
         break;
       } else {
-        SendString("\n\rFinns ingen sådan domän.\n\r");
+        SendString("\n\r%s\n\r", CATSTR(MSG_FORUM_CREATE_DOMAIN_NF));
       }
     }
     tmpConf.domain = fidoDomain->nummer;
@@ -318,7 +341,7 @@ int skapmot(void) {
     }
   }
   if(i >= MAXMOTE) {
-    SendString("\n\n\rDet finns inte plats för fler möten.\n\r");
+    SendString("\n\n\r%s\n\r", CATSTR(MSG_FORUM_CREATE_NO_ROOM));
     return 0;
   }
   tmpConf.nummer = i;
@@ -357,7 +380,7 @@ int skapmot(void) {
     }
   }
 
-  SendString("\r\nÄndrar i användardata..\r\n");
+  SendString("\r\n%s\r\n", CATSTR(MSG_FORUM_CREATE_CHANGING));
   ITER_EL(shortUser, Servermem->user_list, user_node, struct ShortUser *) {
     if(!(shortUser->nummer % 10)) {
       SendString("\r%d", shortUser->nummer);
@@ -405,50 +428,65 @@ int skapmot(void) {
   return 0;
 }
 
-void listmot(char *foo)
-{
-        struct Mote *listpek=(struct Mote *)Servermem->mot_list.mlh_Head;
-        int cnt, pattern = 0, patret;
-        char buffer[61], motpattern[101];
-        puttekn("\r\n\n",-1);
+void listmot(char *pattern) {
+  struct Mote *conf;
+  int cnt, usingPattern = 0, patret;
+  char parsedPattern[101];
 
-        if(foo[0])
-        {
-			strncpy(buffer,foo,50);
-			patret = ParsePatternNoCase(buffer, motpattern, 98);
+  SendString("\r\n\n");
+ 
+  if(pattern[0]) {
+    patret = ParsePatternNoCase(pattern, parsedPattern, 98);
+    if(patret != 1) {
+      SendString("%s\r\n", CATSTR(MSG_FORUM_LIST_PATTERN));
+      return;
+    }
+    usingPattern = 1;
+  }
 
-			if(patret != 1)
-			{
-				puttekn("\r\n\nDu måste ange ett argument som innehåller wildcards!\r\n", -1);
-				return;
-			}
-
-			pattern = 1;
-		}
-
-        for(;listpek->mot_node.mln_Succ;listpek=(struct Mote *)listpek->mot_node.mln_Succ) {
-                if(!MaySeeConf(listpek->nummer,inloggad,&Servermem->inne[nodnr])) continue;
-
-                if(pattern && !MatchPatternNoCase(motpattern, listpek->namn)) continue;
-                cnt=0;
-                if(IsMemberConf(listpek->nummer, inloggad, &Servermem->inne[nodnr])) sprintf(outbuffer,"%3d %s ",countunread(listpek->nummer),listpek->namn);
-                else sprintf(outbuffer,"   *%s ",listpek->namn);
-                if(puttekn(outbuffer,-1)) return;
-                if(listpek->status & SLUTET) if(puttekn(" (Slutet)",-1)) return;
-                if(listpek->status & SKRIVSKYDD) if(puttekn(" (Skrivskyddat)",-1)) return;
-                if(listpek->status & KOMSKYDD) if(puttekn(" (Kom.skyddat)",-1)) return;
-                if(listpek->status & HEMLIGT) if(puttekn(" (Hemligt)",-1)) return;
-                if(listpek->status & AUTOMEDLEM) if(puttekn(" (Auto)",-1)) return;
-                if(listpek->status & SKRIVSTYRT) if(puttekn(" (Skrivstyrt)",-1)) return;
-                if((listpek->status & SUPERHEMLIGT) && Servermem->inne[nodnr].status >= Servermem->cfg.st.medmoten) if(puttekn(" (ARexx-styrt)",-1)) return;
-                if(puttekn("\r\n",-1)) return;
-        }
-
-        if(Servermem->info.hightext > -1)
-	        sprintf(outbuffer,"\r\n\nGlobala texter: Lägsta textnummer: %d   Högsta textnummer: %d\r\n\n",Servermem->info.lowtext, Servermem->info.hightext);
-		else
-			strcpy(outbuffer, "\r\n\nDet finns inga texter.\r\n\n");
-        puttekn(outbuffer,-1);
+  ITER_EL(conf, Servermem->mot_list, mot_node, struct Mote *) {
+    if(!MaySeeConf(conf->nummer,inloggad,&Servermem->inne[nodnr])) {
+      continue;
+    }
+    if(usingPattern && !MatchPatternNoCase(parsedPattern, conf->namn)) {
+      continue;
+    }
+    cnt = 0;
+    if(IsMemberConf(conf->nummer, inloggad, &Servermem->inne[nodnr])) {
+      if(SendString("%3d %s ", countunread(conf->nummer), conf->namn)) { return; }
+    } else {
+      if(SendString("   *%s ",conf->namn)) { return; }
+    }
+    if(conf->status & SLUTET) {
+      if(SendString(" (%s)", CATSTR(MSG_FORUM_LIST_CLOSED))) { return; }
+    }
+    if(conf->status & SKRIVSKYDD) {
+      if(SendString(" (%s)", CATSTR(MSG_FORUM_LIST_WRITEPROT))) { return; }
+    }
+    if(conf->status & KOMSKYDD) {
+      if(SendString(" (%s)", CATSTR(MSG_FORUM_LIST_COMMPROT))) { return; }
+    }
+    if(conf->status & HEMLIGT) {
+      if(SendString(" (%s)", CATSTR(MSG_FORUM_LIST_SECRET))) { return; }
+    }
+    if(conf->status & AUTOMEDLEM) {
+      if(SendString(" (%s)", CATSTR(MSG_FORUM_LIST_AUTO))) { return; }
+    }
+    if(conf->status & SKRIVSTYRT) {
+      if(SendString(" (%s)", CATSTR(MSG_FORUM_LIST_WRITECTRL))) { return; }
+    }
+    if((conf->status & SUPERHEMLIGT) && Servermem->inne[nodnr].status >= Servermem->cfg.st.medmoten) {
+      if(SendString(" (%s)", CATSTR(MSG_FORUM_LIST_AREXX))) { return; }
+    }
+    if(SendString("\r\n")) { return; }
+  }
+  
+  if(Servermem->info.hightext > -1) {
+    SendStringCat("\r\n\n%s\r\n\n", CATSTR(MSG_FORUM_LIST_SUMMARY),
+                  Servermem->info.lowtext, Servermem->info.hightext);
+  } else {
+    SendString("\r\n\n%s\r\n\n", CATSTR(MSG_FORUM_LIST_NOTEXTS));
+  }
 }
 
 struct LangCommand *chooseLangCommand(struct Kommando *cmd) {

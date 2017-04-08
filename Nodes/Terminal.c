@@ -730,10 +730,10 @@ int MaybeEditNumberChar(char *label, char *number, int maxlen, int minVal,
   return ret;
 }
 
-int EditBitFlag(char *label, char yesChar, char noChar, char *yesStr, char *noStr,
+int EditBitFlag(char *preStr, char *label, char *yesChar, char *noChar, char *yesStr, char *noStr,
                 long *value, long bitmask) {
   int setFlag;
-  if(GetYesOrNo(NULL, label, &yesChar, &noChar, yesStr, noStr, NULL, *value & bitmask, &setFlag)) {
+  if(GetYesOrNo(preStr, label, yesChar, noChar, yesStr, noStr, NULL, *value & bitmask, &setFlag)) {
     return 1;
   }
   if(setFlag) {
@@ -744,18 +744,18 @@ int EditBitFlag(char *label, char yesChar, char noChar, char *yesStr, char *noSt
   return 0;
 }
 
-int EditBitFlagShort(char *label, char yesChar, char noChar,
+int EditBitFlagShort(char *preStr, char *label, char *yesChar, char *noChar,
                      char *yesStr, char *noStr, short *value, long bitmask) {
   long tmpValue = *value, ret;
-  ret = EditBitFlag(label, yesChar, noChar, yesStr, noStr, &tmpValue, bitmask);
+  ret = EditBitFlag(preStr, label, yesChar, noChar, yesStr, noStr, &tmpValue, bitmask);
   *value = tmpValue;
   return ret;
 }
 
-int EditBitFlagChar(char *label, char yesChar, char noChar,
+int EditBitFlagChar(char *preStr, char *label, char *yesChar, char *noChar,
                     char *yesStr, char *noStr, char *value, long bitmask) {
   long tmpValue = *value, ret;
-  ret = EditBitFlag(label, yesChar, noChar, yesStr, noStr, &tmpValue, bitmask);
+  ret = EditBitFlag(preStr, label, yesChar, noChar, yesStr, noStr, &tmpValue, bitmask);
   *value = tmpValue;
   return ret;
 }

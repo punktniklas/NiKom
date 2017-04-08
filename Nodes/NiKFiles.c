@@ -499,12 +499,12 @@ int andraarea(void) {
 		break;
 	}
         
-        if(EditBitFlag("\n\rSka uploads till arean förbjudas?",
-                       'j', 'n', "Ja", "Nej", &tempar.flaggor, AREA_NOUPLOAD)) {
+        if(EditBitFlag("\n\r", "Ska uploads till arean förbjudas?",
+                       "j", "n", "Ja", "Nej", &tempar.flaggor, AREA_NOUPLOAD)) {
           return 1;
         }
-        if(EditBitFlag("\n\rSka downloads från arean förbjudas?",
-                       'j', 'n', "Ja", "Nej", &tempar.flaggor, AREA_NODOWNLOAD)) {
+        if(EditBitFlag("\n\r", "Ska downloads från arean förbjudas?",
+                       "j", "n", "Ja", "Nej", &tempar.flaggor, AREA_NODOWNLOAD)) {
           return 1;
         }
 
@@ -830,15 +830,15 @@ int andrafil(void) {
 		tmpflaggor=filpek->flaggor;
 		tmpvalidtime=filpek->validtime;
 
-                if(EditBitFlag("\n\rSka filen vara ovaliderad?",
-                               'j', 'n', "Ja", "Nej", &tmpflaggor, FILE_NOTVALID)) {
+                if(EditBitFlag("\n\r", "Ska filen vara ovaliderad?",
+                               "j", "n", "Ja", "Nej", &tmpflaggor, FILE_NOTVALID)) {
                   return 1;
                 }
                 if(filpek->flaggor & FILE_NOTVALID && !(tmpflaggor& FILE_NOTVALID)) {
                   tmpvalidtime = time(NULL);
                 }
-                if(EditBitFlag("\n\rSka filen ha fri download?",
-                               'j', 'n', "Ja", "Nej", &tmpflaggor, FILE_FREEDL)) {
+                if(EditBitFlag("\n\r", "Ska filen ha fri download?",
+                               "j", "n", "Ja", "Nej", &tmpflaggor, FILE_FREEDL)) {
                   return 1;
                 }
 	} else {

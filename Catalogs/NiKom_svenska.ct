@@ -139,6 +139,8 @@ Du har redan dissat text %d.
 MSG_REACTION_DONE_DIS
 Du har dissat text %d.
 ;
+MSG_WRITE_NO_MAIL
+Använd kommandot 'Brev' i brevlådan.
 MSG_WRITE_TEXT_GOT_NUMBER
 Texten fick nummer %d.
 MSG_WRITE_TOO_MANY_COMMENTS
@@ -147,6 +149,8 @@ MSG_WRITE_FORUM
 Möte: %s
 MSG_WRITE_SUBJECT
 Ärende:
+MSG_WRITE_NO_PERM_IN_FORUM
+Du får inte skriva i det här mötet.
 ;
 MSG_READ_SYNTAX
 Skriv: Läsa <textnr>
@@ -366,6 +370,92 @@ MSG_LEAVE_NOT_MEMBER
 Du är inte medlem i det mötet.
 MSG_LEAVE_HAVE_LEFT
 Du har nu utträtt ur mötet %s.
+;
+MSG_FORUM_CREATE_NAME
+Namn på mötet
+MSG_FORUM_CREATE_ALREADY_EXISTS
+Finns redan ett sådant möte.
+MSG_FORUM_CREATE_ADMIN
+MötesAdministratör (MAD)
+MSG_FORUM_CREATE_SORT
+Sorteringsvärde
+MSG_FORUM_CREATE_CLOSED
+Ska mötet vara slutet?
+MSG_FORUM_CREATE_CLOSED_YES
+Slutet
+MSG_FORUM_CREATE_CLOSED_NO
+Öppet
+MSG_FORUM_CREATE_GROUPS
+Vilka grupper ska ha tillgång till mötet? (? för lista)
+MSG_FORUM_CREATE_WRITE
+Ska mötet vara skrivskyddat?
+MSG_FORUM_CREATE_PROTECTED
+Skyddat
+MSG_FORUM_CREATE_UNPROTECTED
+Oskyddat
+MSG_FORUM_CREATE_COMMENT
+Ska mötet vara kommentarskyddat?
+MSG_FORUM_CREATE_SECRET
+Ska mötet vara hemligt?
+MSG_FORUM_CREATE_SECRET_YES
+Hemligt
+MSG_FORUM_CREATE_SECRET_NO
+Ej hemligt
+MSG_FORUM_CREATE_AUTO
+Ska alla användare bli medlemmar automagiskt?
+MSG_FORUM_CREATE_PERMWRITE
+Ska rättigheterna styra skrivmöjlighet?
+MSG_FORUM_CREATE_AREXX
+Ska mötet enbart kommas åt från ARexx?
+MSG_FORUM_CREATE_TYPE_HEAD
+Vilken typ av möte ska det vara?
+MSG_FORUM_CREATE_TYPE_LOCAL
+Lokalt möte
+MSG_FORUM_CREATE_TYPE_FIDO
+Fido-möte
+MSG_FORUM_CREATE_FIDO_DIR
+Katalog for .msg-filerna
+MSG_FORUM_CREATE_FIDO_DIR_ERROR
+Kunde inte skapa katalogen.
+MSG_FORUM_CREATE_FIDO_TAG
+FidoNet tag-namn
+MSG_FORUM_CREATE_FIDO_ORIGIN
+Origin-rad
+MSG_FORUM_CREATE_FIDO_CHR
+Vilken teckenuppsättning ska användas för utgående texter?
+MSG_FORUM_CREATE_DOMAIN
+Vilken Fido-domän är mötet i?
+MSG_FORUM_CREATE_NO_DOMAIN
+Du måste definiera en domän i NiKomFido.cfg först.
+MSG_FORUM_CREATE_DOMAIN_CHOICE
+Domän: 
+MSG_FORUM_CREATE_DOMAIN_NF
+Finns ingen sådan domän.
+MSG_FORUM_CREATE_NO_ROOM
+Det finns inte plats för fler möten.
+MSG_FORUM_CREATE_CHANGING
+Ändrar i användardata...
+;
+MSG_FORUM_LIST_PATTERN
+Du måste ange ett argument som innehåller wildcards.
+MSG_FORUM_LIST_CLOSED
+Slutet
+MSG_FORUM_LIST_WRITEPROT
+Skrivskyddat
+MSG_FORUM_LIST_COMMPROT
+Kom.skyddat
+MSG_FORUM_LIST_SECRET
+Hemligt
+MSG_FORUM_LIST_AUTO
+Auto
+MSG_FORUM_LIST_WRITECTRL
+Skrivstyrt
+MSG_FORUM_LIST_AREXX
+ARexx-styrt
+MSG_FORUM_LIST_SUMMARY
+Globala texter: Lägsta textnummer: %d   Högsta textnummer: %d
+MSG_FORUM_LIST_NOTEXTS
+Det finns inga texter.
 ;
 ; ******** Dealing with flags **********
 MSG_FLAG_ON
