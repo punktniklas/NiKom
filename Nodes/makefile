@@ -24,18 +24,22 @@ NoDebug/$(CPU): NoDebug
   -makedir NoDebug/$(CPU)
 
 clean:
+  -delete objects.slink
   -delete \#?.o
   -delete Debug NoDebug all
 
-NiKomCon: Debug/$(CPU) NoDebug/$(CPU) $(OBJS) $(CONOBJS)
-  slink FROM lib:c.o $(CONOBJS) $(OBJS) \
+objects.slink:
+  echo $(OBJS) >objects.slink
+
+NiKomCon: Debug/$(CPU) NoDebug/$(CPU) $(OBJS) $(CONOBJS) objects.slink
+  slink FROM lib:c.o $(CONOBJS) WITH objects.slink \
         TO Debug/$(CPU)/NiKomCon \
         LIB lib:sc.lib+lib:amiga.lib+/UtilLib/Debug/$(CPU)/nikomutils.lib \
         NOICONS
   slink Debug/$(CPU)/NiKomCon TO NoDebug/$(CPU)/NiKomCon NODEBUG NOICONS
 
-NiKomSer: Debug/$(CPU) NoDebug/$(CPU) $(OBJS) $(SEROBJS)
-  slink FROM lib:c.o $(SEROBJS) $(OBJS) \
+NiKomSer: Debug/$(CPU) NoDebug/$(CPU) $(OBJS) $(SEROBJS) objects.slink
+  slink FROM lib:c.o $(SEROBJS) WITH objects.slink \
         TO Debug/$(CPU)/NiKomSer \
         LIB lib:sc.lib+lib:amiga.lib+/UtilLib/Debug/$(CPU)/nikomutils.lib \
         NOICONS VERBOSE
