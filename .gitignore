@@ -6,6 +6,7 @@ NoDebug
 nikom_pragmas.h
 Include/CatalogDefaults.h
 /NiKomDev.lha
+Nodes/objects.slink
 Tools/SetNodeState/SetNodeState
 Tools/CryptPasswords/CryptPasswords
 Tools/NiKomFido/NiKomFido
