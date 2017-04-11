@@ -424,7 +424,7 @@ Which Fido domain is the forum in?
 MSG_FORUM_CREATE_NO_DOMAIN (827//)
 There must be a domain configured in NiKomFido.cfg first.
 MSG_FORUM_CREATE_DOMAIN_CHOICE (828//)
-Domain
+Domain: 
 MSG_FORUM_CREATE_DOMAIN_NF (829//)
 There is no such domain.
 MSG_FORUM_CREATE_NO_ROOM (830//)
