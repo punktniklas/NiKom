@@ -31,7 +31,7 @@ extern struct System *Servermem;
 
 struct IntuitionBase *IntuitionBase=NULL;
 struct RsxLib *RexxSysBase;
-struct Library *UtilityBase, *LocaleBase, *NiKomBase;
+struct Library *UtilityBase, *NiKomBase;
 struct Window *NiKwind=NULL;
 struct MsgPort *rexxport, *nikomnodeport;
 char rexxportnamn[15], pubscreen[40], nikomnodeportnamn[15];
