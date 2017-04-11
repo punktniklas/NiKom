@@ -8,8 +8,8 @@
 #include <stdio.h>
 #include <time.h>
 #include "NiKomStr.h"
-#include "NiKomFuncs.h"
 #include "NiKomLib.h"
+#include "NiKomFuncs.h"
 #include "Logging.h"
 #include "Terminal.h"
 #include "StringUtils.h"
