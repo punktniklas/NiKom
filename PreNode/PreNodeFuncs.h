@@ -1,3 +1,4 @@
+#include <devices/serial.h>
 /* Prototypes for functions defined in Ser.c */
 BYTE OpenConsole(struct Window *window);
 BYTE OpenSerial(struct IOExtSer *writereq,struct IOExtSer *readreq,struct IOExtSer *changereq);
