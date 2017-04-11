@@ -32,7 +32,7 @@ extern char outbuffer[],inmat[],*argument,zinitstring[],serinput;
 extern struct Inloggning Statstr;
 extern struct MinList edit_list;
 
-struct XPR_IO *xio;
+static struct XPR_IO *xio;
 struct Library *XProtocolBase;
 /*
 char zmodeminit[] = "TN OR B16 F0 AN DN KY SN RN PNiKom:Program/Amig",
@@ -46,7 +46,7 @@ struct MinList tf_list;
 extern int writefiles(int);
 extern int updatefile(int,struct Fil *);
 
-long __saveds __regargs nik_fopen(char *filename,char *accessmode) {
+static long __saveds __regargs nik_fopen(char *filename,char *accessmode) {
 	BPTR fh;
 	switch(accessmode[0]) {
 		case 'r' :
@@ -67,28 +67,28 @@ long __saveds __regargs nik_fopen(char *filename,char *accessmode) {
 	return((long)fh);
 }
 
-long __saveds __regargs nik_fclose(LONG *fh) {
+static long __saveds __regargs nik_fclose(LONG *fh) {
 	/* printf("Xpr_fclose anropad, fp=%d\n",fp); */
 	if(!fh) return(NULL);
 	if(Close((BPTR)fh)) return(NULL);
 	else return(EOF);
 }
 
-long __saveds __regargs nik_fread(char *databuffer,long size,long count,LONG *fh) {
+static long __saveds __regargs nik_fread(char *databuffer,long size,long count,LONG *fh) {
 	LONG ret;
 	ret=Read((BPTR)fh,databuffer,size*count);
 	if(ret==-1) return(0);
 	else return(ret/size);
 }
 
-long __saveds __regargs nik_fwrite(char *databuffer,long size,long count,LONG *fh) {
+static long __saveds __regargs nik_fwrite(char *databuffer,long size,long count,LONG *fh) {
 	LONG ret;
 	ret=Write((BPTR)fh,databuffer,size*count);
 	if(ret==-1) return(0);
 	else return(ret/size);
 }
 
-long __saveds __regargs nik_fseek(LONG *fh,long offset,long origin) {
+static long __saveds __regargs nik_fseek(LONG *fh,long offset,long origin) {
 	LONG mode;
 	switch(origin) {
 		case 0 :
@@ -105,7 +105,7 @@ long __saveds __regargs nik_fseek(LONG *fh,long offset,long origin) {
 	else return(0);
 }
 
-long __saveds __regargs nik_sread(char *databuffer,long size,long timeout) {
+static long __saveds __regargs nik_sread(char *databuffer,long size,long timeout) {
   ULONG signals, sersig = 1L << serreadport->mp_SigBit,
     timersig = 1L << timerport->mp_SigBit;
   if(timeout) {
@@ -152,7 +152,7 @@ long __saveds __regargs nik_sread(char *databuffer,long size,long timeout) {
   }
 }
 
-long __saveds __regargs nik_swrite(char *databuffer,long size) {
+static long __saveds __regargs nik_swrite(char *databuffer,long size) {
   if(ConnectionLost()) {
     return -1L;
   }
@@ -165,7 +165,7 @@ long __saveds __regargs nik_swrite(char *databuffer,long size) {
   return(0L);
 }
 
-long __saveds __regargs nik_update(struct XPR_UPDATE *update) {
+static long __saveds __regargs nik_update(struct XPR_UPDATE *update) {
 	struct TransferFiles *tf, *tmptf;
 	int equalulfiles = 0;
 
@@ -218,7 +218,7 @@ long __saveds __regargs nik_update(struct XPR_UPDATE *update) {
 	return(0L);
 }
 
-long __saveds __regargs nik_sflush(void) {
+static long __saveds __regargs nik_sflush(void) {
 	long ret;
 	serchangereq->IOSer.io_Command=CMD_CLEAR;
 	DoIO((struct IORequest *)serchangereq);
@@ -227,21 +227,21 @@ long __saveds __regargs nik_sflush(void) {
 	return(ret);
 }
 
-long __saveds __regargs nik_chkabort(void) {
+static long __saveds __regargs nik_chkabort(void) {
   if(ImmediateLogout()) {
     return -1L;
   }
   return 0L;
 }
 
-long __saveds __regargs nik_gets(char *prompt,char *buffer) {
+static long __saveds __regargs nik_gets(char *prompt,char *buffer) {
 	conputtekn("\r\n\nNu promptas det!!\r\n",-1);
 	conputtekn(prompt,-1);
 	strcpy(buffer,"");
 	return(1L);
 }
 
-long __saveds __regargs nik_finfo(char *filename,long typeinfo) {
+static long __saveds __regargs nik_finfo(char *filename,long typeinfo) {
 	__aligned struct FileInfoBlock info;
 	dfind(&info,filename,0);
 	switch(typeinfo) {
@@ -252,7 +252,7 @@ long __saveds __regargs nik_finfo(char *filename,long typeinfo) {
 	}
 }
 
-long __saveds __regargs nik_ffirst(char *buffer,char *pattern) {
+static long __saveds __regargs nik_ffirst(char *buffer,char *pattern) {
 	struct TransferFiles *tf;
 	tf=(struct TransferFiles *)tf_list.mlh_Head;
 	if(tf->node.mln_Succ) {
@@ -263,7 +263,7 @@ long __saveds __regargs nik_ffirst(char *buffer,char *pattern) {
 	return(0L);
 }
 
-long __saveds __regargs nik_fnext(long oldstate, char *buffer, char *pattern) {
+static long __saveds __regargs nik_fnext(long oldstate, char *buffer, char *pattern) {
 	struct TransferFiles *tf;
 	if(countbytes==filesize) currentfil->sucess=TRUE;
 	currentfil->cps=cps;
@@ -276,7 +276,7 @@ long __saveds __regargs nik_fnext(long oldstate, char *buffer, char *pattern) {
 	return(0L);
 }
 
-void xpr_setup(struct XPR_IO *sio) {
+static void xpr_setup(struct XPR_IO *sio) {
 	sio->xpr_filename=NULL;
 	sio->xpr_fopen=(long (* )())nik_fopen;
 	sio->xpr_fclose=(long (* )())nik_fclose;
