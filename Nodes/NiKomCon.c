@@ -31,7 +31,7 @@ extern char outbuffer[], nodid[], inmat[];
 extern struct System *Servermem;
 
 struct IntuitionBase *IntuitionBase=NULL;
-struct RsxLib *RexxSysBase;
+struct RsxLib *RexxSysBase=NULL;
 struct Library *UtilityBase, *NiKomBase;
 struct Window *NiKwind=NULL;
 struct MsgPort *rexxport, *nikomnodeport;
