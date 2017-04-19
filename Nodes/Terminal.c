@@ -295,7 +295,7 @@ int GetStringX(int echo, int maxchrs, char *defaultStr,
           SendStringNoBrk("\b \b",-1,0);
         }
       }
-      movmem(&inmat[pos], &inmat[pos - 1], size - pos);
+      memmove(&inmat[pos - 1], &inmat[pos], size - pos);
       pos--;
       size--;
       modified = TRUE;
@@ -307,7 +307,7 @@ int GetStringX(int echo, int maxchrs, char *defaultStr,
       if(echo) {
         SendStringNoBrk("\x1b\x5b\x50");
       }
-      movmem(&inmat[pos + 1], &inmat[pos], size - pos);
+      memmove(&inmat[pos], &inmat[pos + 1], size - pos);
       size--;
       modified = TRUE;
     }
@@ -403,7 +403,7 @@ int GetStringX(int echo, int maxchrs, char *defaultStr,
           eka('*');
         }
       }
-      movmem(&inmat[pos], &inmat[pos+1], size - pos);
+      memmove(&inmat[pos+1], &inmat[pos], size - pos);
       inmat[pos++] = ch;
       size++;
       modified = TRUE;

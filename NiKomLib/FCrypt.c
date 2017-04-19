@@ -83,7 +83,7 @@
 #include <time.h>
 #include <stdlib.h>
 /* I now assume that you have des.h available */
-#include "des.h"
+#include "Des.h"
 
 #define ITERATIONS 16
 #define HALF_ITERATIONS 8

@@ -26,7 +26,7 @@ struct Library *RexxSysBase, *UtilityBase;
 
 void copychrstables(struct NiKomBase *NiKomBase) {
 
-#include "chartabs.h"
+#include "CharTabs.h"
 
 	memcpy(NiKomBase->IbmToAmiga,IbmToAmiga,256);
 	memcpy(NiKomBase->SF7ToAmiga,SF7ToAmiga,256);

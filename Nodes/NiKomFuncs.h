@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <devices/serial.h>
 /*
  * TODO: The long time goal is for this file to die. Every .c
  * file should be a module that should have a corresponding .h
@@ -207,21 +208,6 @@ void validerafil(void);
 struct Fil *filexists(char *skri,int area);
 
 /* Prototypes for functions defined in NiKTransfer.c */
-long __regargs __saveds nik_fopen(char *filename,char *accessmode);
-long __regargs __saveds nik_fclose(LONG *fh);
-long __regargs __saveds nik_fread(char *databuffer,long size,long count,LONG *fh);
-long __regargs __saveds nik_fwrite(char *databuffer,long size,long count,LONG *fh);
-long __regargs __saveds nik_fseek(LONG *fh,long offset,long origin);
-long __regargs __saveds nik_sread(char *databuffer,long size,long timeout);
-long __regargs __saveds nik_swrite(char *databuffer,long size);
-long __regargs __saveds nik_update(struct XPR_UPDATE *update);
-long __regargs __saveds nik_sflush(void);
-long __regargs __saveds nik_chkabort(void);
-long __regargs __saveds nik_gets(char *prompt,char *buffer);
-long __regargs __saveds nik_finfo(char *filename,long typeinfo);
-long __regargs __saveds nik_ffirst(char *buffer,char *pattern);
-long __regargs __saveds nik_fnext(long oldstate,char *buffer,char *pattern);
-void xpr_setup(struct XPR_IO *sio);
 int download(void);
 int valnamn(char *namn,int area,char *textbuf);
 int upload(void);

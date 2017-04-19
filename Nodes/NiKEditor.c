@@ -613,7 +613,7 @@ void fullnormalchr(char ch) {
     }
     eka(ch);
     if(kolpos != antkol) {
-      movmem(&curline->text[kolpos], &curline->text[kolpos + 1], antkol - kolpos);
+      memmove(&curline->text[kolpos + 1], &curline->text[kolpos], antkol - kolpos);
     }
     curline->text[kolpos++] = ch;
     antkol++;
@@ -624,7 +624,7 @@ void fullnormalchr(char ch) {
     if(!(tmpline = allocEditLine())) {
       return;
     }
-    movmem(&curline->text[kolpos], &curline->text[kolpos + 1], antkol - kolpos);
+    memmove(&curline->text[kolpos + 1], &curline->text[kolpos], antkol - kolpos);
     curline->text[kolpos++] = ch;
     antkol++;
     curline->text[kolpos] = 0;
@@ -651,7 +651,7 @@ void fullbackspace(void) {
   struct EditLine *prevline = (struct EditLine *)curline->line_node.mln_Pred;
   if(kolpos) {
     SendStringNoBrk("\x1b\x5b\x44\x1b\x5b\x50");
-    movmem(&curline->text[kolpos], &curline->text[kolpos - 1], antkol - kolpos + 1);
+    memmove(&curline->text[kolpos - 1], &curline->text[kolpos], antkol - kolpos + 1);
     kolpos--;
     antkol--;
   } else if(prevline->line_node.mln_Pred != NULL) {
@@ -677,7 +677,7 @@ void fulldelete(void) {
   struct EditLine *succline = (struct EditLine *)curline->line_node.mln_Succ;
   if(kolpos != antkol) {
     SendStringNoBrk("\x1b\x5b\x50");
-    movmem(&curline->text[kolpos + 1], &curline->text[kolpos], antkol - kolpos);
+    memmove(&curline->text[kolpos], &curline->text[kolpos + 1], antkol - kolpos);
     antkol--;
   } else if(succline->line_node.mln_Succ != NULL) {
     if(strlen(curline->text) + strlen(succline->text) < MAXFULLEDITTKN - 1) {
@@ -700,7 +700,7 @@ void fulldelete(void) {
 void fulltab(void) {
   int cnt = 8- (kolpos % 8), i;
   SendStringNoBrk("\x1b\x5b%d\x40", cnt);
-  movmem(&curline->text[kolpos], &curline->text[kolpos+cnt], antkol - kolpos);
+  memmove(&curline->text[kolpos+cnt], &curline->text[kolpos], antkol - kolpos);
   for(i = 0; i < cnt; i++) {
     curline->text[kolpos + i] = ' ';
     eka(' ');
@@ -778,9 +778,9 @@ void fullctrlx(void) {
 
 void fullctrly(void) {
   if(strlen(curline->text) + strlen(yankbuffer) < MAXFULLEDITTKN - 1) {
-    movmem(&curline->text[kolpos], &curline->text[kolpos+strlen(yankbuffer)],
-           antkol - kolpos);
-    movmem(yankbuffer, &curline->text[kolpos], strlen(yankbuffer));
+    memmove(&curline->text[kolpos+strlen(yankbuffer)], &curline->text[kolpos],
+            antkol - kolpos);
+    memmove(&curline->text[kolpos], yankbuffer, strlen(yankbuffer));
     SendStringNoBrk("\r%s", curline->text);
     antkol = strlen(curline->text);
     if(kolpos) {

@@ -810,7 +810,7 @@ void writesenaste(void) {
 	Statstr.tid_inloggad=(tiden-logintime)/60;
 	Statstr.utloggtid=tiden;
 	NiKForbid();
-	movmem(&Servermem->senaste,&Servermem->senaste[1],sizeof(struct Inloggning)*(MAXSENASTE-1));
+	memmove(&Servermem->senaste[1],&Servermem->senaste,sizeof(struct Inloggning)*(MAXSENASTE-1));
 	memcpy(Servermem->senaste,&Statstr,sizeof(struct Inloggning));
 	if(!(fh=Open("NiKom:DatoCfg/Senaste.dat",MODE_NEWFILE))) {
 		printf("Kunde inte öppna Senaste.dat\n");

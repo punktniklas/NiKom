@@ -27,8 +27,8 @@
 int CXBRK(void) { return(0); }
 
 struct IntuitionBase *IntuitionBase=NULL;
-struct RsxLib *RexxSysBase;
-struct Library *UtilityBase, *NiKomBase, *LocaleBase;
+struct RsxLib *RexxSysBase=NULL;
+struct Library *UtilityBase, *NiKomBase;
 struct Window *NiKwind=NULL;
 struct MsgPort *rexxport, *nikomnodeport;
 

@@ -41,7 +41,7 @@ void initLanguages(void);
 void openWindow(void);
 
 struct IntuitionBase *IntuitionBase;
-struct RsxLib *RexxSysBase;
+struct RsxLib *RexxSysBase=NULL;
 struct Library *UtilityBase;
 struct Library *NiKomBase;
 struct MsgPort *NiKPort, *permitport, *rexxport, *nodereplyport;
