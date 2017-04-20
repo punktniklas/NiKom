@@ -336,6 +336,8 @@ MSG_CHRS_NEW (511//)
 New character set
 MSG_CHRS_BAD (512//)
 Bad character set. Choice must be between 1 and 4.
+MSG_CHRS_UTF8 (513//)
+UTF-8
 ;
 MSG_EDIT_LINE_HELP1 (600//)
 Press Ctrl-Z on an empty line to save the text.

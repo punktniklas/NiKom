@@ -46,6 +46,9 @@ int AskUserForCharacterSet(int forceChoice, int showExamples) {
   Servermem->inne[nodnr].chrset = CHRS_SIS7;
   SendString("%c 4: %-45s %s\n\r",
              chrsetbup == CHRS_SIS7 ? '*' : ' ', CATSTR(MSG_CHRS_SIS7), example);
+  Servermem->inne[nodnr].chrset = CHRS_UTF8;
+  SendString("%c 5: %-45s %s\n\r",
+             chrsetbup == CHRS_UTF8 ? '*' : ' ', CATSTR(MSG_CHRS_UTF8), example);
 
   Servermem->inne[nodnr].chrset = chrsetbup;
   SendString("\n\r%s ", CATSTR(MSG_COMMON_CHOICE));
@@ -69,6 +72,10 @@ int AskUserForCharacterSet(int forceChoice, int showExamples) {
     case '4' :
       Servermem->inne[nodnr].chrset = CHRS_SIS7;
       SendString("%s\n\r", CATSTR(MSG_CHRS_SIS7));
+      return 0;
+    case '5' :
+      Servermem->inne[nodnr].chrset = CHRS_UTF8;
+      SendString("%s\n\r", CATSTR(MSG_CHRS_UTF8));
       return 0;
     case GETCHAR_RETURN :
       if(!forceChoice) {

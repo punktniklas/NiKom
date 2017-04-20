@@ -340,6 +340,8 @@ MSG_CHRS_NEW
 Nytt teckenset
 MSG_CHRS_BAD
 Felaktig teckenuppsättning, ska vara mellan 1 och 4.
+MSG_CHRS_UTF8
+UTF-8
 ;
 MSG_EDIT_LINE_HELP1
 Tryck Ctrl-Z på en tom rad för att spara texten.

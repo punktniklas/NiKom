@@ -104,6 +104,10 @@ void bytteckenset(void) {
       Servermem->inne[nodnr].chrset = CHRS_SIS7;
       SendString("\n\n\r%s: %s\n\r", CATSTR(MSG_CHRS_NEW), CATSTR(MSG_CHRS_SIS7));
       return;
+    case '5' :
+      Servermem->inne[nodnr].chrset = CHRS_UTF8;
+      SendString("\n\n\r%s: %s\n\r", CATSTR(MSG_CHRS_NEW), CATSTR(MSG_CHRS_UTF8));
+      return;
     case '-':
       if(argument[1] == 'e' || argument[1] == 'E') {
         showExample = TRUE;
