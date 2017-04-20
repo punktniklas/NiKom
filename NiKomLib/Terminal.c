@@ -156,3 +156,228 @@ void __saveds __asm LIBStripAnsiSequences(register __a0 char *ansistr, register 
                 tempstr=NULL;
         }
 }
+
+/* Lookup table for length of UTF-8 characters. */
+static const char utf8_extra[64] = {
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+  3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5
+};
+
+static int parseUTF8(char *dst, const char *src, const int si, const int len) {
+  unsigned chr = (unsigned char)src[si];
+  int need;
+
+  if((chr & 0xc0) != 0xc0) {
+    /* Unexpected continuation byte. */
+    *dst = '?';
+    return 0;
+  }
+  need = utf8_extra[chr - 192];
+  if(len == INT_MAX) {
+    unsigned idx = si+1;
+    switch(need) {
+    case 5:
+      if(src[idx] == '\0') {
+        return -5;
+      }
+      ++idx;
+    case 4:
+      if(src[idx] == '\0') {
+
+        return -4;
+      }
+      ++idx;
+    case 3:
+      if(src[idx] == '\0') {
+        return -3;
+      }
+      ++idx;
+    case 2:
+      if(src[idx] == '\0') {
+        return -2;
+      }
+      ++idx;
+    case 1:
+      if(src[idx] == '\0') {
+        return -1;
+      }
+      break;
+    }
+  } else if(need + 1 > (len - si)) {
+    return -(need + 1 - (len - si));
+  }
+
+  switch (need) {
+  case 1:
+    chr &= 0x1f;
+    chr <<= 6;
+    chr |= src[si + 1] & 0x3f;
+    if (chr < 256) {
+      *dst = chr;
+    } else {
+      *dst = '?'; // Non ISO-8859-1
+    }
+    return 1;
+  default:
+    *dst = '?'; // Non ISO-8859-1
+    break;
+  }
+  return need;
+}
+
+/* Name: ConvMBChrsToAmiga
+*  Parameters: a0 - Pointer to result string. Must be at least as big
+*                   as source string.
+*              a1 - Pointer to string that should be converted.
+*              d0 - Length of string to convert. If 0, convert until
+*                   nul.
+*              d1 - Source character set, defined in NiKomLib.h
+*
+*  Return value: Length of new string, or negative if more bytes are
+*                needed to perform conversion.
+*
+*  Description: Converts source string to ISO-8859-1 from the
+*               specified character set. Characters not present in
+*               ISO-8859-1 are replaced by '?'. For CHRS_CP437 and
+*               CHRS_MAC8 only characters greater than 128 are
+*               converted. For CHRS_SIS7 only characters greater than
+*               32 are converted.  Character greater than 128 in
+*               SIS-strings are interpreted as ISO-8859-1.
+*               CHRS_LATIN1 is not converted.
+*
+*               Note that the destination string is not nul terminated
+*               even if len is passed as zero. That must be done by
+*               the caller if needed.
+*/
+
+int __saveds __asm LIBConvMBChrsToAmiga(register __a0 char *dst,
+                                        register __a1 char *src,
+                                        register __d0 int len,
+                                        register __d1 int chrs,
+                                        register __a6 struct NiKomBase *NiKomBase) {
+  int si, di;
+
+  if(len == 0) {
+    len = INT_MAX;
+  }
+  for(si=0,di=0; src[si] && si<len; si++,di++) {
+    switch(chrs) {
+    case CHRS_CP437:
+      if(src[si] >= 128) {
+        dst[di] = NiKomBase->IbmToAmiga[src[si]];
+        continue;
+      }
+      /* No conversion, just copy. */
+      break;
+    case CHRS_SIS7:
+      if(src[si] >= 32) {
+        dst[di] = NiKomBase->SF7ToAmiga[src[si]];
+        continue;
+      }
+      /* No conversion, just copy. */
+      break;
+    case CHRS_MAC:
+      if(src[si] >= 128) {
+        dst[di] = NiKomBase->MacToAmiga[src[si]];
+        continue;
+      }
+      /* No conversion, just copy. */
+      break;
+    case CHRS_CP850:
+      dst[di] = convnokludge(src[si]);
+      continue;
+    case CHRS_UTF8:
+      if((src[si] & 0x80)) {
+        int ret;
+        ret = parseUTF8(dst + di, src, si, len);
+        if (ret < 0) {
+          return ret;
+        }
+        si += ret;
+        continue;
+      }
+      /* No conversion, just copy. */
+      break;
+    }
+    /* No conversion, just copy. */
+    dst[di] = src[si];
+  }
+  return di;
+}
+
+/* Name: ConvMBChrsFromAmiga
+*  Parameters: a0 - Pointer to result string. Must be at least twice
+*                   as big as source string.
+*              a1 - Pointer to string that should be converted.
+*              d0 - Length of string to convert. If 0, convert until
+*                   nul.
+*              d1 - Destination character set, defined in NiKomLib.h
+*
+*  Return value: Length of new string.
+*
+*  Description: Converts source string from ISO-8859-1 from the
+*               specified character set. Characters not present in the
+*               destination character set are replaced by '?'.  For
+*               CHRS_CP437 and CHRS_MAC8 only characters greater than
+*               128 are converted. For CHRS_SIS7 only characters
+*               greater than 32 are converted. For UTF-8 the
+*               destination string may be upto twice as long as the
+*               source string.
+*               CHRS_LATIN1 is not converted.
+*
+*               Note that the destination string is not nul terminated
+*               even if len is passed as zero. That must be done by
+*               the caller if needed.
+*/
+
+int __saveds __asm LIBConvMBChrsFromAmiga(register __a0 char *dst,
+                                          register __a1 char *src,
+                                          register __d0 int len,
+                                          register __d1 int chrs,
+                                          register __a6 struct NiKomBase *NiKomBase) {
+  int si, di;
+
+  if(len == 0) {
+    len = INT_MAX;
+  }
+  for(si=0,di=0; src[si] && si<len; si++,di++) {
+    switch(chrs) {
+    case CHRS_CP437:
+      if(src[si] >= 128) {
+        dst[di] = NiKomBase->AmigaToIbm[src[si]];
+        continue;
+      }
+      /* No conversion, just copy. */
+      break;
+    case CHRS_SIS7:
+      if(src[si] >= 32) {
+        dst[di] = NiKomBase->AmigaToSF7[src[si]];
+        continue;
+      }
+      /* No conversion, just copy. */
+      break;
+    case CHRS_MAC:
+      if(src[si] >= 128) {
+        dst[di] = NiKomBase->AmigaToMac[src[si]];
+        continue;
+      }
+      /* No conversion, just copy. */
+      break;
+    case CHRS_UTF8:
+      if((src[si] & 0x80)) {
+        unsigned char c = src[si];
+        dst[di] = 0xc0 | ((unsigned) c >> 6);
+        di++;
+        dst[di] = 0x80 | (c & 0x3f);
+        continue;
+      }
+      /* No conversion, just copy. */
+      break;
+    }
+    /* No conversion, just copy. */
+    dst[di] = src[si];
+  }
+  return di;
+}
