@@ -117,7 +117,7 @@ void bytteckenset(void) {
       }
       break;
     default :
-      SendString("\n\n\r%s\n\r", CATSTR(MSG_CHRS_BAD));
+      SendStringCat("\n\n\r%s\n\r", CATSTR(MSG_CHRS_BAD), 1, 5);
       return;
     }
   }

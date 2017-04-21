@@ -339,7 +339,7 @@ SIS-7 (Svensk 7-bit, måsvingar)
 MSG_CHRS_NEW
 Nytt teckenset
 MSG_CHRS_BAD
-Felaktig teckenuppsättning, ska vara mellan 1 och 4.
+Felaktig teckenuppsättning, ska vara mellan %u och %u.
 MSG_CHRS_UTF8
 UTF-8
 ;

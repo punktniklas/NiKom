@@ -335,7 +335,7 @@ SIS-7 (Swedish 7 bit encoding)
 MSG_CHRS_NEW (511//)
 New character set
 MSG_CHRS_BAD (512//)
-Bad character set. Choice must be between 1 and 4.
+Bad character set. Choice must be between %u and %u.
 MSG_CHRS_UTF8 (513//)
 UTF-8
 ;
