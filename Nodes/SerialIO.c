@@ -437,13 +437,8 @@ void putstring(char *pekare,int size, long flags) {
 	char serpekare[400];
 	int bytes;
 
-	if((flags & PS_NOCONV)) {
-	  strncpy(serpekare,pekare,199);
-	  serpekare[199] = 0;
-	  bytes = strlen(serpekare);
-	} else {
-	  bytes = ConvMBChrsFromAmiga(serpekare,pekare,199,Servermem->inne[nodnr].chrset);
-	}
+	bytes = ConvMBChrsFromAmiga(serpekare, pekare, 199,
+				    Servermem->inne[nodnr].chrset);
 	serwritereq->IOSer.io_Command=CMD_WRITE;
 	serwritereq->IOSer.io_Data=serpekare;
 	serwritereq->IOSer.io_Length=bytes;
@@ -461,13 +456,8 @@ void serputstring(char *pekare,int size, long flags)
 	char serpekare[400];
 	int bytes;
 
-	if((flags & PS_NOCONV)) {
-	  strncpy(serpekare,pekare,199);
-	  serpekare[199] = 0;
-	  bytes = strlen(serpekare);
-	} else {
-	  bytes = ConvMBChrsFromAmiga(serpekare,pekare,199,Servermem->inne[nodnr].chrset);
-	}
+	bytes = ConvMBChrsFromAmiga(serpekare, pekare, 199,
+				    Servermem->inne[nodnr].chrset);
 	serwritereq->IOSer.io_Command=CMD_WRITE;
 	serwritereq->IOSer.io_Data=serpekare;
 	serwritereq->IOSer.io_Length=bytes;
