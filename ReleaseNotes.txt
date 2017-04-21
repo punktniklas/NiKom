@@ -1,6 +1,9 @@
 ---------------------------------------------------------------------------
                          NiKom v2.3.0, 2017-xx-yy
 ---------------------------------------------------------------------------
+NiKom now supports UTF-8 terminals. Users can select UTF-8 as their
+character set.
+
 NiKom now supports multiple languages. Initially the two available
 langauges are English and Swedish which are selected for each induvidual
 user. The default language is English which means that when 2.3 is
