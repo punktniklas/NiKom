@@ -284,6 +284,8 @@ char gettekn(void) {
     serreadsig = 1L << serreadport->mp_SigBit,
     inactivesig=1L << inactiveport->mp_SigBit,
     nikomnodesig = 1L << nikomnodeport->mp_SigBit;
+  char serbuf[8];
+  int seridx;
   char ch = '\0', tmp[51];
 
   if(ImmediateLogout()) {
@@ -298,6 +300,7 @@ char gettekn(void) {
     return ch;
   }
 
+  seridx = 0;
   while(!ch) {
     signals = Wait(conreadsig | windsig | serreadsig | inactivesig | nikomnodesig
                    | SIGBREAKF_CTRL_C);
@@ -306,8 +309,14 @@ char gettekn(void) {
       UpdateInactive();
     }
     if((signals & serreadsig) && CheckIO((struct IORequest *)serreadreq)) {
-      ch = sergettkn();
-      ConvChrsToAmiga(&ch,1,Servermem->inne[nodnr].chrset);
+      int conv;
+      serbuf[seridx] = sergettkn();
+      conv = ConvMBChrsToAmiga(&ch,serbuf,seridx+1,
+                               Servermem->inne[nodnr].chrset);
+      if (conv < 0) {
+        /* Need more bytes, continue reading. */
+        ++seridx;
+      }
       UpdateInactive();
       QueryCarrierDropped();
     }
@@ -370,16 +379,16 @@ char sergettkn(void) {
 
 void eka(char tecken) {
 	int err;
-	char sertkn;
+	char sertkn[2];
+	int bytes;
 	conwritereq->io_Command=CMD_WRITE;
 	conwritereq->io_Data=(APTR)&tecken;
 	conwritereq->io_Length=1;
 	if(DoIO((struct IORequest *)conwritereq)) printf("DoIO i eka() (1)\n");
-	sertkn=tecken;
-	ConvChrsFromAmiga(&sertkn,1,Servermem->inne[nodnr].chrset);
+	bytes = ConvMBChrsFromAmiga(sertkn,&tecken,1,Servermem->inne[nodnr].chrset);
 	serwritereq->IOSer.io_Command=CMD_WRITE;
-	serwritereq->IOSer.io_Data=(APTR)&sertkn;
-	serwritereq->IOSer.io_Length=1;
+	serwritereq->IOSer.io_Data=(APTR)sertkn;
+	serwritereq->IOSer.io_Length=bytes;
 	if(err=DoIO((struct IORequest *)serwritereq)) writesererr(err);
 
 	if(tecken == '\n')
@@ -389,12 +398,12 @@ void eka(char tecken) {
 void sereka(char tecken)
 {
 	int err;
-	char sertkn;
-	sertkn=tecken;
-	ConvChrsFromAmiga(&sertkn,1,Servermem->inne[nodnr].chrset);
+	char sertkn[2];
+	int bytes;
+	bytes = ConvMBChrsFromAmiga(sertkn,&tecken,1,Servermem->inne[nodnr].chrset);
 	serwritereq->IOSer.io_Command=CMD_WRITE;
-	serwritereq->IOSer.io_Data=(APTR)&sertkn;
-	serwritereq->IOSer.io_Length=1;
+	serwritereq->IOSer.io_Data=(APTR)sertkn;
+	serwritereq->IOSer.io_Length=bytes;
 	if(err=DoIO((struct IORequest *)serwritereq)) writesererr(err);
 
 	if(tecken == '\n')
@@ -425,14 +434,14 @@ void serreqtkn(void) {
 
 void putstring(char *pekare,int size, long flags) {
 	int err;
-	char serpekare[200];
+	char serpekare[400];
+	int bytes;
 
-	strncpy(serpekare,pekare,199);
-	serpekare[199] = 0;
-	if(!(flags & PS_NOCONV)) ConvChrsFromAmiga(serpekare,0,Servermem->inne[nodnr].chrset);
+	bytes = ConvMBChrsFromAmiga(serpekare, pekare, 199,
+				    Servermem->inne[nodnr].chrset);
 	serwritereq->IOSer.io_Command=CMD_WRITE;
 	serwritereq->IOSer.io_Data=serpekare;
-	serwritereq->IOSer.io_Length=strlen(serpekare);
+	serwritereq->IOSer.io_Length=bytes;
 	SendIO((struct IORequest *)serwritereq);
 	conwritereq->io_Command=CMD_WRITE;
 	conwritereq->io_Data=(APTR)pekare;
@@ -444,14 +453,14 @@ void putstring(char *pekare,int size, long flags) {
 
 void serputstring(char *pekare,int size, long flags)
 {
-	char serpekare[200];
+	char serpekare[400];
+	int bytes;
 
-	strncpy(serpekare,pekare,199);
-	serpekare[199] = 0;
-	if(!(flags & PS_NOCONV)) ConvChrsFromAmiga(serpekare,0,Servermem->inne[nodnr].chrset);
+	bytes = ConvMBChrsFromAmiga(serpekare, pekare, 199,
+				    Servermem->inne[nodnr].chrset);
 	serwritereq->IOSer.io_Command=CMD_WRITE;
 	serwritereq->IOSer.io_Data=serpekare;
-	serwritereq->IOSer.io_Length=strlen(serpekare);
+	serwritereq->IOSer.io_Length=bytes;
 	DoIO((struct IORequest *)serwritereq);
 }
 
@@ -667,8 +676,8 @@ int checkcharbuffer(void)
 
 int puttekn(char *pekare,int size)
 {
-	int aborted=FALSE, x1, x2, consize, sersize, nyrad;
-	char serpekare[1200],localconstring[1200];
+	int aborted=FALSE, x1, x2, consize, sersize, nyrad, bytes;
+	char serpekare[2400],localconstring[1200];
 	char serbuf[1200], conbuf[1200], *concurpek, *sercurpek, *constartpek, *serstartpek;
 	char conready, serready, conlineready, serlineready;
 
@@ -686,16 +695,19 @@ int puttekn(char *pekare,int size)
 	strncpy(localconstring,pekare,1199);
 	localconstring[1199]=0;
 	if(Servermem->cfg.cfgflags & NICFG_LOCALCOLOURS) {
-		strncpy(serpekare,pekare,1199);
+		bytes=ConvMBChrsFromAmiga(serpekare,pekare,1199,Servermem->inne[nodnr].chrset);
+		serpekare[bytes] = '\0';
 		if(!(Servermem->inne[nodnr].flaggor & ANSICOLOURS)) StripAnsiSequences(serpekare);
 	} else {
 		StripAnsiSequences(localconstring);
-		if(Servermem->inne[nodnr].flaggor & ANSICOLOURS) strncpy(serpekare,pekare,1199);
-		else strncpy(serpekare,localconstring,1199);
+		if(Servermem->inne[nodnr].flaggor & ANSICOLOURS) {
+			bytes=ConvMBChrsFromAmiga(serpekare,pekare,1199,Servermem->inne[nodnr].chrset);
+			serpekare[bytes] = '\0';
+		} else  {
+			bytes=ConvMBChrsFromAmiga(serpekare,localconstring,1199,Servermem->inne[nodnr].chrset);
+			serpekare[bytes] = '\0';
+		}
 	}
-	serpekare[1199]=0;
-
-	ConvChrsFromAmiga(serpekare,0,Servermem->inne[nodnr].chrset);
 
 	concurpek = constartpek = &localconstring[0];
 	sercurpek = serstartpek = &serpekare[0];

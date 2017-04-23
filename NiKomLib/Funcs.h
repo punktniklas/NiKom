@@ -42,6 +42,10 @@ void __saveds __asm LIBConvChrsToAmiga(register __a0 char *, register __d0 int,
 void __saveds __asm LIBConvChrsFromAmiga(register __a0 char *, register __d0 int,
 	register __d1 int, register __a6 struct NiKomBase *);
 void __saveds __asm LIBStripAnsiSequences(register __a0 char *, register __a6 struct NiKomBase *);
+int __saveds __asm LIBConvMBChrsToAmiga(register __a0 char *, register __a1 char *,
+	register __d0 int, register __d1 int, register __a6 struct NiKomBase *);
+int __saveds __asm LIBConvMBChrsFromAmiga(register __a0 char *, register __a1 char *,
+	register __d0 int, register __d1 int, register __a6 struct NiKomBase *);
 int __saveds __asm LIBSetNodeState(register __d0 int, register __d1 int);
 int __saveds __asm LIBSendNodeMessage(register __d0 int, register __d1 int, register __a0 char *, register __a6 struct NiKomBase *);
 NiKHash * __saveds __asm LIBNewNiKHash(register __d0 int);
