@@ -457,6 +457,28 @@ Globala texter: Lägsta textnummer: %d   Högsta textnummer: %d
 MSG_FORUM_LIST_NOTEXTS
 Det finns inga texter.
 ;
+MSG_FORUM_LISTMEM_MAIL
+Alla är medlemmar i brevlådan.
+MSG_FORUM_LISTMEM_WHAT
+Lista medlemmar eller icke medlemmar?
+MSG_FORUM_LISTMEM_MEM
+Medlemmar
+MSG_FORUM_LISTMEM_NONMEM
+Icke medlemmar
+;
+MSG_FORUM_LISTAUTH_MAIL
+Alla har fullständiga rättigheter i brevlådan.
+MSG_FORUM_LISTAUTH_AUTO
+Alla har rättigheter i auto-möten.
+MSG_FORUM_LISTAUTH_AREXX
+Ingen, men samtidigt alla, har rättigheter i ARexx-styrda möten.
+MSG_FORUM_LISTAUTH_WHAT
+Lista rättigheter eller icke rättigheter?
+MSG_FORUM_LISTAUTH_AUTH
+Rättigheter
+MSG_FORUM_LISTAUTH_NONAUTH
+Icke rättigheter
+;
 ; ******** Dealing with flags **********
 MSG_FLAG_ON
 På

@@ -108,18 +108,20 @@ void listmed(void) {
     return;
   }
   if(mote2 == -1) {
-    SendString("\r\n\nAlla är medlemmar i brevlådan\r\n\n");
+    SendString("\r\n\n%s\r\n\n", CATSTR(MSG_FORUM_LISTMEM_MAIL));
     return;
   }
   
-  if(GetYesOrNo("\r\n\n", "Lista medlemmar eller icke medlemmar?",
-                NULL, NULL, "Medlemmar", "Icke medlemmar", "\r\n\n",
-                TRUE, &listMembers)) {
+  if(GetYesOrNo("\r\n\n", CATSTR(MSG_FORUM_LISTMEM_WHAT), NULL, NULL,
+                CATSTR(MSG_FORUM_LISTMEM_MEM), CATSTR(MSG_FORUM_LISTMEM_NONMEM),
+                "\r\n\n", TRUE, &listMembers)) {
     return;
   }
 
   conf = getmotpek(mote2);
-  SendString("%sedlemmar i mötet %s\n\n\r", listMembers ? "M" : "Icke m", conf->namn);
+  SendString("%s - %s\n\n\r",
+             listMembers ? CATSTR(MSG_FORUM_LISTMEM_MEM) : CATSTR(MSG_FORUM_LISTMEM_NONMEM),
+             conf->namn);
   ITER_EL(shortUser, Servermem->user_list, user_node, struct ShortUser *) {
     if(readuser(shortUser->nummer, &listuser)) {
       return;
@@ -140,27 +142,28 @@ void listratt(void) {
   struct User listuser;
 
   if(mote2 == -1) {
-    SendString("\r\n\nAlla har fullständiga rättigheter i brevlådan\r\n\n");
+    SendString("\r\n\n%s\r\n\n", CATSTR(MSG_FORUM_LISTAUTH_MAIL));
     return;
   }
   conf = getmotpek(mote2);
   if(conf->status & AUTOMEDLEM) {
-    SendString("\n\n\rAlla har rättigheter i auto-möten.\n\r");
+    SendString("\n\n\r%s\n\r", CATSTR(MSG_FORUM_LISTAUTH_AUTO));
     return;
   }
   if(conf->status & SUPERHEMLIGT) {
-    SendString("\n\n\rIngen, men samtidigt alla, har rättigheter i "
-               "ARexx-styrda möten.\n\r");
+    SendString("\n\n\r%s\n\r", CATSTR(MSG_FORUM_LISTAUTH_AREXX));
     return;
   }
 
-  if(GetYesOrNo("\r\n\n", "Lista rättigheter eller icke rättigheter?",
-                NULL, NULL, "Rättigheter", "Icke rättigheter", "\r\n\n",
-                TRUE, &listPerm)) {
+  if(GetYesOrNo("\r\n\n", CATSTR(MSG_FORUM_LISTAUTH_WHAT), NULL, NULL,
+                CATSTR(MSG_FORUM_LISTAUTH_AUTH), CATSTR(MSG_FORUM_LISTAUTH_NONAUTH),
+                "\r\n\n", TRUE, &listPerm)) {
     return;
   }
 
-  SendString("%sättigheter i mötet %s\n\n\r", listPerm ? "R" : "Icke r", conf->namn);
+  SendString("%s - %s\n\n\r",
+             listPerm ? CATSTR(MSG_FORUM_LISTAUTH_AUTH) : CATSTR(MSG_FORUM_LISTAUTH_NONAUTH),
+             conf->namn);
   ITER_EL(shortUser, Servermem->user_list, user_node, struct ShortUser *) {
     if(readuser(shortUser->nummer, &listuser)) {
       return;

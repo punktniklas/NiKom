@@ -453,6 +453,28 @@ Global texts: Lowest text: %d  Highest text: %d
 MSG_FORUM_LIST_NOTEXTS (859//)
 You have no unread texts.
 ;
+MSG_FORUM_LISTMEM_MAIL (870//)
+Everyone is a member of the mailbox.
+MSG_FORUM_LISTMEM_WHAT (871//)
+List member or non members?
+MSG_FORUM_LISTMEM_MEM (872//)
+Members
+MSG_FORUM_LISTMEM_NONMEM (873//)
+Non members
+;
+MSG_FORUM_LISTAUTH_MAIL (880//)
+Everyone is authorized in the mailbox.
+MSG_FORUM_LISTAUTH_AUTO (881//)
+Everyone is authorized in auto forums.
+MSG_FORUM_LISTAUTH_AREXX (882//)
+No one, but also everyone, is authorized in ARexx controlled forums.
+MSG_FORUM_LISTAUTH_WHAT (883//)
+List authorized or not authorized?
+MSG_FORUM_LISTAUTH_AUTH (884//)
+Authorized
+MSG_FORUM_LISTAUTH_NONAUTH (885//)
+Not authorized
+;
 ; ******** Dealing with flags **********
 MSG_FLAG_ON (1000//)
 On
