@@ -73,6 +73,7 @@ struct FidoLine
 #define CHRS_SIS7     4
 #define CHRS_MAC      8
 #define CHRS_CP850   16
+#define CHRS_UTF8    32
 
 /* Vilka lägen en nod kan befinna sig i */
 #define NIKSTATE_RELOGIN    1   /* Användaren ska göra en ny inloggning */

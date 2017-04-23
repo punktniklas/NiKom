@@ -165,9 +165,6 @@
 #define ITER_EL(var, list, nodeField, type) for(var = (type)list.mlh_Head; var->nodeField.mln_Succ; var = (type) var->nodeField.mln_Succ)
 #define ITER_EL_R(var, list, nodeField, type) for(var = (type)list.mlh_TailPred; var->nodeField.mln_Pred; var = (type) var->nodeField.mln_Pred)
 
-/* Flaggor till putstring() */
-#define PS_NOCONV 1
-
 struct Statuscfg {
    char skriv,texter,brev,medmoten,radmoten,sestatus,anv,chgstatus,
       bytarea,radarea,filer,laddaner,crashmail, grupper;
