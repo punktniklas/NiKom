@@ -286,6 +286,16 @@ int DoSerIOErr(struct IOExtSer *req){
   return err;
 }
 
+static int WaitSerIOErr(struct IOExtSer *req){
+  int err;
+
+  err = WaitIO((struct IORequest *)req);
+  if(err) {
+    writesererr(err);
+  }
+  return err;
+}
+
 char gettekn(void) {
   struct IntuiMessage *mymess;
   struct NiKMess *nikmess;
@@ -379,10 +389,7 @@ char congettkn(void) {
 
 char sergettkn(void) {
   char temp;
-  int err;
-  if(err = WaitIO((struct IORequest *)serreadreq)) {
-    writesererr(err);
-  }
+  WaitSerIOErr(serreadreq);
   temp = serinput;
   serreqtkn();
   return temp;
@@ -442,7 +449,6 @@ void serreqtkn(void) {
 }
 
 void putstring(char *pekare,int size, long flags) {
-	int err;
 	char serpekare[400];
 	int bytes;
 
@@ -457,7 +463,7 @@ void putstring(char *pekare,int size, long flags) {
 	conwritereq->io_Length=size;
 	DoIO((struct IORequest *)conwritereq);
 
-	if(err=WaitIO((struct IORequest *)serwritereq)) writesererr(err);
+	WaitSerIOErr(serwritereq);
 }
 
 void serputstring(char *pekare,int size, long flags)
@@ -841,7 +847,7 @@ int sendtosercon(char *conpek, char *serpek, int consize, int sersize) {
 
   char tecken;
   int aborted = FALSE, paused=FALSE;
-  int console=1,serial=1,err;
+  int console=1,serial=1;
   ULONG signals,
     conwritesig = 1L << conwriteport->mp_SigBit,
     conreadsig = 1L << conreadport->mp_SigBit,
@@ -888,9 +894,7 @@ int sendtosercon(char *conpek, char *serpek, int consize, int sersize) {
     }
     if((signals & serwritesig) && CheckIO((struct IORequest *)serwritereq)) {
       serial = 0;
-      if(err=WaitIO((struct IORequest *)serwritereq)) {
-        writesererr(err);
-      }
+      WaitSerIOErr(serwritereq);
     }
     if((signals & conreadsig) && CheckIO((struct IORequest *)conreadreq)) {
       if((tecken = congettkn()) == 3) {
