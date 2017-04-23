@@ -133,7 +133,6 @@ BYTE OpenSerial(writereq,readreq,changereq)
 struct IOExtSer *writereq,*readreq,*changereq;
 {
 	BYTE error;
-	int sererr;
 
 	if(handskakning == 2)
 		writereq->io_SerFlags= SERF_XDISABLED | SERF_7WIRE | SERF_SHARED;
@@ -166,7 +165,7 @@ struct IOExtSer *writereq,*readreq,*changereq;
 	}
 
 	writereq->IOSer.io_Command = SDCMD_SETPARAMS;
-	if(sererr=DoIO((struct IORequest *)writereq)) writesererr(sererr);
+	DoSerIOErr(writereq);
 	CopyMem(writereq,readreq,sizeof(struct IOExtSer));
 	readreq->IOSer.io_Message.mn_ReplyPort = serreadport;
 	CopyMem(writereq,changereq,sizeof(struct IOExtSer));
@@ -277,6 +276,16 @@ void writesererr(int errcode) {
 	printf("Serial error on node %d (%s, unit %d): %s\n",nodnr,device,unit,errstr);
 }
 
+int DoSerIOErr(struct IOExtSer *req){
+  int err;
+
+  err = DoIO((struct IORequest *)req);
+  if(err) {
+    writesererr(err);
+  }
+  return err;
+}
+
 char gettekn(void) {
   struct IntuiMessage *mymess;
   struct NiKMess *nikmess;
@@ -380,7 +389,6 @@ char sergettkn(void) {
 }
 
 void eka(char tecken) {
-	int err;
 	char sertkn[2];
 	int bytes;
 	conwritereq->io_Command=CMD_WRITE;
@@ -391,7 +399,7 @@ void eka(char tecken) {
 	serwritereq->IOSer.io_Command=CMD_WRITE;
 	serwritereq->IOSer.io_Data=(APTR)sertkn;
 	serwritereq->IOSer.io_Length=bytes;
-	if(err=DoIO((struct IORequest *)serwritereq)) writesererr(err);
+	DoSerIOErr(serwritereq);
 
 	if(tecken == '\n')
 		incantrader();
@@ -399,14 +407,13 @@ void eka(char tecken) {
 
 void sereka(char tecken)
 {
-	int err;
 	char sertkn[2];
 	int bytes;
 	bytes = ConvMBChrsFromAmiga(sertkn,&tecken,1,Servermem->inne[nodnr].chrset);
 	serwritereq->IOSer.io_Command=CMD_WRITE;
 	serwritereq->IOSer.io_Data=(APTR)sertkn;
 	serwritereq->IOSer.io_Length=bytes;
-	if(err=DoIO((struct IORequest *)serwritereq)) writesererr(err);
+	DoSerIOErr(serwritereq);
 
 	if(tecken == '\n')
 		incantrader();
@@ -475,11 +482,8 @@ int ConnectionLost(void) {
 }
 
 void QueryCarrierDropped(void) {
-  int err;
   serchangereq->IOSer.io_Command=SDCMD_QUERY;
-  if(err = DoIO((struct IORequest *)serchangereq)) {
-    writesererr(err);
-  }
+  DoSerIOErr(serchangereq);
   if(serchangereq->io_Status & NOCARRIER) {
     nodestate |= NIKSTATE_NOCARRIER;
   }

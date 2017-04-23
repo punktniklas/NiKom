@@ -21,6 +21,7 @@ void CloseConsole(void);
 void CloseSerial(struct IOExtSer *writereq);
 void CloseTimer(struct timerequest *treq);
 void writesererr(int);
+int DoSerIOErr(struct IOExtSer *req);
 char gettekn(void);
 char congettkn(void);
 char sergettkn(void);

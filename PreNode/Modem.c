@@ -41,11 +41,10 @@ char svara[17],init[81],hangup[32];
 int plussa,autoanswer,highbaud,hst,hangupdelay;
 
 void modemcmd(char *pekare,int size) {
-	int err;
 	serwritereq->IOSer.io_Command=CMD_WRITE;
 	serwritereq->IOSer.io_Data=(APTR)pekare;
 	serwritereq->IOSer.io_Length=size;
-	if(err=DoIO((struct IORequest *)serwritereq)) writesererr(err);
+	DoSerIOErr(serwritereq);
 }
 
 void disconnect() {
@@ -63,11 +62,11 @@ void disconnect() {
 }
 
 void sendat(char *atstring) {
-	int count=2,going=TRUE, err, i=0;
+	int count=2,going=TRUE, i=0;
 	char tkn;
 	long signals,timersig=1L << timerport->mp_SigBit,sersig=1L << serreadport->mp_SigBit;
 	serchangereq->IOSer.io_Command = SDCMD_QUERY;
-	if(err=DoIO((struct IORequest *)serchangereq)) writesererr(err);
+	DoSerIOErr(serchangereq);
 	conputtekn("\nSerial diagnosis\n----------------\n",-1);
 	sprintf(outbuffer,"Data Set Ready:      %sactive\n",(serchangereq->io_Status & (1 << 3)) ? "not " : "");
 	conputtekn(outbuffer,-1);
@@ -221,7 +220,7 @@ conputtekn("%%% Har fått ett meddelande %%%\n",-1);
 
 
 void waitconnect(void) {
-	int bufcnt,len,err, oldstate;
+	int bufcnt,len, oldstate;
 	UBYTE buf[50],temp, svarabuf[20];
 	char CallerIDHost[81], CallerIDHostIP[81];
 	coneka(15);
@@ -303,9 +302,9 @@ void waitconnect(void) {
 				AbortIO((struct IORequest *)serreadreq);
 				WaitIO((struct IORequest *)serreadreq);
 				serchangereq->IOSer.io_Command=CMD_CLEAR;
-				if(err=DoIO((struct IORequest *)serchangereq)) writesererr(err);
+				DoSerIOErr(serchangereq);
 				serchangereq->IOSer.io_Command=CMD_FLUSH;
-				if(err=DoIO((struct IORequest *)serchangereq)) writesererr(err);
+				DoSerIOErr(serchangereq);
 				if(!hst) {
 					if(!(strncmp(&buf[8],"2400",4))) serchangereq->io_Baud=2400;
 					else if(!(strncmp(&buf[8],"1200",4))) serchangereq->io_Baud=1200;
@@ -337,7 +336,7 @@ void waitconnect(void) {
 							serchangereq->io_SerFlags= SERF_XDISABLED | SERF_SHARED;
 					}
 
-					if(err=DoIO((struct IORequest *)serchangereq)) writesererr(err);
+					DoSerIOErr(serchangereq);
 					dtespeed = serchangereq->io_Baud;
 				}
 				serreqtkn();
