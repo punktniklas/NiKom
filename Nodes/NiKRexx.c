@@ -1,6 +1,10 @@
 #include <exec/types.h>
 #include <exec/memory.h>
 #include <proto/exec.h>
+#ifdef __GNUC__
+/* For NewList() */
+# include <proto/alib.h>
+#endif
 #include <proto/intuition.h>
 #include <proto/dos.h>
 #include <proto/rexxsyslib.h>

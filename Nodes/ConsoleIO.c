@@ -1,5 +1,9 @@
 #include <exec/types.h>
 #include <proto/exec.h>
+#ifdef __GNUC__
+/* For NewList() */
+# include <proto/alib.h>
+#endif
 #include <dos/dos.h>
 #include <intuition/intuition.h>
 #include <devices/console.h>
