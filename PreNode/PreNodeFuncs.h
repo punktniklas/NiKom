@@ -1,39 +1,12 @@
 #include <devices/serial.h>
-/* Prototypes for functions defined in Ser.c */
-BYTE OpenConsole(struct Window *window);
-BYTE OpenSerial(struct IOExtSer *writereq,struct IOExtSer *readreq,struct IOExtSer *changereq);
-void CloseConsole(void);
-void CloseSerial(struct IOExtSer *);
-void writesererr(int);
-char gettekn(void);
-char congettkn(void);
-char sergettkn(void);
-void eka(char tecken);
-void coneka(char tecken);
-void conreqtkn(void);
-void serreqtkn(void);
-void putstring(char *pekare,int size, long flags);
-int puttekn(char *pekare,int size);
-void modemcmd(char *pekare,int size);
-void sendfile(char *filnamn);
-struct MsgPort *SafePutToPort(struct NiKMess *message,char *portname);
-void getnodeconfig(char *);
-char convseventoeight(char foo);
-char conveighttoseven(char foo);
-void convstring(char *string);
-void sendat(char *atstring);
-void sendplus(void);
-void freealiasmem(void);
-void waitconnect(void);
-void cleanup(int kod,char *text);
-void main(int argc,char **argv);
-void disconnect(void);
 
-/* SerialIO.c */
-int OpenIO(struct Window *);
-void CloseIO(void);
-void abortserial(void);
-int tknwaiting(void);
+#include <NiKomNodeCommon.h>
+/* Prototypes for functions defined in Ser.c */
+void cleanup(int kod,char *text);
+
+/* Modem.c */
+void disconnect(void);
+void waitconnect(void);
 
 /* Terminal.c */
 int getkeyfile(void);
