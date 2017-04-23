@@ -292,7 +292,7 @@ int fido_skriv(int komm,int komtill) {
     LogEvent(USAGE_LOG, INFO, "%s skriver text %d i %s",
              getusername(inloggad), nummer, motpek->namn);
   }
-  while(first = (struct MinNode *)RemHead((struct List *)&ft.text)) {
+  while((first = (struct MinNode *)RemHead((struct List *)&ft.text))) {
     FreeMem(first,sizeof(struct EditLine));
   }
   NewList((struct List *)&edit_list);

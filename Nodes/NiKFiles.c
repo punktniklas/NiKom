@@ -1048,7 +1048,7 @@ int area;
 		quoted = TRUE;
 		strncpy(tmpstr,&skri[1],41);
 		tmpstr[41] = 0;
-		if(pt = strchr(tmpstr,'"')) *pt = 0;
+		if((pt = strchr(tmpstr,'"'))) *pt = 0;
 	}
 	else {
 		strncpy(tmpstr,skri,41);

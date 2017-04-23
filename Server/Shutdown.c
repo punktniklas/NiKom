@@ -28,7 +28,7 @@ void freefilemem(void) {
 
 void freemotmem(void) {
 	struct Mote *pek;
-	while(pek=(struct Mote *)RemHead((struct List *)&Servermem->mot_list))
+	while((pek=(struct Mote *)RemHead((struct List *)&Servermem->mot_list)))
 		FreeMem(pek,sizeof(struct Mote));
 }
 

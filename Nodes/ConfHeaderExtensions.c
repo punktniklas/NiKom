@@ -22,7 +22,7 @@ struct MemHeaderExtension *CreateMemHeaderExtension(long textId) {
 
 void DeleteMemHeaderExtension(struct MemHeaderExtension *ext) {
   struct MemHeaderExtensionNode *node;
-  while(node = (struct MemHeaderExtensionNode *)RemHead((struct List *)&ext->nodes)) {
+  while((node = (struct MemHeaderExtensionNode *)RemHead((struct List *)&ext->nodes))) {
     FreeMem(node, sizeof(struct MemHeaderExtensionNode));
   }
   FreeMem(ext, sizeof(struct MemHeaderExtension));

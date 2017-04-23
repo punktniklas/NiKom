@@ -100,7 +100,7 @@ void ExecFifo(char *command,int cooked) {
   while(going) {
     event = getfifoevent(fifoport, &userchar);
     if(event & FIFOEVENT_FROMFIFO) {
-      while(avail = ReadFifo(fiforead, &buffer, avail)) {
+      while((avail = ReadFifo(fiforead, &buffer, avail))) {
         if(avail == -1) {
           going = FALSE;
           break;
@@ -121,7 +121,7 @@ void ExecFifo(char *command,int cooked) {
         WaitPort(fifoport);
         while((backmess = GetMsg(fifoport)) != &fifowritemess) {
           if(backmess == &fiforeadmess) {
-            while(avail = ReadFifo(fiforead, &buffer, avail)) {
+            while((avail = ReadFifo(fiforead, &buffer, avail))) {
               if(avail == -1) {
                 going = FALSE;
                 break;
@@ -145,7 +145,7 @@ void ExecFifo(char *command,int cooked) {
       WaitPort(fifoport);
       GetMsg(fifoport);
       sprintf(fifoName, "FIFO:NiKomFifo%d/C", nodnr);
-      if(fh = Open(fifoName, MODE_OLDFILE)) {
+      if((fh = Open(fifoName, MODE_OLDFILE))) {
         Close(fh);
       } else {
         LogEvent(SYSTEM_LOG, ERROR,
@@ -169,7 +169,7 @@ void ExecFifo(char *command,int cooked) {
   if(ImmediateLogout()) {
     WriteFifo(fifowrite, " ", 1);
     sprintf(fifoName, "FIFO:NiKomFifo%d/C", nodnr);
-    if(fh=Open(fifoName,MODE_OLDFILE)) {
+    if((fh=Open(fifoName,MODE_OLDFILE))) {
       Close(fh);
     } else {
       LogEvent(SYSTEM_LOG, ERROR,

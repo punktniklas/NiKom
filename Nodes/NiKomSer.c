@@ -43,7 +43,7 @@ int highbaud, hst, getty, hangupdelay, gettybps, autoanswer, plussa;
 
 void freealiasmem(void) {
 	struct Alias *pekare;
-	while(pekare=(struct Alias *)RemHead((struct List *)&aliaslist))
+	while((pekare=(struct Alias *)RemHead((struct List *)&aliaslist)))
 		FreeMem(pekare,sizeof(struct Alias));
 }
 

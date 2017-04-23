@@ -424,7 +424,7 @@ int download(void) {
 			puttekn(outbuffer,-1);
 		}
 	}
-	while(tf=(struct TransferFiles *)RemHead((struct List *)&tf_list))
+	while((tf=(struct TransferFiles *)RemHead((struct List *)&tf_list)))
 		FreeMem(tf,sizeof(struct TransferFiles));
 
 	if(ImmediateLogout()) {
@@ -470,8 +470,8 @@ int upload(void) {
   Servermem->action[nodnr] = UPLOAD;
   Servermem->varmote[nodnr] = area;
   Servermem->vilkastr[nodnr] = NULL;
-  if(ret=recbinfile(Servermem->cfg.ultmp)) {
-    while(tf=(struct TransferFiles *)RemHead((struct List *)&tf_list))
+  if((ret=recbinfile(Servermem->cfg.ultmp))) {
+    while((tf=(struct TransferFiles *)RemHead((struct List *)&tf_list)))
       FreeMem(tf,sizeof(struct TransferFiles));
     if(ImmediateLogout()) {
       return 1;
@@ -603,7 +603,7 @@ int upload(void) {
     }
   }
   
-  while(tf=(struct TransferFiles *)RemHead((struct List *)&tf_list))
+  while((tf=(struct TransferFiles *)RemHead((struct List *)&tf_list)))
     FreeMem(tf,sizeof(struct TransferFiles));
   
   return(0);

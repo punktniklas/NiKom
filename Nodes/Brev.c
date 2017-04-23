@@ -150,7 +150,7 @@ int HasUnreadMail(void) {
   char filename[40];
   sprintf(filename, "NiKom:Users/%d/%d/%d.letter", inloggad/100, inloggad,
           Servermem->inne[nodnr].brevpek);
-  if(lock = Lock(filename, ACCESS_READ)) {
+  if((lock = Lock(filename, ACCESS_READ))) {
     UnLock(lock);
     return TRUE;
   }
@@ -606,7 +606,7 @@ int fido_brev(char *tillpers,char *adr,struct Mote *motpek) {
     savefidocopy(&ft, inloggad);
   }
   
-  while(first=(struct MinNode *)RemHead((struct List *)&ft.text)) {
+  while((first=(struct MinNode *)RemHead((struct List *)&ft.text))) {
     FreeMem(first,sizeof(struct EditLine));
   }
   NewList((struct List *)&edit_list);

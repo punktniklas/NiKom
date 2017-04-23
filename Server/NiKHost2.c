@@ -661,7 +661,7 @@ void nextunread(struct RexxMsg *mess) {
 
 void freeeditlist(void) {
         struct EditLine *el;
-        while(el=(struct EditLine *)RemHead((struct List *)&edit_list))
+        while((el=(struct EditLine *)RemHead((struct List *)&edit_list)))
                 FreeMem(el,sizeof(struct EditLine));
         NewList((struct List *)&edit_list);
 }

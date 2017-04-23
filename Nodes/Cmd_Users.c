@@ -114,7 +114,7 @@ void Cmd_Status(void) {
     }
     SendString("\n");
   }
-  if(cnt = countmail(userId, readuserstr.brevpek)) {
+  if((cnt = countmail(userId, readuserstr.brevpek))) {
     if(SendString("%4d %s\r\n", cnt, CATSTR(MSG_MAIL_MAILBOX))) { return; }
     sumUnread += cnt;
   }

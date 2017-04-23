@@ -131,7 +131,7 @@ void fidotextquote(struct Mote *conf) {
   if(!ft) {
     return;
   }
-  while(line = RemHead((struct List *)&ft->text)) {
+  while((line = RemHead((struct List *)&ft->text))) {
     AddTail((struct List *)&edit_list, line);
   }
   FreeFidoText(ft);

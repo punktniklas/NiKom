@@ -145,7 +145,7 @@ void main() {
     }
     if(signals & SIGBREAKF_CTRL_C) if(!noder) cleanup(EXIT_OK,"");
     if(signals & nikPortMask) {
-      while(MyNiKMess=(struct NiKMess *)GetMsg(NiKPort)) {
+      while((MyNiKMess=(struct NiKMess *)GetMsg(NiKPort))) {
         switch(MyNiKMess->kommando) {
         case NYNOD :
           if(noder<MAXNOD) {
@@ -202,13 +202,13 @@ void main() {
       }
     }
     if(signals & rexxmask) {
-      while(rexxmess=(struct RexxMsg *)GetMsg(rexxport)) {
+      while((rexxmess=(struct RexxMsg *)GetMsg(rexxport))) {
         handlerexx(rexxmess);
         ReplyMsg((struct Message *)rexxmess);
       }
     }
     if(signals & nodereplymask) {
-      while(MyNiKMess = (struct NiKMess *) GetMsg(nodereplyport))
+      while((MyNiKMess = (struct NiKMess *) GetMsg(nodereplyport)))
         FreeMem(MyNiKMess,sizeof(struct NiKMess));
     }
   }

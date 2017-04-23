@@ -935,7 +935,7 @@ int area;
 	if(skri[0]=='"') {
 		quoted = TRUE;
 		strcpy(tmpstr,&skri[1]);
-		if(pt = strchr(tmpstr,'"')) *pt = 0;
+		if((pt = strchr(tmpstr,'"'))) *pt = 0;
 	}
 	else strcpy(tmpstr,skri);
 	letpek=(struct Fil *)Servermem->areor[area].ar_list.mlh_TailPred;

@@ -333,7 +333,7 @@ int skapmot(void) {
         return 1;
       }
       fidoDomainId = atoi(inmat);
-      if(fidoDomain = getfidodomain(fidoDomainId, 0)) {
+      if((fidoDomain = getfidodomain(fidoDomainId, 0))) {
         break;
       } else {
         SendString("\n\r%s\n\r", CATSTR(MSG_FORUM_CREATE_DOMAIN_NF));
@@ -666,7 +666,7 @@ void medlem(char *args) {
     unreadTexts->lowestPossibleUnreadText[confId] = conf->lowtext;
   }
   sprintf(filename,"NiKom:Lappar/%d.motlapp", confId);
-  if(lock = Lock(filename,ACCESS_READ)) {
+  if((lock = Lock(filename,ACCESS_READ))) {
     UnLock(lock);
     sendfile(filename);
   }

@@ -355,7 +355,7 @@ int andmot(void) {
       if(inmat[0] == '\0') {
         break;
       }
-      if(domain = getfidodomain(atoi(inmat), 0)) {
+      if((domain = getfidodomain(atoi(inmat), 0))) {
         tmpConf.domain = domain->nummer;
         break;
       } else {

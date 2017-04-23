@@ -151,7 +151,7 @@ void commonsendrexx(int komnr,int hasarg) {
 
   for(;;) {
     mess = (struct RexxMsg *)WaitPort(rexxport);
-    while(mess = (struct RexxMsg *)GetMsg(rexxport)) {
+    while((mess = (struct RexxMsg *)GetMsg(rexxport))) {
       if(mess->rm_Node.mn_Node.ln_Type == NT_REPLYMSG) {
         handleRexxFinished(nikrexxmess);
         return;
@@ -558,7 +558,7 @@ void rexxsendbinfile(struct RexxMsg *mess) {
   }
   buf[strlen(buf) - 1] = '\0';
   
-  while(tf=(struct TransferFiles *)RemHead((struct List *)&tf_list))
+  while((tf=(struct TransferFiles *)RemHead((struct List *)&tf_list)))
     FreeMem(tf,sizeof(struct TransferFiles));
 
   if(ImmediateLogout()) {
@@ -586,7 +586,7 @@ void rexxrecbinfile(struct RexxMsg *mess) {
   }
   buf[strlen(buf)-1] = '\0';
 
-  while(tf=(struct TransferFiles *)RemHead((struct List *)&tf_list))
+  while((tf=(struct TransferFiles *)RemHead((struct List *)&tf_list)))
     FreeMem(tf,sizeof(struct TransferFiles));
   SetRexxResultString(mess, buf);
 }
@@ -737,7 +737,7 @@ void rxsendrawfile(struct RexxMsg *mess) {
   if(!(fh = Open(filename,MODE_OLDFILE))) {
     retstr = "0";
   } else {
-    while(bytesRead = Read(fh,outbuffer,99)) {
+    while((bytesRead = Read(fh,outbuffer,99))) {
       if(bytesRead == -1) {
         break;
       }

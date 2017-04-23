@@ -42,7 +42,7 @@ extern char commandhistory[];
 
 void freealiasmem(void) {
 	struct Alias *pekare;
-	while(pekare=(struct Alias *)RemHead((struct List *)&aliaslist))
+	while((pekare=(struct Alias *)RemHead((struct List *)&aliaslist)))
 		FreeMem(pekare,sizeof(struct Alias));
 }
 

@@ -695,7 +695,7 @@ void defalias(void) {
 	pek = &argument[0];
 	while(pek[0] != ' ' && pek[0]) pek++;
 	pek[0] = NULL;
-	if(defpek=parsealias(argument)) {
+	if((defpek=parsealias(argument))) {
 		strncpy(defpek->blirtill,andra,40);
 	} else {
 		if(!(defpek=AllocMem(sizeof(struct Alias),MEMF_CLEAR))) {
@@ -766,7 +766,7 @@ int readtextlines(long pos, int lines, int textId) {
 
 void freeeditlist(void) {
 	struct EditLine *el;
-	while(el=(struct EditLine *)RemHead((struct List *)&edit_list))
+	while((el=(struct EditLine *)RemHead((struct List *)&edit_list)))
 		FreeMem(el,sizeof(struct EditLine));
 	NewList((struct List *)&edit_list);
 }

@@ -209,7 +209,7 @@ char wc_gettkn(int seropen) {
 		cleanup(EXIT_OK,"");
 	}
 	if(signals & nikomnodesig) {
-		while(nikmess = (struct NiKMess *) GetMsg(nikomnodeport)) {
+		while((nikmess = (struct NiKMess *) GetMsg(nikomnodeport))) {
 conputtekn("%%% Har fått ett meddelande %%%\n",-1);
 			handleservermess(nikmess);
 			ReplyMsg((struct Message *)nikmess);

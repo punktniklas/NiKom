@@ -94,7 +94,7 @@ void rxsendrawfile(struct RexxMsg *mess) {
 		puttekn(outbuffer,-1);
 		retstr[0]='0';
 	} else {
-		while(antal = Read(fh,outbuffer,99)) {
+		while((antal = Read(fh,outbuffer,99))) {
 			if(antal == -1) break;
 			outbuffer[antal] = 0;
 			putstring(outbuffer,-1,0);

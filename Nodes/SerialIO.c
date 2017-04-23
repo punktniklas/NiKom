@@ -145,8 +145,10 @@ struct IOExtSer *writereq,*readreq,*changereq;
 			writereq->io_SerFlags= SERF_XDISABLED | SERF_SHARED;
 	}
 
-	if(error=OpenDevice(device,unit,(struct IORequest *)writereq,0))
+	error = OpenDevice(device, unit, (struct IORequest *)writereq, 0);
+	if(error) {
 		cleanup(EXIT_ERROR,"Kunde inte öppna devicet\n");
+	}
 	writereq->io_Baud=dtespeed;
 	writereq->io_RBufLen=16384;
 	writereq->io_ReadLen=8;
@@ -345,7 +347,7 @@ char gettekn(void) {
       nodestate |= NIKSTATE_INACTIVITY;
     }
     if(signals & nikomnodesig) {
-      while(nikmess = (struct NiKMess *) GetMsg(nikomnodeport)) {
+      while((nikmess = (struct NiKMess *) GetMsg(nikomnodeport))) {
         handleservermess(nikmess);
         ReplyMsg((struct Message *)nikmess);
       }
@@ -621,7 +623,7 @@ int getfifoevent(struct MsgPort *fifoport, char *puthere) {
       event |= FIFOEVENT_FROMFIFO;
     }
     if(signals & nikomnodesig) {
-      while(nikmess = (struct NiKMess *) GetMsg(nikomnodeport)) {
+      while((nikmess = (struct NiKMess *) GetMsg(nikomnodeport))) {
         handleservermess(nikmess);
         ReplyMsg((struct Message *)nikmess);
       }
@@ -951,7 +953,7 @@ int sendtosercon(char *conpek, char *serpek, int consize, int sersize) {
       cleanup(EXIT_OK,"");
     }
     if(signals & nikomnodesig) {
-      while(nikmess = (struct NiKMess *) GetMsg(nikomnodeport)) {
+      while((nikmess = (struct NiKMess *) GetMsg(nikomnodeport))) {
         handleservermess(nikmess);
         ReplyMsg((struct Message *)nikmess);
       }
@@ -1008,7 +1010,7 @@ int sendtocon(char *pekare, int size)
 			cleanup(EXIT_OK,"");
 		}
 		if(signals & nikomnodesig) {
-			while(nikmess = (struct NiKMess *) GetMsg(nikomnodeport)) {
+			while((nikmess = (struct NiKMess *) GetMsg(nikomnodeport))) {
 				handleservermess(nikmess);
 				ReplyMsg((struct Message *)nikmess);
 			}
@@ -1133,7 +1135,7 @@ int sendtoser(char *pekare, int size) {
       cleanup(EXIT_OK,"");
     }
     if(signals & nikomnodesig) {
-      while(nikmess = (struct NiKMess *) GetMsg(nikomnodeport)) {
+      while((nikmess = (struct NiKMess *) GetMsg(nikomnodeport))) {
         handleservermess(nikmess);
         ReplyMsg((struct Message *)nikmess);
       }
