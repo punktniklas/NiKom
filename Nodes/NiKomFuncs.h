@@ -9,15 +9,6 @@
  */
 
 /* Prototypes for functions defined in NiKomSer.c */
-void modemcmd(char *pekare,int size);
-void paus(ULONG tid);
-char convseventoeight(char foo);
-char conveighttoseven(char foo);
-void convstring(char *string);
-void sendat(char *atstring);
-void sendplus(void);
-void freealiasmem(void);
-void waitconnect(void);
 void cleanup(int kod,char *text);
 void main(int argc,char **argv);
 
