@@ -10,6 +10,11 @@
 #include <proto/rexxsyslib.h>
 #include <time.h>
 #include <stdio.h>
+#ifdef __GNUC__
+/* In gcc access() is defined in unistd.h, while SAS/C has the
+   prototype in stdio.h */
+# include <unistd.h>
+#endif
 #include <string.h>
 #include <stdlib.h>
 #ifdef MWDEBUG
