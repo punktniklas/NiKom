@@ -40,7 +40,7 @@ char rexxportnamn[15], pubscreen[40], nikomnodeportnamn[15];
 int inloggad, ypos, xpos, ysize, xsize;
 extern char commandhistory[];
 
-void freealiasmem(void) {
+static void freealiasmem(void) {
 	struct Alias *pekare;
 	while((pekare=(struct Alias *)RemHead((struct List *)&aliaslist)))
 		FreeMem(pekare,sizeof(struct Alias));

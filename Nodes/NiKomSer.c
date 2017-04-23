@@ -41,7 +41,7 @@ int inloggad, ypos,xpos,ysize,xsize;
 char svara[17],init[81],hangup[32],nodid[20];
 int highbaud, hst, getty, hangupdelay, gettybps, autoanswer, plussa;
 
-void freealiasmem(void) {
+static void freealiasmem(void) {
 	struct Alias *pekare;
 	while((pekare=(struct Alias *)RemHead((struct List *)&aliaslist)))
 		FreeMem(pekare,sizeof(struct Alias));

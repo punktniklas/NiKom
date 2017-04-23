@@ -466,7 +466,7 @@ void putstring(char *pekare,int size, long flags) {
 	WaitSerIOErr(serwritereq);
 }
 
-void serputstring(char *pekare,int size, long flags)
+static void serputstring(char *pekare, int size, long flags)
 {
 	char serpekare[400];
 	int bytes;

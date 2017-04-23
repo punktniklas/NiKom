@@ -216,7 +216,6 @@ int initbrevheader(int tillpers);
 int fido_brev(char *,char *,struct Mote *);
 void sparabrev(void);
 void sprattgok(char *);
-void savefidocopy(struct FidoText *,int);
 
 /* Prototypes for functions defined in OrgMeet.c */
 int org_skriv(void);

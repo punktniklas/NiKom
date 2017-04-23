@@ -40,7 +40,10 @@ extern char outbuffer[];
 char svara[17],init[81],hangup[32];
 int plussa,autoanswer,highbaud,hst,hangupdelay;
 
-void modemcmd(char *pekare,int size) {
+static void sendat(char *atstring);
+static void sendplus(void);
+
+static void modemcmd(char *pekare,int size) {
 	serwritereq->IOSer.io_Command=CMD_WRITE;
 	serwritereq->IOSer.io_Data=(APTR)pekare;
 	serwritereq->IOSer.io_Length=size;
@@ -61,7 +64,7 @@ void disconnect() {
 	}
 }
 
-void sendat(char *atstring) {
+static void sendat(char *atstring) {
 	int count=2,going=TRUE, i=0;
 	char tkn;
 	long signals,timersig=1L << timerport->mp_SigBit,sersig=1L << serreadport->mp_SigBit;
@@ -147,7 +150,7 @@ void sendat(char *atstring) {
 	}
 }
 
-void sendplus(void) {
+static void sendplus(void) {
 	int count=2,going=TRUE;
 	char tkn;
 	long signals,timersig=1L << timerport->mp_SigBit,sersig=1L << serreadport->mp_SigBit;
@@ -184,7 +187,7 @@ void sendplus(void) {
 	}
 }
 
-char wc_gettkn(int seropen) {
+static char wc_gettkn(int seropen) {
 	struct IntuiMessage *mymess;
 	struct NiKMess *nikmess;
 	ULONG signals, windsig=1L << NiKwind->UserPort->mp_SigBit, serreadsig=1L << serreadport->mp_SigBit,

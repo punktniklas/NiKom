@@ -32,6 +32,8 @@ extern struct Header readhead;
 struct ReadLetter brevread,brevspar;
 char crashmail;
 
+static void savefidocopy(struct FidoText *ft, int anv);
+
 int getzone(char *adr) {
 	int x;
 	for(x=0;adr[x]!=':' && adr[x]!=' ' && adr[x]!=0;x++);
@@ -733,7 +735,7 @@ void sparabrev(void) {
   }
 }
 
-void savefidocopy(struct FidoText *ft,int anv) {
+static void savefidocopy(struct FidoText *ft, int anv) {
   struct FidoLine *fl;
   BPTR fh;
   int nummer;
