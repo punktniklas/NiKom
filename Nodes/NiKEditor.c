@@ -119,7 +119,7 @@ void fidotextquote(struct Mote *conf) {
   struct FidoText *ft;
   struct Node *line;
   char filename[10],fullpath[100];
-  sprintf(filename, "%d.msg", senast_text_nr - conf->renumber_offset);
+  sprintf(filename, "%ld.msg", senast_text_nr - conf->renumber_offset);
   strcpy(fullpath, conf->dir);
   AddPart(fullpath, filename, 99);
   ft = ReadFidoTextTags(fullpath,

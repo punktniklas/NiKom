@@ -28,8 +28,10 @@ void setnodestate(struct NiKMess *mess) {
 long sendnodemess(short command, long node, long data, long extdata1, long extdata2) {
   struct NiKMess *mess;
   char portname[15];
-  if(mess = (struct NiKMess *)AllocMem(sizeof(struct NiKMess),
-                                       MEMF_PUBLIC | MEMF_CLEAR)) {
+
+  mess = (struct NiKMess *)AllocMem(sizeof(struct NiKMess),
+				    MEMF_PUBLIC | MEMF_CLEAR);
+  if(mess != NULL) {
     mess->stdmess.mn_Node.ln_Type = NT_MESSAGE;
     mess->stdmess.mn_Length = sizeof(struct NiKMess);
     mess->stdmess.mn_ReplyPort = nodereplyport;
@@ -38,7 +40,7 @@ long sendnodemess(short command, long node, long data, long extdata1, long extda
     mess->nod = node;
     mess->extdata1 = extdata1;
     mess->extdata2 = extdata2;
-    sprintf(portname, "NiKomNode%d", node);
+    sprintf(portname, "NiKomNode%ld", node);
     if(SafePutToPort((struct Message *) mess, portname)) {
       return 1;
     } else {

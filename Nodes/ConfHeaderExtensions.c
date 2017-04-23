@@ -51,7 +51,7 @@ int SaveHeaderExtension(struct MemHeaderExtension *ext) {
   }
 
   NiKForbid();
-  sprintf(fileName, "NiKom:Moten/Extensions%d.dat", ext->textId / 512);
+  sprintf(fileName, "NiKom:Moten/Extensions%ld.dat", ext->textId / 512);
   if(!(fh = Open(fileName, MODE_READWRITE))) {
     NiKPermit();
     LogEvent(SYSTEM_LOG, ERROR, "Can't open %s for writing.", fileName);

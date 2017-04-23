@@ -535,7 +535,7 @@ void motesstatus(void) {
 	puttekn(outbuffer,-1);
 	sprintf(outbuffer,"\r\nMötesnummer:     %d",motpek->nummer);
 	puttekn(outbuffer,-1);
-	sprintf(outbuffer,"\r\nSorteringsvärde: %d",motpek->sortpri);
+	sprintf(outbuffer,"\r\nSorteringsvärde: %ld",motpek->sortpri);
 	puttekn(outbuffer,-1);
 	sprintf(outbuffer,"\r\nMAD:             %s",getusername(motpek->mad));
 	puttekn(outbuffer,-1);
@@ -651,7 +651,7 @@ void listgruppmed(void) {
 	puttekn("\r\n\n",-1);
 	for(listpek=(struct ShortUser *)Servermem->user_list.mlh_Head;listpek->user_node.mln_Succ;listpek=(struct ShortUser *)listpek->user_node.mln_Succ) {
 		if(BAMTEST((char *)&listpek->grupper,grupp)) {
-			sprintf(outbuffer,"%s #%d\r\n",listpek->namn,listpek->nummer);
+			sprintf(outbuffer,"%s #%ld\r\n",listpek->namn,listpek->nummer);
 			if(puttekn(outbuffer,-1)) return;
 		}
 	}

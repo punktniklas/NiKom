@@ -678,7 +678,7 @@ void rxextratime(struct RexxMsg *mess) {
   char buf[10], *arg=hittaefter(mess->rm_Args[0]);
 
   if(strcmp(arg,"GET") == 0) {
-    sprintf(buf,"%d",extratime);
+    sprintf(buf,"%ld",extratime);
     SetRexxResultString(mess, buf);
   } else {
     extratime=atoi(arg);
@@ -696,7 +696,7 @@ void rxgettime(struct RexxMsg *mess) {
   } else {
     timeLeft=0;
   }
-  sprintf(buf,"%d",timeLeft);
+  sprintf(buf,"%ld",timeLeft);
   SetRexxResultString(mess, buf);
 }
 

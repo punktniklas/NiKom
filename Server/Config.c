@@ -48,7 +48,7 @@ int InitLegacyConversionData(void) {
   if(Servermem->legacyConversionData.lowTextWhenBitmap0ConversionStarted == -1) {
     Servermem->legacyConversionData.lowTextWhenBitmap0ConversionStarted =
       Servermem->info.lowtext;
-    sprintf(line, "LowTextWhenBitmap0ConversionStarted=%d\n",
+    sprintf(line, "LowTextWhenBitmap0ConversionStarted=%ld\n",
             Servermem->info.lowtext);
     putsRes = FPuts(file, line);
   }

@@ -341,7 +341,7 @@ void waitconnect(void) {
 					dtespeed = serchangereq->io_Baud;
 				}
 				serreqtkn();
-				sprintf(outbuffer,"Connect-speed: %d, DTE-speed: %d\n\n",Servermem->connectbps[nodnr],dtespeed);
+				sprintf(outbuffer,"Connect-speed: %ld, DTE-speed: %d\n\n",Servermem->connectbps[nodnr],dtespeed);
 				conputtekn(outbuffer,-1);
 				nodestate = nodestate & (NIKSTATE_CLOSESER | NIKSTATE_NOANSWER);
 				return;

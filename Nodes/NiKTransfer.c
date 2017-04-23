@@ -176,7 +176,7 @@ static long __saveds __regargs nik_update(struct XPR_UPDATE *update) {
 		if(Servermem->action[nodnr]==UPLOAD || Servermem->action[nodnr]==DOWNLOAD) Servermem->vilkastr[nodnr] = FilePart(xprfilnamn);
 	}
 	if(update->xpru_updatemask & XPRU_FILESIZE) {
-		sprintf(outbuffer,"Filens längd %d\r\n",update->xpru_filesize);
+		sprintf(outbuffer,"Filens längd %ld\r\n",update->xpru_filesize);
 		conputtekn(outbuffer,-1);
 		filesize=update->xpru_filesize;
 	}
@@ -184,7 +184,7 @@ static long __saveds __regargs nik_update(struct XPR_UPDATE *update) {
 	if(update->xpru_updatemask & XPRU_ERRORMSG) { conputtekn(update->xpru_errormsg,-1); conputtekn("\r\n",-1); }
 	if(update->xpru_updatemask & XPRU_DATARATE) cps=update->xpru_datarate;
 	if(update->xpru_updatemask & XPRU_BYTES) {
-		sprintf(outbuffer,"\rBytes: %d (%d cps)",update->xpru_bytes,update->xpru_datarate);
+		sprintf(outbuffer,"\rBytes: %ld (%ld cps)",update->xpru_bytes,update->xpru_datarate);
 		conputtekn(outbuffer,-1);
 		countbytes=update->xpru_bytes;
 		if(countbytes == filesize && Servermem->action[nodnr]==UPLOAD) {
@@ -392,7 +392,7 @@ int download(void) {
 		sprintf(tf->path,"%s%s",Servermem->areor[area2].dir[filpek->dir],filpek->namn);
 		tf->filpek=filpek;
 		AddTail((struct List *)&tf_list,(struct Node *)tf);
-		sprintf(outbuffer,"Skickar filen %s. Storlek: %d %s\r\n",filpek->namn,filpek->size,(filpek->flaggor & FILE_FREEDL) ? "(Fri download)" : "");
+		sprintf(outbuffer,"Skickar filen %s. Storlek: %ld %s\r\n",filpek->namn,filpek->size,(filpek->flaggor & FILE_FREEDL) ? "(Fri download)" : "");
 		puttekn(outbuffer,-1);
 		nextfile=nextnext;
 		nextnext=hittaefter(nextnext);
@@ -417,7 +417,7 @@ int download(void) {
 			if(!(tf->filpek->flaggor & FILE_FREEDL)) Servermem->inne[nodnr].download++;
 			Statstr.dl++;
 			raisefiledl(tf->filpek);
-			sprintf(outbuffer,"%s, %d cps\n\r",tf->filpek->namn,tf->cps);
+			sprintf(outbuffer,"%s, %ld cps\n\r",tf->filpek->namn,tf->cps);
 			puttekn(outbuffer,-1);
 		} else {
 			sprintf(outbuffer,"%s misslyckades.\n\r",tf->filpek->namn);

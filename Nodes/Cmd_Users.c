@@ -330,7 +330,7 @@ int Cmd_ListUsers(void) {
       if(status!=-1 && status!=listpek->status) continue;
       if(listpek->status>less || listpek->status<more) continue;
       if(!namematch(pattern,listpek->namn)) continue;
-      sprintf(outbuffer,"%s #%d\r\n",listpek->namn,listpek->nummer);
+      sprintf(outbuffer,"%s #%ld\r\n",listpek->namn,listpek->nummer);
       if(puttekn(outbuffer,-1)) break;
     }
     return(0);
@@ -339,7 +339,7 @@ int Cmd_ListUsers(void) {
     if(status!=-1 && status!=listpek->status) continue;
     if(listpek->status>less || listpek->status<more) continue;
     if(!namematch(pattern,listpek->namn)) continue;
-    sprintf(outbuffer,"%s #%d\r\n",listpek->namn,listpek->nummer);
+    sprintf(outbuffer,"%s #%ld\r\n",listpek->namn,listpek->nummer);
     if(puttekn(outbuffer,-1)) break;
   }
   return(0);

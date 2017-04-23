@@ -36,7 +36,8 @@ void convertUser(int userId) {
     return;
   }
   if(statbuf.st_size != sizeof(struct User)) {
-    printf("Size of user's data file is %d, was expecting %d.\n", statbuf.st_size, sizeof(struct User));
+    printf("Size of user's data file is %d, was expecting %lu.\n",
+           statbuf.st_size, (unsigned long)sizeof(struct User));
     printf("Are you running the right version of CryptPasswords?\n");
     return;
   }

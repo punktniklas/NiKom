@@ -466,7 +466,8 @@ void radbrev(void) {
 
 void vilka(void) {
 	int x,verbose=FALSE;
-	long timenow, idle;
+	long timenow;
+	int idle;
 	struct Mote *motpek;
 	char namn[50],bps[15];
 	if(argument[0]) {
@@ -491,7 +492,7 @@ void vilka(void) {
 			continue; */
 
 			if(Servermem->inloggad[x] == -2)
-				sprintf(bps,"Bps: %-7d%15d:%02d %c\r\n\n",Servermem->connectbps[x],idle/3600,(idle%3600)/60,Servermem->say[x] ? '*' : ' ');
+				sprintf(bps,"Bps: %-7ld%15d:%02d %c\r\n\n",Servermem->connectbps[x],idle/3600,(idle%3600)/60,Servermem->say[x] ? '*' : ' ');
 			else
 				sprintf(bps,"Bps: -      %15d:%02d %c\r\n\n",idle/3600,(idle%3600)/60,Servermem->say[x] ? '*' : ' ');
 
@@ -500,7 +501,7 @@ void vilka(void) {
 		}
 		if(Servermem->nodtyp[x]==NODCON)
 			sprintf(bps,"Bps: -      %15d:%02d %c",idle/3600,(idle%3600)/60,Servermem->say[x] ? '*' : ' ');
-		else sprintf(bps,"Bps: %-7d%15d:%02d %c",Servermem->connectbps[x],idle/3600,(idle%3600)/60,Servermem->say[x] ? '*' : ' ');
+		else sprintf(bps,"Bps: %-7ld%15d:%02d %c",Servermem->connectbps[x],idle/3600,(idle%3600)/60,Servermem->say[x] ? '*' : ' ');
 		switch(Servermem->action[x]) {
 			case INGET :
 				sprintf(outbuffer,"%-32s Har inga olästa texter\r\n\n",bps);
@@ -877,7 +878,7 @@ int dumpatext(void) {
 		dumpfil=inmat;
 	}
 	if(readtexthead(tnr,&dumphead)) return(0);
-	sprintf(filnamn,"NiKom:Moten/Text%d.dat",dumphead.nummer/512);
+	sprintf(filnamn,"NiKom:Moten/Text%ld.dat",dumphead.nummer/512);
 	NiKForbid();
 	if(!(fpr=fopen(filnamn,"r"))) {
 		puttekn("\r\n\nKunde inte öppna Text.dat!\r\n\n",-1);
@@ -962,8 +963,8 @@ void listaarende(void) {
     lahead.arende[22]=0;
     ts=localtime(&lahead.tid);
     if(lahead.kom_till_nr==-1) strcpy(kom,"   -");
-    else sprintf(kom,"%d",lahead.kom_till_nr);
-    sprintf(outbuffer,"%-34s%6d %6s %02d%02d%02d %s\r\n", namn,
+    else sprintf(kom,"%ld",lahead.kom_till_nr);
+    sprintf(outbuffer,"%-34s%6ld %6s %02d%02d%02d %s\r\n", namn,
             lahead.nummer, kom, ts->tm_year % 100, ts->tm_mon + 1,
             ts->tm_mday, lahead.arende);
     if(puttekn(outbuffer,-1)) return;

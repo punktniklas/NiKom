@@ -109,15 +109,15 @@ void rexxsysteminfo(struct RexxMsg *mess)
 	switch(mess->rm_Args[1][0])
 	{
 		case 'f' : case 'F' :
-			sprintf(str,"%d",Servermem->cfg.defaultflags);
+			sprintf(str,"%ld",Servermem->cfg.defaultflags);
 			break;
 
 		case 'd' : case 'D' :
-			sprintf(str,"%d",Servermem->cfg.diskfree);
+			sprintf(str,"%ld",Servermem->cfg.diskfree);
 			break;
 
 		case 'm' : case 'M' :
-			sprintf(str,"%d",Servermem->cfg.logmask);
+			sprintf(str,"%ld",Servermem->cfg.logmask);
 			break;
 
 		case 'l' : case 'L' :

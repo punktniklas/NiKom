@@ -37,7 +37,7 @@ void sparatext(struct NiKMess *message) {
         if(headpek->root_text == 0) {
           headpek->root_text = headpek->nummer;
         }
-	sprintf(filnamn,"NiKom:Moten/Text%d.dat",headpek->nummer/512);
+	sprintf(filnamn,"NiKom:Moten/Text%ld.dat",headpek->nummer/512);
 	if(!(fh=Open(filnamn,MODE_OLDFILE))) {
 		if(!(fh=Open(filnamn,MODE_NEWFILE))) {
 			printf("Kunde inte öppna %s\n",filnamn);
@@ -61,7 +61,7 @@ void sparatext(struct NiKMess *message) {
 		cnt++;
 	}
 	Close(fh);
-	sprintf(filnamn,"NiKom:Moten/Head%d.dat",headpek->nummer/512);
+	sprintf(filnamn,"NiKom:Moten/Head%ld.dat",headpek->nummer/512);
 	if(!(fh=Open(filnamn,MODE_OLDFILE))) {
 		if(!(fh=Open(filnamn,MODE_NEWFILE))) {
 			printf("Kunde inte öppna %s\n",filnamn);
@@ -102,9 +102,9 @@ void purgeOldTexts(int numberOfTexts) {
   }
   
   for(i=0; i < numberOfTexts; i += 512) {
-    sprintf(filename, "NiKom:Moten/Head%d.dat", (oldlowtext + i) / 512);
+    sprintf(filename, "NiKom:Moten/Head%ld.dat", (oldlowtext + i) / 512);
     DeleteFile(filename);
-    sprintf(filename, "NiKom:Moten/Text%d.dat", (oldlowtext + i) / 512);
+    sprintf(filename, "NiKom:Moten/Text%ld.dat", (oldlowtext + i) / 512);
     DeleteFile(filename);
   }
 }
