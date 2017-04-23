@@ -158,9 +158,9 @@
 
 #define NUM_LANGUAGES     2
 
-#define BAMTEST(a,b) (((char *)(a))[(b)/8] & 1 << 8-1-(b)%8)
-#define BAMSET(a,b) (((char *)(a))[(b)/8] |= 1 << 8-1-(b)%8)
-#define BAMCLEAR(a,b) (((char *)(a))[(b)/8] &= ~(1 << 8-1-(b)%8))
+#define BAMTEST(a,b) (((char *)(a))[(b)/8] & 1 << (8 - 1 - (b)%8))
+#define BAMSET(a,b) (((char *)(a))[(b)/8] |= 1 << (8 - 1 - (b)%8))
+#define BAMCLEAR(a,b) (((char *)(a))[(b)/8] &= ~(1 << (8 - 1 - (b)%8)))
 
 #define ITER_EL(var, list, nodeField, type) for(var = (type)list.mlh_Head; var->nodeField.mln_Succ; var = (type) var->nodeField.mln_Succ)
 #define ITER_EL_R(var, list, nodeField, type) for(var = (type)list.mlh_TailPred; var->nodeField.mln_Pred; var = (type) var->nodeField.mln_Pred)
