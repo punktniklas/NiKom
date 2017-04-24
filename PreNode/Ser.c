@@ -78,7 +78,7 @@ void cleanup(int errorCode, char *text) {
     CloseWindow(NiKwind);
   }
   if(LocaleBase) {
-    CloseLibrary(LocaleBase);
+    CloseLibrary((struct Library *)LocaleBase);
   }
   if(RexxSysBase) {
     CloseLibrary((struct Library *)RexxSysBase);
@@ -182,7 +182,7 @@ int main(int argc,char *argv[]) {
     cleanup(EXIT_ERROR,"Kunde inte öppna intuition.library\n");
   if(!(UtilityBase=OpenLibrary("utility.library",37L)))
     cleanup(EXIT_ERROR,"Kunde inte öppna utility.library\n");
-  if(!(LocaleBase=OpenLibrary("locale.library",38L)))
+  if(!(LocaleBase=(NiKomLocaleType *)OpenLibrary("locale.library",38L)))
     cleanup(EXIT_ERROR,"Kunde inte öppna locale.library\n");
   if(!(NiKomBase=OpenLibrary("nikom.library",0L)))
     cleanup(EXIT_ERROR,"Kunde inte öppna nikom.library\n");
