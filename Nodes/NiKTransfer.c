@@ -259,6 +259,8 @@ static long __saveds __regargs nik_finfo(char *filename,long typeinfo) {
 		case 2 :
 			return(1L);
 	}
+	/* Unknown typeinfo. */
+	return 0;
 }
 
 static long __saveds __regargs nik_ffirst(char *buffer,char *pattern) {
