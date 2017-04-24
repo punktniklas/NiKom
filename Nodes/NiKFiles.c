@@ -1048,6 +1048,7 @@ struct Fil *parsefilallareas(char *skri)
 		fil = parsefil(skri, x);
 		if(fil) return fil;
 	}
+	return NULL;
 }
 
 struct Fil *parsefil(skri,area)
