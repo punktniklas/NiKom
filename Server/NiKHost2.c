@@ -203,7 +203,7 @@ void rexxnextpatternfile(struct RexxMsg *mess)
 	}
 
 	pek=(struct Fil *)pek->f_node.mln_Pred;
-	for(pek;pek->f_node.mln_Pred;pek=(struct Fil *)pek->f_node.mln_Pred)
+	for(;pek->f_node.mln_Pred;pek=(struct Fil *)pek->f_node.mln_Pred)
 	{
 		if(ParsePatternNoCase(mess->rm_Args[3], buffer, 100) == 1)
 		{
