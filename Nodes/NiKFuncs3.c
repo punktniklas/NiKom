@@ -1020,6 +1020,7 @@ int skrivlapp(void) {
 	}
 	fclose(fp);
 	freeeditlist();
+	return 1;
 }
 
 void radlapp(void) {
