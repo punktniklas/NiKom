@@ -250,7 +250,7 @@ void rexxmarktextunread(struct RexxMsg *mess) {
   
 void rexxmarktext(struct RexxMsg *mess, int desiredUnreadStatus) {
   int textNr, userId, i, needToSave = FALSE;
-  struct UnreadTexts *unreadTexts;
+  struct UnreadTexts *unreadTexts = NULL;
   static struct UnreadTexts unreadTextsBuf;
 
   if(!mess->rm_Args[1] || !mess->rm_Args[2]) {
