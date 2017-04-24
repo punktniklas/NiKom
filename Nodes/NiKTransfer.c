@@ -56,7 +56,7 @@ extern int writefiles(int);
 extern int updatefile(int,struct Fil *);
 
 static long __saveds __regargs nik_fopen(char *filename,char *accessmode) {
-	BPTR fh;
+	BPTR fh = NULL;
 	switch(accessmode[0]) {
 		case 'r' :
 			fh=Open(filename,MODE_OLDFILE);
