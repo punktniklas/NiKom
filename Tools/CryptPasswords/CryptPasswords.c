@@ -72,7 +72,7 @@ void printUsage(int exitCode) {
     exit(exitCode);
 }
 
-void main(int argc, char *argv[]) {
+int main(int argc, char *argv[]) {
   if(argc < 2 || argv[1][0] != '-') {
     printUsage(0);
   }
@@ -106,4 +106,5 @@ void main(int argc, char *argv[]) {
     printf("Invalid option.\n\n");
     printUsage(10);
   }
+  return 0;
 }

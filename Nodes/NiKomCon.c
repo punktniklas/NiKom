@@ -74,7 +74,7 @@ void cleanup(int kod,char *fel) {
 	exit(kod);
 }
 
-void main(int argc, char **argv) {
+int main(int argc, char **argv) {
   int going = TRUE, forsok = 2,car = 1, tmp, ch;
   long tid;
   char tellstr[100],*tmppscreen, titel[80];
@@ -218,4 +218,5 @@ void main(int argc, char **argv) {
     SendString("\r\n\nOne more login? (Y/n)",-1);
   } while((ch = GetChar()) != 'n' && ch != 'N');
   cleanup(EXIT_OK,"");
+  return 0;
 }

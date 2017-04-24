@@ -75,7 +75,7 @@ void cleanup(int kod,char *text) {
 	exit(kod);
 }
 
-void main(int argc,char *argv[]) {
+int main(int argc,char *argv[]) {
   int x;
   long tid;
   char tellstr[100],*tmppscreen, titel[80], configname[50] = "NiKom:DatoCfg/SerNode.cfg";
@@ -198,4 +198,5 @@ void main(int argc,char *argv[]) {
   }
   nodestate &= (NIKSTATE_RELOGIN | NIKSTATE_CLOSESER | NIKSTATE_NOANSWER);
   cleanup(nodestate,"");
+  return 0;
 }

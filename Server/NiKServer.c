@@ -120,7 +120,7 @@ void writeinfo(void) {
 	}
 }
 
-void main() {
+int main(void) {
   int Going=TRUE,noder=0,x=0;
   long windmask, nikPortMask, signals, rexxmask, nodereplymask;
   struct NiKMess *MyNiKMess, *dummymess;
@@ -212,4 +212,5 @@ void main() {
         FreeMem(MyNiKMess,sizeof(struct NiKMess));
     }
   }
+  return 0;
 }

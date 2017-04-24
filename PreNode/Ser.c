@@ -166,7 +166,7 @@ struct NodeType *selectNodeType(void) {
   return nt;
 }
 
-void main(int argc,char *argv[]) {
+int main(int argc,char *argv[]) {
   int going=TRUE,forsok=2,car=1,x,connectbps, i, tmp;
   struct NodeType *nt;
   char *tmppscreen,commandstring[100], configname[50] = "NiKom:DatoCfg/SerNode.cfg";
@@ -341,4 +341,5 @@ void main(int argc,char *argv[]) {
     if(getty) cleanup(EXIT_OK,"");
     disconnect();
   }
+  return 0;
 }
