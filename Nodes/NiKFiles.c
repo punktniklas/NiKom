@@ -14,6 +14,8 @@
 /* In gcc access() is defined in unistd.h, while SAS/C has the
    prototype in stdio.h */
 # include <unistd.h>
+/* ...and mkdir() is defined in sys/stat. */
+# include <sys/stat.h>
 #endif
 #include <stdlib.h>
 #include <string.h>
