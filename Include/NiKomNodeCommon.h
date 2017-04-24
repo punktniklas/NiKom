@@ -1,5 +1,7 @@
 #ifndef NIKOMNODECOMMON_H
 #define NIKOMNODECOMMON_H
+
+#include <intuition/intuition.h>
 /*
  * TODO: The long time goal is for this file to die. Every .c
  * file should be a module that should have a corresponding .h
