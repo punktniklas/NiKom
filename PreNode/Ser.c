@@ -105,7 +105,7 @@ void cleanup(int errorCode, char *text) {
 }
 
 struct NodeType *selectNodeType(void) {
-  struct NodeType *nt;
+  struct NodeType *nt = NULL;
   int going, i, isCorrect;
 
   if(Servermem->nodetypes[0].nummer == 0) {
