@@ -109,6 +109,8 @@ static long __saveds __regargs nik_fseek(LONG *fh,long offset,long origin) {
 		case 2 :
 			mode=OFFSET_END;
 			break;
+		default:
+			return -1;
 	}
 	if(Seek((BPTR)fh,offset,mode)==-1) return(-1);
 	else return(0);
