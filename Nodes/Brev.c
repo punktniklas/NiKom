@@ -783,7 +783,7 @@ static void savefidocopy(struct FidoText *ft, int anv) {
 }
 
 int skickabrev(void) {
-  int pers,editret;
+  int pers=0, editret;
   char *adr;
   if(!(adr = strchr(argument, '@'))) {
     if((pers = parsenamn(argument)) == -1) {
