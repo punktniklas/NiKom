@@ -167,7 +167,7 @@ struct NodeType *selectNodeType(void) {
 }
 
 int main(int argc,char *argv[]) {
-  int going=TRUE,forsok=2,car=1,x,connectbps, i, tmp;
+  int going=TRUE, forsok=2, car=1, x, connectbps=0, i, tmp;
   struct NodeType *nt;
   char *tmppscreen,commandstring[100], configname[50] = "NiKom:DatoCfg/SerNode.cfg";
   FILE *fil;
