@@ -7,6 +7,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <limits.h>
+#include <proto/exec.h>
 
 #include "Terminal.h"
 #include "ServerMemUtils.h"
