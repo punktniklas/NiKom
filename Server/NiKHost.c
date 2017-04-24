@@ -199,6 +199,7 @@ void userinfo(struct RexxMsg *mess) {
 		return;
 	}
 
+	nodnr = 0; // Fix false warning about uninitialized variable.
 	if(mess->rm_Args[2][0]!='n' && mess->rm_Args[2][0]!='N' && mess->rm_Args[2][0]!='r'  && mess->rm_Args[2][0]!='R') {
 		for(nodnr=0;nodnr<MAXNOD;nodnr++) if(Servermem->inloggad[nodnr]==nummer) break;
 
