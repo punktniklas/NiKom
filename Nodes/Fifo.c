@@ -1,5 +1,6 @@
 #include <exec/ports.h>
 #include <dos/dos.h>
+#include <proto/dos.h>
 #include <dos/dostags.h>
 #include <proto/exec.h>
 #include <fifoproto.h>

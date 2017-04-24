@@ -4,6 +4,7 @@
 /* For NewList() */
 # include <proto/alib.h>
 #endif
+#include <proto/dos.h>
 #include <dos/dos.h>
 #include <intuition/intuition.h>
 #include <devices/console.h>

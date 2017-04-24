@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
+#include <proto/dos.h>
 #include "NiKomStr.h"
 #include "NiKomLib.h"
 #include "NiKomFuncs.h"
