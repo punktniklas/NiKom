@@ -760,7 +760,7 @@ void rxsendrawfile(struct RexxMsg *mess) {
 
 void rxchglatestinfo(struct RexxMsg *mess) {
   char *what, retstr[15];
-  int amount, retval, badarg = FALSE;
+  int amount, retval;
   what = hittaefter(mess->rm_Args[0]);
   amount = atoi(hittaefter(what));
   switch(what[0]) {
@@ -777,14 +777,11 @@ void rxchglatestinfo(struct RexxMsg *mess) {
     retval = Statstr.ul += amount;
     break;
   default:
-    badarg = TRUE;
-  }
-  if(badarg) {
     SetRexxErrorResult(mess, 5);
-  } else {
-    sprintf(retstr,"%d",retval);
-    SetRexxResultString(mess, retstr);
+    return;
   }
+  sprintf(retstr, "%d", retval);
+  SetRexxResultString(mess, retstr);
 }
 
 void rxgetnumber(struct RexxMsg *mess) {
