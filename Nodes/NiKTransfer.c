@@ -366,15 +366,12 @@ int download(void) {
 	{
 		for(cnt=0;nextfile[cnt]!=' ' && nextfile[cnt]!=0;cnt++);
 		nextfile[cnt]=0;
-		if(!global && !(filpek=parsefil(nextfile,area2))) {
-			sprintf(outbuffer,"Finns ingen fil som matchar \"%s\"\n\r",nextfile);
-			puttekn(outbuffer,-1);
-			nextfile=nextnext;
-			nextnext=hittaefter(nextnext);
-			continue;
+		if(global) {
+			filpek = parsefilallareas(nextfile);
+		} else {
+			filpek = parsefil(nextfile, area2);
 		}
-		if(!filpek && global && !(filpek=parsefilallareas(nextfile)))
-		{
+		if(!filpek) {
 			sprintf(outbuffer,"Finns ingen fil som matchar \"%s\"\n\r",nextfile);
 			puttekn(outbuffer,-1);
 			nextfile=nextnext;
