@@ -2,6 +2,7 @@
 #include <devices/serial.h>
 #include <dos/dos.h>
 
+#include <NiKomStr.h>
 #include <NiKomNodeCommon.h>
 /*
  * TODO: The long time goal is for this file to die. Every .c
