@@ -405,6 +405,7 @@ int maybeConvertConferenceTextData(int numberOfTexts) {
     cleanup(EXIT_ERROR, "Couldn't delete Textmot.dat.");
   }
   printf("  Conversion finished.\n");
+  return 1;
 }
 
 void readIntoConfTextsArray(int arrayIndex, int fileIndex, int textsToRead,
