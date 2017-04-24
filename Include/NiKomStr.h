@@ -252,8 +252,9 @@ struct User {
       grupper,defarea,downloadbytes,chrset,uploadbytes,reserv5,upload,download,
       loggin,shell;
    char namn[41],gata[41],postadress[41],land[41],telefon[21],
-      annan_info[61],losen[16],status,rader,language,
-      prompt[6],motratt[MAXMOTE/8],motmed[MAXMOTE/8],vote[MAXVOTE];
+      annan_info[61],losen[16],status,rader;
+   unsigned char language;
+   char prompt[6],motratt[MAXMOTE/8],motmed[MAXMOTE/8],vote[MAXVOTE];
 };
 
 struct UnreadTexts {
