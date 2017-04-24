@@ -99,7 +99,7 @@ int GetChar(void) {
 }
 
 int handle1bChar(void) {
-  unsigned char ch;
+  char ch;
 
   ch = gettekn();
   if(ImmediateLogout()) {
@@ -115,7 +115,7 @@ int handle1bChar(void) {
  * Handles characters after CSI (1b5b), i.e. ANSI escape sequences
  */
 int handleAnsiSequence(void) {
-  unsigned char ch;
+  char ch;
 
   ch = gettekn();
   if(ImmediateLogout()) {
@@ -144,7 +144,7 @@ int handleAnsiSequence(void) {
  * Handles the CSI (0x1b5b) follwed by '3' (0x33)
  */
 int handleCsi3(void) {
-  unsigned char ch;
+  char ch;
 
   ch = gettekn();
   if(ImmediateLogout()) {
@@ -160,7 +160,7 @@ int handleCsi3(void) {
 }
 
 int handleShiftedAnsiSequence(void) {
-  unsigned char ch;
+  char ch;
 
   ch = gettekn();
   if(ImmediateLogout()) {
