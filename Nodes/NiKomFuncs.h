@@ -12,7 +12,6 @@
 
 /* Prototypes for functions defined in NiKomSer.c */
 void cleanup(int kod,char *text);
-void main(int argc,char **argv);
 
 /* Lite temporärt såhär.. Egentligen SerialIO.c.. */
 int incantrader(void);
