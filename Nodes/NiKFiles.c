@@ -885,6 +885,7 @@ int andrafil(void) {
         if(updatefile(area2,filpek)) {
           puttekn("\r\n\nKunde inte skriva filen!\r\n",-1);
         }
+	return 0;
 }
 
 int lagrafil(void) { return(0); }
