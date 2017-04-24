@@ -426,7 +426,7 @@ void sprattgok(char *str) {
 }
 
 int fido_brev(char *tillpers,char *adr,struct Mote *motpek) {
-  int length = 0, i = 0, editret, chrs, inputch, wantCopy, textId;
+  int length = 0, i = 0, editret, chrs=CHRS_LATIN1, inputch, wantCopy, textId;
   struct FidoDomain *fd;
   struct FidoText *komft,ft;
   struct MinNode *first, *last;
