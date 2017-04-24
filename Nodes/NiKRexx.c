@@ -458,6 +458,10 @@ void rexxgetchar(struct RexxMsg *mess) {
     case GETCHAR_LEFT:
       res = "LEFT";
       break;
+    default:
+      /* Should not happen. */
+      res = NULL;
+      break;
     }
   }
   SetRexxResultString(mess, res);
