@@ -309,7 +309,7 @@ int Cmd_ListUsers(void) {
   while(argpek[0] && going) {
     if(argpek[0]=='-') {
       if(argpek[1]=='b' || argpek[1]=='B') backwards=TRUE;
-      else if(argpek[1]='s' || argpek[1]=='S') {
+      else if(argpek[1]=='s' || argpek[1]=='S') {
         while(argpek[cnt] && argpek[cnt]!=' ') {
           if(argpek[cnt]=='-') { tpek=&argpek[cnt+1]; break; }
           cnt++;
