@@ -22,6 +22,7 @@ struct MemHeaderExtension *CreateMemHeaderExtension(long textId) {
   res->textId = textId;
   NewList((struct List *)&res->nodes);
   res->notInHeaderYet = 1;
+  return res;
 }
 
 void DeleteMemHeaderExtension(struct MemHeaderExtension *ext) {
