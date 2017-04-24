@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <devices/serial.h>
+#include <dos/dos.h>
 
 #include <NiKomNodeCommon.h>
 /*
