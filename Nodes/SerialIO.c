@@ -2,6 +2,10 @@
 #include <dos/dos.h>
 #include <intuition/intuition.h>
 #include <proto/exec.h>
+#ifdef __GNUC__
+/* For NewList() */
+# include <proto/alib.h>
+#endif
 #include <devices/serial.h>
 #include <devices/console.h>
 #include <devices/conunit.h>
