@@ -1,4 +1,5 @@
 #include <proto/locale.h>
+#include "NiKomStr.h"
 #include "CatalogDefaults.h"
 
 #define CATSTR(foo) GetCatalogStr(g_Catalog, foo, foo ## _STR)

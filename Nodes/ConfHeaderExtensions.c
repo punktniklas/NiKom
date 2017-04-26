@@ -1,6 +1,10 @@
 #include <dos/dos.h>
 #include <exec/memory.h>
 #include <proto/exec.h>
+#ifdef __GNUC__
+/* For NewList() */
+# include <proto/alib.h>
+#endif
 #include <proto/dos.h>
 #include <stdio.h>
 #include "NiKomStr.h"
@@ -18,11 +22,12 @@ struct MemHeaderExtension *CreateMemHeaderExtension(long textId) {
   res->textId = textId;
   NewList((struct List *)&res->nodes);
   res->notInHeaderYet = 1;
+  return res;
 }
 
 void DeleteMemHeaderExtension(struct MemHeaderExtension *ext) {
   struct MemHeaderExtensionNode *node;
-  while(node = (struct MemHeaderExtensionNode *)RemHead((struct List *)&ext->nodes)) {
+  while((node = (struct MemHeaderExtensionNode *)RemHead((struct List *)&ext->nodes))) {
     FreeMem(node, sizeof(struct MemHeaderExtensionNode));
   }
   FreeMem(ext, sizeof(struct MemHeaderExtension));
@@ -51,7 +56,7 @@ int SaveHeaderExtension(struct MemHeaderExtension *ext) {
   }
 
   NiKForbid();
-  sprintf(fileName, "NiKom:Moten/Extensions%d.dat", ext->textId / 512);
+  sprintf(fileName, "NiKom:Moten/Extensions%ld.dat", ext->textId / 512);
   if(!(fh = Open(fileName, MODE_READWRITE))) {
     NiKPermit();
     LogEvent(SYSTEM_LOG, ERROR, "Can't open %s for writing.", fileName);

@@ -2,6 +2,10 @@
 #include <dos/dos.h>
 #include <intuition/intuition.h>
 #include <proto/exec.h>
+#ifdef __GNUC__
+/* For NewList() */
+# include <proto/alib.h>
+#endif
 #include <devices/serial.h>
 #include <devices/console.h>
 #include <devices/conunit.h>
@@ -133,7 +137,6 @@ BYTE OpenSerial(writereq,readreq,changereq)
 struct IOExtSer *writereq,*readreq,*changereq;
 {
 	BYTE error;
-	int sererr;
 
 	if(handskakning == 2)
 		writereq->io_SerFlags= SERF_XDISABLED | SERF_7WIRE | SERF_SHARED;
@@ -145,8 +148,10 @@ struct IOExtSer *writereq,*readreq,*changereq;
 			writereq->io_SerFlags= SERF_XDISABLED | SERF_SHARED;
 	}
 
-	if(error=OpenDevice(device,unit,(struct IORequest *)writereq,0))
+	error = OpenDevice(device, unit, (struct IORequest *)writereq, 0);
+	if(error) {
 		cleanup(EXIT_ERROR,"Kunde inte öppna devicet\n");
+	}
 	writereq->io_Baud=dtespeed;
 	writereq->io_RBufLen=16384;
 	writereq->io_ReadLen=8;
@@ -164,7 +169,7 @@ struct IOExtSer *writereq,*readreq,*changereq;
 	}
 
 	writereq->IOSer.io_Command = SDCMD_SETPARAMS;
-	if(sererr=DoIO((struct IORequest *)writereq)) writesererr(sererr);
+	DoSerIOErr(writereq);
 	CopyMem(writereq,readreq,sizeof(struct IOExtSer));
 	readreq->IOSer.io_Message.mn_ReplyPort = serreadport;
 	CopyMem(writereq,changereq,sizeof(struct IOExtSer));
@@ -275,6 +280,26 @@ void writesererr(int errcode) {
 	printf("Serial error on node %d (%s, unit %d): %s\n",nodnr,device,unit,errstr);
 }
 
+int DoSerIOErr(struct IOExtSer *req){
+  int err;
+
+  err = DoIO((struct IORequest *)req);
+  if(err) {
+    writesererr(err);
+  }
+  return err;
+}
+
+static int WaitSerIOErr(struct IOExtSer *req){
+  int err;
+
+  err = WaitIO((struct IORequest *)req);
+  if(err) {
+    writesererr(err);
+  }
+  return err;
+}
+
 char gettekn(void) {
   struct IntuiMessage *mymess;
   struct NiKMess *nikmess;
@@ -345,7 +370,7 @@ char gettekn(void) {
       nodestate |= NIKSTATE_INACTIVITY;
     }
     if(signals & nikomnodesig) {
-      while(nikmess = (struct NiKMess *) GetMsg(nikomnodeport)) {
+      while((nikmess = (struct NiKMess *) GetMsg(nikomnodeport))) {
         handleservermess(nikmess);
         ReplyMsg((struct Message *)nikmess);
       }
@@ -368,17 +393,13 @@ char congettkn(void) {
 
 char sergettkn(void) {
   char temp;
-  int err;
-  if(err = WaitIO((struct IORequest *)serreadreq)) {
-    writesererr(err);
-  }
+  WaitSerIOErr(serreadreq);
   temp = serinput;
   serreqtkn();
   return temp;
 }
 
 void eka(char tecken) {
-	int err;
 	char sertkn[2];
 	int bytes;
 	conwritereq->io_Command=CMD_WRITE;
@@ -389,7 +410,7 @@ void eka(char tecken) {
 	serwritereq->IOSer.io_Command=CMD_WRITE;
 	serwritereq->IOSer.io_Data=(APTR)sertkn;
 	serwritereq->IOSer.io_Length=bytes;
-	if(err=DoIO((struct IORequest *)serwritereq)) writesererr(err);
+	DoSerIOErr(serwritereq);
 
 	if(tecken == '\n')
 		incantrader();
@@ -397,14 +418,13 @@ void eka(char tecken) {
 
 void sereka(char tecken)
 {
-	int err;
 	char sertkn[2];
 	int bytes;
 	bytes = ConvMBChrsFromAmiga(sertkn,&tecken,1,Servermem->inne[nodnr].chrset);
 	serwritereq->IOSer.io_Command=CMD_WRITE;
 	serwritereq->IOSer.io_Data=(APTR)sertkn;
 	serwritereq->IOSer.io_Length=bytes;
-	if(err=DoIO((struct IORequest *)serwritereq)) writesererr(err);
+	DoSerIOErr(serwritereq);
 
 	if(tecken == '\n')
 		incantrader();
@@ -433,7 +453,6 @@ void serreqtkn(void) {
 }
 
 void putstring(char *pekare,int size, long flags) {
-	int err;
 	char serpekare[400];
 	int bytes;
 
@@ -448,10 +467,10 @@ void putstring(char *pekare,int size, long flags) {
 	conwritereq->io_Length=size;
 	DoIO((struct IORequest *)conwritereq);
 
-	if(err=WaitIO((struct IORequest *)serwritereq)) writesererr(err);
+	WaitSerIOErr(serwritereq);
 }
 
-void serputstring(char *pekare,int size, long flags)
+static void serputstring(char *pekare, int size, long flags)
 {
 	char serpekare[400];
 	int bytes;
@@ -473,11 +492,8 @@ int ConnectionLost(void) {
 }
 
 void QueryCarrierDropped(void) {
-  int err;
   serchangereq->IOSer.io_Command=SDCMD_QUERY;
-  if(err = DoIO((struct IORequest *)serchangereq)) {
-    writesererr(err);
-  }
+  DoSerIOErr(serchangereq);
   if(serchangereq->io_Status & NOCARRIER) {
     nodestate |= NIKSTATE_NOCARRIER;
   }
@@ -621,7 +637,7 @@ int getfifoevent(struct MsgPort *fifoport, char *puthere) {
       event |= FIFOEVENT_FROMFIFO;
     }
     if(signals & nikomnodesig) {
-      while(nikmess = (struct NiKMess *) GetMsg(nikomnodeport)) {
+      while((nikmess = (struct NiKMess *) GetMsg(nikomnodeport))) {
         handleservermess(nikmess);
         ReplyMsg((struct Message *)nikmess);
       }
@@ -835,7 +851,7 @@ int sendtosercon(char *conpek, char *serpek, int consize, int sersize) {
 
   char tecken;
   int aborted = FALSE, paused=FALSE;
-  int console=1,serial=1,err;
+  int console=1,serial=1;
   ULONG signals,
     conwritesig = 1L << conwriteport->mp_SigBit,
     conreadsig = 1L << conreadport->mp_SigBit,
@@ -882,9 +898,7 @@ int sendtosercon(char *conpek, char *serpek, int consize, int sersize) {
     }
     if((signals & serwritesig) && CheckIO((struct IORequest *)serwritereq)) {
       serial = 0;
-      if(err=WaitIO((struct IORequest *)serwritereq)) {
-        writesererr(err);
-      }
+      WaitSerIOErr(serwritereq);
     }
     if((signals & conreadsig) && CheckIO((struct IORequest *)conreadreq)) {
       if((tecken = congettkn()) == 3) {
@@ -951,7 +965,7 @@ int sendtosercon(char *conpek, char *serpek, int consize, int sersize) {
       cleanup(EXIT_OK,"");
     }
     if(signals & nikomnodesig) {
-      while(nikmess = (struct NiKMess *) GetMsg(nikomnodeport)) {
+      while((nikmess = (struct NiKMess *) GetMsg(nikomnodeport))) {
         handleservermess(nikmess);
         ReplyMsg((struct Message *)nikmess);
       }
@@ -1008,7 +1022,7 @@ int sendtocon(char *pekare, int size)
 			cleanup(EXIT_OK,"");
 		}
 		if(signals & nikomnodesig) {
-			while(nikmess = (struct NiKMess *) GetMsg(nikomnodeport)) {
+			while((nikmess = (struct NiKMess *) GetMsg(nikomnodeport))) {
 				handleservermess(nikmess);
 				ReplyMsg((struct Message *)nikmess);
 			}
@@ -1133,7 +1147,7 @@ int sendtoser(char *pekare, int size) {
       cleanup(EXIT_OK,"");
     }
     if(signals & nikomnodesig) {
-      while(nikmess = (struct NiKMess *) GetMsg(nikomnodeport)) {
+      while((nikmess = (struct NiKMess *) GetMsg(nikomnodeport))) {
         handleservermess(nikmess);
         ReplyMsg((struct Message *)nikmess);
       }

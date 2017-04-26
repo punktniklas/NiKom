@@ -2,11 +2,20 @@
 #include <exec/memory.h>
 #include <dos/dos.h>
 #include <proto/exec.h>
+#ifdef __GNUC__
+/* For NewList() */
+# include <proto/alib.h>
+#endif
 #include <proto/dos.h>
 #include <proto/intuition.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#ifdef __GNUC__
+/* In gcc access() is defined in unistd.h, while SAS/C has the
+   prototype in stdio.h */
+# include <unistd.h>
+#endif
 #include <time.h>
 #include "NiKomStr.h"
 #include "NiKomFuncs.h"
@@ -535,7 +544,7 @@ void motesstatus(void) {
 	puttekn(outbuffer,-1);
 	sprintf(outbuffer,"\r\nMötesnummer:     %d",motpek->nummer);
 	puttekn(outbuffer,-1);
-	sprintf(outbuffer,"\r\nSorteringsvärde: %d",motpek->sortpri);
+	sprintf(outbuffer,"\r\nSorteringsvärde: %ld",motpek->sortpri);
 	puttekn(outbuffer,-1);
 	sprintf(outbuffer,"\r\nMAD:             %s",getusername(motpek->mad));
 	puttekn(outbuffer,-1);
@@ -651,7 +660,7 @@ void listgruppmed(void) {
 	puttekn("\r\n\n",-1);
 	for(listpek=(struct ShortUser *)Servermem->user_list.mlh_Head;listpek->user_node.mln_Succ;listpek=(struct ShortUser *)listpek->user_node.mln_Succ) {
 		if(BAMTEST((char *)&listpek->grupper,grupp)) {
-			sprintf(outbuffer,"%s #%d\r\n",listpek->namn,listpek->nummer);
+			sprintf(outbuffer,"%s #%ld\r\n",listpek->namn,listpek->nummer);
 			if(puttekn(outbuffer,-1)) return;
 		}
 	}
@@ -695,7 +704,7 @@ void defalias(void) {
 	pek = &argument[0];
 	while(pek[0] != ' ' && pek[0]) pek++;
 	pek[0] = NULL;
-	if(defpek=parsealias(argument)) {
+	if((defpek=parsealias(argument))) {
 		strncpy(defpek->blirtill,andra,40);
 	} else {
 		if(!(defpek=AllocMem(sizeof(struct Alias),MEMF_CLEAR))) {
@@ -766,7 +775,7 @@ int readtextlines(long pos, int lines, int textId) {
 
 void freeeditlist(void) {
 	struct EditLine *el;
-	while(el=(struct EditLine *)RemHead((struct List *)&edit_list))
+	while((el=(struct EditLine *)RemHead((struct List *)&edit_list)))
 		FreeMem(el,sizeof(struct EditLine));
 	NewList((struct List *)&edit_list);
 }

@@ -78,7 +78,7 @@ void cleanup(int errorCode, char *text) {
     CloseWindow(NiKwind);
   }
   if(LocaleBase) {
-    CloseLibrary(LocaleBase);
+    CloseLibrary((struct Library *)LocaleBase);
   }
   if(RexxSysBase) {
     CloseLibrary((struct Library *)RexxSysBase);
@@ -105,7 +105,7 @@ void cleanup(int errorCode, char *text) {
 }
 
 struct NodeType *selectNodeType(void) {
-  struct NodeType *nt;
+  struct NodeType *nt = NULL;
   int going, i, isCorrect;
 
   if(Servermem->nodetypes[0].nummer == 0) {
@@ -166,8 +166,8 @@ struct NodeType *selectNodeType(void) {
   return nt;
 }
 
-void main(int argc,char *argv[]) {
-  int going=TRUE,forsok=2,car=1,x,connectbps, i, tmp;
+int main(int argc,char *argv[]) {
+  int going=TRUE, forsok=2, car=1, x, connectbps=0, i, tmp;
   struct NodeType *nt;
   char *tmppscreen,commandstring[100], configname[50] = "NiKom:DatoCfg/SerNode.cfg";
   FILE *fil;
@@ -182,7 +182,7 @@ void main(int argc,char *argv[]) {
     cleanup(EXIT_ERROR,"Kunde inte öppna intuition.library\n");
   if(!(UtilityBase=OpenLibrary("utility.library",37L)))
     cleanup(EXIT_ERROR,"Kunde inte öppna utility.library\n");
-  if(!(LocaleBase=OpenLibrary("locale.library",38L)))
+  if(!(LocaleBase=(NiKomLocaleType *)OpenLibrary("locale.library",38L)))
     cleanup(EXIT_ERROR,"Kunde inte öppna locale.library\n");
   if(!(NiKomBase=OpenLibrary("nikom.library",0L)))
     cleanup(EXIT_ERROR,"Kunde inte öppna nikom.library\n");
@@ -341,4 +341,5 @@ void main(int argc,char *argv[]) {
     if(getty) cleanup(EXIT_OK,"");
     disconnect();
   }
+  return 0;
 }

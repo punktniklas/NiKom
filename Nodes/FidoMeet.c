@@ -2,6 +2,10 @@
 #include <exec/memory.h>
 #include <dos/dos.h>
 #include <proto/exec.h>
+#ifdef __GNUC__
+/* For NewList() */
+# include <proto/alib.h>
+#endif
 #include <proto/dos.h>
 #include <proto/intuition.h>
 #include <string.h>
@@ -73,7 +77,7 @@ void fido_visatext(int text,struct Mote *motpek) {
   Servermem->inne[nodnr].read++;
   Servermem->info.lasta++;
   Statstr.read++;
-  sprintf(filnamn,"%d.msg",text - motpek->renumber_offset);
+  sprintf(filnamn,"%ld.msg",text - motpek->renumber_offset);
   strcpy(fullpath,motpek->dir);
   AddPart(fullpath,filnamn,99);
   if(Servermem->inne[nodnr].flaggor & SHOWKLUDGE) ft=ReadFidoTextTags(fullpath,TAG_DONE);
@@ -185,7 +189,7 @@ int fido_skriv(int komm,int komtill) {
   memset(&ft, 0, sizeof(struct FidoText));
   if(komm) {
     strcpy(fullpath, motpek->dir);
-    sprintf(filnamn, "%d.msg", komtill - motpek->renumber_offset);
+    sprintf(filnamn, "%ld.msg", komtill - motpek->renumber_offset);
     AddPart(fullpath, filnamn, 99);
     komft = ReadFidoTextTags(fullpath, RFT_HeaderOnly, TRUE, TAG_DONE);
     if(!komft) {
@@ -292,7 +296,7 @@ int fido_skriv(int komm,int komtill) {
     LogEvent(USAGE_LOG, INFO, "%s skriver text %d i %s",
              getusername(inloggad), nummer, motpek->namn);
   }
-  while(first = (struct MinNode *)RemHead((struct List *)&ft.text)) {
+  while((first = (struct MinNode *)RemHead((struct List *)&ft.text))) {
     FreeMem(first,sizeof(struct EditLine));
   }
   NewList((struct List *)&edit_list);
@@ -321,7 +325,7 @@ void fidolistaarende(struct Mote *motpek,int dir) {
   SendString("\r\n-------------------------------------------------------------------------\r\n");
   for(i = from; i >= motpek->lowtext && i <= motpek->texter; i += dir) {
     strcpy(fullpath, motpek->dir);
-    sprintf(filnamn, "%d.msg", i - motpek->renumber_offset);
+    sprintf(filnamn, "%ld.msg", i - motpek->renumber_offset);
     AddPart(fullpath, filnamn, 99);
     ft = ReadFidoTextTags(fullpath, RFT_HeaderOnly, TRUE, TAG_DONE);
     if(!ft) {

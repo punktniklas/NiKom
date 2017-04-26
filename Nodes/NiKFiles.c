@@ -1,11 +1,24 @@
 #include <exec/types.h>
 #include <proto/exec.h>
+#ifdef __GNUC__
+/* For NewList() */
+# include <proto/alib.h>
+#endif
 #include <proto/intuition.h>
 #include <proto/dos.h>
 #include <proto/utility.h>
 #include <exec/memory.h>
 #include <dos/dos.h>
 #include <stdio.h>
+#ifdef __GNUC__
+/* In gcc access() is defined in unistd.h, while SAS/C has the
+   prototype in stdio.h */
+# include <unistd.h>
+/* ...and mkdir() is defined in sys/stat... */
+# include <sys/stat.h>
+/* ...and takes an extra mode argument. */
+# define mkdir(path) mkdir((path), 0755)
+#endif
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
@@ -358,7 +371,7 @@ void listfiler(void) {
 		if(nyckel!=-1 && !BAMTEST(sokpek->nycklar,nyckel)) continue;
 		ts=localtime(&sokpek->tid);
 		if(puttekn("\r\n",-1)) return;
-		sprintf(outbuffer,"%-24s %c%c %7d %02d%02d%02d %-28s %2d\r\n",
+		sprintf(outbuffer,"%-24s %c%c %7ld %02d%02d%02d %-28s %2d\r\n",
 		              sokpek->namn,
 		              sokpek->flaggor & FILE_NOTVALID ? 'V' : ' ',
 		              sokpek->flaggor & FILE_FREEDL ? 'F' : ' ',
@@ -872,6 +885,7 @@ int andrafil(void) {
         if(updatefile(area2,filpek)) {
           puttekn("\r\n\nKunde inte skriva filen!\r\n",-1);
         }
+	return 0;
 }
 
 int lagrafil(void) { return(0); }
@@ -999,7 +1013,7 @@ int sokfil(void) {
 			}
 			found = TRUE;
 			ts=localtime(&filpek->tid);
-			sprintf(outbuffer,"\r\n%-24s %c%c %7d %02d%02d%02d %-28s %2d\r\n",
+			sprintf(outbuffer,"\r\n%-24s %c%c %7ld %02d%02d%02d %-28s %2d\r\n",
 				filpek->namn,
 				filpek->flaggor & FILE_NOTVALID ? 'V' : ' ',
 				filpek->flaggor & FILE_FREEDL ? 'F' : ' ',
@@ -1034,6 +1048,7 @@ struct Fil *parsefilallareas(char *skri)
 		fil = parsefil(skri, x);
 		if(fil) return fil;
 	}
+	return NULL;
 }
 
 struct Fil *parsefil(skri,area)
@@ -1048,7 +1063,7 @@ int area;
 		quoted = TRUE;
 		strncpy(tmpstr,&skri[1],41);
 		tmpstr[41] = 0;
-		if(pt = strchr(tmpstr,'"')) *pt = 0;
+		if((pt = strchr(tmpstr,'"'))) *pt = 0;
 	}
 	else {
 		strncpy(tmpstr,skri,41);
@@ -1098,7 +1113,7 @@ void filstatus(void) {
 		return;
 	}
 	ts=localtime(&vispek->tid);
-	sprintf(outbuffer,"\r\n\nNamn: %s  Fillängd: %d  Datum:%4d%02d%02d",
+	sprintf(outbuffer,"\r\n\nNamn: %s  Fillängd: %ld  Datum:%4d%02d%02d",
                 vispek->namn, vispek->size, ts->tm_year + 1900, ts->tm_mon + 1,
                 ts->tm_mday);
 	puttekn(outbuffer,-1);
@@ -1182,7 +1197,7 @@ void nyafiler(void) {
 				headerprinted=TRUE;
 			}
 			ts=localtime(&sokpek->tid);
-			sprintf(outbuffer,"\r\n%-24s %c%c %7d %02d%02d%02d %-28s %2d\r\n",
+			sprintf(outbuffer,"\r\n%-24s %c%c %7ld %02d%02d%02d %-28s %2d\r\n",
 		              sokpek->namn,
 		              sokpek->flaggor & FILE_NOTVALID ? 'V' : ' ',
 		              sokpek->flaggor & FILE_FREEDL ? 'F' : ' ',

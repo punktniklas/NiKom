@@ -126,7 +126,7 @@ int isUserOutOfTime(void) {
 struct Kommando *getCommandToExecute(int defaultCmd) {
   int parseRes, cmdId;
   struct Alias *alias;
-  static badCommandCnt = 0;
+  static unsigned badCommandCnt = 0;
   static char aliasbuf[1081];
 
   if(GetString(999, NULL)) {

@@ -8,6 +8,11 @@
 #include <proto/utility.h>
 #include <time.h>
 #include <stdio.h>
+#ifdef __GNUC__
+/* In gcc access() is defined in unistd.h, while SAS/C has the
+   prototype in stdio.h */
+# include <unistd.h>
+#endif
 #include <stdlib.h>
 #include <string.h>
 #include "NiKomStr.h"
@@ -194,6 +199,7 @@ void userinfo(struct RexxMsg *mess) {
 		return;
 	}
 
+	nodnr = 0; // Fix false warning about uninitialized variable.
 	if(mess->rm_Args[2][0]!='n' && mess->rm_Args[2][0]!='N' && mess->rm_Args[2][0]!='r'  && mess->rm_Args[2][0]!='R') {
 		for(nodnr=0;nodnr<MAXNOD;nodnr++) if(Servermem->inloggad[nodnr]==nummer) break;
 
@@ -232,9 +238,9 @@ void userinfo(struct RexxMsg *mess) {
 			break;
 		case 'd' : case 'D' :
 			if(usrloggedin)
-				sprintf(str,"%d",Servermem->inne[nodnr].download);
+				sprintf(str,"%ld",Servermem->inne[nodnr].download);
 			else
-				sprintf(str,"%d",userinfouser.download);
+				sprintf(str,"%ld",userinfouser.download);
 			break;
 		case 'e' : case 'E' :
 			if(usrloggedin)
@@ -259,27 +265,27 @@ void userinfo(struct RexxMsg *mess) {
 			break;
 		case 'h' : case 'H' :
 			if(usrloggedin)
-				sprintf(str,"%d",Servermem->inne[nodnr].downloadbytes);
+				sprintf(str,"%ld",Servermem->inne[nodnr].downloadbytes);
 			else
-				sprintf(str,"%d",userinfouser.downloadbytes);
+				sprintf(str,"%ld",userinfouser.downloadbytes);
 			break;
 		case 'j' : case 'J' :
 			if(usrloggedin)
-				sprintf(str,"%d",Servermem->inne[nodnr].uploadbytes);
+				sprintf(str,"%ld",Servermem->inne[nodnr].uploadbytes);
 			else
-				sprintf(str,"%d",userinfouser.uploadbytes);
+				sprintf(str,"%ld",userinfouser.uploadbytes);
 			break;
 		case 'i' : case 'I' :
 			if(usrloggedin)
-				sprintf(str,"%d",Servermem->inne[nodnr].loggin);
+				sprintf(str,"%ld",Servermem->inne[nodnr].loggin);
 			else
-				sprintf(str,"%d",userinfouser.loggin);
+				sprintf(str,"%ld",userinfouser.loggin);
 			break;
 		case 'l' : case 'L' :
 			if(usrloggedin)
-				sprintf(str,"%d",Servermem->inne[nodnr].read);
+				sprintf(str,"%ld",Servermem->inne[nodnr].read);
 			else
-				sprintf(str,"%d",userinfouser.read);
+				sprintf(str,"%ld",userinfouser.read);
 			break;
 		case 'm' : case 'M' :
 			if(usrloggedin)
@@ -292,9 +298,9 @@ void userinfo(struct RexxMsg *mess) {
 			break;
 		case 'o' : case 'O' :
 			if(usrloggedin)
-				sprintf(str,"%d",Servermem->inne[nodnr].flaggor);
+				sprintf(str,"%ld",Servermem->inne[nodnr].flaggor);
 			else
-				sprintf(str,"%d",userinfouser.flaggor);
+				sprintf(str,"%ld",userinfouser.flaggor);
 			break;
 		case 'p' : case 'P' :
 			if(usrloggedin)
@@ -313,21 +319,21 @@ void userinfo(struct RexxMsg *mess) {
 			break;
 		case 's' : case 'S' :
 			if(usrloggedin)
-				sprintf(str,"%d",Servermem->inne[nodnr].skrivit);
+				sprintf(str,"%ld",Servermem->inne[nodnr].skrivit);
 			else
-				sprintf(str,"%d",userinfouser.skrivit);
+				sprintf(str,"%ld",userinfouser.skrivit);
 			break;
 		case 't' : case 'T' :
 			if(usrloggedin)
-				sprintf(str,"%d",Servermem->inne[nodnr].tot_tid);
+				sprintf(str,"%ld",Servermem->inne[nodnr].tot_tid);
 			else
-				sprintf(str,"%d",userinfouser.tot_tid);
+				sprintf(str,"%ld",userinfouser.tot_tid);
 			break;
 		case 'u' : case 'U' :
 			if(usrloggedin)
-				sprintf(str,"%d",Servermem->inne[nodnr].upload);
+				sprintf(str,"%ld",Servermem->inne[nodnr].upload);
 			else
-				sprintf(str,"%d",userinfouser.upload);
+				sprintf(str,"%ld",userinfouser.upload);
 			break;
 		case 'x' : case 'X' :
 			if(usrloggedin)
@@ -343,9 +349,9 @@ void userinfo(struct RexxMsg *mess) {
 			break;
 		case 'z' : case 'Z' :
 			if(usrloggedin)
-				sprintf(str,"%d",Servermem->inne[nodnr].brevpek);
+				sprintf(str,"%ld",Servermem->inne[nodnr].brevpek);
 			else
-				sprintf(str,"%d",userinfouser.brevpek);
+				sprintf(str,"%ld",userinfouser.brevpek);
 			break;
 		default :
 			str[0]=0;
@@ -375,7 +381,7 @@ void motesinfo(struct RexxMsg *mess) {
 
 	switch(mess->rm_Args[2][0]) {
 		case 'a' : case 'A' :
-			sprintf(str,"%d",motpek->skapat_av);
+			sprintf(str,"%ld",motpek->skapat_av);
 			break;
 		case 'c' : case 'C' :
 			sprintf(str,"%d",motpek->charset);
@@ -390,13 +396,13 @@ void motesinfo(struct RexxMsg *mess) {
 			sprintf(str,"%d,%d",(unsigned int)motpek->grupper/65536,(unsigned int)motpek->grupper%65536);
 			break;
 		case 'h' : case 'H' :
-			sprintf(str,"%d",motpek->texter);
+			sprintf(str,"%ld",motpek->texter);
 			break;
 		case 'l' : case 'L' :
-			sprintf(str,"%d",motpek->lowtext);
+			sprintf(str,"%ld",motpek->lowtext);
 			break;
 		case 'm' : case 'M' :
-			sprintf(str,"%d",motpek->mad);
+			sprintf(str,"%ld",motpek->mad);
 			break;
 		case 'n' : case 'N' :
 			strcpy(str,motpek->namn);
@@ -405,10 +411,10 @@ void motesinfo(struct RexxMsg *mess) {
 			strcpy(str,motpek->origin);
 			break;
 		case 'p' : case 'P' :
-			sprintf(str,"%d",motpek->sortpri);
+			sprintf(str,"%ld",motpek->sortpri);
 			break;
 		case 'r' : case 'R' :
-			sprintf(str,"%d",motpek->renumber_offset);
+			sprintf(str,"%ld",motpek->renumber_offset);
 			break;
 		case 's' : case 'S' :
 			sprintf(str,"%d",motpek->status);
@@ -595,7 +601,7 @@ void senaste(struct RexxMsg *mess) {
 	}
 	switch(mess->rm_Args[2][0]) {
 		case 'a' : case 'A' :
-			sprintf(str,"%d",Servermem->senaste[nummer].anv);
+			sprintf(str,"%ld",Servermem->senaste[nummer].anv);
 			break;
 		case 'd' : case 'D' :
 			sprintf(str,"%d",Servermem->senaste[nummer].dl);
@@ -639,16 +645,16 @@ void sysinfo(struct RexxMsg *mess) {
 	}
 	switch(mess->rm_Args[1][0]) {
 		case 'a' : case 'A' :
-			sprintf(str,"%d",((struct ShortUser *)Servermem->user_list.mlh_TailPred)->nummer);
+			sprintf(str,"%ld",((struct ShortUser *)Servermem->user_list.mlh_TailPred)->nummer);
 			break;
 		case 'h' : case 'H' :
-			sprintf(str,"%d",Servermem->info.hightext);
+			sprintf(str,"%ld",Servermem->info.hightext);
 			break;
 		case 'k' : case 'K' :
 			sprintf(str,"%d",Servermem->info.kommandon);
 			break;
 		case 'l' : case 'L' :
-			sprintf(str,"%d",Servermem->info.lowtext);
+			sprintf(str,"%ld",Servermem->info.lowtext);
 			break;
 		case 'm' : case 'M' :
 			letpek=(struct Mote *)Servermem->mot_list.mlh_Head;
@@ -701,7 +707,7 @@ void sysinfo(struct RexxMsg *mess) {
 				break;
 			}
 
-			sprintf(str,"%d %d",Servermem->info.bps[tmp1-1], Servermem->info.antbps[tmp1-1]);
+			sprintf(str,"%ld %ld",Servermem->info.bps[tmp1-1], Servermem->info.antbps[tmp1-1]);
 			break;
 		case 'd' : case 'D' :
 			sprintf(str, "%d", (int) MAXNOD);
@@ -935,7 +941,7 @@ int area;
 	if(skri[0]=='"') {
 		quoted = TRUE;
 		strcpy(tmpstr,&skri[1]);
-		if(pt = strchr(tmpstr,'"')) *pt = 0;
+		if((pt = strchr(tmpstr,'"'))) *pt = 0;
 	}
 	else strcpy(tmpstr,skri);
 	letpek=(struct Fil *)Servermem->areor[area].ar_list.mlh_TailPred;
@@ -1015,10 +1021,10 @@ void kominfo(struct RexxMsg *mess) {
 			sprintf(str,"%d",kompek->argument);
 			break;
 		case 'd' : case 'D' :
-			sprintf(str,"%d",kompek->mindays);
+			sprintf(str,"%ld",kompek->mindays);
 			break;
 		case 'l' : case 'L' :
-			sprintf(str,"%d",kompek->minlogg);
+			sprintf(str,"%ld",kompek->minlogg);
 			break;
 		case 'n' : case 'N' :
 			strcpy(str,kompek->langCmd[0].name);
@@ -1079,10 +1085,10 @@ void filinfo(struct RexxMsg *mess) {
                                 ts->tm_hour, ts->tm_min);
 			break;
 		case 'f' : case 'F' :
-			sprintf(str,"%d",filpek->flaggor);
+			sprintf(str,"%ld",filpek->flaggor);
 			break;
 		case 'i' : case 'I' :
-			sprintf(str,"%d",filpek->dir);
+			sprintf(str,"%ld",filpek->dir);
 			break;
 		case 'n' : case 'N' :
 			strcpy(str,filpek->namn);
@@ -1091,7 +1097,7 @@ void filinfo(struct RexxMsg *mess) {
 			sprintf(str,"%d",filpek->status);
 			break;
 		case 's' : case 'S' :
-			sprintf(str,"%d",filpek->size);
+			sprintf(str,"%ld",filpek->size);
 			break;
 		case 't' : case 'T' :
 			ts=localtime(&filpek->tid);
@@ -1100,7 +1106,7 @@ void filinfo(struct RexxMsg *mess) {
                                 ts->tm_hour, ts->tm_min);
 			break;
 		case 'u' : case 'U' :
-			sprintf(str,"%d",filpek->uppladdare);
+			sprintf(str,"%ld",filpek->uppladdare);
 			break;
 		case 'l' : case 'L' :
 			if(filpek->flaggor & FILE_LONGDESC)
@@ -1145,7 +1151,7 @@ void areainfo(struct RexxMsg *mess) {
 	}
 	switch(mess->rm_Args[2][0]) {
 		case 'a' : case 'A' :
-			sprintf(str,"%d",Servermem->areor[nummer].skapad_av);
+			sprintf(str,"%ld",Servermem->areor[nummer].skapad_av);
 			break;
 		case 'd' : case  'D' :
 			dir=atoi(&mess->rm_Args[2][1]);
@@ -1156,7 +1162,7 @@ void areainfo(struct RexxMsg *mess) {
 			strcpy(str,Servermem->areor[nummer].dir[dir]);
 			break;
 		case 'f' : case 'F' :
-			sprintf(str,"%d",Servermem->areor[nummer].flaggor);
+			sprintf(str,"%ld",Servermem->areor[nummer].flaggor);
 			break;
 		case 'g' : case 'G' :
 			sprintf(str,"%d,%d",(unsigned int)Servermem->areor[nummer].grupper/65536,(unsigned int)Servermem->areor[nummer].grupper%65536);
@@ -1362,7 +1368,7 @@ void skapafil(struct RexxMsg *mess) {
 	}
 	fil->tid=fil->validtime=time(&tid);
 	if(!(lock=Lock(filnamn,ACCESS_READ))) {
-		printf("Kunde inte få ett lock för filen!\n",-1);
+		printf("Kunde inte få ett lock för filen!\n");
 		mess->rm_Result1=3;
 		mess->rm_Result2=NULL;
 		FreeMem(fil,sizeof(struct Fil));

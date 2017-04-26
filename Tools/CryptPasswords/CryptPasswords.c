@@ -36,7 +36,8 @@ void convertUser(int userId) {
     return;
   }
   if(statbuf.st_size != sizeof(struct User)) {
-    printf("Size of user's data file is %d, was expecting %d.\n", statbuf.st_size, sizeof(struct User));
+    printf("Size of user's data file is %d, was expecting %lu.\n",
+           statbuf.st_size, (unsigned long)sizeof(struct User));
     printf("Are you running the right version of CryptPasswords?\n");
     return;
   }
@@ -71,7 +72,7 @@ void printUsage(int exitCode) {
     exit(exitCode);
 }
 
-void main(int argc, char *argv[]) {
+int main(int argc, char *argv[]) {
   if(argc < 2 || argv[1][0] != '-') {
     printUsage(0);
   }
@@ -105,4 +106,5 @@ void main(int argc, char *argv[]) {
     printf("Invalid option.\n\n");
     printUsage(10);
   }
+  return 0;
 }

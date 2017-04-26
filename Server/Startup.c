@@ -3,6 +3,10 @@
 #include <exec/memory.h>
 #include <rexx/storage.h>
 #include <proto/exec.h>
+#ifdef __GNUC__
+/* For NewList() */
+# include <proto/alib.h>
+#endif
 #include <proto/intuition.h>
 #include <proto/dos.h>
 #include <stdio.h>
@@ -230,7 +234,7 @@ void readTextInfo(void) {
     return;
   }
 
-  sprintf(filename, "NiKom:Moten/Head%d.dat", low);
+  sprintf(filename, "NiKom:Moten/Head%ld.dat", low);
   if(!(fh = Open(filename, MODE_OLDFILE))) {
     printf("Can't open %s.\n", filename);
     cleanup(EXIT_ERROR, "Couldn't get lowest textnumber.");
@@ -246,7 +250,7 @@ void readTextInfo(void) {
   Servermem->info.lowtext = readhead.nummer;
   Close(fh);
   
-  sprintf(filename,"NiKom:Moten/Head%d.dat", high);
+  sprintf(filename,"NiKom:Moten/Head%ld.dat", high);
   if(!(fh = Open(filename,MODE_OLDFILE))) {
     printf("Can't open %s.\n", filename);
     cleanup(EXIT_ERROR, "Couldn't get highest textnumber.");
@@ -261,7 +265,7 @@ void readTextInfo(void) {
   }
   Servermem->info.hightext = readhead.nummer;
   Close(fh);
-  printf("Lowtext: %d  Hightext: %d\n",
+  printf("Lowtext: %ld  Hightext: %ld\n",
          Servermem->info.lowtext, Servermem->info.hightext);
 }
 
@@ -401,6 +405,7 @@ int maybeConvertConferenceTextData(int numberOfTexts) {
     cleanup(EXIT_ERROR, "Couldn't delete Textmot.dat.");
   }
   printf("  Conversion finished.\n");
+  return 1;
 }
 
 void readIntoConfTextsArray(int arrayIndex, int fileIndex, int textsToRead,
@@ -550,7 +555,7 @@ void readUserData(void) {
   UnLock(lock);
   FreeDosObject(DOS_EXALLCONTROL,ec);
 
-  printf("Read users (Highest id: %d)\n",
+  printf("Read users (Highest id: %ld)\n",
          ((struct ShortUser *)Servermem->user_list.mlh_TailPred)->nummer);
   printf("User #0 : %s\n",((struct ShortUser *)Servermem->user_list.mlh_Head)->namn);
 }
