@@ -1,3 +1,5 @@
+#include "NiKomStr.h"
+
 extern struct Stack *g_unreadRepliesStack;
 
 void KomLoop(void);

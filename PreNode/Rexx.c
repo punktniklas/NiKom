@@ -57,7 +57,7 @@ int sendrexx(int komnr) {
 		if(tempmess->rm_Node.mn_Node.ln_Type==NT_REPLYMSG) {
 			DeleteArgstring(nikrexxmess->rm_Args[0]);
 			if(nikrexxmess->rm_Result1) {
-				sprintf(outbuffer,"\r\n\nRexx: Return-code %d\r\n\n",nikrexxmess->rm_Result1);
+				sprintf(outbuffer,"\r\n\nRexx: Return-code %ld\r\n\n",(long)nikrexxmess->rm_Result1);
 				puttekn(outbuffer,-1);
 			}
 			DeleteRexxMsg(nikrexxmess);
@@ -94,7 +94,7 @@ void rxsendrawfile(struct RexxMsg *mess) {
 		puttekn(outbuffer,-1);
 		retstr[0]='0';
 	} else {
-		while(antal = Read(fh,outbuffer,99)) {
+		while((antal = Read(fh,outbuffer,99))) {
 			if(antal == -1) break;
 			outbuffer[antal] = 0;
 			putstring(outbuffer,-1,0);
@@ -185,7 +185,7 @@ void rexxgettekn(struct RexxMsg *mess) {
 
 void rexxchkbuffer(struct RexxMsg *mess) {
 	char foo[5];
-	sprintf(foo,"%d",strlen(typeaheadbuf));
+	sprintf(foo,"%d",(int)strlen(typeaheadbuf));
 	mess->rm_Result1=0;
 	if(mess->rm_Action & 1L<<RXFB_RESULT) {
 		if(!(mess->rm_Result2=(long)CreateArgstring(foo,strlen(foo))))

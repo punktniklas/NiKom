@@ -3,6 +3,10 @@
 #include <intuition/intuition.h>
 #include <dos/dos.h>
 #include <proto/exec.h>
+#ifdef __GNUC__
+/* For NewList() */
+# include <proto/alib.h>
+#endif
 #include <proto/intuition.h>
 #include <proto/dos.h>
 #include <proto/locale.h>
@@ -40,9 +44,9 @@ char rexxportnamn[15], pubscreen[40], nikomnodeportnamn[15];
 int inloggad, ypos, xpos, ysize, xsize;
 extern char commandhistory[];
 
-void freealiasmem(void) {
+static void freealiasmem(void) {
 	struct Alias *pekare;
-	while(pekare=(struct Alias *)RemHead((struct List *)&aliaslist))
+	while((pekare=(struct Alias *)RemHead((struct List *)&aliaslist)))
 		FreeMem(pekare,sizeof(struct Alias));
 }
 
@@ -64,13 +68,13 @@ void cleanup(int kod,char *fel) {
 	}
 	if(NiKomBase) CloseLibrary(NiKomBase);
 	if(UtilityBase) CloseLibrary(UtilityBase);
-	if(LocaleBase) CloseLibrary(LocaleBase);
+	if(LocaleBase) CloseLibrary((struct Library *)LocaleBase);
 	if(IntuitionBase) CloseLibrary((struct Library *)IntuitionBase);
 	printf("%s",fel);
 	exit(kod);
 }
 
-void main(int argc, char **argv) {
+int main(int argc, char **argv) {
   int going = TRUE, forsok = 2,car = 1, tmp, ch;
   long tid;
   char tellstr[100],*tmppscreen, titel[80];
@@ -81,7 +85,7 @@ void main(int argc, char **argv) {
     cleanup(EXIT_ERROR,"Kunde inte öppna intuition.library\n");
   if(!(UtilityBase=OpenLibrary("utility.library",37L)))
     cleanup(EXIT_ERROR,"Kunde inte öppna utility.library\n");
-  if(!(LocaleBase=OpenLibrary("locale.library",38L)))
+  if(!(LocaleBase=(NiKomLocaleType *)OpenLibrary("locale.library",38L)))
     cleanup(EXIT_ERROR,"Kunde inte öppna locale.library\n");
   if(!(NiKomBase=OpenLibrary("nikom.library",0L)))
     cleanup(EXIT_ERROR,"Kunde inte öppna nikom.linbrary");
@@ -214,4 +218,5 @@ void main(int argc, char **argv) {
     SendString("\r\n\nOne more login? (Y/n)",-1);
   } while((ch = GetChar()) != 'n' && ch != 'N');
   cleanup(EXIT_OK,"");
+  return 0;
 }

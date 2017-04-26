@@ -31,7 +31,7 @@ int grabfidotext(int text,struct Mote *motpek,FILE *fpgrab) {
 	Servermem->inne[nodnr].read++;
 	Servermem->info.lasta++;
 	Statstr.read++;
-	sprintf(filnamn,"%d.msg",text - motpek->renumber_offset);
+	sprintf(filnamn,"%ld.msg",text - motpek->renumber_offset);
 	strcpy(fullpath,motpek->dir);
 	AddPart(fullpath,filnamn,99);
 	if(Servermem->inne[nodnr].flaggor & SHOWKLUDGE) ft=ReadFidoTextTags(fullpath,TAG_DONE);
@@ -72,13 +72,13 @@ int grabtext(int text,FILE *fpgrab) {
 	}
         ChangeUnreadTextStatus(text, 0, &Servermem->unreadTexts[nodnr]);
 	ts=localtime(&grabhead.tid);
-	fprintf(fpgrab,"\n\nText %d  Möte: %s    %4d%02d%02d %02d:%02d\n",
+	fprintf(fpgrab,"\n\nText %ld  Möte: %s    %4d%02d%02d %02d:%02d\n",
                 grabhead.nummer, getmotnamn(grabhead.mote), ts->tm_year + 1900,
                 ts->tm_mon + 1, ts->tm_mday, ts->tm_hour, ts->tm_min);
 	if(grabhead.person!=-1) fprintf(fpgrab,"Skriven av %s\n",getusername(grabhead.person));
 	else fprintf(fpgrab,"Skriven av <raderad användare>\n");
 	if(grabhead.kom_till_nr!=-1)
-		fprintf(fpgrab,"Kommentar till text %d av %s\n",grabhead.kom_till_nr,getusername(grabhead.kom_till_per));
+		fprintf(fpgrab,"Kommentar till text %ld av %s\n",grabhead.kom_till_nr,getusername(grabhead.kom_till_per));
 	fprintf(fpgrab,"Ärende: %s\n\n",grabhead.arende);
 	if(readtextlines(grabhead.textoffset,grabhead.rader,grabhead.nummer))
 		puttekn("\n\rFel vid läsandet i Text.dat\n\r",-1);
@@ -89,13 +89,13 @@ int grabtext(int text,FILE *fpgrab) {
 		}
 	}
 	freeeditlist();
-	fprintf(fpgrab,"\n(Slut på text %d av %s)\n",grabhead.nummer,getusername(grabhead.person));
+	fprintf(fpgrab,"\n(Slut på text %ld av %s)\n",grabhead.nummer,getusername(grabhead.person));
 	x=0;
 	while(grabhead.kom_i[x] != -1) {
           confId = GetConferenceForText(grabhead.kom_i[x]);
           if(confId != -1
              && IsMemberConf(confId, inloggad, &Servermem->inne[nodnr])) {
-            fprintf(fpgrab,"  (Kommentar i text %d av %s)\n",
+            fprintf(fpgrab,"  (Kommentar i text %ld av %s)\n",
                     grabhead.kom_i[x],getusername(grabhead.kom_av[x]));
           }
           x++;

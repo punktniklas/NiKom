@@ -2,12 +2,21 @@
 #include <exec/memory.h>
 #include <dos/dos.h>
 #include <proto/exec.h>
+#ifdef __GNUC__
+/* For NewList() */
+# include <proto/alib.h>
+#endif
 #include <proto/dos.h>
 #include <proto/intuition.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
 #include <stdio.h>
+#ifdef __GNUC__
+/* In gcc access() is defined in unistd.h, while SAS/C has the
+   prototype in stdio.h */
+# include <unistd.h>
+#endif
 #include <devices/serial.h>
 #include <devices/timer.h>
 #include <xproto.h>
@@ -47,7 +56,7 @@ extern int writefiles(int);
 extern int updatefile(int,struct Fil *);
 
 static long __saveds __regargs nik_fopen(char *filename,char *accessmode) {
-	BPTR fh;
+	BPTR fh = NULL;
 	switch(accessmode[0]) {
 		case 'r' :
 			fh=Open(filename,MODE_OLDFILE);
@@ -100,6 +109,8 @@ static long __saveds __regargs nik_fseek(LONG *fh,long offset,long origin) {
 		case 2 :
 			mode=OFFSET_END;
 			break;
+		default:
+			return -1;
 	}
 	if(Seek((BPTR)fh,offset,mode)==-1) return(-1);
 	else return(0);
@@ -176,7 +187,7 @@ static long __saveds __regargs nik_update(struct XPR_UPDATE *update) {
 		if(Servermem->action[nodnr]==UPLOAD || Servermem->action[nodnr]==DOWNLOAD) Servermem->vilkastr[nodnr] = FilePart(xprfilnamn);
 	}
 	if(update->xpru_updatemask & XPRU_FILESIZE) {
-		sprintf(outbuffer,"Filens längd %d\r\n",update->xpru_filesize);
+		sprintf(outbuffer,"Filens längd %ld\r\n",update->xpru_filesize);
 		conputtekn(outbuffer,-1);
 		filesize=update->xpru_filesize;
 	}
@@ -184,7 +195,7 @@ static long __saveds __regargs nik_update(struct XPR_UPDATE *update) {
 	if(update->xpru_updatemask & XPRU_ERRORMSG) { conputtekn(update->xpru_errormsg,-1); conputtekn("\r\n",-1); }
 	if(update->xpru_updatemask & XPRU_DATARATE) cps=update->xpru_datarate;
 	if(update->xpru_updatemask & XPRU_BYTES) {
-		sprintf(outbuffer,"\rBytes: %d (%d cps)",update->xpru_bytes,update->xpru_datarate);
+		sprintf(outbuffer,"\rBytes: %ld (%ld cps)",update->xpru_bytes,update->xpru_datarate);
 		conputtekn(outbuffer,-1);
 		countbytes=update->xpru_bytes;
 		if(countbytes == filesize && Servermem->action[nodnr]==UPLOAD) {
@@ -250,6 +261,8 @@ static long __saveds __regargs nik_finfo(char *filename,long typeinfo) {
 		case 2 :
 			return(1L);
 	}
+	/* Unknown typeinfo. */
+	return 0;
 }
 
 static long __saveds __regargs nik_ffirst(char *buffer,char *pattern) {
@@ -353,15 +366,12 @@ int download(void) {
 	{
 		for(cnt=0;nextfile[cnt]!=' ' && nextfile[cnt]!=0;cnt++);
 		nextfile[cnt]=0;
-		if(!global && !(filpek=parsefil(nextfile,area2))) {
-			sprintf(outbuffer,"Finns ingen fil som matchar \"%s\"\n\r",nextfile);
-			puttekn(outbuffer,-1);
-			nextfile=nextnext;
-			nextnext=hittaefter(nextnext);
-			continue;
+		if(global) {
+			filpek = parsefilallareas(nextfile);
+		} else {
+			filpek = parsefil(nextfile, area2);
 		}
-		if(!filpek && global && !(filpek=parsefilallareas(nextfile)))
-		{
+		if(!filpek) {
 			sprintf(outbuffer,"Finns ingen fil som matchar \"%s\"\n\r",nextfile);
 			puttekn(outbuffer,-1);
 			nextfile=nextnext;
@@ -392,7 +402,7 @@ int download(void) {
 		sprintf(tf->path,"%s%s",Servermem->areor[area2].dir[filpek->dir],filpek->namn);
 		tf->filpek=filpek;
 		AddTail((struct List *)&tf_list,(struct Node *)tf);
-		sprintf(outbuffer,"Skickar filen %s. Storlek: %d %s\r\n",filpek->namn,filpek->size,(filpek->flaggor & FILE_FREEDL) ? "(Fri download)" : "");
+		sprintf(outbuffer,"Skickar filen %s. Storlek: %ld %s\r\n",filpek->namn,filpek->size,(filpek->flaggor & FILE_FREEDL) ? "(Fri download)" : "");
 		puttekn(outbuffer,-1);
 		nextfile=nextnext;
 		nextnext=hittaefter(nextnext);
@@ -417,14 +427,14 @@ int download(void) {
 			if(!(tf->filpek->flaggor & FILE_FREEDL)) Servermem->inne[nodnr].download++;
 			Statstr.dl++;
 			raisefiledl(tf->filpek);
-			sprintf(outbuffer,"%s, %d cps\n\r",tf->filpek->namn,tf->cps);
+			sprintf(outbuffer,"%s, %ld cps\n\r",tf->filpek->namn,tf->cps);
 			puttekn(outbuffer,-1);
 		} else {
 			sprintf(outbuffer,"%s misslyckades.\n\r",tf->filpek->namn);
 			puttekn(outbuffer,-1);
 		}
 	}
-	while(tf=(struct TransferFiles *)RemHead((struct List *)&tf_list))
+	while((tf=(struct TransferFiles *)RemHead((struct List *)&tf_list)))
 		FreeMem(tf,sizeof(struct TransferFiles));
 
 	if(ImmediateLogout()) {
@@ -470,8 +480,8 @@ int upload(void) {
   Servermem->action[nodnr] = UPLOAD;
   Servermem->varmote[nodnr] = area;
   Servermem->vilkastr[nodnr] = NULL;
-  if(ret=recbinfile(Servermem->cfg.ultmp)) {
-    while(tf=(struct TransferFiles *)RemHead((struct List *)&tf_list))
+  if((ret=recbinfile(Servermem->cfg.ultmp))) {
+    while((tf=(struct TransferFiles *)RemHead((struct List *)&tf_list)))
       FreeMem(tf,sizeof(struct TransferFiles));
     if(ImmediateLogout()) {
       return 1;
@@ -603,7 +613,7 @@ int upload(void) {
     }
   }
   
-  while(tf=(struct TransferFiles *)RemHead((struct List *)&tf_list))
+  while((tf=(struct TransferFiles *)RemHead((struct List *)&tf_list)))
     FreeMem(tf,sizeof(struct TransferFiles));
   
   return(0);

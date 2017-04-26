@@ -1,4 +1,5 @@
 #include <proto/locale.h>
+#include <proto/dos.h>
 
 #include "NiKomStr.h"
 #include "Logging.h"

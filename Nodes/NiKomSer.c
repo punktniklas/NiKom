@@ -3,6 +3,10 @@
 #include <intuition/intuition.h>
 #include <dos/dos.h>
 #include <proto/exec.h>
+#ifdef __GNUC__
+/* For NewList() */
+# include <proto/alib.h>
+#endif
 #include <proto/intuition.h>
 #include <proto/dos.h>
 #include <proto/locale.h>
@@ -41,9 +45,9 @@ int inloggad, ypos,xpos,ysize,xsize;
 char svara[17],init[81],hangup[32],nodid[20];
 int highbaud, hst, getty, hangupdelay, gettybps, autoanswer, plussa;
 
-void freealiasmem(void) {
+static void freealiasmem(void) {
 	struct Alias *pekare;
-	while(pekare=(struct Alias *)RemHead((struct List *)&aliaslist))
+	while((pekare=(struct Alias *)RemHead((struct List *)&aliaslist)))
 		FreeMem(pekare,sizeof(struct Alias));
 }
 
@@ -65,13 +69,13 @@ void cleanup(int kod,char *text) {
 	shutdownnode(NODSPAWNED);
 	if(NiKomBase) CloseLibrary(NiKomBase);
 	if(UtilityBase) CloseLibrary(UtilityBase);
-	if(LocaleBase) CloseLibrary(LocaleBase);
+	if(LocaleBase) CloseLibrary((struct Library *)LocaleBase);
 	if(IntuitionBase) CloseLibrary((struct Library *)IntuitionBase);
 	printf("%s",text);
 	exit(kod);
 }
 
-void main(int argc,char *argv[]) {
+int main(int argc,char *argv[]) {
   int x;
   long tid;
   char tellstr[100],*tmppscreen, titel[80], configname[50] = "NiKom:DatoCfg/SerNode.cfg";
@@ -91,7 +95,7 @@ void main(int argc,char *argv[]) {
     cleanup(EXIT_ERROR,"Kunde inte öppna intuition.library\n");
   if(!(UtilityBase=OpenLibrary("utility.library",37L)))
     cleanup(EXIT_ERROR,"Kunde inte öppna utility.library\n");
-  if(!(LocaleBase=OpenLibrary("locale.library",38L)))
+  if(!(LocaleBase=(NiKomLocaleType *)OpenLibrary("locale.library",38L)))
     cleanup(EXIT_ERROR,"Kunde inte öppna locale.library\n");
   if(!(NiKomBase=OpenLibrary("nikom.library",0L)))
     cleanup(EXIT_ERROR,"Kunde inte öppna nikom.library\n");
@@ -194,4 +198,5 @@ void main(int argc,char *argv[]) {
   }
   nodestate &= (NIKSTATE_RELOGIN | NIKSTATE_CLOSESER | NIKSTATE_NOANSWER);
   cleanup(nodestate,"");
+  return 0;
 }

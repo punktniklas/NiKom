@@ -1,5 +1,9 @@
 #include <stdio.h>
 #include <devices/serial.h>
+#include <dos/dos.h>
+
+#include <NiKomStr.h>
+#include <NiKomNodeCommon.h>
 /*
  * TODO: The long time goal is for this file to die. Every .c
  * file should be a module that should have a corresponding .h
@@ -7,49 +11,10 @@
  */
 
 /* Prototypes for functions defined in NiKomSer.c */
-BYTE OpenConsole(struct Window *window);
-BYTE OpenSerial(struct IOExtSer *writereq,struct IOExtSer *readreq,struct IOExtSer *changereq);
-BYTE OpenTimer(struct timerequest *treq);
-void CloseConsole(void);
-void CloseSerial(struct IOExtSer *writereq);
-void CloseTimer(struct timerequest *treq);
-void writesererr(int);
-char gettekn(void);
-char congettkn(void);
-char sergettkn(void);
-void eka(char tecken);
-void coneka(char tecken);
-void conreqtkn(void);
-void serreqtkn(void);
-void putstring(char *pekare,int size, long flags);
-int puttekn(char *pekare,int size);
-void modemcmd(char *pekare,int size);
-void paus(ULONG tid);
-void getnodeconfig(char *);
-char convseventoeight(char foo);
-char conveighttoseven(char foo);
-void convstring(char *string);
-void sendat(char *atstring);
-void sendplus(void);
-void freealiasmem(void);
-void waitconnect(void);
 void cleanup(int kod,char *text);
-void main(int argc,char **argv);
-int getfifoevent(struct MsgPort *fifoport,char *puthere);
 
 /* Lite temporärt såhär.. Egentligen SerialIO.c.. */
-int OpenIO(struct Window *);
-void CloseIO(void);
-void abortserial(void);
-int tknwaiting(void);
 int incantrader(void);
-int sendtocon(char *pekare, int);
-int checkcharbuffer(void);
-int sendtosercon(char *conpek, char *serpek, int consize, int sersize);
-
-int serputtekn(char *pekare,int size);
-void sereka(char tecken);
-int sendtoser(char *pekare, int);
 
 /* ServerComm.c.. */
 long sendservermess(short, long);
@@ -243,7 +208,6 @@ int initbrevheader(int tillpers);
 int fido_brev(char *,char *,struct Mote *);
 void sparabrev(void);
 void sprattgok(char *);
-void savefidocopy(struct FidoText *,int);
 
 /* Prototypes for functions defined in OrgMeet.c */
 int org_skriv(void);

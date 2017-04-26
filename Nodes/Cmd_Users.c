@@ -1,7 +1,13 @@
 #include <stdio.h>
+#ifdef __GNUC__
+/* In gcc access() is defined in unistd.h, while SAS/C has the
+   prototype in stdio.h */
+# include <unistd.h>
+#endif
 #include <string.h>
 #include <stdlib.h>
 #include <limits.h>
+#include <proto/exec.h>
 
 #include "Terminal.h"
 #include "ServerMemUtils.h"
@@ -114,7 +120,7 @@ void Cmd_Status(void) {
     }
     SendString("\n");
   }
-  if(cnt = countmail(userId, readuserstr.brevpek)) {
+  if((cnt = countmail(userId, readuserstr.brevpek))) {
     if(SendString("%4d %s\r\n", cnt, CATSTR(MSG_MAIL_MAILBOX))) { return; }
     sumUnread += cnt;
   }
@@ -309,7 +315,7 @@ int Cmd_ListUsers(void) {
   while(argpek[0] && going) {
     if(argpek[0]=='-') {
       if(argpek[1]=='b' || argpek[1]=='B') backwards=TRUE;
-      else if(argpek[1]='s' || argpek[1]=='S') {
+      else if(argpek[1]=='s' || argpek[1]=='S') {
         while(argpek[cnt] && argpek[cnt]!=' ') {
           if(argpek[cnt]=='-') { tpek=&argpek[cnt+1]; break; }
           cnt++;
@@ -330,7 +336,7 @@ int Cmd_ListUsers(void) {
       if(status!=-1 && status!=listpek->status) continue;
       if(listpek->status>less || listpek->status<more) continue;
       if(!namematch(pattern,listpek->namn)) continue;
-      sprintf(outbuffer,"%s #%d\r\n",listpek->namn,listpek->nummer);
+      sprintf(outbuffer,"%s #%ld\r\n",listpek->namn,listpek->nummer);
       if(puttekn(outbuffer,-1)) break;
     }
     return(0);
@@ -339,7 +345,7 @@ int Cmd_ListUsers(void) {
     if(status!=-1 && status!=listpek->status) continue;
     if(listpek->status>less || listpek->status<more) continue;
     if(!namematch(pattern,listpek->namn)) continue;
-    sprintf(outbuffer,"%s #%d\r\n",listpek->namn,listpek->nummer);
+    sprintf(outbuffer,"%s #%ld\r\n",listpek->namn,listpek->nummer);
     if(puttekn(outbuffer,-1)) break;
   }
   return(0);

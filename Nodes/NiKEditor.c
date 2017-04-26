@@ -2,6 +2,10 @@
 #include <exec/memory.h>
 #include <dos/dos.h>
 #include <proto/exec.h>
+#ifdef __GNUC__
+/* For NewList() */
+# include <proto/alib.h>
+#endif
 #include <proto/dos.h>
 #include <proto/intuition.h>
 #include <stdio.h>
@@ -69,7 +73,7 @@ void fullflyttatext(char *vart);
 void fullarende(char *nytt);
 int fulldumpa(void);
 int fullnewline(void);
-int fullloadtext(char *filename);
+void fullloadtext(char *filename);
 void fulldisplaytext(void);
 void fullquote(void);
 void fullcrash(void);
@@ -119,7 +123,7 @@ void fidotextquote(struct Mote *conf) {
   struct FidoText *ft;
   struct Node *line;
   char filename[10],fullpath[100];
-  sprintf(filename, "%d.msg", senast_text_nr - conf->renumber_offset);
+  sprintf(filename, "%ld.msg", senast_text_nr - conf->renumber_offset);
   strcpy(fullpath, conf->dir);
   AddPart(fullpath, filename, 99);
   ft = ReadFidoTextTags(fullpath,
@@ -131,7 +135,7 @@ void fidotextquote(struct Mote *conf) {
   if(!ft) {
     return;
   }
-  while(line = RemHead((struct List *)&ft->text)) {
+  while((line = RemHead((struct List *)&ft->text))) {
     AddTail((struct List *)&edit_list, line);
   }
   FreeFidoText(ft);
@@ -1036,10 +1040,10 @@ int fullnewline(void) {
   return 0;
 }
 
-int fullloadtext(char *filename) {
+void fullloadtext(char *filename) {
   FILE *fp;
   if(!(fp = fopen(filename, "r"))) {
-    return 0;
+    return;
   }
   while(fgets(curline->text, MAXFULLEDITTKN + 1, fp)) {
     if(strlen(curline->text) > MAXFULLEDITTKN) {
@@ -1049,8 +1053,7 @@ int fullloadtext(char *filename) {
         curline->text[strlen(curline->text)-1] = 0;
     }
     if(fullnewline()) {
-      fclose(fp);
-      return 0;
+      break;
     }
   }
   fclose(fp);

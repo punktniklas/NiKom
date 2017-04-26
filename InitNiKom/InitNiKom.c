@@ -28,7 +28,7 @@ void createDirOrDie(char *dirname) {
   BPTR lock;
   struct FileInfoBlock __aligned fib;
   
-  if(lock = Lock(dirname, ACCESS_READ)) {
+  if((lock = Lock(dirname, ACCESS_READ))) {
     if(!Examine(lock, &fib)) {
       printf("Could not examine %s\n", dirname);
       UnLock(lock);
@@ -51,7 +51,7 @@ void createDirOrDie(char *dirname) {
 
 void createFile(char *filename, void *data, int size) {
   FILE *fp;
-  if(fp = fopen(filename, "w")) {
+  if((fp = fopen(filename, "w"))) {
     if(size > 0) {
       fwrite(data, size, 1, fp);
     }

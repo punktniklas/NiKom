@@ -1,6 +1,10 @@
 #include <exec/types.h>
 #include <exec/memory.h>
 #include <proto/exec.h>
+#ifdef __GNUC__
+/* For NewList() */
+# include <proto/alib.h>
+#endif
 #include <proto/intuition.h>
 #include <proto/dos.h>
 #include <proto/rexxsyslib.h>
@@ -151,7 +155,7 @@ void commonsendrexx(int komnr,int hasarg) {
 
   for(;;) {
     mess = (struct RexxMsg *)WaitPort(rexxport);
-    while(mess = (struct RexxMsg *)GetMsg(rexxport)) {
+    while((mess = (struct RexxMsg *)GetMsg(rexxport))) {
       if(mess->rm_Node.mn_Node.ln_Type == NT_REPLYMSG) {
         handleRexxFinished(nikrexxmess);
         return;
@@ -454,6 +458,10 @@ void rexxgetchar(struct RexxMsg *mess) {
     case GETCHAR_LEFT:
       res = "LEFT";
       break;
+    default:
+      /* Should not happen. */
+      res = NULL;
+      break;
     }
   }
   SetRexxResultString(mess, res);
@@ -558,7 +566,7 @@ void rexxsendbinfile(struct RexxMsg *mess) {
   }
   buf[strlen(buf) - 1] = '\0';
   
-  while(tf=(struct TransferFiles *)RemHead((struct List *)&tf_list))
+  while((tf=(struct TransferFiles *)RemHead((struct List *)&tf_list)))
     FreeMem(tf,sizeof(struct TransferFiles));
 
   if(ImmediateLogout()) {
@@ -586,7 +594,7 @@ void rexxrecbinfile(struct RexxMsg *mess) {
   }
   buf[strlen(buf)-1] = '\0';
 
-  while(tf=(struct TransferFiles *)RemHead((struct List *)&tf_list))
+  while((tf=(struct TransferFiles *)RemHead((struct List *)&tf_list)))
     FreeMem(tf,sizeof(struct TransferFiles));
   SetRexxResultString(mess, buf);
 }
@@ -678,7 +686,7 @@ void rxextratime(struct RexxMsg *mess) {
   char buf[10], *arg=hittaefter(mess->rm_Args[0]);
 
   if(strcmp(arg,"GET") == 0) {
-    sprintf(buf,"%d",extratime);
+    sprintf(buf,"%ld",extratime);
     SetRexxResultString(mess, buf);
   } else {
     extratime=atoi(arg);
@@ -696,7 +704,7 @@ void rxgettime(struct RexxMsg *mess) {
   } else {
     timeLeft=0;
   }
-  sprintf(buf,"%d",timeLeft);
+  sprintf(buf,"%ld",timeLeft);
   SetRexxResultString(mess, buf);
 }
 
@@ -737,7 +745,7 @@ void rxsendrawfile(struct RexxMsg *mess) {
   if(!(fh = Open(filename,MODE_OLDFILE))) {
     retstr = "0";
   } else {
-    while(bytesRead = Read(fh,outbuffer,99)) {
+    while((bytesRead = Read(fh,outbuffer,99))) {
       if(bytesRead == -1) {
         break;
       }
@@ -756,7 +764,7 @@ void rxsendrawfile(struct RexxMsg *mess) {
 
 void rxchglatestinfo(struct RexxMsg *mess) {
   char *what, retstr[15];
-  int amount, retval, badarg = FALSE;
+  int amount, retval;
   what = hittaefter(mess->rm_Args[0]);
   amount = atoi(hittaefter(what));
   switch(what[0]) {
@@ -773,14 +781,11 @@ void rxchglatestinfo(struct RexxMsg *mess) {
     retval = Statstr.ul += amount;
     break;
   default:
-    badarg = TRUE;
-  }
-  if(badarg) {
     SetRexxErrorResult(mess, 5);
-  } else {
-    sprintf(retstr,"%d",retval);
-    SetRexxResultString(mess, retstr);
+    return;
   }
+  sprintf(retstr, "%d", retval);
+  SetRexxResultString(mess, retstr);
 }
 
 void rxgetnumber(struct RexxMsg *mess) {

@@ -179,7 +179,7 @@ void listnyheter(void) {
 	struct Mote *motpek=(struct Mote *)Servermem->mot_list.mlh_Head;
 	struct Fil *sokpek;
 	puttekn("\r\n\n",-1);
-	if(cnt=countmail(inloggad,Servermem->inne[nodnr].brevpek)) {
+	if((cnt=countmail(inloggad,Servermem->inne[nodnr].brevpek))) {
 		sprintf(outbuffer,"%4d Brevlådan\r\n", cnt);
 		puttekn(outbuffer,-1);
 		olasta=TRUE;

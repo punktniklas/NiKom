@@ -21,7 +21,7 @@ void Cmd_ShowInfo(void) {
     sendfile(CreateLocalizedInfoFilePath("Info.txt", fileName));
     return;
   }
-  if(anchor = AllocMem(sizeof(struct AnchorPath), MEMF_CLEAR)) {
+  if((anchor = AllocMem(sizeof(struct AnchorPath), MEMF_CLEAR))) {
     sprintf(pattern,"%s#?.txt", argument);
     if(MatchFirst(CreateLocalizedInfoFilePath(pattern, fileName), anchor)) {
       SendString("\r\n\n%s\r\n", CATSTR(MSG_INFO_NO_SUCH_FILE));

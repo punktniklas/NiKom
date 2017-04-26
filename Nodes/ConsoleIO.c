@@ -1,5 +1,10 @@
 #include <exec/types.h>
 #include <proto/exec.h>
+#ifdef __GNUC__
+/* For NewList() */
+# include <proto/alib.h>
+#endif
+#include <proto/dos.h>
 #include <dos/dos.h>
 #include <intuition/intuition.h>
 #include <devices/console.h>
@@ -150,7 +155,7 @@ char gettekn(void) {
       cleanup(EXIT_OK,"");
     }
     if(signals & nikomnodesig) {
-      while(nikmess = (struct NiKMess *) GetMsg(nikomnodeport)) {
+      while((nikmess = (struct NiKMess *) GetMsg(nikomnodeport))) {
         handleservermess(nikmess);
         ReplyMsg((struct Message *)nikmess);
       }
@@ -355,7 +360,7 @@ int sendtocon(char *pekare, int size)
 			cleanup(EXIT_OK,"");
 		}
 		if(signals & nikomnodesig) {
-			while(nikmess = (struct NiKMess *) GetMsg(nikomnodeport)) {
+			while((nikmess = (struct NiKMess *) GetMsg(nikomnodeport))) {
 				handleservermess(nikmess);
 				ReplyMsg((struct Message *)nikmess);
 			}
@@ -450,7 +455,7 @@ int getfifoevent(struct MsgPort *fifoport, char *puthere) {
       event |= FIFOEVENT_FROMFIFO;
     }
     if(signals & nikomnodesig) {
-      while(nikmess = (struct NiKMess *) GetMsg(nikomnodeport)) {
+      while((nikmess = (struct NiKMess *) GetMsg(nikomnodeport))) {
         handleservermess(nikmess);
         ReplyMsg((struct Message *)nikmess);
       }

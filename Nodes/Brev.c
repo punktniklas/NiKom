@@ -1,11 +1,20 @@
 #include <exec/types.h>
 #include <dos/dos.h>
 #include <proto/exec.h>
+#ifdef __GNUC__
+/* For NewList() */
+# include <proto/alib.h>
+#endif
 #include <proto/dos.h>
 #include <proto/intuition.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#ifdef __GNUC__
+/* In gcc access() is defined in unistd.h, while SAS/C has the
+   prototype in stdio.h */
+# include <unistd.h>
+#endif
 #include <time.h>
 #include "NiKomStr.h"
 #include "NiKomLib.h"
@@ -31,6 +40,8 @@ extern struct Header readhead;
 
 struct ReadLetter brevread,brevspar;
 char crashmail;
+
+static void savefidocopy(struct FidoText *ft, int anv);
 
 int getzone(char *adr) {
 	int x;
@@ -148,9 +159,9 @@ void brev_lasa(int tnr) {
 int HasUnreadMail(void) {
   BPTR lock;
   char filename[40];
-  sprintf(filename, "NiKom:Users/%d/%d/%d.letter", inloggad/100, inloggad,
+  sprintf(filename, "NiKom:Users/%d/%d/%ld.letter", inloggad/100, inloggad,
           Servermem->inne[nodnr].brevpek);
-  if(lock = Lock(filename, ACCESS_READ)) {
+  if((lock = Lock(filename, ACCESS_READ))) {
     UnLock(lock);
     return TRUE;
   }
@@ -336,7 +347,7 @@ int initbrevheader(int tillpers) {
         mottagare = hittaefter(mottagare);
         continue;
       }
-      sprintf(tempbuf, " %d", tempmott);
+      sprintf(tempbuf, " %ld", tempmott);
       strcat(brevspar.to, tempbuf);
       mottagare = hittaefter(mottagare);
     }
@@ -415,7 +426,7 @@ void sprattgok(char *str) {
 }
 
 int fido_brev(char *tillpers,char *adr,struct Mote *motpek) {
-  int length = 0, i = 0, editret, chrs, inputch, wantCopy, textId;
+  int length = 0, i = 0, editret, chrs=CHRS_LATIN1, inputch, wantCopy, textId;
   struct FidoDomain *fd;
   struct FidoText *komft,ft;
   struct MinNode *first, *last;
@@ -432,7 +443,7 @@ int fido_brev(char *tillpers,char *adr,struct Mote *motpek) {
   if(!tillpers) { /* Det handlar om en kommentar */
     if(motpek) { /* Det är en personlig kommentar */
       strcpy(fullpath, motpek->dir);
-      sprintf(filnamn, "%d.msg", senast_text_nr - motpek->renumber_offset);
+      sprintf(filnamn, "%ld.msg", senast_text_nr - motpek->renumber_offset);
       AddPart(fullpath,filnamn, 99);
       komft = ReadFidoTextTags(fullpath, RFT_HeaderOnly, TRUE,TAG_DONE);
       if(!komft) {
@@ -606,7 +617,7 @@ int fido_brev(char *tillpers,char *adr,struct Mote *motpek) {
     savefidocopy(&ft, inloggad);
   }
   
-  while(first=(struct MinNode *)RemHead((struct List *)&ft.text)) {
+  while((first=(struct MinNode *)RemHead((struct List *)&ft.text))) {
     FreeMem(first,sizeof(struct EditLine));
   }
   NewList((struct List *)&edit_list);
@@ -631,7 +642,7 @@ int updatenextletter(int user) {
     return -1;
   }
   nr=atoi(nrstr);
-  sprintf(nrstr,"%d",nr+1);
+  sprintf(nrstr,"%ld",nr+1);
   if(Seek(fh,0,OFFSET_BEGINNING)==-1) {
     LogEvent(SYSTEM_LOG, ERROR, "Could not rewind %s", filnamn);
     DisplayInternalError();
@@ -733,7 +744,7 @@ void sparabrev(void) {
   }
 }
 
-void savefidocopy(struct FidoText *ft,int anv) {
+static void savefidocopy(struct FidoText *ft, int anv) {
   struct FidoLine *fl;
   BPTR fh;
   int nummer;
@@ -772,7 +783,7 @@ void savefidocopy(struct FidoText *ft,int anv) {
 }
 
 int skickabrev(void) {
-  int pers,editret;
+  int pers=0, editret;
   char *adr;
   if(!(adr = strchr(argument, '@'))) {
     if((pers = parsenamn(argument)) == -1) {
@@ -823,13 +834,13 @@ void initpersheader(void) {
   Servermem->action[nodnr] = SKRIVER;
   Servermem->varmote[nodnr] = -1;
   memset(&brevspar,0,sizeof(struct ReadLetter));
-  sprintf(brevspar.to, "%d", readhead.person);
+  sprintf(brevspar.to, "%ld", readhead.person);
   sprintf(brevspar.from, "%d", inloggad);
   readuser(readhead.person, &usr);
   if(usr.flaggor & LAPPBREV) {
     SendString("\r\n\n");
     lappnr = atoi(brevspar.to);
-    sprintf(filnamn, "NiKom:Users/%d/%d/Lapp", lappnr/100, lappnr);
+    sprintf(filnamn, "NiKom:Users/%ld/%ld/Lapp", lappnr/100, lappnr);
     if(!access(filnamn, 0)) {
       sendfile(filnamn);
     }

@@ -6,10 +6,19 @@
 #include "ServerFuncs.h"
 #include <rexx/storage.h>
 #include <proto/exec.h>
+#ifdef __GNUC__
+/* For NewList() */
+# include <proto/alib.h>
+#endif
 #include <proto/dos.h>
 #include <proto/rexxsyslib.h>
 #include <time.h>
 #include <stdio.h>
+#ifdef __GNUC__
+/* In gcc access() is defined in unistd.h, while SAS/C has the
+   prototype in stdio.h */
+# include <unistd.h>
+#endif
 #include <string.h>
 #include <stdlib.h>
 #ifdef MWDEBUG
@@ -104,22 +113,22 @@ void rexxnodeinfo(struct RexxMsg *mess) {
                         strcpy(str,Servermem->nodid[nod]);
                         break;
                 case 'g' : case 'G' :
-                        sprintf(str,"%d",Servermem->action[nod]);
+                        sprintf(str,"%ld",Servermem->action[nod]);
                         break;
                 case 'i' : case 'I' :
-                        sprintf(str,"%d",Servermem->inloggad[nod]);
+                        sprintf(str,"%ld",Servermem->inloggad[nod]);
                         break;
                 case 'm' : case 'M' :
-                        sprintf(str,"%d",Servermem->varmote[nod]);
+                        sprintf(str,"%ld",Servermem->varmote[nod]);
                         break;
                 case 'p' : case 'P' :
-                        sprintf(str,"%d",time(NULL)-Servermem->idletime[nod]);
+                        sprintf(str,"%ld",time(NULL)-Servermem->idletime[nod]);
                         break;
                 case 's' : case 'S' :
-                        sprintf(str,"%d",Servermem->connectbps[nod]);
+                        sprintf(str,"%ld",Servermem->connectbps[nod]);
                         break;
                 case 't' : case 'T' :
-                        sprintf(str,"%d",Servermem->nodtyp[nod]);
+                        sprintf(str,"%ld",Servermem->nodtyp[nod]);
                         break;
                 case 'u' : case 'U' :
                         sprintf(str,"%c",Servermem->say[nod] ? '1' : '0');
@@ -194,7 +203,7 @@ void rexxnextpatternfile(struct RexxMsg *mess)
 	}
 
 	pek=(struct Fil *)pek->f_node.mln_Pred;
-	for(pek;pek->f_node.mln_Pred;pek=(struct Fil *)pek->f_node.mln_Pred)
+	for(;pek->f_node.mln_Pred;pek=(struct Fil *)pek->f_node.mln_Pred)
 	{
 		if(ParsePatternNoCase(mess->rm_Args[3], buffer, 100) == 1)
 		{
@@ -378,7 +387,7 @@ void createtext(struct RexxMsg *mess) {
         nmess.nod=-1;
         sparatext(&nmess);
         freeeditlist();
-        sprintf(str,"%d",nmess.data);
+        sprintf(str,"%ld",nmess.data);
         if(!(mess->rm_Result2=(long)CreateArgstring(str,strlen(str))))
                 printf("Kunde inte allokera en ArgString\n");
         mess->rm_Result1=0;
@@ -398,24 +407,24 @@ int updatenextletter(int user) {
         char nrstr[20],filnamn[50];
         sprintf(filnamn,"NiKom:Users/%d/%d/.nextletter",user/100,user);
         if(!(fh=Open(filnamn,MODE_OLDFILE))) {
-                printf("Kunde inte öppna .nextfile\n",-1);
+                printf("Kunde inte öppna .nextfile\n");
                 return(-1);
         }
         memset(nrstr,0,20);
         if(Read(fh,nrstr,19)==-1) {
-                printf("Kunde inte läsa .nextfile\n",-1);
+                printf("Kunde inte läsa .nextfile\n");
                 Close(fh);
                 return(-1);
         }
         nr=atoi(nrstr);
-        sprintf(nrstr,"%d",nr+1);
+        sprintf(nrstr,"%ld",nr+1);
         if(Seek(fh,0,OFFSET_BEGINNING)==-1) {
-                printf("Kunde inte söka i .nextfile\n",-1);
+                printf("Kunde inte söka i .nextfile\n");
                 Close(fh);
                 return(-1);
         }
         if(Write(fh,nrstr,strlen(nrstr))==-1) {
-                printf("Kunde inte skriva .nextfile\n",-1);
+                printf("Kunde inte skriva .nextfile\n");
                 Close(fh);
                 return(-1);
         }
@@ -499,7 +508,7 @@ void createletter(struct RexxMsg *mess) {
         motstr=FindNextWord(&tostring[1]);
         if(motstr[0]) {
                 if(!(lock=Lock(orgfilename,ACCESS_READ))) {
-                        printf("Kunde inte få ett lock för brevet\n\r",-1);
+                        printf("Kunde inte få ett lock för brevet\n\r");
                         if(!(mess->rm_Result2=(long)CreateArgstring("-7",strlen("-1"))))
                                 printf("Kunde inte allokera en ArgString\n");
                         mess->rm_Result1=0;
@@ -559,25 +568,25 @@ void textinfo(struct RexxMsg *mess) {
         switch(mess->rm_Args[2][0]) {
                 case 'a' : case 'A' :
                         foo=atoi(&mess->rm_Args[2][1]);
-                        if(foo>=0 && foo<MAXKOM) sprintf(str,"%d",infohead.kom_av[foo]);
+                        if(foo>=0 && foo<MAXKOM) sprintf(str,"%ld",infohead.kom_av[foo]);
                         else strcpy(str,"-1");
                         break;
                 case 'f' : case 'F' :
-                        sprintf(str,"%d",infohead.person);
+                        sprintf(str,"%ld",infohead.person);
                         break;
                 case 'i' : case 'I' :
                         foo=atoi(&mess->rm_Args[2][1]);
-                        if(foo>=0 && foo<MAXKOM) sprintf(str,"%d",infohead.kom_i[foo]);
+                        if(foo>=0 && foo<MAXKOM) sprintf(str,"%ld",infohead.kom_i[foo]);
                         else strcpy(str,"-1");
                         break;
                 case 'k' : case 'K' :
-                        sprintf(str,"%d",infohead.kom_till_nr);
+                        sprintf(str,"%ld",infohead.kom_till_nr);
                         break;
                 case 'm' : case 'M' :
                   sprintf(str, "%d", GetConferenceForText(nummer));
                   break;
                 case 'p' : case 'P' :
-                        sprintf(str,"%d",infohead.kom_till_per);
+                        sprintf(str,"%ld",infohead.kom_till_per);
                         break;
                 case 'r' : case 'R' :
                         strcpy(str,infohead.arende);
@@ -661,7 +670,7 @@ void nextunread(struct RexxMsg *mess) {
 
 void freeeditlist(void) {
         struct EditLine *el;
-        while(el=(struct EditLine *)RemHead((struct List *)&edit_list))
+        while((el=(struct EditLine *)RemHead((struct List *)&edit_list)))
                 FreeMem(el,sizeof(struct EditLine));
         NewList((struct List *)&edit_list);
 }
