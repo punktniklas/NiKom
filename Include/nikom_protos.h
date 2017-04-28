@@ -1,6 +1,9 @@
 #ifndef NIKOM_PROTOS_H
 #define NIKOM_PROTOS_H
 
+#include <proto/exec.h>
+#include "NiKomStr.h"
+
 extern struct Library *NiKomBase;
 
 LONG RexxEntry(struct RexxMsg *);
