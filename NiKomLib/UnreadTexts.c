@@ -45,7 +45,7 @@ int maybeConvertUnreadTextsData(int userId, struct UnreadTexts *unreadTexts,
 
 **********************************************************************/
 
-void __saveds __asm LIBChangeUnreadTextStatus(
+void __saveds AASM LIBChangeUnreadTextStatus(
    register __d0 int textNumber,
    register __d1 int markAsUnread,
    register __a0 struct UnreadTexts *unreadTexts,
@@ -93,7 +93,7 @@ void __saveds __asm LIBChangeUnreadTextStatus(
 
 **********************************************************************/
 
-int __saveds __asm LIBIsTextUnread(
+int __saveds AASM LIBIsTextUnread(
   register __d0 int textNumber,
   register __a0 struct UnreadTexts *unreadTexts,
   register __a6 struct NiKomBase *NiKomBase) {
@@ -126,7 +126,7 @@ int __saveds __asm LIBIsTextUnread(
 
 **********************************************************************/
 
-void __saveds __asm LIBInitUnreadTexts(
+void __saveds AASM LIBInitUnreadTexts(
    register __a0 struct UnreadTexts *unreadTexts,
    register __a6 struct NiKomBase *NiKomBase) {
   unreadTexts->bitmapStartText = NiKomBase->Servermem->info.lowtext;
@@ -163,7 +163,7 @@ void __saveds __asm LIBInitUnreadTexts(
 
 **********************************************************************/
 
-int __saveds __asm LIBFindNextUnreadText(
+int __saveds AASM LIBFindNextUnreadText(
   register __d0 int searchStart,
   register __d1 int conf,
   register __a0 struct UnreadTexts *unreadTexts,
@@ -211,7 +211,7 @@ int __saveds __asm LIBFindNextUnreadText(
 
 **********************************************************************/
 
-int __saveds __asm LIBCountUnreadTexts(
+int __saveds AASM LIBCountUnreadTexts(
   register __d0 int conf,
   register __a0 struct UnreadTexts *unreadTexts,
   register __a6 struct NiKomBase *NiKomBase) {
@@ -251,7 +251,7 @@ int __saveds __asm LIBCountUnreadTexts(
 
 **********************************************************************/
 
-void __saveds __asm LIBSetUnreadTexts(
+void __saveds AASM LIBSetUnreadTexts(
   register __d0 int conf,
   register __d1 int amount,
   register __a0 struct UnreadTexts *unreadTexts,
@@ -303,7 +303,7 @@ struct ConfAndText {
 
 **********************************************************************/
 
-int __saveds __asm LIBReadUnreadTexts(
+int __saveds AASM LIBReadUnreadTexts(
   register __a0 struct UnreadTexts *unreadTexts,
   register __d0 int userId,
   register __a6 struct NiKomBase *NiKomBase) {
@@ -354,7 +354,7 @@ int __saveds __asm LIBReadUnreadTexts(
 
 **********************************************************************/
 
-int __saveds __asm LIBWriteUnreadTexts(
+int __saveds AASM LIBWriteUnreadTexts(
   register __a0 struct UnreadTexts *unreadTexts,
   register __d0 int userId,
   register __a6 struct NiKomBase *NiKomBase) {

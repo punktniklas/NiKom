@@ -13,12 +13,12 @@
 #include "NiKomBase.h"
 
 /* Prototypes */
-ULONG __saveds __asm _LibExpunge( register __a6 struct NiKomBase *libbase );
-ULONG __saveds __asm _LibInit(register __a0 APTR seglist,
+ULONG __saveds AASM _LibExpunge( register __a6 struct NiKomBase *libbase );
+ULONG __saveds AASM _LibInit(register __a0 APTR seglist,
 			      register __d0 struct NiKomBase *libbase );
 
-int   __saveds __asm __UserLibInit(register __a6 struct NiKomBase * NiKomBase);
-void  __saveds __asm __UserLibCleanup(register __a6 struct NiKomBase * NiKomBase);
+int   __saveds AASM __UserLibInit(register __a6 struct NiKomBase * NiKomBase);
+void  __saveds AASM __UserLibCleanup(register __a6 struct NiKomBase * NiKomBase);
 
 typedef LONG (*myPFL)();   /* pointer to function returning 32-bit int        */
 
@@ -59,7 +59,7 @@ struct InitTable __far _LibInitTab =  {
         _LibInit,
 };
 
-ULONG __saveds __asm
+ULONG __saveds AASM
 _LibInit(register __a0 APTR seglist,
 	 register __d0 struct NiKomBase *NiKomBase )
 {
@@ -107,7 +107,7 @@ _LibInit(register __a0 APTR seglist,
     return((ULONG)NiKomBase);
 }
 
-LONG __saveds __asm
+LONG __saveds AASM
 _LibOpen( register __a6 struct NiKomBase *NiKomBase )
 {
     /* mark us as having another customer */
@@ -119,7 +119,7 @@ _LibOpen( register __a6 struct NiKomBase *NiKomBase )
     return ( (LONG) NiKomBase );
 }
 
-ULONG __saveds __asm
+ULONG __saveds AASM
 _LibClose( register __a6 struct NiKomBase *NiKomBase )
 {
     ULONG retval = 0;
@@ -137,7 +137,7 @@ _LibClose( register __a6 struct NiKomBase *NiKomBase )
     return (retval);
 }
 
-ULONG __saveds __asm
+ULONG __saveds AASM
 _LibExpunge( register __a6 struct NiKomBase *NiKomBase )
 {
     ULONG seglist = 0;

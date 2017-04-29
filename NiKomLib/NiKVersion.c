@@ -10,6 +10,6 @@
 
 const char dosversion[] = "$VER: nikom.library_" NIKRELEASE " " NIKLIBVERSIONSTR "." NIKLIBREVISIONSTR " " __AMIGADATE__;
 
-char * __saveds __asm LIBGetBuildTime(void) {
+char * __saveds AASM LIBGetBuildTime(void) {
   return __DATE__ " " __TIME__;
 }

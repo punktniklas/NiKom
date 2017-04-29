@@ -23,7 +23,7 @@ static int getlastmatrix(void) {
   return atoi(buffer);
 }
 
-void __saveds __asm LIBMatrix2NiKom(register __a6 struct NiKomBase *NiKomBase) {
+void __saveds AASM LIBMatrix2NiKom(register __a6 struct NiKomBase *NiKomBase) {
   struct FidoText *fidotext;
   struct FidoLine *fl;
   int userId, mailId, lastMatrix, oldLastMatrix;

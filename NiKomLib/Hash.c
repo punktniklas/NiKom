@@ -26,7 +26,7 @@ struct NiKHash {
 *               element man tänker lagra är kanske lagom.
 */
 
-NiKHash * __saveds __asm LIBNewNiKHash(register __d0 int tablesize) {
+NiKHash * __saveds AASM LIBNewNiKHash(register __d0 int tablesize) {
 	NiKHash *tmptable;
 	if(!(tmptable = (NiKHash *) AllocMem(sizeof(NiKHash),MEMF_CLEAR))) return(NULL);
 	tmptable->tablesize = tablesize;
@@ -48,7 +48,7 @@ NiKHash * __saveds __asm LIBNewNiKHash(register __d0 int tablesize) {
 *               element innan DeleteNiKHash anropas.
 */
 
-void __saveds __asm LIBDeleteNiKHash(register __a0 NiKHash *hashtable) {
+void __saveds AASM LIBDeleteNiKHash(register __a0 NiKHash *hashtable) {
 	FreeMem(hashtable->table, sizeof(struct NiKHashNode *) * hashtable->tablesize);
 	FreeMem(hashtable,sizeof(NiKHash));
 }
@@ -65,7 +65,7 @@ void __saveds __asm LIBDeleteNiKHash(register __a0 NiKHash *hashtable) {
 *  Beskrivning: Stoppar in angivet data med angivet id i hashtabellen.
 */
 
-int __saveds __asm LIBInsertNiKHash(register __a0 NiKHash *hashtable, register __d0 int id,
+int __saveds AASM LIBInsertNiKHash(register __a0 NiKHash *hashtable, register __d0 int id,
 	register __a1 void *data) {
 	int hashvalue;
 	struct NiKHashNode *pek, *newnode;
@@ -97,7 +97,7 @@ int __saveds __asm LIBInsertNiKHash(register __a0 NiKHash *hashtable, register _
 *  Beskrivning: Plockar fram datat till angivet ID.
 */
 
-void * __saveds __asm LIBGetNiKHashData(register __a0 NiKHash *hashtable, register __d0 int id) {
+void * __saveds AASM LIBGetNiKHashData(register __a0 NiKHash *hashtable, register __d0 int id) {
 	int hashvalue;
 	struct NiKHashNode *pek;
 	hashvalue = id % hashtable->tablesize;
@@ -121,7 +121,7 @@ void * __saveds __asm LIBGetNiKHashData(register __a0 NiKHash *hashtable, regist
 *               returnerar det.
 */
 
-void * __saveds __asm LIBRemoveNiKHashData(register __a0 NiKHash *hashtable, register __d0 int id) {
+void * __saveds AASM LIBRemoveNiKHashData(register __a0 NiKHash *hashtable, register __d0 int id) {
 	int hashvalue;
 	struct NiKHashNode *pek, *tmppek;
 	void *data;

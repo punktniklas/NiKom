@@ -5,7 +5,7 @@
 #include "NiKomBase.h"
 #include "Funcs.h"
 
-struct Mote * __saveds __asm LIBGetConfPoint(register __d0 int motnr, register __a6 struct NiKomBase *NiKomBase) {
+struct Mote * __saveds AASM LIBGetConfPoint(register __d0 int motnr, register __a6 struct NiKomBase *NiKomBase) {
 	struct Mote *letpek;
 
 	if(!NiKomBase->Servermem) return(NULL);
@@ -16,7 +16,7 @@ struct Mote * __saveds __asm LIBGetConfPoint(register __d0 int motnr, register _
 	return(NULL);
 }
 
-int __saveds __asm LIBMaySeeConf(register __d0 int mote, register __d1 int usrnr, register __a0 struct User *usr,register __a6 struct NiKomBase *NiKomBase) {
+int __saveds AASM LIBMaySeeConf(register __d0 int mote, register __d1 int usrnr, register __a0 struct User *usr,register __a6 struct NiKomBase *NiKomBase) {
 	struct Mote *motpek;
 
 	if(!NiKomBase->Servermem) return(FALSE);
@@ -31,7 +31,7 @@ int __saveds __asm LIBMaySeeConf(register __d0 int mote, register __d1 int usrnr
 	return(TRUE);
 }
 
-int __saveds __asm LIBMayBeMemberConf(register __d0 int mote, register __d1 int usrnr, register __a0 struct User *usr,register __a6 struct NiKomBase *NiKomBase) {
+int __saveds AASM LIBMayBeMemberConf(register __d0 int mote, register __d1 int usrnr, register __a0 struct User *usr,register __a6 struct NiKomBase *NiKomBase) {
 	struct Mote *motpek;
 
 	if(!NiKomBase->Servermem) return(FALSE);
@@ -48,12 +48,12 @@ int __saveds __asm LIBMayBeMemberConf(register __d0 int mote, register __d1 int 
 	return(FALSE);
 }
 
-int __saveds __asm LIBMayReadConf(register __d0 int mote, register __d1 int usrnr, register __a0 struct User *usr,register __a6 struct NiKomBase *NiKomBase) {
+int __saveds AASM LIBMayReadConf(register __d0 int mote, register __d1 int usrnr, register __a0 struct User *usr,register __a6 struct NiKomBase *NiKomBase) {
 
 	return(LIBMayBeMemberConf(mote,usrnr,usr,NiKomBase));
 }
 
-int __saveds __asm LIBMayWriteConf(register __d0 int mote, register __d1 int usrnr, register __a0 struct User *usr,register __a6 struct NiKomBase *NiKomBase) {
+int __saveds AASM LIBMayWriteConf(register __d0 int mote, register __d1 int usrnr, register __a0 struct User *usr,register __a6 struct NiKomBase *NiKomBase) {
 	struct Mote *motpek;
 
 	if(!NiKomBase->Servermem) return(FALSE);
@@ -69,7 +69,7 @@ int __saveds __asm LIBMayWriteConf(register __d0 int mote, register __d1 int usr
 	return(TRUE);
 }
 
-int __saveds __asm LIBMayReplyConf(register __d0 int mote, register __d1 int usrnr, register __a0 struct User *usr,register __a6 struct NiKomBase *NiKomBase) {
+int __saveds AASM LIBMayReplyConf(register __d0 int mote, register __d1 int usrnr, register __a0 struct User *usr,register __a6 struct NiKomBase *NiKomBase) {
 	struct Mote *motpek;
 
 	if(!NiKomBase->Servermem) return(FALSE);
@@ -85,7 +85,7 @@ int __saveds __asm LIBMayReplyConf(register __d0 int mote, register __d1 int usr
 	return(TRUE);
 }
 
-int __saveds __asm LIBMayAdminConf(register __d0 int mote, register __d1 int usrnr, register __a0 struct User *usr,register __a6 struct NiKomBase *NiKomBase) {
+int __saveds AASM LIBMayAdminConf(register __d0 int mote, register __d1 int usrnr, register __a0 struct User *usr,register __a6 struct NiKomBase *NiKomBase) {
 	struct Mote *motpek;
 
 	if(!NiKomBase->Servermem) return(FALSE);
@@ -100,7 +100,7 @@ int __saveds __asm LIBMayAdminConf(register __d0 int mote, register __d1 int usr
 	return(FALSE);
 }
 
-int __saveds __asm LIBIsMemberConf(register __d0 int mote, register __d1 int usrnr, register __a0 struct User *usr,register __a6 struct NiKomBase *NiKomBase) {
+int __saveds AASM LIBIsMemberConf(register __d0 int mote, register __d1 int usrnr, register __a0 struct User *usr,register __a6 struct NiKomBase *NiKomBase) {
 	struct Mote *motpek;
 
 	if(!NiKomBase->Servermem) return(FALSE);
