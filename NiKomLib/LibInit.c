@@ -46,7 +46,7 @@ extern long __far _LibRevision;         /* Revision of library              */
 
 
 /* From libent.o, needed to determine where data is loaded by loadseg       */
-extern long far _Libmergeddata;
+extern long __far _Libmergeddata;
 
 #define NIKOMBASESIZE ((sizeof(struct NiKomBase) +3) & ~3)
 
