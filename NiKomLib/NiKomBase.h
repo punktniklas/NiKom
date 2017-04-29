@@ -10,6 +10,8 @@
 #include "NiKomStr.h"
 #endif
 
+#include "NiKomCompat.h"
+
 
 /*
  *  STRUCT
