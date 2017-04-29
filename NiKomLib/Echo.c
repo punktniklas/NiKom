@@ -200,10 +200,10 @@ int __saveds __asm LIBReNumberConf(register __a0 struct Mote *conf,register __d0
   }
   confToRenum->renumber_offset += diff;
   LIBWriteConf(confToRenum, NiKomBase);
-  if(!(hwm = gethwm(confToRenum->dir, LITTLE_ENDIAN))) {
+  if(!(hwm = gethwm(confToRenum->dir, NIK_LITTLE_ENDIAN))) {
     return 4;
   }
-  if(!sethwm(confToRenum->dir, hwm - diff, LITTLE_ENDIAN)) {
+  if(!sethwm(confToRenum->dir, hwm - diff, NIK_LITTLE_ENDIAN)) {
     return 5;
   }
   LogEvent(NiKomBase->Servermem, FIDO_LOG, INFO,

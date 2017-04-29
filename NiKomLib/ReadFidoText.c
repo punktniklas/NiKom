@@ -204,11 +204,11 @@ struct FidoText * __saveds __asm LIBReadFidoText(register __a0 char *filename, r
 	strcpy(fidotext->touser,&ftshead[36]);
 	strcpy(fidotext->subject,&ftshead[72]);
 	strcpy(fidotext->date,&ftshead[144]);
-	fidotext->tonode = getTwoByteField(&ftshead[166], LITTLE_ENDIAN);
-	fidotext->fromnode = getTwoByteField(&ftshead[168], LITTLE_ENDIAN);
-	fidotext->fromnet = getTwoByteField(&ftshead[172], LITTLE_ENDIAN);
-	fidotext->tonet = getTwoByteField(&ftshead[174], LITTLE_ENDIAN);
-	fidotext->attribut = getTwoByteField(&ftshead[186], LITTLE_ENDIAN);
+	fidotext->tonode = getTwoByteField(&ftshead[166], NIK_LITTLE_ENDIAN);
+	fidotext->fromnode = getTwoByteField(&ftshead[168], NIK_LITTLE_ENDIAN);
+	fidotext->fromnet = getTwoByteField(&ftshead[172], NIK_LITTLE_ENDIAN);
+	fidotext->tonet = getTwoByteField(&ftshead[174], NIK_LITTLE_ENDIAN);
+	fidotext->attribut = getTwoByteField(&ftshead[186], NIK_LITTLE_ENDIAN);
 	Flush(fh);
 	if(quote) {
 		prequote[0]=' ';
@@ -376,16 +376,16 @@ int __saveds __asm LIBWriteFidoText(register __a0 struct FidoText *fidotext, reg
 	LIBConvChrsFromAmiga(fidotext->subject,0,charset,NiKomBase);
 	strncpy(&ftshead[72],fidotext->subject,71);
 	strncpy(&ftshead[144],fidotext->date,19);
-        writeTwoByteField(fidotext->tonode, &ftshead[166], LITTLE_ENDIAN);
-        writeTwoByteField(fidotext->fromnode, &ftshead[168], LITTLE_ENDIAN);
-        writeTwoByteField(fidotext->fromnet, &ftshead[172], LITTLE_ENDIAN);
-        writeTwoByteField(fidotext->tonet, &ftshead[174], LITTLE_ENDIAN);
-        writeTwoByteField(fidotext->tozone, &ftshead[176], LITTLE_ENDIAN);
-        writeTwoByteField(fidotext->fromzone, &ftshead[178], LITTLE_ENDIAN);
-        writeTwoByteField(fidotext->topoint, &ftshead[180], LITTLE_ENDIAN);
-        writeTwoByteField(fidotext->frompoint, &ftshead[182], LITTLE_ENDIAN);
-        writeTwoByteField(fidotext->attribut, &ftshead[186], LITTLE_ENDIAN);
-	if(!(nummer = gethwm(dir, LITTLE_ENDIAN))) nummer = 2;
+        writeTwoByteField(fidotext->tonode, &ftshead[166], NIK_LITTLE_ENDIAN);
+        writeTwoByteField(fidotext->fromnode, &ftshead[168], NIK_LITTLE_ENDIAN);
+        writeTwoByteField(fidotext->fromnet, &ftshead[172], NIK_LITTLE_ENDIAN);
+        writeTwoByteField(fidotext->tonet, &ftshead[174], NIK_LITTLE_ENDIAN);
+        writeTwoByteField(fidotext->tozone, &ftshead[176], NIK_LITTLE_ENDIAN);
+        writeTwoByteField(fidotext->fromzone, &ftshead[178], NIK_LITTLE_ENDIAN);
+        writeTwoByteField(fidotext->topoint, &ftshead[180], NIK_LITTLE_ENDIAN);
+        writeTwoByteField(fidotext->frompoint, &ftshead[182], NIK_LITTLE_ENDIAN);
+        writeTwoByteField(fidotext->attribut, &ftshead[186], NIK_LITTLE_ENDIAN);
+	if(!(nummer = gethwm(dir, NIK_LITTLE_ENDIAN))) nummer = 2;
 	while(going) {
 		sprintf(filename,"%d.msg",nummer);
 		strcpy(fullpath,dir);
