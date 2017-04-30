@@ -178,7 +178,7 @@ void writeTwoByteField(USHORT value, UBYTE *bytes, char littleEndian) {
   }
 }
 
-struct FidoText * __saveds AASM LIBReadFidoText(register __a0 char *filename, register __a1 struct TagItem *taglist, register __a6 struct NiKomBase *NiKomBase) {
+struct FidoText * __saveds AASM LIBReadFidoText(register __a0 char *filename AREG(a0), register __a1 struct TagItem *taglist AREG(a1), register __a6 struct NiKomBase *NiKomBase AREG(a6)) {
 	int nokludge, noseenby,chrset=0, x, tearlinefound=FALSE, headeronly,quote,linelen;
 	struct FidoText *fidotext;
 	struct FidoLine *fltmp;
@@ -320,7 +320,7 @@ struct FidoText * __saveds AASM LIBReadFidoText(register __a0 char *filename, re
 	return(fidotext);
 }
 
-void __saveds AASM LIBFreeFidoText(register __a0 struct FidoText *fidotext) {
+void __saveds AASM LIBFreeFidoText(register __a0 struct FidoText *fidotext AREG(a0)) {
 	struct FidoLine *fltmp;
 	while(fltmp=(struct FidoLine *)RemHead((struct List *)&fidotext->text)) FreeMem(fltmp,sizeof(struct FidoLine));
 	FreeMem(fidotext,sizeof(struct FidoText));
@@ -355,7 +355,7 @@ int sethwm(char *dir, int nummer, char littleEndian) {
 	return(1);
 }
 
-int __saveds AASM LIBWriteFidoText(register __a0 struct FidoText *fidotext, register __a1 struct TagItem *taglist,register __a6 struct NiKomBase *NiKomBase) {
+int __saveds AASM LIBWriteFidoText(register __a0 struct FidoText *fidotext AREG(a0), register __a1 struct TagItem *taglist AREG(a1),register __a6 struct NiKomBase *NiKomBase AREG(a6)) {
 	BPTR lock,fh;
 	struct FidoLine *fl,*next;
 	int nummer,going=TRUE,charset;

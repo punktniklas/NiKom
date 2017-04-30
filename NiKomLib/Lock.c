@@ -15,7 +15,7 @@
  */
 
 void __saveds AASM
-LIBLockNiKomBase(register __a6 struct NiKomBase * NiKomBase)
+LIBLockNiKomBase(register __a6 struct NiKomBase * NiKomBase AREG(a6))
 {
     ObtainSemaphore(& NiKomBase->sem);
 }
@@ -30,7 +30,7 @@ LIBLockNiKomBase(register __a6 struct NiKomBase * NiKomBase)
  */
 
 void __saveds AASM
-LIBUnLockNiKomBase(register __a6 struct NiKomBase * NiKomBase)
+LIBUnLockNiKomBase(register __a6 struct NiKomBase * NiKomBase AREG(a6))
 {
     ReleaseSemaphore(& NiKomBase->sem);
 }

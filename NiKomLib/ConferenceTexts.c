@@ -40,8 +40,8 @@ int growConfTextsArray(int neededPos, struct System *Servermem);
 **********************************************************************/
 
 int __saveds AASM LIBGetConferenceForText(
-   register __d0 int textNumber,
-   register __a6 struct NiKomBase *NiKomBase) {
+   register __d0 int textNumber AREG(d0),
+   register __a6 struct NiKomBase *NiKomBase AREG(a6)) {
 
   if((textNumber < NiKomBase->Servermem->info.lowtext)
      || (textNumber > NiKomBase->Servermem->info.hightext)) {
@@ -80,10 +80,10 @@ int __saveds AASM LIBGetConferenceForText(
 **********************************************************************/
 
 void __saveds AASM LIBSetConferenceForText(
-   register __d0 int textNumber,
-   register __d1 int conf,
-   register __d2 int saveToDisk,
-   register __a6 struct NiKomBase *NiKomBase) {
+   register __d0 int textNumber AREG(d0),
+   register __d1 int conf AREG(d1),
+   register __d2 int saveToDisk AREG(d2),
+   register __a6 struct NiKomBase *NiKomBase AREG(a6)) {
 
   int arrayPos;
 
@@ -128,9 +128,9 @@ void __saveds AASM LIBSetConferenceForText(
 **********************************************************************/
 
 int __saveds AASM LIBFindNextTextInConference(
-   register __d0 int searchStart,
-   register __d1 int conf,
-   register __a6 struct NiKomBase *NiKomBase) {
+   register __d0 int searchStart AREG(d0),
+   register __d1 int conf AREG(d1),
+   register __a6 struct NiKomBase *NiKomBase AREG(a6)) {
 
   int i, textIndex;
 
@@ -171,9 +171,9 @@ int __saveds AASM LIBFindNextTextInConference(
 **********************************************************************/
 
 int __saveds AASM LIBFindPrevTextInConference(
-   register __d0 int searchStart,
-   register __d1 int conf,
-   register __a6 struct NiKomBase *NiKomBase) {
+   register __d0 int searchStart AREG(d0),
+   register __d1 int conf AREG(d1),
+   register __a6 struct NiKomBase *NiKomBase AREG(a6)) {
 
   int i, textIndex;
 
@@ -210,7 +210,7 @@ int __saveds AASM LIBFindPrevTextInConference(
 **********************************************************************/
 
 int __saveds AASM LIBWriteConferenceTexts(
-   register __a6 struct NiKomBase *NiKomBase) {
+   register __a6 struct NiKomBase *NiKomBase AREG(a6)) {
   BPTR file;
   int writeRes, textsToWrite;
 
@@ -261,8 +261,8 @@ int __saveds AASM LIBWriteConferenceTexts(
 **********************************************************************/
 
 int __saveds AASM LIBDeleteConferenceTexts(
-   register __d0 int numberOfTexts,
-   register __a6 struct NiKomBase *NiKomBase) {
+   register __d0 int numberOfTexts AREG(d0),
+   register __a6 struct NiKomBase *NiKomBase AREG(a6)) {
 
   int newTotalTexts;
 

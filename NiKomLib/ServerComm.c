@@ -25,7 +25,7 @@
  *              i NiKomLib.h.
  */
 
-int __saveds AASM LIBSetNodeState(register __d0 int node, register __d1 int state) {
+int __saveds AASM LIBSetNodeState(register __d0 int node AREG(d0), register __d1 int state AREG(d1)) {
 	return(sendservermess(NIKMESS_SETNODESTATE,-1,node,state,0L));
 }
 
@@ -45,8 +45,8 @@ int __saveds AASM LIBSetNodeState(register __d0 int node, register __d1 int stat
  *              Om man sätter avsändare till -1 tolkas det som ett systemmeddelande.
  */
 
-int __saveds AASM LIBSendNodeMessage(register __d0 int node, register __d1 int from, register __a0 char *str,
-	register __a6 struct NiKomBase *NiKomBase) {
+int __saveds AASM LIBSendNodeMessage(register __d0 int node AREG(d0), register __d1 int from AREG(d1), register __a0 char *str AREG(a0),
+	register __a6 struct NiKomBase *NiKomBase AREG(a6)) {
 	int i, ret = 0;
 
 	if(node > MAXNOD) return(-1);
