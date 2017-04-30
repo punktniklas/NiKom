@@ -10,6 +10,10 @@
 #include <dos/dos.h>
 #endif
 
+#include "NiKomCompat.h"
+
+#include "NiKomBase.h"
+
 /* Function prototypes */
 
 /* Those in the library */
