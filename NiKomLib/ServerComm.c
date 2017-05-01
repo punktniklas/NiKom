@@ -65,7 +65,8 @@ int __saveds AASM LIBSendNodeMessage(register __d0 int node AREG(d0), register _
 int linksaystring(int node, int from, char *str, struct NiKomBase *NiKomBase) {
 	struct SayString *ss, *pek;
 	int ret;
-	if(ss = AllocMem(sizeof(struct SayString),MEMF_CLEAR | MEMF_PUBLIC)) {
+	ss = AllocMem(sizeof(struct SayString), MEMF_CLEAR | MEMF_PUBLIC);
+	if(ss) {
 		ss->fromuser = from;
 		ss->timestamp = time(NULL);
 		strncpy(ss->text,str,MAXSAYTKN - 1);
@@ -101,7 +102,8 @@ char *portname;
 long sendservermess(short kommando, long nod, long data, long extdata1, long extdata2) {
 	struct NiKMess mess;
 	struct MsgPort *repport;
-	if(repport = CreateMsgPort()) {
+	repport = CreateMsgPort();
+	if(repport) {
 		memset(&mess,0,sizeof(struct NiKMess));
 		mess.stdmess.mn_Node.ln_Type = NT_MESSAGE;
 		mess.stdmess.mn_Length = sizeof(struct NiKMess);

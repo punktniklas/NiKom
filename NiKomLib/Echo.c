@@ -35,9 +35,12 @@ void __saveds AASM LIBReScanFidoConf(register __a0 struct Mote *motpek AREG(a0),
     newmotpek=LIBGetConfPoint(motnr,NiKomBase);
     if(!newmotpek) return;
   }
-  if(lock = Lock(newmotpek->dir,ACCESS_READ)) {
-    if(buffer = AllocMem(2048,MEMF_CLEAR)) {
-      if(eac = AllocDosObject(DOS_EXALLCONTROL,NULL)) {
+  lock = Lock(newmotpek->dir, ACCESS_READ);
+  if(lock) {
+    buffer = AllocMem(2048, MEMF_CLEAR);
+    if(buffer) {
+      eac = AllocDosObject(DOS_EXALLCONTROL, NULL);
+      if(eac) {
         eac->eac_LastKey = 0;
         eac->eac_MatchString = NULL;
         eac->eac_MatchFunc = NULL;
@@ -88,7 +91,8 @@ void __saveds AASM LIBUpdateFidoConf(register __a0 struct Mote *motpek AREG(a0),
     strcpy(fullpath,motpek->dir);
     sprintf(filnamn,"%d.msg",tmpmax);
     AddPart(fullpath,filnamn,99);
-    if(lock = Lock(fullpath,ACCESS_READ)) {
+    lock = Lock(fullpath, ACCESS_READ);
+    if(lock) {
       UnLock(lock);
       tmpmax++;
     } else break;
@@ -101,7 +105,8 @@ void __saveds AASM LIBUpdateFidoConf(register __a0 struct Mote *motpek AREG(a0),
     strcpy(fullpath,motpek->dir);
     sprintf(filnamn,"%d.msg",tmpmin);
     AddPart(fullpath,filnamn,99);
-    if(lock=Lock(fullpath,ACCESS_READ)) {
+    lock = Lock(fullpath, ACCESS_READ);
+    if(lock) {
       UnLock(lock);
       break;
     } else tmpmin++;

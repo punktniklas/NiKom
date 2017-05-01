@@ -261,7 +261,7 @@ struct FidoText * __saveds AASM LIBReadFidoText(register __a0 char *filename ARE
 		if(headeronly) continue;
 		if(!(fltmp = (struct FidoLine *)AllocMem(sizeof(struct FidoLine),MEMF_CLEAR))) {
 			Close(fh);
-			while(fltmp=(struct FidoLine *)RemHead((struct List *)&fidotext->text)) FreeMem(fltmp,sizeof(struct FidoLine));
+			while((fltmp=(struct FidoLine *)RemHead((struct List *)&fidotext->text))) FreeMem(fltmp,sizeof(struct FidoLine));
 			FreeMem(fidotext,sizeof(struct FidoText));
 			return(NULL);
 		}
@@ -271,46 +271,46 @@ struct FidoText * __saveds AASM LIBReadFidoText(register __a0 char *filename ARE
 	Close(fh);
 	if(fidotext->attribut & FIDOT_PRIVATE) {
 		if(fidotext->msgid[0]) {
-			if(x=getzone(fidotext->msgid)) fidotext->fromzone=x;
-			if(x=getnet(fidotext->msgid)) fidotext->fromnet=x;
-			if(x=getnode(fidotext->msgid)) fidotext->fromnode=x;
-			if(x=getpoint(fidotext->msgid)) fidotext->frompoint=x;
+			if((x=getzone(fidotext->msgid))) fidotext->fromzone=x;
+			if((x=getnet(fidotext->msgid))) fidotext->fromnet=x;
+			if((x=getnode(fidotext->msgid))) fidotext->fromnode=x;
+			if((x=getpoint(fidotext->msgid))) fidotext->frompoint=x;
 		}
 		if(replyto[0]) {
-			if(x=getzone(replyto)) fidotext->tozone=x;
-			if(x=getnet(replyto)) fidotext->tonet=x;
-			if(x=getnode(replyto)) fidotext->tonode=x;
-			if(x=getpoint(replyto)) fidotext->topoint=x;
+			if((x=getzone(replyto))) fidotext->tozone=x;
+			if((x=getnet(replyto))) fidotext->tonet=x;
+			if((x=getnode(replyto))) fidotext->tonode=x;
+			if((x=getpoint(replyto))) fidotext->topoint=x;
 		}
 		if(intl[0]) {
-			if(x=getzone(intl)) fidotext->tozone=x;
-			if(x=getnet(intl)) fidotext->tonet=x;
-			if(x=getnode(intl)) fidotext->tonode=x;
+			if((x=getzone(intl))) fidotext->tozone=x;
+			if((x=getnet(intl))) fidotext->tonet=x;
+			if((x=getnode(intl))) fidotext->tonode=x;
 			foo=hittaefter(intl);
-			if(x=getzone(foo)) fidotext->fromzone=x;
-			if(x=getnet(foo)) fidotext->fromnet=x;
-			if(x=getnode(foo)) fidotext->fromnode=x;
+			if((x=getzone(foo))) fidotext->fromzone=x;
+			if((x=getnet(foo))) fidotext->fromnet=x;
+			if((x=getnode(foo))) fidotext->fromnode=x;
 		}
 		if(topt[0]) fidotext->topoint = atoi(topt);
 		if(fmpt[0]) fidotext->frompoint = atoi(fmpt);
 	} else {
 		if(fidotext->msgid[0]) {
-			if(x=getzone(fidotext->msgid)) fidotext->fromzone=x;
-			if(x=getnet(fidotext->msgid)) fidotext->fromnet=x;
-			if(x=getnode(fidotext->msgid)) fidotext->fromnode=x;
-			if(x=getpoint(fidotext->msgid)) fidotext->frompoint=x;
+			if((x=getzone(fidotext->msgid))) fidotext->fromzone=x;
+			if((x=getnet(fidotext->msgid))) fidotext->fromnet=x;
+			if((x=getnode(fidotext->msgid))) fidotext->fromnode=x;
+			if((x=getpoint(fidotext->msgid))) fidotext->frompoint=x;
 		}
 		if(replyto[0]) {
-			if(x=getzone(replyto)) fidotext->tozone=x;
-			if(x=getnet(replyto)) fidotext->tonet=x;
-			if(x=getnode(replyto)) fidotext->tonode=x;
-			if(x=getpoint(replyto)) fidotext->topoint=x;
+			if((x=getzone(replyto))) fidotext->tozone=x;
+			if((x=getnet(replyto))) fidotext->tonet=x;
+			if((x=getnode(replyto))) fidotext->tonode=x;
+			if((x=getpoint(replyto))) fidotext->topoint=x;
 		}
 		if(origin[0]) {
-			if(x=getzone(origin)) fidotext->fromzone=x;
-			if(x=getnet(origin)) fidotext->fromnet=x;
-			if(x=getnode(origin)) fidotext->fromnode=x;
-			if(x=getpoint(origin)) fidotext->frompoint=x;
+			if((x=getzone(origin))) fidotext->fromzone=x;
+			if((x=getnet(origin))) fidotext->fromnet=x;
+			if((x=getnode(origin))) fidotext->fromnode=x;
+			if((x=getpoint(origin))) fidotext->frompoint=x;
 		}
 	}
 	if(fidotext->tozone==0) fidotext->tozone=fidotext->fromzone;
@@ -322,7 +322,7 @@ struct FidoText * __saveds AASM LIBReadFidoText(register __a0 char *filename ARE
 
 void __saveds AASM LIBFreeFidoText(register __a0 struct FidoText *fidotext AREG(a0)) {
 	struct FidoLine *fltmp;
-	while(fltmp=(struct FidoLine *)RemHead((struct List *)&fidotext->text)) FreeMem(fltmp,sizeof(struct FidoLine));
+	while((fltmp=(struct FidoLine *)RemHead((struct List *)&fidotext->text))) FreeMem(fltmp,sizeof(struct FidoLine));
 	FreeMem(fidotext,sizeof(struct FidoText));
 }
 
@@ -390,7 +390,8 @@ int __saveds AASM LIBWriteFidoText(register __a0 struct FidoText *fidotext AREG(
 		sprintf(filename,"%d.msg",nummer);
 		strcpy(fullpath,dir);
 		AddPart(fullpath,filename,99);
-		if(lock = Lock(fullpath,ACCESS_READ)) {
+		lock = Lock(fullpath, ACCESS_READ);
+		if(lock) {
 			UnLock(lock);
 			nummer++;
 		} else going=FALSE;
