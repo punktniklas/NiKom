@@ -31,4 +31,9 @@ typedef struct Library NiKomLocaleType;
 # define AREG(reg)
 #endif
 
+/* Far pointer handling. */
+#ifdef __GNUC__
+# define __far /* FIXME: Not sure what gcc does by default. */
+#endif
+
 #endif /* NIKOMCOMPAT_H */
