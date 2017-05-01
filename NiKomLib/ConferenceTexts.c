@@ -315,4 +315,5 @@ static int growConfTextsArray(int neededPos, struct System *Servermem) {
   Servermem->confTexts.texts = newArray;
   Servermem->confTexts.arraySize = newArraySize;
   FreeMem(oldArray, oldArraySize * sizeof(short));
+  return 1;
 }
