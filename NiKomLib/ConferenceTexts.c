@@ -13,8 +13,8 @@
 
 /* ******* Local functions ******** */
 
-int writeSingleConfText(int arrayPos, struct System *Servermem);
-int growConfTextsArray(int neededPos, struct System *Servermem);
+static int writeSingleConfText(int arrayPos, struct System *Servermem);
+static int growConfTextsArray(int neededPos, struct System *Servermem);
 
 /* ******* Library functions ******** */
 
@@ -281,7 +281,7 @@ int __saveds AASM LIBDeleteConferenceTexts(
   return WriteConferenceTexts();
 }
 
-int writeSingleConfText(int arrayPos, struct System *Servermem) {
+static int writeSingleConfText(int arrayPos, struct System *Servermem) {
   BPTR file;
   int writeRes;
 
@@ -301,7 +301,7 @@ int writeSingleConfText(int arrayPos, struct System *Servermem) {
   return writeRes == sizeof(short);
 }
 
-int growConfTextsArray(int neededPos, struct System *Servermem) {
+static int growConfTextsArray(int neededPos, struct System *Servermem) {
   int newArraySize, oldArraySize;
   short *newArray, *oldArray;
 
