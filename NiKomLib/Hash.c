@@ -2,6 +2,7 @@
 #include <exec/memory.h>
 #include <proto/exec.h>
 #include "NiKomLib.h"
+#include "Funcs.h"
 
 struct NiKHashNode {
 	int id;
