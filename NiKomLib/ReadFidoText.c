@@ -402,9 +402,9 @@ int __saveds AASM LIBWriteFidoText(register __a0 struct FidoText *fidotext AREG(
 		return(FALSE);
 	}
 	Flush(fh);
-	if(domain) sprintf(ftshead,"\001MSGID: %d:%d/%d.%d@%s %x\r",fidotext->fromzone,fidotext->fromnet,
+	if(domain) sprintf(ftshead,"\001MSGID: %d:%d/%d.%d@%s %lx\r",fidotext->fromzone,fidotext->fromnet,
 		fidotext->fromnode, fidotext->frompoint, domain, time(NULL));
-	else sprintf(ftshead,"\001MSGID: %d:%d/%d.%d %d\r",fidotext->fromzone,fidotext->fromnet,
+	else sprintf(ftshead,"\001MSGID: %d:%d/%d.%d %ld\r",fidotext->fromzone,fidotext->fromnet,
 		fidotext->fromnode, fidotext->frompoint, time(NULL));
 	FPuts(fh,ftshead);
 	if(reply) {

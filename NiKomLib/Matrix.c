@@ -187,7 +187,7 @@ int updatenextletter(int user) {
 		return(-1);
 	}
 	nr=atoi(nrstr);
-	sprintf(nrstr,"%d",nr+1);
+	sprintf(nrstr,"%ld",nr+1);
 	if(Seek(fh,0,OFFSET_BEGINNING)==-1) {
 		Close(fh);
 		return(-1);
