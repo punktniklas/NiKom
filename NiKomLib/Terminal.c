@@ -327,6 +327,8 @@ int __saveds AASM LIBConvMBChrsToAmiga(register __a0 char *dst AREG(a0),
   switch(chrs) {
   case CHRS_CP437:
     return conv128Table(dst, src, len, NiKomBase->IbmToAmiga);
+  case CHRS_CP850:
+    return conv128Table(dst, src, len, NiKomBase->CP850ToAmiga);
   case CHRS_SIS7:
     return conv32Table(dst, src, len, NiKomBase->SF7ToAmiga);
   case CHRS_MAC:
@@ -394,6 +396,8 @@ int __saveds AASM LIBConvMBChrsFromAmiga(register __a0 char *dst AREG(a0),
   switch(chrs) {
   case CHRS_CP437:
     return conv128Table(dst, src, len, NiKomBase->AmigaToIbm);
+  case CHRS_CP850:
+    return conv128Table(dst, src, len, NiKomBase->AmigaToCP850);
   case CHRS_SIS7:
     return conv32Table(dst, src, len, NiKomBase->AmigaToSF7);
   case CHRS_MAC:

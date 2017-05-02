@@ -71,6 +71,10 @@ int getfidoline(char *fidoline,char *buffer,int linelen, int chrs, BPTR fh,char 
 				if(tmp<128) fidoline[anttkn++]=tmp;
 				else fidoline[anttkn++]=NiKomBase->IbmToAmiga[tmp];
 				break;
+			case CHRS_CP850 :
+				if(tmp<128) fidoline[anttkn++]=tmp;
+				else fidoline[anttkn++]=NiKomBase->CP850ToAmiga[tmp];
+				break;
 			case CHRS_SIS7 :
 				fidoline[anttkn++]=NiKomBase->SF7ToAmiga[tmp];
 				break;
@@ -245,6 +249,8 @@ struct FidoText * __saveds AASM LIBReadFidoText(register __a0 char *filename ARE
 				} else if(!strncmp(foo, "CP437 2", 7) ||
 					  !strncmp(foo, "IBMPC 2", 7)) {
 					chrset = CHRS_CP437;
+				} else if(!strncmp(foo, "CP850 2", 7)) {
+					chrset = CHRS_CP850;
 				} else if(!strncmp(foo, "SWEDISH 1", 9)) {
 					chrset = CHRS_SIS7;
 				} else if(!strncmp(foo, "CP10000 2", 9) ||
@@ -421,6 +427,9 @@ int __saveds AASM LIBWriteFidoText(register __a0 struct FidoText *fidotext AREG(
 	switch(charset) {
 		case CHRS_CP437 :
 			strcpy(ftshead,"\001CHRS: CP437 2\r");
+			break;
+		case CHRS_CP850 :
+			strcpy(ftshead,"\001CHRS: CP850 2\r");
 			break;
 		case CHRS_SIS7 :
 			strcpy(ftshead,"\001CHRS: SWEDISH 1\r");
