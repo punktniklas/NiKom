@@ -72,6 +72,7 @@ struct FidoLine
 #define CHRS_CP437    2
 #define CHRS_CP850    3
 #define CHRS_SIS7     4
+#define CHRS_CP866    5
 #define CHRS_MAC      8
 #define CHRS_UTF8    32
 

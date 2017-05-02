@@ -31,7 +31,8 @@ struct NiKomBase {
   UBYTE IbmToAmiga[256], AmigaToIbm[256],
     SF7ToAmiga[256], AmigaToSF7[256],
     MacToAmiga[256], AmigaToMac[256],
-    CP850ToAmiga[256], AmigaToCP850[256];
+    CP850ToAmiga[256], AmigaToCP850[256],
+    CP866ToAmiga[256], AmigaToCP866[256];
 };
 
 #define NIK_LITTLE_ENDIAN NiKomBase->Servermem->fidodata.littleEndianByteOrder
