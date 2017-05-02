@@ -38,10 +38,13 @@
 
 int getfidoline(char *fidoline,char *buffer,int linelen, int chrs, BPTR fh,char *quotepre,struct NiKomBase *NiKomBase) {
 	int anttkn,foo,tmpret,hasquoted=FALSE,donotwordwrap=FALSE;
+	char fidobuf[8];
+	unsigned fidoidx;
 	UBYTE tmp,*findquotesign,insquotebuf[81];
 	strcpy(fidoline,buffer);
 	anttkn=strlen(fidoline);
 	buffer[0]=0;
+	fidoidx = 0;
 	for(;;) {
 		tmpret=FGetC(fh);
 		if(tmpret==-1) return(FALSE);
@@ -66,6 +69,7 @@ int getfidoline(char *fidoline,char *buffer,int linelen, int chrs, BPTR fh,char 
 			}
 			break;
 		}
+		fidobuf[fidoidx] = tmp;
 		switch(chrs) {
 			case CHRS_CP437 :
 				if(tmp<128) fidoline[anttkn++]=tmp;
@@ -89,8 +93,19 @@ int getfidoline(char *fidoline,char *buffer,int linelen, int chrs, BPTR fh,char 
 			case CHRS_LATIN1 :
 				fidoline[anttkn++]=tmp;
 				break;
+			case CHRS_UTF8 :
+				tmpret = convUTF8ToAmiga(fidoline+anttkn, fidobuf, fidoidx+1);
+				if (tmpret < 0) {
+					/* Need more bytes, continue reading. */
+					++fidoidx;
+					continue;
+				}
+				anttkn += tmpret;
+				fidoidx = 0;
+				break;
 			default :
 				fidoline[anttkn++]=convnokludge(tmp);
+				break;
 		}
 		fidoline[anttkn]=0;
 		if(quotepre && !hasquoted && anttkn>=5) {    // När antal tecken överstiger fem är det dags
@@ -262,6 +277,11 @@ struct FidoText * __saveds AASM LIBReadFidoText(register __a0 char *filename ARE
 				} else if(!strncmp(foo, "CP10000 2", 9) ||
 					  !strncmp(foo, "MAC 2", 5)) {
 					chrset = CHRS_MAC;
+				} else if(!strncmp(foo, "UTF-8 4", 7) ||
+					  !strncmp(foo, "UTF-8 2", 7)) {
+					/* The latter variant is incorrect, but quite common in
+						practice. */
+					chrset = CHRS_UTF8;
 				}
 			}
 			if(nokludge) continue;
