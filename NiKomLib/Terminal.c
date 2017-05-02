@@ -264,7 +264,7 @@ static int conv32Table(char *dst, const char *src, unsigned len,
   return (int)i;
 }
 
-static int convCP850ToAmiga(char *dst, const char *src, unsigned len){
+static int convNoKludgeToAmiga(char *dst, const char *src, unsigned len){
   unsigned i;
 
   for(i=0; src[i] && i < len; i++) {
@@ -331,13 +331,12 @@ int __saveds AASM LIBConvMBChrsToAmiga(register __a0 char *dst AREG(a0),
     return conv32Table(dst, src, len, NiKomBase->SF7ToAmiga);
   case CHRS_MAC:
     return conv128Table(dst, src, len, NiKomBase->MacToAmiga);
-  case CHRS_CP850:
-    return convCP850ToAmiga(dst, src, len);
   case CHRS_UTF8:
     return convUTF8ToAmiga(dst, src, len);
   case CHRS_LATIN1:
-  default:
     return noConvCopy(dst, src, len);
+  default:
+    return convNoKludgeToAmiga(dst, src, len);
   }
   /* Not reached. */
 }
@@ -401,7 +400,6 @@ int __saveds AASM LIBConvMBChrsFromAmiga(register __a0 char *dst AREG(a0),
     return conv128Table(dst, src, len, NiKomBase->AmigaToMac);
   case CHRS_UTF8:
     return convUTF8FromAmiga(dst, src, len);
-  case CHRS_CP850:
   case CHRS_LATIN1:
   default:
     return noConvCopy(dst, src, len);
