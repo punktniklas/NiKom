@@ -207,6 +207,7 @@ struct FidoText * __saveds AASM LIBReadFidoText(register __a0 char *filename ARE
 	struct FidoLine *fltmp;
 	BPTR fh;
 	UBYTE intl[30],replyto[20],origin[20],topt[5],fmpt[5],ftshead[190],fidoline[81],flbuffer[81],*foo,prequote[10];
+	int bytes;
 
 	if(!NiKomBase->Servermem) return(NULL);
 
@@ -223,9 +224,9 @@ struct FidoText * __saveds AASM LIBReadFidoText(register __a0 char *filename ARE
           return(NULL);
 	}
 	Read(fh,ftshead,190);
+	/* Re-extracted after we know charset. */
 	strcpy(fidotext->fromuser,&ftshead[0]);
-	strcpy(fidotext->touser,&ftshead[36]);
-	strcpy(fidotext->subject,&ftshead[72]);
+	/* touser and subject extracted after we know charset. */
 	strcpy(fidotext->date,&ftshead[144]);
 	fidotext->tonode = getTwoByteField(&ftshead[166], NIK_LITTLE_ENDIAN);
 	fidotext->fromnode = getTwoByteField(&ftshead[168], NIK_LITTLE_ENDIAN);
@@ -237,8 +238,10 @@ struct FidoText * __saveds AASM LIBReadFidoText(register __a0 char *filename ARE
 		prequote[0]=' ';
 		prequote[1]=0;
 		x=1;
-		foo=strcpy(flbuffer,fidotext->fromuser); // Bara lånar flbuffer tillfälligt..
-		LIBConvChrsToAmiga(foo,0,0,NiKomBase);
+		foo = flbuffer; // Temporarily borrowing flbuffer...
+		bytes = LIBConvMBChrsToAmiga(flbuffer, fidotext->fromuser, 0, 0,
+					     NiKomBase);
+		flbuffer[bytes] = '\0';
 		while(foo[0]) {
 			prequote[x]=foo[0];
 			prequote[x+1]=0;
@@ -353,9 +356,16 @@ struct FidoText * __saveds AASM LIBReadFidoText(register __a0 char *filename ARE
 		}
 	}
 	if(fidotext->tozone==0) fidotext->tozone=fidotext->fromzone;
-	LIBConvChrsToAmiga(fidotext->subject,0,chrset,NiKomBase);
-	LIBConvChrsToAmiga(fidotext->fromuser,0,chrset,NiKomBase);
-	LIBConvChrsToAmiga(fidotext->touser,0,chrset,NiKomBase);
+
+	bytes = LIBConvMBChrsToAmiga(fidotext->fromuser, &ftshead[0], 0,
+				     chrset, NiKomBase);
+	fidotext->fromuser[bytes] = '\0';
+	bytes = LIBConvMBChrsToAmiga(fidotext->touser, &ftshead[36], 0,
+				     chrset, NiKomBase);
+	fidotext->touser[bytes] = '\0';
+	bytes = LIBConvMBChrsToAmiga(fidotext->subject, &ftshead[72], 0,
+				     chrset, NiKomBase);
+	fidotext->subject[bytes] = '\0';
 	return(fidotext);
 }
 
@@ -397,7 +407,7 @@ int sethwm(char *dir, int nummer, char littleEndian) {
 int __saveds AASM LIBWriteFidoText(register __a0 struct FidoText *fidotext AREG(a0), register __a1 struct TagItem *taglist AREG(a1),register __a6 struct NiKomBase *NiKomBase AREG(a6)) {
 	BPTR lock,fh;
 	struct FidoLine *fl,*next;
-	int nummer,going=TRUE,charset;
+	int nummer, going=TRUE, charset, bytes;
 	UBYTE *dir,filename[20],fullpath[100],ftshead[190],*domain,*reply,flowchar,datebuf[14],timebuf[10];
 	struct DateTime dt;
 
@@ -410,10 +420,12 @@ int __saveds AASM LIBWriteFidoText(register __a0 struct FidoText *fidotext AREG(
 	if(!dir) return(0);
 	memset(ftshead,0,190);
 	strncpy(&ftshead[0],fidotext->fromuser,35);
-	LIBConvChrsFromAmiga(fidotext->touser,0,charset,NiKomBase);
-	strncpy(&ftshead[36],fidotext->touser,35);
-	LIBConvChrsFromAmiga(fidotext->subject,0,charset,NiKomBase);
-	strncpy(&ftshead[72],fidotext->subject,71);
+	bytes = LIBConvMBChrsFromAmiga(&ftshead[36], fidotext->touser, 0,
+				       charset, 35, NiKomBase);
+	ftshead[36+bytes] = '\0';
+	bytes = LIBConvMBChrsFromAmiga(&ftshead[72], fidotext->subject, 0,
+				       charset,71, NiKomBase);
+	ftshead[72+bytes] = '\0';
 	strncpy(&ftshead[144],fidotext->date,19);
         writeTwoByteField(fidotext->tonode, &ftshead[166], NIK_LITTLE_ENDIAN);
         writeTwoByteField(fidotext->fromnode, &ftshead[168], NIK_LITTLE_ENDIAN);
@@ -488,8 +500,9 @@ int __saveds AASM LIBWriteFidoText(register __a0 struct FidoText *fidotext AREG(
 	FPuts(fh, "\001PID: NiKom " NIKRELEASE "\r");
 	for(fl=(struct FidoLine *)fidotext->text.mlh_Head;fl->line_node.mln_Succ;fl=(struct FidoLine *)fl->line_node.mln_Succ) {
 		next=(struct FidoLine *)fl->line_node.mln_Succ;
-		strcpy(ftshead,fl->text);
-		LIBConvChrsFromAmiga(ftshead,0,charset,NiKomBase);
+		bytes = LIBConvMBChrsFromAmiga(ftshead, fl->text, 0, charset,
+					       sizeof(ftshead) - 1, NiKomBase);
+		ftshead[bytes] = '\0';
 		if(!next->line_node.mln_Succ) next=NULL;
 		flowchar='\r';
 		if(next) {
