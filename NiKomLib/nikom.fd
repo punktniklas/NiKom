@@ -53,5 +53,5 @@ FindPrevTextInConference(searchStart,conf)(D0,D1)
 WriteConferenceTexts()
 DeleteConferenceTexts(numberOfTexts)(D0)
 ConvMBChrsToAmiga(dst,src,len,chrs)(A0,A1,D0,D1)
-ConvMBChrsFromAmiga(dst,src,len,chrs)(A0,A1,D0,D1)
+ConvMBChrsFromAmiga(dst,src,srclen,chrs,dstlen)(A0,A1,D0,D1,D2)
 ##end

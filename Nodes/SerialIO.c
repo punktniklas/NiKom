@@ -406,7 +406,7 @@ void eka(char tecken) {
 	conwritereq->io_Data=(APTR)&tecken;
 	conwritereq->io_Length=1;
 	if(DoIO((struct IORequest *)conwritereq)) printf("DoIO i eka() (1)\n");
-	bytes = ConvMBChrsFromAmiga(sertkn,&tecken,1,Servermem->inne[nodnr].chrset);
+	bytes = ConvMBChrsFromAmiga(sertkn,&tecken,1,Servermem->inne[nodnr].chrset,0);
 	serwritereq->IOSer.io_Command=CMD_WRITE;
 	serwritereq->IOSer.io_Data=(APTR)sertkn;
 	serwritereq->IOSer.io_Length=bytes;
@@ -420,7 +420,7 @@ void sereka(char tecken)
 {
 	char sertkn[2];
 	int bytes;
-	bytes = ConvMBChrsFromAmiga(sertkn,&tecken,1,Servermem->inne[nodnr].chrset);
+	bytes = ConvMBChrsFromAmiga(sertkn,&tecken,1,Servermem->inne[nodnr].chrset,0);
 	serwritereq->IOSer.io_Command=CMD_WRITE;
 	serwritereq->IOSer.io_Data=(APTR)sertkn;
 	serwritereq->IOSer.io_Length=bytes;
@@ -457,7 +457,7 @@ void putstring(char *pekare,int size, long flags) {
 	int bytes;
 
 	bytes = ConvMBChrsFromAmiga(serpekare, pekare, 199,
-				    Servermem->inne[nodnr].chrset);
+				    Servermem->inne[nodnr].chrset, 0);
 	serwritereq->IOSer.io_Command=CMD_WRITE;
 	serwritereq->IOSer.io_Data=serpekare;
 	serwritereq->IOSer.io_Length=bytes;
@@ -476,7 +476,7 @@ static void serputstring(char *pekare, int size, long flags)
 	int bytes;
 
 	bytes = ConvMBChrsFromAmiga(serpekare, pekare, 199,
-				    Servermem->inne[nodnr].chrset);
+				    Servermem->inne[nodnr].chrset, 0);
 	serwritereq->IOSer.io_Command=CMD_WRITE;
 	serwritereq->IOSer.io_Data=serpekare;
 	serwritereq->IOSer.io_Length=bytes;
@@ -711,16 +711,16 @@ int puttekn(char *pekare,int size)
 	strncpy(localconstring,pekare,1199);
 	localconstring[1199]=0;
 	if(Servermem->cfg.cfgflags & NICFG_LOCALCOLOURS) {
-		bytes=ConvMBChrsFromAmiga(serpekare,pekare,1199,Servermem->inne[nodnr].chrset);
+		bytes=ConvMBChrsFromAmiga(serpekare,pekare,1199,Servermem->inne[nodnr].chrset,0);
 		serpekare[bytes] = '\0';
 		if(!(Servermem->inne[nodnr].flaggor & ANSICOLOURS)) StripAnsiSequences(serpekare);
 	} else {
 		StripAnsiSequences(localconstring);
 		if(Servermem->inne[nodnr].flaggor & ANSICOLOURS) {
-			bytes=ConvMBChrsFromAmiga(serpekare,pekare,1199,Servermem->inne[nodnr].chrset);
+			bytes=ConvMBChrsFromAmiga(serpekare,pekare,1199,Servermem->inne[nodnr].chrset,0);
 			serpekare[bytes] = '\0';
 		} else  {
-			bytes=ConvMBChrsFromAmiga(serpekare,localconstring,1199,Servermem->inne[nodnr].chrset);
+			bytes=ConvMBChrsFromAmiga(serpekare,localconstring,1199,Servermem->inne[nodnr].chrset,0);
 			serpekare[bytes] = '\0';
 		}
 	}

@@ -36,7 +36,7 @@ char *GetBuildTime(void);
 void ConvChrsToAmiga(char *, int, int);
 void ConvChrsFromAmiga(char *, int, int);
 int ConvMBChrsToAmiga(char *, char *, int, int);
-int ConvMBChrsFromAmiga(char *, char *, int, int);
+int ConvMBChrsFromAmiga(char *, char *, int, int, int);
 void StripAnsiSequences(char *);
 int SetNodeState(int, int);
 int SendNodeMessage(int, int, char *);
