@@ -10,53 +10,57 @@
 #include <dos/dos.h>
 #endif
 
+#include "NiKomCompat.h"
+
+#include "NiKomBase.h"
+
 /* Function prototypes */
 
 /* Those in the library */
-void __saveds __asm LIBMatrix2NiKom(register __a6 struct NiKomBase *);
-LONG __saveds __asm LIBRexxEntry(register __a0 struct RexxMsg *,register __a6 struct NiKomBase *);
-void __saveds __asm LIBLockNiKomBase(register __a6 struct NiKomBase *);
-void __saveds __asm LIBUnLockNiKomBase(register __a6 struct NiKomBase *);
-struct FidoText * __saveds __asm LIBReadFidoText(register __a0 char *, register __a1 struct TagItem *,register __a6 struct NiKomBase *);
-void __saveds __asm LIBFreeFidoText(register __a0 struct FidoText *);
-int __saveds __asm LIBWriteFidoText(register __a0 struct FidoText *, register __a1 struct TagItem *,register __a6 struct NiKomBase *);
-void __saveds __asm LIBReScanFidoConf(register __a0 struct Mote *, register __d0 int, register __a6 struct NiKomBase *);
-void __saveds __asm LIBUpdateFidoConf(register __a0 struct Mote *, register __a6 struct NiKomBase *);
-void __saveds __asm LIBUpdateAllFidoConf(register __a6 struct NiKomBase *);
-void __saveds __asm LIBReScanAllFidoConf(register __a6 struct NiKomBase *);
-struct NodeType * __saveds __asm LIBGetNodeType(register __d0 long, register __a6 struct NiKomBase *);
-int __saveds __asm LIBReNumberConf(register __a0 struct Mote *, register __d0 int,
-	register __d1 int, register __a6 struct NiKomBase *);
-int __saveds __asm LIBWriteConf(register __a0 struct Mote *, register __a6 struct NiKomBase *);
-struct Mote * __saveds __asm LIBGetConfPoint(register __d0 int, register __a6 struct NiKomBase *);
-int __saveds __asm LIBMaySeeConf(register __d0 int, register __d1 int, register __a0 struct User *,register __a6 struct NiKomBase *);
-int __saveds __asm LIBMayBeMemberConf(register __d0 int, register __d1 int, register __a0 struct User *,register __a6 struct NiKomBase *);
-int __saveds __asm LIBMayReadConf(register __d0 int, register __d1 int, register __a0 struct User *,register __a6 struct NiKomBase *);
-int __saveds __asm LIBMayWriteConf(register __d0 int, register __d1 int, register __a0 struct User *,register __a6 struct NiKomBase *);
-int __saveds __asm LIBMayReplyConf(register __d0 int, register __d1 int, register __a0 struct User *,register __a6 struct NiKomBase *);
-int __saveds __asm LIBMayAdminConf(register __d0 int, register __d1 int, register __a0 struct User *,register __a6 struct NiKomBase *);
-int __saveds __asm LIBIsMemberConf(register __d0 int, register __d1 int, register __a0 struct User *,register __a6 struct NiKomBase *);
-char * __saveds __asm LIBGetBuildTime();
-void __saveds __asm LIBConvChrsToAmiga(register __a0 char *, register __d0 int,
-	register __d1 int, register __a6 struct NiKomBase *);
-void __saveds __asm LIBConvChrsFromAmiga(register __a0 char *, register __d0 int,
-	register __d1 int, register __a6 struct NiKomBase *);
-void __saveds __asm LIBStripAnsiSequences(register __a0 char *, register __a6 struct NiKomBase *);
-int __saveds __asm LIBConvMBChrsToAmiga(register __a0 char *, register __a1 char *,
-	register __d0 int, register __d1 int, register __a6 struct NiKomBase *);
-int __saveds __asm LIBConvMBChrsFromAmiga(register __a0 char *, register __a1 char *,
-	register __d0 int, register __d1 int, register __a6 struct NiKomBase *);
-int __saveds __asm LIBSetNodeState(register __d0 int, register __d1 int);
-int __saveds __asm LIBSendNodeMessage(register __d0 int, register __d1 int, register __a0 char *, register __a6 struct NiKomBase *);
-NiKHash * __saveds __asm LIBNewNiKHash(register __d0 int);
-void __saveds __asm LIBDeleteNiKHash(register __a0 NiKHash *);
-int __saveds __asm LIBInsertNiKHash(register __a0 NiKHash *, register __d0 int, register __a1 void *);
-void * __saveds __asm LIBGetNiKHashData(register __a0 NiKHash *, register __d0 int);
-void * __saveds __asm LIBRemoveNiKHashData(register __a0 NiKHash *, register __d0 int);
-int __saveds __asm LIBCreateUser(register __d0 LONG, register __a0 struct TagItem *, register __a6 struct NiKomBase *);
+void __saveds AASM LIBMatrix2NiKom(register __a6 struct NiKomBase * AREG(a6));
+LONG __saveds AASM LIBRexxEntry(register __a0 struct RexxMsg * AREG(a0),register __a6 struct NiKomBase * AREG(a6));
+void __saveds AASM LIBLockNiKomBase(register __a6 struct NiKomBase * AREG(a6));
+void __saveds AASM LIBUnLockNiKomBase(register __a6 struct NiKomBase * AREG(a6));
+struct FidoText * __saveds AASM LIBReadFidoText(register __a0 char * AREG(a0), register __a1 struct TagItem * AREG(a1),register __a6 struct NiKomBase * AREG(a6));
+void __saveds AASM LIBFreeFidoText(register __a0 struct FidoText * AREG(a0));
+int __saveds AASM LIBWriteFidoText(register __a0 struct FidoText * AREG(a0), register __a1 struct TagItem * AREG(a1),register __a6 struct NiKomBase * AREG(a6));
+void __saveds AASM LIBReScanFidoConf(register __a0 struct Mote * AREG(a0), register __d0 int AREG(d0), register __a6 struct NiKomBase * AREG(a6));
+void __saveds AASM LIBUpdateFidoConf(register __a0 struct Mote * AREG(a0), register __a6 struct NiKomBase * AREG(a6));
+void __saveds AASM LIBUpdateAllFidoConf(register __a6 struct NiKomBase * AREG(a6));
+void __saveds AASM LIBReScanAllFidoConf(register __a6 struct NiKomBase * AREG(a6));
+struct NodeType * __saveds AASM LIBGetNodeType(register __d0 long AREG(d0), register __a6 struct NiKomBase * AREG(a6));
+int __saveds AASM LIBReNumberConf(register __a0 struct Mote * AREG(a0), register __d0 int AREG(d0),
+	register __d1 int AREG(d1), register __a6 struct NiKomBase * AREG(a6));
+int __saveds AASM LIBWriteConf(register __a0 struct Mote * AREG(a0), register __a6 struct NiKomBase * AREG(a6));
+struct Mote * __saveds AASM LIBGetConfPoint(register __d0 int AREG(d0), register __a6 struct NiKomBase * AREG(a6));
+int __saveds AASM LIBMaySeeConf(register __d0 int AREG(d0), register __d1 int AREG(d1), register __a0 struct User * AREG(a0),register __a6 struct NiKomBase * AREG(a6));
+int __saveds AASM LIBMayBeMemberConf(register __d0 int AREG(d0), register __d1 int AREG(d1), register __a0 struct User * AREG(a0),register __a6 struct NiKomBase * AREG(a6));
+int __saveds AASM LIBMayReadConf(register __d0 int AREG(d0), register __d1 int AREG(d1), register __a0 struct User * AREG(a0),register __a6 struct NiKomBase * AREG(a6));
+int __saveds AASM LIBMayWriteConf(register __d0 int AREG(d0), register __d1 int AREG(d1), register __a0 struct User * AREG(a0),register __a6 struct NiKomBase * AREG(a6));
+int __saveds AASM LIBMayReplyConf(register __d0 int AREG(d0), register __d1 int AREG(d1), register __a0 struct User * AREG(a0),register __a6 struct NiKomBase * AREG(a6));
+int __saveds AASM LIBMayAdminConf(register __d0 int AREG(d0), register __d1 int AREG(d1), register __a0 struct User * AREG(a0),register __a6 struct NiKomBase * AREG(a6));
+int __saveds AASM LIBIsMemberConf(register __d0 int AREG(d0), register __d1 int AREG(d1), register __a0 struct User * AREG(a0),register __a6 struct NiKomBase * AREG(a6));
+char * __saveds AASM LIBGetBuildTime();
+void __saveds AASM LIBConvChrsToAmiga(register __a0 char * AREG(a0), register __d0 int AREG(d0),
+	register __d1 int AREG(d1), register __a6 struct NiKomBase * AREG(a6));
+void __saveds AASM LIBConvChrsFromAmiga(register __a0 char * AREG(a0), register __d0 int AREG(d0),
+	register __d1 int AREG(d1), register __a6 struct NiKomBase * AREG(a6));
+void __saveds AASM LIBStripAnsiSequences(register __a0 char * AREG(a0), register __a6 struct NiKomBase * AREG(a6));
+int __saveds AASM LIBConvMBChrsToAmiga(register __a0 char * AREG(a0), register __a1 char * AREG(a1),
+	register __d0 int AREG(d0), register __d1 int AREG(d1), register __a6 struct NiKomBase * AREG(a6));
+int __saveds AASM LIBConvMBChrsFromAmiga(register __a0 char * AREG(a0), register __a1 char * AREG(a1),
+	register __d0 int AREG(d0), register __d1 int AREG(d1), register __a6 struct NiKomBase * AREG(a6));
+int __saveds AASM LIBSetNodeState(register __d0 int AREG(d0), register __d1 int AREG(d1));
+int __saveds AASM LIBSendNodeMessage(register __d0 int AREG(d0), register __d1 int AREG(d1), register __a0 char * AREG(a0), register __a6 struct NiKomBase * AREG(a6));
+NiKHash * __saveds AASM LIBNewNiKHash(register __d0 int AREG(d0));
+void __saveds AASM LIBDeleteNiKHash(register __a0 NiKHash * AREG(a0));
+int __saveds AASM LIBInsertNiKHash(register __a0 NiKHash * AREG(a0), register __d0 int AREG(d0), register __a1 void * AREG(a1));
+void * __saveds AASM LIBGetNiKHashData(register __a0 NiKHash * AREG(a0), register __d0 int AREG(d0));
+void * __saveds AASM LIBRemoveNiKHashData(register __a0 NiKHash * AREG(a0), register __d0 int AREG(d0));
+int __saveds AASM LIBCreateUser(register __d0 LONG AREG(d0), register __a0 struct TagItem * AREG(a0), register __a6 struct NiKomBase * AREG(a6));
 
-int __saveds __asm LIBNiKParse(register __a0 char *string, register __d0 char subject, register __a6 struct NiKomBase *NiKomBase);
-int __saveds __asm LIBSysInfo(register __a0 char *subject, register __a6 struct NiKomBase *NiKomBase);
+int __saveds AASM LIBNiKParse(register __a0 char *string AREG(a0), register __d0 char subject AREG(d0), register __a6 struct NiKomBase *NiKomBase AREG(a6));
+int __saveds AASM LIBSysInfo(register __a0 char *subject AREG(a0), register __a6 struct NiKomBase *NiKomBase AREG(a6));
 
 /* Other useful little functions */
 

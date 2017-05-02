@@ -36,8 +36,8 @@ void copychrstables(struct NiKomBase *NiKomBase) {
 	memcpy(NiKomBase->AmigaToMac,AmigaToMac,256);
 }
 
-int __saveds __asm
-__UserLibInit(register __a6 struct NiKomBase * NiKomBase)
+int __saveds AASM
+__UserLibInit(register __a6 struct NiKomBase * NiKomBase AREG(a6))
 {
 	/* NiKomBase private initialization */
 
@@ -63,8 +63,8 @@ __UserLibInit(register __a6 struct NiKomBase * NiKomBase)
 	return (RET_OK);
 }
 
-void __saveds __asm
-__UserLibCleanup(register __a6 struct NiKomBase * NiKomBase)
+void __saveds AASM
+__UserLibCleanup(register __a6 struct NiKomBase * NiKomBase AREG(a6))
 {
 	CloseLibrary(UtilityBase);
 	CloseLibrary(RexxSysBase);
@@ -72,7 +72,7 @@ __UserLibCleanup(register __a6 struct NiKomBase * NiKomBase)
 	CloseLibrary((struct Library *)DOSBase);
 }
 
-void __saveds __asm
-LIBInitServermem(register __a0 struct System *Servermem, register __a6 struct NiKomBase * NiKomBase) {
+void __saveds AASM
+LIBInitServermem(register __a0 struct System *Servermem AREG(a0), register __a6 struct NiKomBase * NiKomBase AREG(a6)) {
 	NiKomBase->Servermem = Servermem;
 }

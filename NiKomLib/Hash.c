@@ -2,6 +2,7 @@
 #include <exec/memory.h>
 #include <proto/exec.h>
 #include "NiKomLib.h"
+#include "Funcs.h"
 
 struct NiKHashNode {
 	int id;
@@ -26,7 +27,7 @@ struct NiKHash {
 *               element man tänker lagra är kanske lagom.
 */
 
-NiKHash * __saveds __asm LIBNewNiKHash(register __d0 int tablesize) {
+NiKHash * __saveds AASM LIBNewNiKHash(register __d0 int tablesize AREG(d0)) {
 	NiKHash *tmptable;
 	if(!(tmptable = (NiKHash *) AllocMem(sizeof(NiKHash),MEMF_CLEAR))) return(NULL);
 	tmptable->tablesize = tablesize;
@@ -48,7 +49,7 @@ NiKHash * __saveds __asm LIBNewNiKHash(register __d0 int tablesize) {
 *               element innan DeleteNiKHash anropas.
 */
 
-void __saveds __asm LIBDeleteNiKHash(register __a0 NiKHash *hashtable) {
+void __saveds AASM LIBDeleteNiKHash(register __a0 NiKHash *hashtable AREG(a0)) {
 	FreeMem(hashtable->table, sizeof(struct NiKHashNode *) * hashtable->tablesize);
 	FreeMem(hashtable,sizeof(NiKHash));
 }
@@ -65,8 +66,9 @@ void __saveds __asm LIBDeleteNiKHash(register __a0 NiKHash *hashtable) {
 *  Beskrivning: Stoppar in angivet data med angivet id i hashtabellen.
 */
 
-int __saveds __asm LIBInsertNiKHash(register __a0 NiKHash *hashtable, register __d0 int id,
-	register __a1 void *data) {
+int __saveds AASM LIBInsertNiKHash(register __a0 NiKHash *hashtable AREG(a0),
+                                   register __d0 int id AREG(d0),
+                                   register __a1 void *data AREG(a1)) {
 	int hashvalue;
 	struct NiKHashNode *pek, *newnode;
 	hashvalue = id % hashtable->tablesize;
@@ -97,7 +99,8 @@ int __saveds __asm LIBInsertNiKHash(register __a0 NiKHash *hashtable, register _
 *  Beskrivning: Plockar fram datat till angivet ID.
 */
 
-void * __saveds __asm LIBGetNiKHashData(register __a0 NiKHash *hashtable, register __d0 int id) {
+void * __saveds AASM LIBGetNiKHashData(register __a0 NiKHash *hashtable AREG(a0),
+                                       register __d0 int id AREG(d0)) {
 	int hashvalue;
 	struct NiKHashNode *pek;
 	hashvalue = id % hashtable->tablesize;
@@ -121,7 +124,8 @@ void * __saveds __asm LIBGetNiKHashData(register __a0 NiKHash *hashtable, regist
 *               returnerar det.
 */
 
-void * __saveds __asm LIBRemoveNiKHashData(register __a0 NiKHash *hashtable, register __d0 int id) {
+void * __saveds AASM LIBRemoveNiKHashData(register __a0 NiKHash *hashtable AREG(a0),
+                                          register __d0 int id AREG(d0)) {
 	int hashvalue;
 	struct NiKHashNode *pek, *tmppek;
 	void *data;

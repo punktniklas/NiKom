@@ -45,11 +45,11 @@ int maybeConvertUnreadTextsData(int userId, struct UnreadTexts *unreadTexts,
 
 **********************************************************************/
 
-void __saveds __asm LIBChangeUnreadTextStatus(
-   register __d0 int textNumber,
-   register __d1 int markAsUnread,
-   register __a0 struct UnreadTexts *unreadTexts,
-   register __a6 struct NiKomBase *NiKomBase) {
+void __saveds AASM LIBChangeUnreadTextStatus(
+   register __d0 int textNumber AREG(d0),
+   register __d1 int markAsUnread AREG(d1),
+   register __a0 struct UnreadTexts *unreadTexts AREG(a0),
+   register __a6 struct NiKomBase *NiKomBase AREG(a6)) {
 
    if(textNumber < unreadTexts->bitmapStartText) {
       return;
@@ -93,10 +93,10 @@ void __saveds __asm LIBChangeUnreadTextStatus(
 
 **********************************************************************/
 
-int __saveds __asm LIBIsTextUnread(
-  register __d0 int textNumber,
-  register __a0 struct UnreadTexts *unreadTexts,
-  register __a6 struct NiKomBase *NiKomBase) {
+int __saveds AASM LIBIsTextUnread(
+  register __d0 int textNumber AREG(d0),
+  register __a0 struct UnreadTexts *unreadTexts AREG(a0),
+  register __a6 struct NiKomBase *NiKomBase AREG(a6)) {
 
   if(textNumber < unreadTexts->bitmapStartText) {
     return 0;
@@ -126,9 +126,9 @@ int __saveds __asm LIBIsTextUnread(
 
 **********************************************************************/
 
-void __saveds __asm LIBInitUnreadTexts(
-   register __a0 struct UnreadTexts *unreadTexts,
-   register __a6 struct NiKomBase *NiKomBase) {
+void __saveds AASM LIBInitUnreadTexts(
+   register __a0 struct UnreadTexts *unreadTexts AREG(a0),
+   register __a6 struct NiKomBase *NiKomBase AREG(a6)) {
   unreadTexts->bitmapStartText = NiKomBase->Servermem->info.lowtext;
   memset(unreadTexts->bitmap, 0xff, UNREADTEXTS_BITMAPSIZE/8);
   memset(unreadTexts->lowestPossibleUnreadText, 0, MAXMOTE * sizeof(long));
@@ -163,11 +163,11 @@ void __saveds __asm LIBInitUnreadTexts(
 
 **********************************************************************/
 
-int __saveds __asm LIBFindNextUnreadText(
-  register __d0 int searchStart,
-  register __d1 int conf,
-  register __a0 struct UnreadTexts *unreadTexts,
-  register __a6 struct NiKomBase *NiKomBase) {
+int __saveds AASM LIBFindNextUnreadText(
+  register __d0 int searchStart AREG(d0),
+  register __d1 int conf AREG(d1),
+  register __a0 struct UnreadTexts *unreadTexts AREG(a0),
+  register __a6 struct NiKomBase *NiKomBase AREG(a6)) {
 
   int textInConf;
 
@@ -211,10 +211,10 @@ int __saveds __asm LIBFindNextUnreadText(
 
 **********************************************************************/
 
-int __saveds __asm LIBCountUnreadTexts(
-  register __d0 int conf,
-  register __a0 struct UnreadTexts *unreadTexts,
-  register __a6 struct NiKomBase *NiKomBase) {
+int __saveds AASM LIBCountUnreadTexts(
+  register __d0 int conf AREG(d0),
+  register __a0 struct UnreadTexts *unreadTexts AREG(a0),
+  register __a6 struct NiKomBase *NiKomBase AREG(a6)) {
 
   int textInConf, cnt = 0;
 
@@ -251,11 +251,11 @@ int __saveds __asm LIBCountUnreadTexts(
 
 **********************************************************************/
 
-void __saveds __asm LIBSetUnreadTexts(
-  register __d0 int conf,
-  register __d1 int amount,
-  register __a0 struct UnreadTexts *unreadTexts,
-  register __a6 struct NiKomBase *NiKomBase) {
+void __saveds AASM LIBSetUnreadTexts(
+  register __d0 int conf AREG(d0),
+  register __d1 int amount AREG(d1),
+  register __a0 struct UnreadTexts *unreadTexts AREG(a0),
+  register __a6 struct NiKomBase *NiKomBase AREG(a6)) {
 
   int i, lowestUnreadText = NiKomBase->Servermem->info.hightext + 1;
 
@@ -303,10 +303,10 @@ struct ConfAndText {
 
 **********************************************************************/
 
-int __saveds __asm LIBReadUnreadTexts(
-  register __a0 struct UnreadTexts *unreadTexts,
-  register __d0 int userId,
-  register __a6 struct NiKomBase *NiKomBase) {
+int __saveds AASM LIBReadUnreadTexts(
+  register __a0 struct UnreadTexts *unreadTexts AREG(a0),
+  register __d0 int userId AREG(d0),
+  register __a6 struct NiKomBase *NiKomBase AREG(a6)) {
   BPTR file;
   char filepath[41];
   int readRes, convertRes;
@@ -354,10 +354,10 @@ int __saveds __asm LIBReadUnreadTexts(
 
 **********************************************************************/
 
-int __saveds __asm LIBWriteUnreadTexts(
-  register __a0 struct UnreadTexts *unreadTexts,
-  register __d0 int userId,
-  register __a6 struct NiKomBase *NiKomBase) {
+int __saveds AASM LIBWriteUnreadTexts(
+  register __a0 struct UnreadTexts *unreadTexts AREG(a0),
+  register __d0 int userId AREG(d0),
+  register __a6 struct NiKomBase *NiKomBase AREG(a6)) {
   BPTR file;
   char filepath[41];
   int writeRes;

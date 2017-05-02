@@ -21,6 +21,10 @@
 #include <utility/tagitem.h>
 #include <proto/dos.h>
 #include <proto/exec.h>
+#ifdef __GNUC__
+/* For NewList() */
+# include <proto/alib.h>
+#endif
 #include <proto/utility.h>
 #include <string.h>
 #include <stdlib.h>
@@ -174,7 +178,7 @@ void writeTwoByteField(USHORT value, UBYTE *bytes, char littleEndian) {
   }
 }
 
-struct FidoText * __saveds __asm LIBReadFidoText(register __a0 char *filename, register __a1 struct TagItem *taglist, register __a6 struct NiKomBase *NiKomBase) {
+struct FidoText * __saveds AASM LIBReadFidoText(register __a0 char *filename AREG(a0), register __a1 struct TagItem *taglist AREG(a1), register __a6 struct NiKomBase *NiKomBase AREG(a6)) {
 	int nokludge, noseenby,chrset=0, x, tearlinefound=FALSE, headeronly,quote,linelen;
 	struct FidoText *fidotext;
 	struct FidoLine *fltmp;
@@ -200,11 +204,11 @@ struct FidoText * __saveds __asm LIBReadFidoText(register __a0 char *filename, r
 	strcpy(fidotext->touser,&ftshead[36]);
 	strcpy(fidotext->subject,&ftshead[72]);
 	strcpy(fidotext->date,&ftshead[144]);
-	fidotext->tonode = getTwoByteField(&ftshead[166], LITTLE_ENDIAN);
-	fidotext->fromnode = getTwoByteField(&ftshead[168], LITTLE_ENDIAN);
-	fidotext->fromnet = getTwoByteField(&ftshead[172], LITTLE_ENDIAN);
-	fidotext->tonet = getTwoByteField(&ftshead[174], LITTLE_ENDIAN);
-	fidotext->attribut = getTwoByteField(&ftshead[186], LITTLE_ENDIAN);
+	fidotext->tonode = getTwoByteField(&ftshead[166], NIK_LITTLE_ENDIAN);
+	fidotext->fromnode = getTwoByteField(&ftshead[168], NIK_LITTLE_ENDIAN);
+	fidotext->fromnet = getTwoByteField(&ftshead[172], NIK_LITTLE_ENDIAN);
+	fidotext->tonet = getTwoByteField(&ftshead[174], NIK_LITTLE_ENDIAN);
+	fidotext->attribut = getTwoByteField(&ftshead[186], NIK_LITTLE_ENDIAN);
 	Flush(fh);
 	if(quote) {
 		prequote[0]=' ';
@@ -257,7 +261,7 @@ struct FidoText * __saveds __asm LIBReadFidoText(register __a0 char *filename, r
 		if(headeronly) continue;
 		if(!(fltmp = (struct FidoLine *)AllocMem(sizeof(struct FidoLine),MEMF_CLEAR))) {
 			Close(fh);
-			while(fltmp=(struct FidoLine *)RemHead((struct List *)&fidotext->text)) FreeMem(fltmp,sizeof(struct FidoLine));
+			while((fltmp=(struct FidoLine *)RemHead((struct List *)&fidotext->text))) FreeMem(fltmp,sizeof(struct FidoLine));
 			FreeMem(fidotext,sizeof(struct FidoText));
 			return(NULL);
 		}
@@ -267,46 +271,46 @@ struct FidoText * __saveds __asm LIBReadFidoText(register __a0 char *filename, r
 	Close(fh);
 	if(fidotext->attribut & FIDOT_PRIVATE) {
 		if(fidotext->msgid[0]) {
-			if(x=getzone(fidotext->msgid)) fidotext->fromzone=x;
-			if(x=getnet(fidotext->msgid)) fidotext->fromnet=x;
-			if(x=getnode(fidotext->msgid)) fidotext->fromnode=x;
-			if(x=getpoint(fidotext->msgid)) fidotext->frompoint=x;
+			if((x=getzone(fidotext->msgid))) fidotext->fromzone=x;
+			if((x=getnet(fidotext->msgid))) fidotext->fromnet=x;
+			if((x=getnode(fidotext->msgid))) fidotext->fromnode=x;
+			if((x=getpoint(fidotext->msgid))) fidotext->frompoint=x;
 		}
 		if(replyto[0]) {
-			if(x=getzone(replyto)) fidotext->tozone=x;
-			if(x=getnet(replyto)) fidotext->tonet=x;
-			if(x=getnode(replyto)) fidotext->tonode=x;
-			if(x=getpoint(replyto)) fidotext->topoint=x;
+			if((x=getzone(replyto))) fidotext->tozone=x;
+			if((x=getnet(replyto))) fidotext->tonet=x;
+			if((x=getnode(replyto))) fidotext->tonode=x;
+			if((x=getpoint(replyto))) fidotext->topoint=x;
 		}
 		if(intl[0]) {
-			if(x=getzone(intl)) fidotext->tozone=x;
-			if(x=getnet(intl)) fidotext->tonet=x;
-			if(x=getnode(intl)) fidotext->tonode=x;
+			if((x=getzone(intl))) fidotext->tozone=x;
+			if((x=getnet(intl))) fidotext->tonet=x;
+			if((x=getnode(intl))) fidotext->tonode=x;
 			foo=hittaefter(intl);
-			if(x=getzone(foo)) fidotext->fromzone=x;
-			if(x=getnet(foo)) fidotext->fromnet=x;
-			if(x=getnode(foo)) fidotext->fromnode=x;
+			if((x=getzone(foo))) fidotext->fromzone=x;
+			if((x=getnet(foo))) fidotext->fromnet=x;
+			if((x=getnode(foo))) fidotext->fromnode=x;
 		}
 		if(topt[0]) fidotext->topoint = atoi(topt);
 		if(fmpt[0]) fidotext->frompoint = atoi(fmpt);
 	} else {
 		if(fidotext->msgid[0]) {
-			if(x=getzone(fidotext->msgid)) fidotext->fromzone=x;
-			if(x=getnet(fidotext->msgid)) fidotext->fromnet=x;
-			if(x=getnode(fidotext->msgid)) fidotext->fromnode=x;
-			if(x=getpoint(fidotext->msgid)) fidotext->frompoint=x;
+			if((x=getzone(fidotext->msgid))) fidotext->fromzone=x;
+			if((x=getnet(fidotext->msgid))) fidotext->fromnet=x;
+			if((x=getnode(fidotext->msgid))) fidotext->fromnode=x;
+			if((x=getpoint(fidotext->msgid))) fidotext->frompoint=x;
 		}
 		if(replyto[0]) {
-			if(x=getzone(replyto)) fidotext->tozone=x;
-			if(x=getnet(replyto)) fidotext->tonet=x;
-			if(x=getnode(replyto)) fidotext->tonode=x;
-			if(x=getpoint(replyto)) fidotext->topoint=x;
+			if((x=getzone(replyto))) fidotext->tozone=x;
+			if((x=getnet(replyto))) fidotext->tonet=x;
+			if((x=getnode(replyto))) fidotext->tonode=x;
+			if((x=getpoint(replyto))) fidotext->topoint=x;
 		}
 		if(origin[0]) {
-			if(x=getzone(origin)) fidotext->fromzone=x;
-			if(x=getnet(origin)) fidotext->fromnet=x;
-			if(x=getnode(origin)) fidotext->fromnode=x;
-			if(x=getpoint(origin)) fidotext->frompoint=x;
+			if((x=getzone(origin))) fidotext->fromzone=x;
+			if((x=getnet(origin))) fidotext->fromnet=x;
+			if((x=getnode(origin))) fidotext->fromnode=x;
+			if((x=getpoint(origin))) fidotext->frompoint=x;
 		}
 	}
 	if(fidotext->tozone==0) fidotext->tozone=fidotext->fromzone;
@@ -316,9 +320,9 @@ struct FidoText * __saveds __asm LIBReadFidoText(register __a0 char *filename, r
 	return(fidotext);
 }
 
-void __saveds __asm LIBFreeFidoText(register __a0 struct FidoText *fidotext) {
+void __saveds AASM LIBFreeFidoText(register __a0 struct FidoText *fidotext AREG(a0)) {
 	struct FidoLine *fltmp;
-	while(fltmp=(struct FidoLine *)RemHead((struct List *)&fidotext->text)) FreeMem(fltmp,sizeof(struct FidoLine));
+	while((fltmp=(struct FidoLine *)RemHead((struct List *)&fidotext->text))) FreeMem(fltmp,sizeof(struct FidoLine));
 	FreeMem(fidotext,sizeof(struct FidoText));
 }
 
@@ -351,7 +355,7 @@ int sethwm(char *dir, int nummer, char littleEndian) {
 	return(1);
 }
 
-int __saveds __asm LIBWriteFidoText(register __a0 struct FidoText *fidotext, register __a1 struct TagItem *taglist,register __a6 struct NiKomBase *NiKomBase) {
+int __saveds AASM LIBWriteFidoText(register __a0 struct FidoText *fidotext AREG(a0), register __a1 struct TagItem *taglist AREG(a1),register __a6 struct NiKomBase *NiKomBase AREG(a6)) {
 	BPTR lock,fh;
 	struct FidoLine *fl,*next;
 	int nummer,going=TRUE,charset;
@@ -372,21 +376,22 @@ int __saveds __asm LIBWriteFidoText(register __a0 struct FidoText *fidotext, reg
 	LIBConvChrsFromAmiga(fidotext->subject,0,charset,NiKomBase);
 	strncpy(&ftshead[72],fidotext->subject,71);
 	strncpy(&ftshead[144],fidotext->date,19);
-        writeTwoByteField(fidotext->tonode, &ftshead[166], LITTLE_ENDIAN);
-        writeTwoByteField(fidotext->fromnode, &ftshead[168], LITTLE_ENDIAN);
-        writeTwoByteField(fidotext->fromnet, &ftshead[172], LITTLE_ENDIAN);
-        writeTwoByteField(fidotext->tonet, &ftshead[174], LITTLE_ENDIAN);
-        writeTwoByteField(fidotext->tozone, &ftshead[176], LITTLE_ENDIAN);
-        writeTwoByteField(fidotext->fromzone, &ftshead[178], LITTLE_ENDIAN);
-        writeTwoByteField(fidotext->topoint, &ftshead[180], LITTLE_ENDIAN);
-        writeTwoByteField(fidotext->frompoint, &ftshead[182], LITTLE_ENDIAN);
-        writeTwoByteField(fidotext->attribut, &ftshead[186], LITTLE_ENDIAN);
-	if(!(nummer = gethwm(dir, LITTLE_ENDIAN))) nummer = 2;
+        writeTwoByteField(fidotext->tonode, &ftshead[166], NIK_LITTLE_ENDIAN);
+        writeTwoByteField(fidotext->fromnode, &ftshead[168], NIK_LITTLE_ENDIAN);
+        writeTwoByteField(fidotext->fromnet, &ftshead[172], NIK_LITTLE_ENDIAN);
+        writeTwoByteField(fidotext->tonet, &ftshead[174], NIK_LITTLE_ENDIAN);
+        writeTwoByteField(fidotext->tozone, &ftshead[176], NIK_LITTLE_ENDIAN);
+        writeTwoByteField(fidotext->fromzone, &ftshead[178], NIK_LITTLE_ENDIAN);
+        writeTwoByteField(fidotext->topoint, &ftshead[180], NIK_LITTLE_ENDIAN);
+        writeTwoByteField(fidotext->frompoint, &ftshead[182], NIK_LITTLE_ENDIAN);
+        writeTwoByteField(fidotext->attribut, &ftshead[186], NIK_LITTLE_ENDIAN);
+	if(!(nummer = gethwm(dir, NIK_LITTLE_ENDIAN))) nummer = 2;
 	while(going) {
 		sprintf(filename,"%d.msg",nummer);
 		strcpy(fullpath,dir);
 		AddPart(fullpath,filename,99);
-		if(lock = Lock(fullpath,ACCESS_READ)) {
+		lock = Lock(fullpath, ACCESS_READ);
+		if(lock) {
 			UnLock(lock);
 			nummer++;
 		} else going=FALSE;
@@ -397,9 +402,9 @@ int __saveds __asm LIBWriteFidoText(register __a0 struct FidoText *fidotext, reg
 		return(FALSE);
 	}
 	Flush(fh);
-	if(domain) sprintf(ftshead,"\001MSGID: %d:%d/%d.%d@%s %x\r",fidotext->fromzone,fidotext->fromnet,
+	if(domain) sprintf(ftshead,"\001MSGID: %d:%d/%d.%d@%s %lx\r",fidotext->fromzone,fidotext->fromnet,
 		fidotext->fromnode, fidotext->frompoint, domain, time(NULL));
-	else sprintf(ftshead,"\001MSGID: %d:%d/%d.%d %d\r",fidotext->fromzone,fidotext->fromnet,
+	else sprintf(ftshead,"\001MSGID: %d:%d/%d.%d %ld\r",fidotext->fromzone,fidotext->fromnet,
 		fidotext->fromnode, fidotext->frompoint, time(NULL));
 	FPuts(fh,ftshead);
 	if(reply) {

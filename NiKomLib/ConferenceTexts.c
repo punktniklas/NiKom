@@ -13,8 +13,8 @@
 
 /* ******* Local functions ******** */
 
-int writeSingleConfText(int arrayPos, struct System *Servermem);
-int growConfTextsArray(int neededPos, struct System *Servermem);
+static int writeSingleConfText(int arrayPos, struct System *Servermem);
+static int growConfTextsArray(int neededPos, struct System *Servermem);
 
 /* ******* Library functions ******** */
 
@@ -39,9 +39,9 @@ int growConfTextsArray(int neededPos, struct System *Servermem);
 
 **********************************************************************/
 
-int __saveds __asm LIBGetConferenceForText(
-   register __d0 int textNumber,
-   register __a6 struct NiKomBase *NiKomBase) {
+int __saveds AASM LIBGetConferenceForText(
+   register __d0 int textNumber AREG(d0),
+   register __a6 struct NiKomBase *NiKomBase AREG(a6)) {
 
   if((textNumber < NiKomBase->Servermem->info.lowtext)
      || (textNumber > NiKomBase->Servermem->info.hightext)) {
@@ -79,11 +79,11 @@ int __saveds __asm LIBGetConferenceForText(
 
 **********************************************************************/
 
-void __saveds __asm LIBSetConferenceForText(
-   register __d0 int textNumber,
-   register __d1 int conf,
-   register __d2 int saveToDisk,
-   register __a6 struct NiKomBase *NiKomBase) {
+void __saveds AASM LIBSetConferenceForText(
+   register __d0 int textNumber AREG(d0),
+   register __d1 int conf AREG(d1),
+   register __d2 int saveToDisk AREG(d2),
+   register __a6 struct NiKomBase *NiKomBase AREG(a6)) {
 
   int arrayPos;
 
@@ -127,10 +127,10 @@ void __saveds __asm LIBSetConferenceForText(
 
 **********************************************************************/
 
-int __saveds __asm LIBFindNextTextInConference(
-   register __d0 int searchStart,
-   register __d1 int conf,
-   register __a6 struct NiKomBase *NiKomBase) {
+int __saveds AASM LIBFindNextTextInConference(
+   register __d0 int searchStart AREG(d0),
+   register __d1 int conf AREG(d1),
+   register __a6 struct NiKomBase *NiKomBase AREG(a6)) {
 
   int i, textIndex;
 
@@ -170,10 +170,10 @@ int __saveds __asm LIBFindNextTextInConference(
 
 **********************************************************************/
 
-int __saveds __asm LIBFindPrevTextInConference(
-   register __d0 int searchStart,
-   register __d1 int conf,
-   register __a6 struct NiKomBase *NiKomBase) {
+int __saveds AASM LIBFindPrevTextInConference(
+   register __d0 int searchStart AREG(d0),
+   register __d1 int conf AREG(d1),
+   register __a6 struct NiKomBase *NiKomBase AREG(a6)) {
 
   int i, textIndex;
 
@@ -209,8 +209,8 @@ int __saveds __asm LIBFindPrevTextInConference(
 
 **********************************************************************/
 
-int __saveds __asm LIBWriteConferenceTexts(
-   register __a6 struct NiKomBase *NiKomBase) {
+int __saveds AASM LIBWriteConferenceTexts(
+   register __a6 struct NiKomBase *NiKomBase AREG(a6)) {
   BPTR file;
   int writeRes, textsToWrite;
 
@@ -260,9 +260,9 @@ int __saveds __asm LIBWriteConferenceTexts(
 
 **********************************************************************/
 
-int __saveds __asm LIBDeleteConferenceTexts(
-   register __d0 int numberOfTexts,
-   register __a6 struct NiKomBase *NiKomBase) {
+int __saveds AASM LIBDeleteConferenceTexts(
+   register __d0 int numberOfTexts AREG(d0),
+   register __a6 struct NiKomBase *NiKomBase AREG(a6)) {
 
   int newTotalTexts;
 
@@ -281,7 +281,7 @@ int __saveds __asm LIBDeleteConferenceTexts(
   return WriteConferenceTexts();
 }
 
-int writeSingleConfText(int arrayPos, struct System *Servermem) {
+static int writeSingleConfText(int arrayPos, struct System *Servermem) {
   BPTR file;
   int writeRes;
 
@@ -301,7 +301,7 @@ int writeSingleConfText(int arrayPos, struct System *Servermem) {
   return writeRes == sizeof(short);
 }
 
-int growConfTextsArray(int neededPos, struct System *Servermem) {
+static int growConfTextsArray(int neededPos, struct System *Servermem) {
   int newArraySize, oldArraySize;
   short *newArray, *oldArray;
 
@@ -315,4 +315,5 @@ int growConfTextsArray(int neededPos, struct System *Servermem) {
   Servermem->confTexts.texts = newArray;
   Servermem->confTexts.arraySize = newArraySize;
   FreeMem(oldArray, oldArraySize * sizeof(short));
+  return 1;
 }

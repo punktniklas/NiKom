@@ -1,4 +1,8 @@
 #include <proto/exec.h>
+#ifdef __GNUC__
+/* For DeletePort() */
+# include <proto/alib.h>
+#endif
 #include <proto/intuition.h>
 #include <stdio.h>
 #include <stdlib.h>

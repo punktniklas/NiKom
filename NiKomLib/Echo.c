@@ -18,9 +18,9 @@
 #include "Funcs.h"
 #include "Logging.h"
 
-void __saveds __asm LIBReScanFidoConf(register __a0 struct Mote *motpek,
-                                      register __d0 int motnr,
-                                      register __a6 struct NiKomBase *NiKomBase) {
+void __saveds AASM LIBReScanFidoConf(register __a0 struct Mote *motpek AREG(a0),
+                                      register __d0 int motnr AREG(d0),
+                                      register __a6 struct NiKomBase *NiKomBase AREG(a6)) {
   struct ExAllData *ead;
   struct ExAllControl *eac;
   void *buffer;
@@ -35,9 +35,12 @@ void __saveds __asm LIBReScanFidoConf(register __a0 struct Mote *motpek,
     newmotpek=LIBGetConfPoint(motnr,NiKomBase);
     if(!newmotpek) return;
   }
-  if(lock = Lock(newmotpek->dir,ACCESS_READ)) {
-    if(buffer = AllocMem(2048,MEMF_CLEAR)) {
-      if(eac = AllocDosObject(DOS_EXALLCONTROL,NULL)) {
+  lock = Lock(newmotpek->dir, ACCESS_READ);
+  if(lock) {
+    buffer = AllocMem(2048, MEMF_CLEAR);
+    if(buffer) {
+      eac = AllocDosObject(DOS_EXALLCONTROL, NULL);
+      if(eac) {
         eac->eac_LastKey = 0;
         eac->eac_MatchString = NULL;
         eac->eac_MatchFunc = NULL;
@@ -75,7 +78,7 @@ void __saveds __asm LIBReScanFidoConf(register __a0 struct Mote *motpek,
            newmotpek->tagnamn, newmotpek->lowtext, min, newmotpek->texter, max);
 }
 
-void __saveds __asm LIBUpdateFidoConf(register __a0 struct Mote *motpek,register __a6 struct NiKomBase *NiKomBase) {
+void __saveds AASM LIBUpdateFidoConf(register __a0 struct Mote *motpek AREG(a0),register __a6 struct NiKomBase *NiKomBase AREG(a6)) {
   int tmpmin, tmpmax, oldmin, oldmax;
   BPTR lock;
   char filnamn[20],fullpath[100];
@@ -88,7 +91,8 @@ void __saveds __asm LIBUpdateFidoConf(register __a0 struct Mote *motpek,register
     strcpy(fullpath,motpek->dir);
     sprintf(filnamn,"%d.msg",tmpmax);
     AddPart(fullpath,filnamn,99);
-    if(lock = Lock(fullpath,ACCESS_READ)) {
+    lock = Lock(fullpath, ACCESS_READ);
+    if(lock) {
       UnLock(lock);
       tmpmax++;
     } else break;
@@ -101,7 +105,8 @@ void __saveds __asm LIBUpdateFidoConf(register __a0 struct Mote *motpek,register
     strcpy(fullpath,motpek->dir);
     sprintf(filnamn,"%d.msg",tmpmin);
     AddPart(fullpath,filnamn,99);
-    if(lock=Lock(fullpath,ACCESS_READ)) {
+    lock = Lock(fullpath, ACCESS_READ);
+    if(lock) {
       UnLock(lock);
       break;
     } else tmpmin++;
@@ -118,7 +123,7 @@ void __saveds __asm LIBUpdateFidoConf(register __a0 struct Mote *motpek,register
            motpek->texter - oldmax);
 }
 
-void __saveds __asm LIBUpdateAllFidoConf(register __a6 struct NiKomBase *NiKomBase) {
+void __saveds AASM LIBUpdateAllFidoConf(register __a6 struct NiKomBase *NiKomBase AREG(a6)) {
 	struct Mote *motpek;
 
 	if(!NiKomBase->Servermem) return;
@@ -130,7 +135,7 @@ void __saveds __asm LIBUpdateAllFidoConf(register __a6 struct NiKomBase *NiKomBa
 	}
 }
 
-void __saveds __asm LIBReScanAllFidoConf(register __a6 struct NiKomBase *NiKomBase) {
+void __saveds AASM LIBReScanAllFidoConf(register __a6 struct NiKomBase *NiKomBase AREG(a6)) {
 	struct Mote *motpek;
 
 	if(!NiKomBase->Servermem) return;
@@ -161,9 +166,9 @@ void __saveds __asm LIBReScanAllFidoConf(register __a6 struct NiKomBase *NiKomBa
 *               hårddisken.
 */
 
-int __saveds __asm LIBReNumberConf(register __a0 struct Mote *conf,register __d0 int confId,
-                                   register __d1 int newlowest,
-                                   register __a6 struct NiKomBase *NiKomBase) {
+int __saveds AASM LIBReNumberConf(register __a0 struct Mote *conf AREG(a0),register __d0 int confId AREG(d0),
+                                   register __d1 int newlowest AREG(d1),
+                                   register __a6 struct NiKomBase *NiKomBase AREG(a6)) {
   struct Mote *confToRenum;
   int i, reallowest, realhighest, diff, hwm;
   char oldpath[100], newpath[100], filename[20];
@@ -200,10 +205,10 @@ int __saveds __asm LIBReNumberConf(register __a0 struct Mote *conf,register __d0
   }
   confToRenum->renumber_offset += diff;
   LIBWriteConf(confToRenum, NiKomBase);
-  if(!(hwm = gethwm(confToRenum->dir, LITTLE_ENDIAN))) {
+  if(!(hwm = gethwm(confToRenum->dir, NIK_LITTLE_ENDIAN))) {
     return 4;
   }
-  if(!sethwm(confToRenum->dir, hwm - diff, LITTLE_ENDIAN)) {
+  if(!sethwm(confToRenum->dir, hwm - diff, NIK_LITTLE_ENDIAN)) {
     return 5;
   }
   LogEvent(NiKomBase->Servermem, FIDO_LOG, INFO,
@@ -229,7 +234,7 @@ int __saveds __asm LIBReNumberConf(register __a0 struct Mote *conf,register __d0
 *  Beskrivning: Skriver ner mötet på disk.
 */
 
-int __saveds __asm LIBWriteConf(register __a0 struct Mote *motpek, register __a6 struct NiKomBase *NiKomBase) {
+int __saveds AASM LIBWriteConf(register __a0 struct Mote *motpek AREG(a0), register __a6 struct NiKomBase *NiKomBase AREG(a6)) {
 	BPTR fh;
 
 	if(!NiKomBase->Servermem) return(-1);

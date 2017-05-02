@@ -25,7 +25,7 @@
  *              i NiKomLib.h.
  */
 
-int __saveds __asm LIBSetNodeState(register __d0 int node, register __d1 int state) {
+int __saveds AASM LIBSetNodeState(register __d0 int node AREG(d0), register __d1 int state AREG(d1)) {
 	return(sendservermess(NIKMESS_SETNODESTATE,-1,node,state,0L));
 }
 
@@ -45,8 +45,8 @@ int __saveds __asm LIBSetNodeState(register __d0 int node, register __d1 int sta
  *              Om man sätter avsändare till -1 tolkas det som ett systemmeddelande.
  */
 
-int __saveds __asm LIBSendNodeMessage(register __d0 int node, register __d1 int from, register __a0 char *str,
-	register __a6 struct NiKomBase *NiKomBase) {
+int __saveds AASM LIBSendNodeMessage(register __d0 int node AREG(d0), register __d1 int from AREG(d1), register __a0 char *str AREG(a0),
+	register __a6 struct NiKomBase *NiKomBase AREG(a6)) {
 	int i, ret = 0;
 
 	if(node > MAXNOD) return(-1);
@@ -65,7 +65,8 @@ int __saveds __asm LIBSendNodeMessage(register __d0 int node, register __d1 int 
 int linksaystring(int node, int from, char *str, struct NiKomBase *NiKomBase) {
 	struct SayString *ss, *pek;
 	int ret;
-	if(ss = AllocMem(sizeof(struct SayString),MEMF_CLEAR | MEMF_PUBLIC)) {
+	ss = AllocMem(sizeof(struct SayString), MEMF_CLEAR | MEMF_PUBLIC);
+	if(ss) {
 		ss->fromuser = from;
 		ss->timestamp = time(NULL);
 		strncpy(ss->text,str,MAXSAYTKN - 1);
@@ -101,7 +102,8 @@ char *portname;
 long sendservermess(short kommando, long nod, long data, long extdata1, long extdata2) {
 	struct NiKMess mess;
 	struct MsgPort *repport;
-	if(repport = CreateMsgPort()) {
+	repport = CreateMsgPort();
+	if(repport) {
 		memset(&mess,0,sizeof(struct NiKMess));
 		mess.stdmess.mn_Node.ln_Type = NT_MESSAGE;
 		mess.stdmess.mn_Length = sizeof(struct NiKMess);

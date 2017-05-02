@@ -5,7 +5,7 @@
 #include "NiKomBase.h"
 #include "Funcs.h"
 
-struct NodeType * __saveds __asm LIBGetNodeType(register __d0 long number, register __a6 struct NiKomBase *NiKomBase) {
+struct NodeType * __saveds AASM LIBGetNodeType(register __d0 long number AREG(d0), register __a6 struct NiKomBase *NiKomBase AREG(a6)) {
 	int x;
 
 	if(!NiKomBase->Servermem) return(NULL);

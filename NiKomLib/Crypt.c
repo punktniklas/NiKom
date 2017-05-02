@@ -41,10 +41,10 @@ char *getcryptkey(void);
         
 *******************************************************************************/
 
-int __saveds __asm LIBCheckPassword(
-  register __a0 char *clearText,
-  register __a1 char *correctPassword,
-  register __a6 struct NiKomBase *NiKomBase) {
+int __saveds AASM LIBCheckPassword(
+  register __a0 char *clearText AREG(a0),
+  register __a1 char *correctPassword AREG(a1),
+  register __a6 struct NiKomBase *NiKomBase AREG(a6)) {
 
   char salt[SALTLENGTH+1], cryptbuf[14];
 
@@ -58,10 +58,10 @@ int __saveds __asm LIBCheckPassword(
   }
 }
 
-char *__saveds __asm LIBCryptPassword(
-  register __a0 char *clearText,
-  register __a1 char *resultBuf,
-  register __a6 struct NiKomBase *NiKomBase) {
+char *__saveds AASM LIBCryptPassword(
+  register __a0 char *clearText AREG(a0),
+  register __a1 char *resultBuf AREG(a1),
+  register __a6 struct NiKomBase *NiKomBase AREG(a6)) {
   char salt[SALTLENGTH+1];
 	
   generateSalt(salt, SALTLENGTH);

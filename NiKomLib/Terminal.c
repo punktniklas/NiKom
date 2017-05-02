@@ -27,8 +27,8 @@
 *               CHRS_LATIN1 konverteras inte alls.
 */
 
-void __saveds __asm LIBConvChrsToAmiga(register __a0 char *str, register __d0 int len,
-	register __d1 int chrs, register __a6 struct NiKomBase *NiKomBase) {
+void __saveds AASM LIBConvChrsToAmiga(register __a0 char *str AREG(a0), register __d0 int len AREG(d0),
+	register __d1 int chrs AREG(d1), register __a6 struct NiKomBase *NiKomBase AREG(a6)) {
 
 	int x;
 	if(chrs==CHRS_LATIN1) return;
@@ -67,8 +67,8 @@ void __saveds __asm LIBConvChrsToAmiga(register __a0 char *str, register __d0 in
 *               CHRS_LATIN1 konverteras inte alls.
 */
 
-void __saveds __asm LIBConvChrsFromAmiga(register __a0 char *str, register __d0 int len,
-	register __d1 int chrs, register __a6 struct NiKomBase *NiKomBase) {
+void __saveds AASM LIBConvChrsFromAmiga(register __a0 char *str AREG(a0), register __d0 int len AREG(d0),
+	register __d1 int chrs AREG(d1), register __a6 struct NiKomBase *NiKomBase AREG(a6)) {
 
 	int x;
 	if(chrs==CHRS_LATIN1) return;
@@ -114,7 +114,7 @@ UBYTE convnokludge(UBYTE tkn) {
 
 */
 
-void __saveds __asm LIBStripAnsiSequences(register __a0 char *ansistr, register __a6 struct NiKomBase *NiKomBase) {
+void __saveds AASM LIBStripAnsiSequences(register __a0 char *ansistr AREG(a0), register __a6 struct NiKomBase *NiKomBase AREG(a6)) {
 
         char *strptr, *tempstr=NULL, *orgstr;
         int index=0, status=0;
@@ -316,11 +316,11 @@ static int convUTF8ToAmiga(char *dst, const char *src, unsigned len){
 *               the caller if needed.
 */
 
-int __saveds __asm LIBConvMBChrsToAmiga(register __a0 char *dst,
-                                        register __a1 char *src,
-                                        register __d0 int len,
-                                        register __d1 int chrs,
-                                        register __a6 struct NiKomBase *NiKomBase) {
+int __saveds AASM LIBConvMBChrsToAmiga(register __a0 char *dst AREG(a0),
+                                        register __a1 char *src AREG(a1),
+                                        register __d0 int len AREG(d0),
+                                        register __d1 int chrs AREG(d1),
+                                        register __a6 struct NiKomBase *NiKomBase AREG(a6)) {
   if(len == 0) {
     len = INT_MAX;
   }
@@ -384,11 +384,11 @@ static int convUTF8FromAmiga(char *dst, const char *src, unsigned len){
 *               the caller if needed.
 */
 
-int __saveds __asm LIBConvMBChrsFromAmiga(register __a0 char *dst,
-                                          register __a1 char *src,
-                                          register __d0 int len,
-                                          register __d1 int chrs,
-                                          register __a6 struct NiKomBase *NiKomBase) {
+int __saveds AASM LIBConvMBChrsFromAmiga(register __a0 char *dst AREG(a0),
+                                          register __a1 char *src AREG(a1),
+                                          register __d0 int len AREG(d0),
+                                          register __d1 int chrs AREG(d1),
+                                          register __a6 struct NiKomBase *NiKomBase AREG(a6)) {
   if(len == 0) {
     len = INT_MAX;
   }

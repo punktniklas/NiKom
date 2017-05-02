@@ -23,7 +23,7 @@ static int getlastmatrix(void) {
   return atoi(buffer);
 }
 
-void __saveds __asm LIBMatrix2NiKom(register __a6 struct NiKomBase *NiKomBase) {
+void __saveds AASM LIBMatrix2NiKom(register __a6 struct NiKomBase *NiKomBase AREG(a6)) {
   struct FidoText *fidotext;
   struct FidoLine *fl;
   int userId, mailId, lastMatrix, oldLastMatrix;
@@ -187,7 +187,7 @@ int updatenextletter(int user) {
 		return(-1);
 	}
 	nr=atoi(nrstr);
-	sprintf(nrstr,"%d",nr+1);
+	sprintf(nrstr,"%ld",nr+1);
 	if(Seek(fh,0,OFFSET_BEGINNING)==-1) {
 		Close(fh);
 		return(-1);

@@ -2,37 +2,37 @@
 #include "NiKomLib.h"
 #endif
 
-void __saveds __asm LIBChangeUnreadTextStatus(
-   register __d0 int textNumber,
-   register __d1 int markAsUnread,
-   register __a0 struct UnreadTexts *unreadTexts,
-   register __a6 struct NiKomBase *NiKomBase);
-int __saveds __asm LIBIsTextUnread(
-  register __d0 int textNumber,
-  register __a0 struct UnreadTexts *unreadTexts,
-  register __a6 struct NiKomBase *NiKomBase);
-int __saveds __asm LIBFindNextUnreadText(
-  register __d0 int searchStart,
-  register __d1 int conf,
-  register __a0 struct UnreadTexts *unreadTexts,
-  register __a6 struct NiKomBase *NiKomBase);
-void __saveds __asm LIBInitUnreadTexts(
-   register __a0 struct UnreadTexts *unreadTexts,
-   register __a6 struct NiKomBase *NiKomBase);
-int __saveds __asm LIBCountUnreadTexts(
-  register __d0 int conf,
-  register __a0 struct UnreadTexts *unreadTexts,
-  register __a6 struct NiKomBase *NiKomBase);
-void __saveds __asm LIBSetUnreadTexts(
-  register __d0 int conf,
-  register __d1 int amount,
-  register __a0 struct UnreadTexts *unreadTexts,
-  register __a6 struct NiKomBase *NiKomBase);
-int __saveds __asm LIBReadUnreadTexts(
-  register __a0 struct UnreadTexts *unreadTexts,
-  register __d0 int userId,
-  register __a6 struct NiKomBase *NiKomBase);
-int __saveds __asm LIBWriteUnreadTexts(
-  register __a0 struct UnreadTexts *unreadTexts,
-  register __d0 int userId,
-  register __a6 struct NiKomBase *NiKomBase);
+void __saveds AASM LIBChangeUnreadTextStatus(
+   register __d0 int textNumber AREG(d0),
+   register __d1 int markAsUnread AREG(d1),
+   register __a0 struct UnreadTexts *unreadTexts AREG(a0),
+   register __a6 struct NiKomBase *NiKomBase AREG(a6));
+int __saveds AASM LIBIsTextUnread(
+  register __d0 int textNumber AREG(d0),
+  register __a0 struct UnreadTexts *unreadTexts AREG(a0),
+  register __a6 struct NiKomBase *NiKomBase AREG(a6));
+int __saveds AASM LIBFindNextUnreadText(
+  register __d0 int searchStart AREG(d0),
+  register __d1 int conf AREG(d1),
+  register __a0 struct UnreadTexts *unreadTexts AREG(a0),
+  register __a6 struct NiKomBase *NiKomBase AREG(a6));
+void __saveds AASM LIBInitUnreadTexts(
+   register __a0 struct UnreadTexts *unreadTexts AREG(a0),
+   register __a6 struct NiKomBase *NiKomBase AREG(a6));
+int __saveds AASM LIBCountUnreadTexts(
+  register __d0 int conf AREG(d0),
+  register __a0 struct UnreadTexts *unreadTexts AREG(a0),
+  register __a6 struct NiKomBase *NiKomBase AREG(a6));
+void __saveds AASM LIBSetUnreadTexts(
+  register __d0 int conf AREG(d0),
+  register __d1 int amount AREG(d1),
+  register __a0 struct UnreadTexts *unreadTexts AREG(a0),
+  register __a6 struct NiKomBase *NiKomBase AREG(a6));
+int __saveds AASM LIBReadUnreadTexts(
+  register __a0 struct UnreadTexts *unreadTexts AREG(a0),
+  register __d0 int userId AREG(d0),
+  register __a6 struct NiKomBase *NiKomBase AREG(a6));
+int __saveds AASM LIBWriteUnreadTexts(
+  register __a0 struct UnreadTexts *unreadTexts AREG(a0),
+  register __d0 int userId AREG(d0),
+  register __a6 struct NiKomBase *NiKomBase AREG(a6));
