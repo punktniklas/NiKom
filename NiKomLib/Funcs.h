@@ -85,6 +85,7 @@ struct Mote *getmotpek(int, struct System *);
 
 /* Terminal.c */
 UBYTE convnokludge(UBYTE);
+int convUTF8ToAmiga(char *dst, const char *src, unsigned len);
 
 /* ServerComm.c */
 

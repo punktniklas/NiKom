@@ -273,7 +273,7 @@ static int convNoKludgeToAmiga(char *dst, const char *src, unsigned len){
   return (int)i;
 }
 
-static int convUTF8ToAmiga(char *dst, const char *src, unsigned len){
+int convUTF8ToAmiga(char *dst, const char *src, unsigned len){
   unsigned si, di;
 
   for(si=0, di=0; src[si] && si < len; si++, di++) {
