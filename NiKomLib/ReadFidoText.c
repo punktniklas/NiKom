@@ -243,7 +243,7 @@ struct FidoText * __saveds AASM LIBReadFidoText(register __a0 char *filename ARE
 				if(!strncmp(foo,"LATIN-1 2",9)) chrset=CHRS_LATIN1;
 				if(!strncmp(foo,"IBMPC 2",7)) chrset=CHRS_CP437;
 				if(!strncmp(foo,"SWEDISH 1",9)) chrset=CHRS_SIS7;
-				if(!strncmp(foo,"MAC 2",9)) chrset=CHRS_MAC;
+				if(!strncmp(foo,"MAC 2",5)) chrset=CHRS_MAC;
 			}
 			if(nokludge) continue;
 		}
