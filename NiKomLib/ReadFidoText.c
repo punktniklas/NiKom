@@ -241,9 +241,9 @@ struct FidoText * __saveds AASM LIBReadFidoText(register __a0 char *filename ARE
 				replyto[19]=0;
 			} else if(!strncmp(&fidoline[1],"CHRS",4)) {
 				if(!strncmp(foo,"LATIN-1 2",9)) chrset=CHRS_LATIN1;
-				if(!strncmp(foo,"IBMPC 2",7)) chrset=CHRS_CP437;
-				if(!strncmp(foo,"SWEDISH 1",9)) chrset=CHRS_SIS7;
-				if(!strncmp(foo,"MAC 2",5)) chrset=CHRS_MAC;
+				else if(!strncmp(foo,"IBMPC 2",7)) chrset=CHRS_CP437;
+				else if(!strncmp(foo,"SWEDISH 1",9)) chrset=CHRS_SIS7;
+				else if(!strncmp(foo,"MAC 2",5)) chrset=CHRS_MAC;
 			}
 			if(nokludge) continue;
 		}
