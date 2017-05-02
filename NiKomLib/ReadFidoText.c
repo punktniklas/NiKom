@@ -241,8 +241,10 @@ struct FidoText * __saveds AASM LIBReadFidoText(register __a0 char *filename ARE
 				replyto[19]=0;
 			} else if(!strncmp(&fidoline[1],"CHRS",4)) {
 				if(!strncmp(foo,"LATIN-1 2",9)) chrset=CHRS_LATIN1;
+				else if(!strncmp(foo,"CP437 2",7)) chrset=CHRS_CP437;
 				else if(!strncmp(foo,"IBMPC 2",7)) chrset=CHRS_CP437;
 				else if(!strncmp(foo,"SWEDISH 1",9)) chrset=CHRS_SIS7;
+				else if(!strncmp(foo,"CP10000 2",9)) chrset=CHRS_MAC;
 				else if(!strncmp(foo,"MAC 2",5)) chrset=CHRS_MAC;
 			}
 			if(nokludge) continue;
@@ -413,13 +415,13 @@ int __saveds AASM LIBWriteFidoText(register __a0 struct FidoText *fidotext AREG(
 	}
 	switch(charset) {
 		case CHRS_CP437 :
-			strcpy(ftshead,"\001CHRS: IBMPC 2\r");
+			strcpy(ftshead,"\001CHRS: CP437 2\r");
 			break;
 		case CHRS_SIS7 :
 			strcpy(ftshead,"\001CHRS: SWEDISH 1\r");
 			break;
 		case CHRS_MAC :
-			strcpy(ftshead,"\001CHRS: MAC 2\r");
+			strcpy(ftshead,"\001CHRS: CP10000 2\r");
 			break;
 		case CHRS_LATIN1 :
 		default :
