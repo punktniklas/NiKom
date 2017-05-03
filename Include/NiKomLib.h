@@ -67,12 +67,12 @@ struct FidoLine
 #define WFT_Reply (WFT_Dummy + 4) /* Vilken text som kommenteras, från MSGID */
 
 
-/* Lite olika teckenformat */
+/* Character sets */
 #define CHRS_LATIN1   1
 #define CHRS_CP437    2
+#define CHRS_CP850    3
 #define CHRS_SIS7     4
 #define CHRS_MAC      8
-#define CHRS_CP850   16
 #define CHRS_UTF8    32
 
 /* Vilka lägen en nod kan befinna sig i */
