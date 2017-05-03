@@ -36,7 +36,9 @@
 #include "VersionStrings.h"
 #include "Logging.h"
 
-int getfidoline(char *fidoline,char *buffer,int linelen, int chrs, BPTR fh,char *quotepre,struct NiKomBase *NiKomBase) {
+static int getfidoline(char *fidoline, char *buffer, int linelen,
+		       int chrs, BPTR fh, char *quotepre,
+		       struct NiKomBase *NiKomBase) {
 	int anttkn,foo,tmpret,hasquoted=FALSE,donotwordwrap=FALSE;
 	char fidobuf[8];
 	unsigned fidoidx;
@@ -183,7 +185,7 @@ int getpoint(char *adr) {
 	else return(0);
 }
 
-USHORT getTwoByteField(UBYTE *bytes, char littleEndian) {
+static USHORT getTwoByteField(UBYTE *bytes, char littleEndian) {
   if(littleEndian) {
     return (USHORT) (bytes[1] * 0x100 + bytes[0]);
   } else {
@@ -191,7 +193,7 @@ USHORT getTwoByteField(UBYTE *bytes, char littleEndian) {
   }
 }
 
-void writeTwoByteField(USHORT value, UBYTE *bytes, char littleEndian) {
+static void writeTwoByteField(USHORT value, UBYTE *bytes, char littleEndian) {
   if(littleEndian) {
     bytes[1] = value / 0x100;
     bytes[0] = value % 0x100;

@@ -75,7 +75,6 @@ int updatenextletter(int);
 void writelog(char *,char *);
 
 /* ReadFidoText.c */
-int getfidoline(char *, char *, int, int, BPTR,char *,struct NiKomBase *);
 char *hittaefter(char *);
 int getzone(char *);
 int getnet(char *);
