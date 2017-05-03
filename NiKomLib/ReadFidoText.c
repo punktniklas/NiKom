@@ -37,7 +37,7 @@
 #include "Logging.h"
 
 static int getfidoline(char *fidoline, char *buffer, int linelen,
-		       int chrs, BPTR fh, char *quotepre,
+		       enum nikom_chrs chrs, BPTR fh, char *quotepre,
 		       struct NiKomBase *NiKomBase) {
 	int anttkn,foo,tmpret,hasquoted=FALSE,donotwordwrap=FALSE;
 	char fidobuf[8];
@@ -105,7 +105,7 @@ static int getfidoline(char *fidoline, char *buffer, int linelen,
 				anttkn += tmpret;
 				fidoidx = 0;
 				break;
-			default :
+			case CHRS_UNKNOWN :
 				fidoline[anttkn++]=convnokludge(tmp);
 				break;
 		}

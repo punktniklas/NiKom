@@ -321,10 +321,12 @@ int __saveds AASM LIBConvMBChrsToAmiga(register __a0 char *dst AREG(a0),
                                         register __d0 int len AREG(d0),
                                         register __d1 int chrs AREG(d1),
                                         register __a6 struct NiKomBase *NiKomBase AREG(a6)) {
+  enum nikom_chrs chrset = chrs;
+
   if(len == 0) {
     len = INT_MAX;
   }
-  switch(chrs) {
+  switch(chrset) {
   case CHRS_CP437:
     return conv128Table(dst, src, len, NiKomBase->IbmToAmiga);
   case CHRS_CP850:
@@ -337,12 +339,12 @@ int __saveds AASM LIBConvMBChrsToAmiga(register __a0 char *dst AREG(a0),
     return conv128Table(dst, src, len, NiKomBase->MacToAmiga);
   case CHRS_UTF8:
     return convUTF8ToAmiga(dst, src, len);
-  case CHRS_LATIN1:
-    return noConvCopy(dst, src, len);
-  default:
+  case CHRS_UNKNOWN:
     return convNoKludgeToAmiga(dst, src, len);
+  case CHRS_LATIN1:
+    break;
   }
-  /* Not reached. */
+  return noConvCopy(dst, src, len);
 }
 
 static int convUTF8FromAmiga(char *dst, const char *src,
@@ -406,10 +408,12 @@ int __saveds AASM LIBConvMBChrsFromAmiga(register __a0 char *dst AREG(a0),
                                           register __d1 int chrs AREG(d1),
                                           register __d2 int dstlen AREG(d2),
                                           register __a6 struct NiKomBase *NiKomBase AREG(a6)) {
+  enum nikom_chrs chrset = chrs;
+
   if(srclen == 0) {
     srclen = INT_MAX;
   }
-  switch(chrs) {
+  switch(chrset) {
   case CHRS_CP437:
     return conv128Table(dst, src, srclen, NiKomBase->AmigaToIbm);
   case CHRS_CP850:
@@ -423,8 +427,8 @@ int __saveds AASM LIBConvMBChrsFromAmiga(register __a0 char *dst AREG(a0),
   case CHRS_UTF8:
     return convUTF8FromAmiga(dst, src, srclen, dstlen);
   case CHRS_LATIN1:
-  default:
-    return noConvCopy(dst, src, srclen);
+  case CHRS_UNKNOWN:
+    break;
   }
-  /* Not reached. */
+  return noConvCopy(dst, src, srclen);
 }
