@@ -247,6 +247,8 @@ MSG_MAIL_PURGE_RESULT
 %d brev raderade.
 MSG_MAIL_MAILBOX
 Brevlådan
+MSG_MAIL_DELETE
+Radera Brev är tillfälligt ur funktion.
 ;
 MSG_INFO_NO_SUCH_FILE
 Finns ingen sådan info-fil.
@@ -437,6 +439,18 @@ MSG_FORUM_CREATE_NO_ROOM
 Det finns inte plats för fler möten.
 MSG_FORUM_CREATE_CHANGING
 Ändrar i användardata...
+MSG_FORUM_CHANGE_SYNTAX
+Skriv: Ändra Möte <mötesnamn>
+MSG_FORUM_CHANGE_NOPERM
+Du har ingen rätt att ändra på det mötet.
+MSG_FORUM_CHANGE_RESET_1
+Medlemskap och rättigheter i mötet kommer att nollställas för alla
+MSG_FORUM_CHANGE_RESET_2
+användare som om mötet var nyskapat.
+MSG_FORUM_CHANGE_STILL_CORRECT
+Är ändringarna fortfarande korrekta?
+MSG_FORUM_CHANGE_RESETTING
+Nollställer medlemskap och rättigheter...
 ;
 MSG_FORUM_LIST_PATTERN
 Du måste ange ett argument som innehåller wildcards.
@@ -480,6 +494,95 @@ MSG_FORUM_LISTAUTH_AUTH
 Rättigheter
 MSG_FORUM_LISTAUTH_NONAUTH
 Icke rättigheter
+;
+MSG_ONLY_SYNTAX
+Skriv: Endast <antal texter> [mötesnamn]
+;
+MSG_PERSONAL_MAIL
+Brev kommenterar du som vanligt med 'kommentera'.
+;
+MSG_DELTEXT_ONLY_LOCAL
+Du kan bara radera texter i interna möten.
+MSG_DELTEXT_ONLY_SELF
+Du kan bara radera texter av dig själv.
+;
+MSG_DELFORUM_SYNTAX
+Skriv: Radera Möte <mötesnamn>
+MSG_DELFORUM_NOPERM
+Du har ingen rätt att radera det mötet.
+MSG_DELFORUM_CONFIRM
+Är du säker på att du vill radera mötet %s?
+;
+MSG_WHO_NOONE
+Ingen inloggad
+MSG_WHO_CONNECTED
+Uppkopplad
+MSG_WHO_NODE
+Nod
+MSG_WHO_NO_UNREAD
+Har inga olästa texter
+MSG_WHO_WRITES_TEXT
+Skriver en text
+MSG_WHO_WRITES_IN
+Skriver i
+MSG_WHO_WRITES_MAIL
+Skriver ett brev
+MSG_WHO_READS_TEXTS
+Läser texter
+MSG_WHO_READS_IN
+Läser i
+MSG_WHO_READS_MAIL
+Läser i brevlådan
+MSG_WHO_UPLOADING
+Laddar upp
+MSG_WHO_SOON_UPLOAD
+Ska strax ladda upp en fil
+MSG_WHO_DOWNLOADING
+Laddar ner
+MSG_WHO_SOON_DOWNLOAD
+Ska strax ladda ner en fil
+MSG_WHO_UNDEFINED
+Gör något odefinierat
+;
+MSG_PURGE_TEXTS_SYNTAX
+Skriv : Rensa texter <antal texter>
+MSG_PURGE_TEXTS_512
+Antalet måste vara en jämn multipel av 512.
+;
+MSG_SAY_DISPLAY_SYSTEM
+Systemmeddelande
+MSG_SAY_SYNTAX
+Skriv : Säg <användare>[,<meddelande>]
+MSG_SAY_NOT_LOGGED_IN
+Användaren %s är inte inloggad!
+MSG_SAY_WHAT
+Vad vill du säga?
+MSG_SAY_USER_LOGGED_OUT
+Tyvärr, användaren har loggat ut.
+MSG_SAY_USER_HAS_UNREAD
+%s har olästa meddelanden, lägger till detta meddelande till listan
+MSG_SAY_SENT
+%s meddelad.
+;
+MSG_LIST_LOGINS_HEADER
+     Namn                            Utloggad     Tid   Läst Skr  Ul  Dl
+;
+MSG_DUMP_TEXT_SYNTAX
+Skriv: Dumpa Text <textnr> [<filename>]
+MSG_DUMP_TEXT_FILE
+Till vilken fil?
+MSG_DUMP_TEXT_NOPERM
+Du har inte rätt att dumpa den texten.
+MSG_DUMP_TEXT_ERROR_OPEN
+Kunde inte öppna filen '%s'
+;
+MSG_LIST_TEXTS_MAIL
+Använd 'Lista Brev' i brevlådan.
+MSG_LIST_TEXTS_HEADER
+Namn                              Text    Kom   Datum  Ärende
+;
+MSG_DELETE_NOTE_DONE
+Lappen raderad.
 ;
 ; ******** Dealing with flags **********
 MSG_FLAG_ON
@@ -530,3 +633,5 @@ MSG_COMMON_IS_CORRECT
 Är allt korrekt?
 MSG_COMMON_ABORTING
 Avbryter
+MSG_COMMON_ENTERING_EDITOR
+Går in i editorn.

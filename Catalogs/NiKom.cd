@@ -243,6 +243,8 @@ MSG_MAIL_PURGE_RESULT (375//)
 %d mail purged.
 MSG_MAIL_MAILBOX (376//)
 Mailbox
+MSG_MAIL_DELETE (377//)
+Delete Mail is temporarily out of order.
 ;
 MSG_INFO_NO_SUCH_FILE (400//)
 There is no such info file.
@@ -433,6 +435,18 @@ MSG_FORUM_CREATE_NO_ROOM (830//)
 There is no room for any more forums.
 MSG_FORUM_CREATE_CHANGING (831//)
 Changing user data...
+MSG_FORUM_CHANGE_SYNTAX (832//)
+Syntax: Edit Forum <forum>
+MSG_FORUM_CHANGE_NOPERM (833//)
+You don't have permissions to edit that forum.
+MSG_FORUM_CHANGE_RESET_1 (834//)
+Membership and authorization for the forum will be reset for all users
+MSG_FORUM_CHANGE_RESET_2 (835//)
+as if the forum was newly created.
+MSG_FORUM_CHANGE_STILL_CORRECT (836//)
+Are the changes still correct?
+MSG_FORUM_CHANGE_RESETTING (837//)
+Resetting memberships and authorizations...
 ;
 MSG_FORUM_LIST_PATTERN (850//)
 You have to provide an argument containing wildcards.
@@ -477,10 +491,99 @@ Authorized
 MSG_FORUM_LISTAUTH_NONAUTH (885//)
 Not authorized
 ;
+MSG_ONLY_SYNTAX (900//)
+Syntax: Only <number of texts> [forum]
+;
+MSG_PERSONAL_MAIL (910//)
+Use the command 'Comment' to comment on mail.
+;
+MSG_DELTEXT_ONLY_LOCAL (920//)
+You can only delete texts in local forums.
+MSG_DELTEXT_ONLY_SELF (921//)
+You can only delete your own texts.
+;
+MSG_DELFORUM_SYNTAX (930//)
+Syntax: Delete Forum <forum>
+MSG_DELFORUM_NOPERM (931//)
+You have no permission to delete that forum.
+MSG_DELFORUM_CONFIRM (932//)
+Are you sure you want to delete the forum %s?
+;
+MSG_WHO_NOONE (940//)
+No one logged in
+MSG_WHO_CONNECTED (941//)
+Connected
+MSG_WHO_NODE (942//)
+Node
+MSG_WHO_NO_UNREAD (943//)
+Has no unread texts
+MSG_WHO_WRITES_TEXT (944//)
+Writes a text
+MSG_WHO_WRITES_IN (945//)
+Writes in
+MSG_WHO_WRITES_MAIL (946//)
+Writes a mail
+MSG_WHO_READS_TEXTS (947//)
+Reads texts
+MSG_WHO_READS_IN (948//)
+Reads in
+MSG_WHO_READS_MAIL (949//)
+Reads in the mailbox
+MSG_WHO_UPLOADING (950//)
+Uploading
+MSG_WHO_SOON_UPLOAD (951//)
+Is about to upload a file
+MSG_WHO_DOWNLOADING (952//)
+Downloading
+MSG_WHO_SOON_DOWNLOAD (953//)
+Is about to download a file
+MSG_WHO_UNDEFINED (954//)
+Does something undefined
+;
+MSG_PURGE_TEXTS_SYNTAX (960//)
+Syntax: Purge Texts <number of texts>
+MSG_PURGE_TEXTS_512 (961//)
+The number of texts must be a multiple of 512.
+;
+MSG_SAY_DISPLAY_SYSTEM (970//)
+System message
+MSG_SAY_SYNTAX (971//)
+Syntax: Say <user>[,<message>]
+MSG_SAY_NOT_LOGGED_IN (972//)
+The user %s is not logged in
+MSG_SAY_WHAT (973//)
+What do want to say?
+MSG_SAY_USER_LOGGED_OUT (974//)
+Sorry, the user has logged out.
+MSG_SAY_USER_HAS_UNREAD (975//)
+%s has unread messages, adding this message to the list.
+MSG_SAY_SENT (976//)
+Message to %s has been sent.
+;
+MSG_LIST_LOGINS_HEADER (980//)
+     Name                            Logged out   Time  Read Wri  Ul  Dl
+;
+MSG_DUMP_TEXT_SYNTAX (990//)
+Syntax: Dump Text <text number> [<filename>]
+MSG_DUMP_TEXT_FILE (991//)
+To which file?
+MSG_DUMP_TEXT_NOPERM (992//)
+You don't have permissions to dump that text.
+MSG_DUMP_TEXT_ERROR_OPEN (993//)
+Could not open the file '%s'
+;
+MSG_LIST_TEXTS_MAIL (1001//)
+Use 'List Mail' in the mailbox.
+MSG_LIST_TEXTS_HEADER (1002//)
+Name                              Text    Comm  Date   Subject
+;
+MSG_DELETE_NOTE_DONE (1010//)
+Note deleted.
+;
 ; ******** Dealing with flags **********
-MSG_FLAG_ON (1000//)
+MSG_FLAG_ON (9000//)
 On
-MSG_FLAG_OFF (1001//)
+MSG_FLAG_OFF (9001//)
 Off
 ;
 ; ******** The flags **********
@@ -526,3 +629,5 @@ MSG_COMMON_IS_CORRECT (20004//)
 Is everything correct?
 MSG_COMMON_ABORTING (20005//)
 Aborting
+MSG_COMMON_ENTERING_EDITOR (20006//)
+Entering the editor.
