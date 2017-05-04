@@ -21,17 +21,18 @@
  */
 
 struct NiKomBase {
-	struct Library lib;
+  struct Library lib;
 
-	ULONG  seglist;		/* Used by init/exit-code. */
+  ULONG  seglist;		/* Used by init/exit-code. */
 
-	struct SignalSemaphore sem;	/* Semaphore to gain exclusive access to NiKomBase */
+  struct SignalSemaphore sem;	/* Semaphore to gain exclusive access to NiKomBase */
 
-	struct System *Servermem;
-	UBYTE IbmToAmiga[256], AmigaToIbm[256],
-			SF7ToAmiga[256], AmigaToSF7[256],
-			MacToAmiga[256], AmigaToMac[256];
-
+  struct System *Servermem;
+  UBYTE IbmToAmiga[256], AmigaToIbm[256],
+    SF7ToAmiga[256], AmigaToSF7[256],
+    MacToAmiga[256], AmigaToMac[256],
+    CP850ToAmiga[256], AmigaToCP850[256],
+    CP866ToAmiga[256], AmigaToCP866[256];
 };
 
 #define NIK_LITTLE_ENDIAN NiKomBase->Servermem->fidodata.littleEndianByteOrder

@@ -31,9 +31,13 @@ void copychrstables(struct NiKomBase *NiKomBase) {
 	memcpy(NiKomBase->IbmToAmiga,IbmToAmiga,256);
 	memcpy(NiKomBase->SF7ToAmiga,SF7ToAmiga,256);
 	memcpy(NiKomBase->MacToAmiga,MacToAmiga,256);
+	memcpy(NiKomBase->CP850ToAmiga,CP850ToAmiga,256);
+	memcpy(NiKomBase->CP866ToAmiga,CP866ToAmiga,256);
 	memcpy(NiKomBase->AmigaToIbm,AmigaToIbm,256);
 	memcpy(NiKomBase->AmigaToSF7,AmigaToSF7,256);
 	memcpy(NiKomBase->AmigaToMac,AmigaToMac,256);
+	memcpy(NiKomBase->AmigaToCP850,AmigaToCP850,256);
+	memcpy(NiKomBase->AmigaToCP866,AmigaToCP866,256);
 }
 
 int __saveds AASM

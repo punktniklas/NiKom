@@ -48,8 +48,12 @@ void __saveds AASM LIBConvChrsFromAmiga(register __a0 char * AREG(a0), register 
 void __saveds AASM LIBStripAnsiSequences(register __a0 char * AREG(a0), register __a6 struct NiKomBase * AREG(a6));
 int __saveds AASM LIBConvMBChrsToAmiga(register __a0 char * AREG(a0), register __a1 char * AREG(a1),
 	register __d0 int AREG(d0), register __d1 int AREG(d1), register __a6 struct NiKomBase * AREG(a6));
-int __saveds AASM LIBConvMBChrsFromAmiga(register __a0 char * AREG(a0), register __a1 char * AREG(a1),
-	register __d0 int AREG(d0), register __d1 int AREG(d1), register __a6 struct NiKomBase * AREG(a6));
+int __saveds AASM LIBConvMBChrsFromAmiga(register __a0 char * AREG(a0),
+                                         register __a1 char * AREG(a1),
+                                         register __d0 int AREG(d0),
+                                         register __d1 int AREG(d1),
+                                         register __d2 int AREG(d2),
+                                         register __a6 struct NiKomBase * AREG(a6));
 int __saveds AASM LIBSetNodeState(register __d0 int AREG(d0), register __d1 int AREG(d1));
 int __saveds AASM LIBSendNodeMessage(register __d0 int AREG(d0), register __d1 int AREG(d1), register __a0 char * AREG(a0), register __a6 struct NiKomBase * AREG(a6));
 NiKHash * __saveds AASM LIBNewNiKHash(register __d0 int AREG(d0));
@@ -71,7 +75,6 @@ int updatenextletter(int);
 void writelog(char *,char *);
 
 /* ReadFidoText.c */
-int getfidoline(char *, char *, int, int, BPTR,char *,struct NiKomBase *);
 char *hittaefter(char *);
 int getzone(char *);
 int getnet(char *);
@@ -85,6 +88,7 @@ struct Mote *getmotpek(int, struct System *);
 
 /* Terminal.c */
 UBYTE convnokludge(UBYTE);
+int convUTF8ToAmiga(char *dst, const char *src, unsigned len);
 
 /* ServerComm.c */
 

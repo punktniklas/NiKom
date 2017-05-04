@@ -67,13 +67,17 @@ struct FidoLine
 #define WFT_Reply (WFT_Dummy + 4) /* Vilken text som kommenteras, från MSGID */
 
 
-/* Lite olika teckenformat */
-#define CHRS_LATIN1   1
-#define CHRS_CP437    2
-#define CHRS_SIS7     4
-#define CHRS_MAC      8
-#define CHRS_CP850   16
-#define CHRS_UTF8    32
+/* Character sets */
+enum nikom_chrs {
+  CHRS_UNKNOWN =  0,
+  CHRS_LATIN1  =  1,
+  CHRS_CP437   =  2,
+  CHRS_CP850   =  3,
+  CHRS_SIS7    =  4,
+  CHRS_CP866   =  5,
+  CHRS_MAC     =  8,
+  CHRS_UTF8    = 32,
+};
 
 /* Vilka lägen en nod kan befinna sig i */
 #define NIKSTATE_RELOGIN    1   /* Användaren ska göra en ny inloggning */

@@ -264,7 +264,7 @@ static int conv32Table(char *dst, const char *src, unsigned len,
   return (int)i;
 }
 
-static int convCP850ToAmiga(char *dst, const char *src, unsigned len){
+static int convNoKludgeToAmiga(char *dst, const char *src, unsigned len){
   unsigned i;
 
   for(i=0; src[i] && i < len; i++) {
@@ -273,7 +273,7 @@ static int convCP850ToAmiga(char *dst, const char *src, unsigned len){
   return (int)i;
 }
 
-static int convUTF8ToAmiga(char *dst, const char *src, unsigned len){
+int convUTF8ToAmiga(char *dst, const char *src, unsigned len){
   unsigned si, di;
 
   for(si=0, di=0; src[si] && si < len; si++, di++) {
@@ -321,33 +321,49 @@ int __saveds AASM LIBConvMBChrsToAmiga(register __a0 char *dst AREG(a0),
                                         register __d0 int len AREG(d0),
                                         register __d1 int chrs AREG(d1),
                                         register __a6 struct NiKomBase *NiKomBase AREG(a6)) {
+  enum nikom_chrs chrset = chrs;
+
   if(len == 0) {
     len = INT_MAX;
   }
-  switch(chrs) {
+  switch(chrset) {
   case CHRS_CP437:
     return conv128Table(dst, src, len, NiKomBase->IbmToAmiga);
+  case CHRS_CP850:
+    return conv128Table(dst, src, len, NiKomBase->CP850ToAmiga);
+  case CHRS_CP866:
+    return conv128Table(dst, src, len, NiKomBase->CP866ToAmiga);
   case CHRS_SIS7:
     return conv32Table(dst, src, len, NiKomBase->SF7ToAmiga);
   case CHRS_MAC:
     return conv128Table(dst, src, len, NiKomBase->MacToAmiga);
-  case CHRS_CP850:
-    return convCP850ToAmiga(dst, src, len);
   case CHRS_UTF8:
     return convUTF8ToAmiga(dst, src, len);
+  case CHRS_UNKNOWN:
+    return convNoKludgeToAmiga(dst, src, len);
   case CHRS_LATIN1:
-  default:
-    return noConvCopy(dst, src, len);
+    break;
   }
-  /* Not reached. */
+  return noConvCopy(dst, src, len);
 }
 
-static int convUTF8FromAmiga(char *dst, const char *src, unsigned len){
+static int convUTF8FromAmiga(char *dst, const char *src,
+                             unsigned srclen, unsigned dstlen){
   unsigned si, di;
 
-  for(si=0, di=0; src[si] && si < len; si++, di++) {
+  if(dstlen == 0) {
+    /* We never generate code points with more than 2 bytes. */
+    dstlen = srclen * 2;
+  }
+  for(si=0, di=0; src[si] && si < srclen && di < dstlen; si++, di++) {
     if((src[si] & 0x80)) {
-      unsigned char c = src[si];
+      unsigned char c;
+
+      if (di + 1 >= dstlen) {
+        /* Do not truncate in the middle of an UTF-8 character. */
+        return (int)di;
+      }
+      c = src[si];
       dst[di] = 0xc0 | ((unsigned) c >> 6);
       di++;
       dst[di] = 0x80 | (c & 0x3f);
@@ -366,6 +382,8 @@ static int convUTF8FromAmiga(char *dst, const char *src, unsigned len){
 *              d0 - Length of string to convert. If 0, convert until
 *                   nul.
 *              d1 - Destination character set, defined in NiKomLib.h
+*              d2 - Maximum destination length. Must be >= d0.
+*                   Ignored if 0.
 *
 *  Return value: Length of new string.
 *
@@ -386,25 +404,31 @@ static int convUTF8FromAmiga(char *dst, const char *src, unsigned len){
 
 int __saveds AASM LIBConvMBChrsFromAmiga(register __a0 char *dst AREG(a0),
                                           register __a1 char *src AREG(a1),
-                                          register __d0 int len AREG(d0),
+                                          register __d0 int srclen AREG(d0),
                                           register __d1 int chrs AREG(d1),
+                                          register __d2 int dstlen AREG(d2),
                                           register __a6 struct NiKomBase *NiKomBase AREG(a6)) {
-  if(len == 0) {
-    len = INT_MAX;
+  enum nikom_chrs chrset = chrs;
+
+  if(srclen == 0) {
+    srclen = INT_MAX;
   }
-  switch(chrs) {
+  switch(chrset) {
   case CHRS_CP437:
-    return conv128Table(dst, src, len, NiKomBase->AmigaToIbm);
-  case CHRS_SIS7:
-    return conv32Table(dst, src, len, NiKomBase->AmigaToSF7);
-  case CHRS_MAC:
-    return conv128Table(dst, src, len, NiKomBase->AmigaToMac);
-  case CHRS_UTF8:
-    return convUTF8FromAmiga(dst, src, len);
+    return conv128Table(dst, src, srclen, NiKomBase->AmigaToIbm);
   case CHRS_CP850:
+    return conv128Table(dst, src, srclen, NiKomBase->AmigaToCP850);
+  case CHRS_CP866:
+    return conv128Table(dst, src, srclen, NiKomBase->AmigaToCP866);
+  case CHRS_SIS7:
+    return conv32Table(dst, src, srclen, NiKomBase->AmigaToSF7);
+  case CHRS_MAC:
+    return conv128Table(dst, src, srclen, NiKomBase->AmigaToMac);
+  case CHRS_UTF8:
+    return convUTF8FromAmiga(dst, src, srclen, dstlen);
   case CHRS_LATIN1:
-  default:
-    return noConvCopy(dst, src, len);
+  case CHRS_UNKNOWN:
+    break;
   }
-  /* Not reached. */
+  return noConvCopy(dst, src, srclen);
 }

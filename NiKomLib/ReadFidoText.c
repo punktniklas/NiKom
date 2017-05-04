@@ -36,12 +36,17 @@
 #include "VersionStrings.h"
 #include "Logging.h"
 
-int getfidoline(char *fidoline,char *buffer,int linelen, int chrs, BPTR fh,char *quotepre,struct NiKomBase *NiKomBase) {
+static int getfidoline(char *fidoline, char *buffer, int linelen,
+		       enum nikom_chrs chrs, BPTR fh, char *quotepre,
+		       struct NiKomBase *NiKomBase) {
 	int anttkn,foo,tmpret,hasquoted=FALSE,donotwordwrap=FALSE;
+	char fidobuf[8];
+	unsigned fidoidx;
 	UBYTE tmp,*findquotesign,insquotebuf[81];
 	strcpy(fidoline,buffer);
 	anttkn=strlen(fidoline);
 	buffer[0]=0;
+	fidoidx = 0;
 	for(;;) {
 		tmpret=FGetC(fh);
 		if(tmpret==-1) return(FALSE);
@@ -66,10 +71,19 @@ int getfidoline(char *fidoline,char *buffer,int linelen, int chrs, BPTR fh,char 
 			}
 			break;
 		}
+		fidobuf[fidoidx] = tmp;
 		switch(chrs) {
 			case CHRS_CP437 :
 				if(tmp<128) fidoline[anttkn++]=tmp;
 				else fidoline[anttkn++]=NiKomBase->IbmToAmiga[tmp];
+				break;
+			case CHRS_CP850 :
+				if(tmp<128) fidoline[anttkn++]=tmp;
+				else fidoline[anttkn++]=NiKomBase->CP850ToAmiga[tmp];
+				break;
+			case CHRS_CP866 :
+				if(tmp<128) fidoline[anttkn++]=tmp;
+				else fidoline[anttkn++]=NiKomBase->CP866ToAmiga[tmp];
 				break;
 			case CHRS_SIS7 :
 				fidoline[anttkn++]=NiKomBase->SF7ToAmiga[tmp];
@@ -81,8 +95,19 @@ int getfidoline(char *fidoline,char *buffer,int linelen, int chrs, BPTR fh,char 
 			case CHRS_LATIN1 :
 				fidoline[anttkn++]=tmp;
 				break;
-			default :
+			case CHRS_UTF8 :
+				tmpret = convUTF8ToAmiga(fidoline+anttkn, fidobuf, fidoidx+1);
+				if (tmpret < 0) {
+					/* Need more bytes, continue reading. */
+					++fidoidx;
+					continue;
+				}
+				anttkn += tmpret;
+				fidoidx = 0;
+				break;
+			case CHRS_UNKNOWN :
 				fidoline[anttkn++]=convnokludge(tmp);
+				break;
 		}
 		fidoline[anttkn]=0;
 		if(quotepre && !hasquoted && anttkn>=5) {    // När antal tecken överstiger fem är det dags
@@ -160,7 +185,7 @@ int getpoint(char *adr) {
 	else return(0);
 }
 
-USHORT getTwoByteField(UBYTE *bytes, char littleEndian) {
+static USHORT getTwoByteField(UBYTE *bytes, char littleEndian) {
   if(littleEndian) {
     return (USHORT) (bytes[1] * 0x100 + bytes[0]);
   } else {
@@ -168,7 +193,7 @@ USHORT getTwoByteField(UBYTE *bytes, char littleEndian) {
   }
 }
 
-void writeTwoByteField(USHORT value, UBYTE *bytes, char littleEndian) {
+static void writeTwoByteField(USHORT value, UBYTE *bytes, char littleEndian) {
   if(littleEndian) {
     bytes[1] = value / 0x100;
     bytes[0] = value % 0x100;
@@ -184,6 +209,7 @@ struct FidoText * __saveds AASM LIBReadFidoText(register __a0 char *filename ARE
 	struct FidoLine *fltmp;
 	BPTR fh;
 	UBYTE intl[30],replyto[20],origin[20],topt[5],fmpt[5],ftshead[190],fidoline[81],flbuffer[81],*foo,prequote[10];
+	int bytes;
 
 	if(!NiKomBase->Servermem) return(NULL);
 
@@ -200,9 +226,9 @@ struct FidoText * __saveds AASM LIBReadFidoText(register __a0 char *filename ARE
           return(NULL);
 	}
 	Read(fh,ftshead,190);
+	/* Re-extracted after we know charset. */
 	strcpy(fidotext->fromuser,&ftshead[0]);
-	strcpy(fidotext->touser,&ftshead[36]);
-	strcpy(fidotext->subject,&ftshead[72]);
+	/* touser and subject extracted after we know charset. */
 	strcpy(fidotext->date,&ftshead[144]);
 	fidotext->tonode = getTwoByteField(&ftshead[166], NIK_LITTLE_ENDIAN);
 	fidotext->fromnode = getTwoByteField(&ftshead[168], NIK_LITTLE_ENDIAN);
@@ -214,8 +240,10 @@ struct FidoText * __saveds AASM LIBReadFidoText(register __a0 char *filename ARE
 		prequote[0]=' ';
 		prequote[1]=0;
 		x=1;
-		foo=strcpy(flbuffer,fidotext->fromuser); // Bara lånar flbuffer tillfälligt..
-		LIBConvChrsToAmiga(foo,0,0,NiKomBase);
+		foo = flbuffer; // Temporarily borrowing flbuffer...
+		bytes = LIBConvMBChrsToAmiga(flbuffer, fidotext->fromuser, 0, 0,
+					     NiKomBase);
+		flbuffer[bytes] = '\0';
 		while(foo[0]) {
 			prequote[x]=foo[0];
 			prequote[x+1]=0;
@@ -240,10 +268,26 @@ struct FidoText * __saveds AASM LIBReadFidoText(register __a0 char *filename ARE
 				strncpy(replyto,foo,19);
 				replyto[19]=0;
 			} else if(!strncmp(&fidoline[1],"CHRS",4)) {
-				if(!strncmp(foo,"LATIN-1 2",9)) chrset=CHRS_LATIN1;
-				if(!strncmp(foo,"IBMPC 2",7)) chrset=CHRS_CP437;
-				if(!strncmp(foo,"SWEDISH 1",9)) chrset=CHRS_SIS7;
-				if(!strncmp(foo,"MAC 2",9)) chrset=CHRS_MAC;
+				if(!strncmp(foo, "LATIN-1 2", 9)) {
+					chrset = CHRS_LATIN1;
+				} else if(!strncmp(foo, "CP437 2", 7) ||
+					  !strncmp(foo, "IBMPC 2", 7)) {
+					chrset = CHRS_CP437;
+				} else if(!strncmp(foo, "CP850 2", 7)) {
+					chrset = CHRS_CP850;
+				} else if(!strncmp(foo, "CP866 2", 7)) {
+					chrset = CHRS_CP866;
+				} else if(!strncmp(foo, "SWEDISH 1", 9)) {
+					chrset = CHRS_SIS7;
+				} else if(!strncmp(foo, "CP10000 2", 9) ||
+					  !strncmp(foo, "MAC 2", 5)) {
+					chrset = CHRS_MAC;
+				} else if(!strncmp(foo, "UTF-8 4", 7) ||
+					  !strncmp(foo, "UTF-8 2", 7)) {
+					/* The latter variant is incorrect, but quite common in
+						practice. */
+					chrset = CHRS_UTF8;
+				}
 			}
 			if(nokludge) continue;
 		}
@@ -314,9 +358,16 @@ struct FidoText * __saveds AASM LIBReadFidoText(register __a0 char *filename ARE
 		}
 	}
 	if(fidotext->tozone==0) fidotext->tozone=fidotext->fromzone;
-	LIBConvChrsToAmiga(fidotext->subject,0,chrset,NiKomBase);
-	LIBConvChrsToAmiga(fidotext->fromuser,0,chrset,NiKomBase);
-	LIBConvChrsToAmiga(fidotext->touser,0,chrset,NiKomBase);
+
+	bytes = LIBConvMBChrsToAmiga(fidotext->fromuser, &ftshead[0], 0,
+				     chrset, NiKomBase);
+	fidotext->fromuser[bytes] = '\0';
+	bytes = LIBConvMBChrsToAmiga(fidotext->touser, &ftshead[36], 0,
+				     chrset, NiKomBase);
+	fidotext->touser[bytes] = '\0';
+	bytes = LIBConvMBChrsToAmiga(fidotext->subject, &ftshead[72], 0,
+				     chrset, NiKomBase);
+	fidotext->subject[bytes] = '\0';
 	return(fidotext);
 }
 
@@ -358,7 +409,7 @@ int sethwm(char *dir, int nummer, char littleEndian) {
 int __saveds AASM LIBWriteFidoText(register __a0 struct FidoText *fidotext AREG(a0), register __a1 struct TagItem *taglist AREG(a1),register __a6 struct NiKomBase *NiKomBase AREG(a6)) {
 	BPTR lock,fh;
 	struct FidoLine *fl,*next;
-	int nummer,going=TRUE,charset;
+	int nummer, going=TRUE, charset, bytes;
 	UBYTE *dir,filename[20],fullpath[100],ftshead[190],*domain,*reply,flowchar,datebuf[14],timebuf[10];
 	struct DateTime dt;
 
@@ -371,10 +422,12 @@ int __saveds AASM LIBWriteFidoText(register __a0 struct FidoText *fidotext AREG(
 	if(!dir) return(0);
 	memset(ftshead,0,190);
 	strncpy(&ftshead[0],fidotext->fromuser,35);
-	LIBConvChrsFromAmiga(fidotext->touser,0,charset,NiKomBase);
-	strncpy(&ftshead[36],fidotext->touser,35);
-	LIBConvChrsFromAmiga(fidotext->subject,0,charset,NiKomBase);
-	strncpy(&ftshead[72],fidotext->subject,71);
+	bytes = LIBConvMBChrsFromAmiga(&ftshead[36], fidotext->touser, 0,
+				       charset, 35, NiKomBase);
+	ftshead[36+bytes] = '\0';
+	bytes = LIBConvMBChrsFromAmiga(&ftshead[72], fidotext->subject, 0,
+				       charset,71, NiKomBase);
+	ftshead[72+bytes] = '\0';
 	strncpy(&ftshead[144],fidotext->date,19);
         writeTwoByteField(fidotext->tonode, &ftshead[166], NIK_LITTLE_ENDIAN);
         writeTwoByteField(fidotext->fromnode, &ftshead[168], NIK_LITTLE_ENDIAN);
@@ -413,13 +466,19 @@ int __saveds AASM LIBWriteFidoText(register __a0 struct FidoText *fidotext AREG(
 	}
 	switch(charset) {
 		case CHRS_CP437 :
-			strcpy(ftshead,"\001CHRS: IBMPC 2\r");
+			strcpy(ftshead,"\001CHRS: CP437 2\r");
+			break;
+		case CHRS_CP850 :
+			strcpy(ftshead,"\001CHRS: CP850 2\r");
+			break;
+		case CHRS_CP866 :
+			strcpy(ftshead,"\001CHRS: CP866 2\r");
 			break;
 		case CHRS_SIS7 :
 			strcpy(ftshead,"\001CHRS: SWEDISH 1\r");
 			break;
 		case CHRS_MAC :
-			strcpy(ftshead,"\001CHRS: MAC 2\r");
+			strcpy(ftshead,"\001CHRS: CP10000 2\r");
 			break;
 		case CHRS_LATIN1 :
 		default :
@@ -443,8 +502,9 @@ int __saveds AASM LIBWriteFidoText(register __a0 struct FidoText *fidotext AREG(
 	FPuts(fh, "\001PID: NiKom " NIKRELEASE "\r");
 	for(fl=(struct FidoLine *)fidotext->text.mlh_Head;fl->line_node.mln_Succ;fl=(struct FidoLine *)fl->line_node.mln_Succ) {
 		next=(struct FidoLine *)fl->line_node.mln_Succ;
-		strcpy(ftshead,fl->text);
-		LIBConvChrsFromAmiga(ftshead,0,charset,NiKomBase);
+		bytes = LIBConvMBChrsFromAmiga(ftshead, fl->text, 0, charset,
+					       sizeof(ftshead) - 1, NiKomBase);
+		ftshead[bytes] = '\0';
 		if(!next->line_node.mln_Succ) next=NULL;
 		flowchar='\r';
 		if(next) {

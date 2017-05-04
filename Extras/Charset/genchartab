@@ -1,0 +1,104 @@
+#!/usr/bin/env python
+"""Generate character set translation tables to and from ISO-8859-1.
+
+The character set name should be given as the first and only argument.
+The resulting tables are written as ISO-8859-1 C source to stdout.
+
+For characters that cannot be encoded in the destination charset we
+try to normalize to NFKD and then strip away the combining codepoints,
+leaving us with plain ASCII.
+
+For CP866 we also try to do Cyrillic transliteration according to
+ISO 9:1995 using https://github.com/cjolowicz/iso9 if that module
+is available.
+"""
+
+import sys
+import unicodedata
+try:
+    import iso9
+except:
+    iso9 = None
+
+indent = '  '
+normalize = True
+
+def handle_valid(out, latin1=True):
+    val = ord(out)
+    if val == 127:
+        if latin1:
+            sys.stdout.write("' ',")
+        else:
+            sys.stdout.write("%3d," % (127))
+    elif val > 127 and val < 160:
+        sys.stdout.write("%3d," % (val))
+    else:
+        if out == "'":
+            out = "\\'"
+        elif out == "\\":
+            out = "\\\\"
+        sys.stdout.write("'%s'," % (out))
+
+def handle_invalid(uc, encoding=None):
+    if not normalize:
+        sys.stdout.write("%3d," % (0))
+        return
+    out = None
+    if encoding == "CP866" and iso9:
+        uout = iso9.transliterate(uc)
+        try:
+            out = uout.encode("ISO-8859-1")
+        except:
+            pass
+    if out is None:
+        out = unicodedata.normalize('NFKD', uc).encode('ascii', 'ignore')
+    if len(out) != 1 or out == ' ':
+        sys.stdout.write("%3d," % (0))
+    else:
+        sys.stdout.write("'%s'," % (out))
+
+
+def main():
+    encoding = sys.argv[1].upper()
+
+    sys.stdout.write("/* -*- coding: iso-8859-1 -*- */\n\n")
+
+    sys.stdout.write("static const UBYTE %sToAmiga[256] = {" % (encoding))
+    for c in xrange(0, 256):
+        if (c % 16) == 0:
+            sys.stdout.write("\n%s" % (indent))
+        if c < 32:
+            if c in ( 1, 10, 13, 27 ):
+                sys.stdout.write("%3d," % (c))
+            else:
+                sys.stdout.write("%3d," % (0))
+            continue
+        uc = chr(c).decode(encoding)
+        try:
+            out = uc.encode("ISO-8859-1")
+            handle_valid(out)
+        except:
+            handle_invalid(uc, encoding=encoding)
+    sys.stdout.write("\n};\n\n")
+
+    sys.stdout.write("static const UBYTE AmigaTo%s[256] = {" % (encoding))
+    for c in xrange(0, 256):
+        if (c % 16) == 0:
+            sys.stdout.write("\n%s" % (indent))
+        if c < 32:
+            if c in ( 1, 10, 13, 27 ):
+                sys.stdout.write("%3d," % (c))
+            else:
+                sys.stdout.write("%3d," % (0))
+            continue
+        uc = chr(c).decode("ISO-8859-1")
+        try:
+            out = uc.encode(encoding)
+            handle_valid(out, latin1=False)
+        except:
+            handle_invalid(uc)
+    sys.stdout.write("\n};\n")
+
+
+if __name__ == '__main__':
+    sys.exit(main())
