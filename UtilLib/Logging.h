@@ -1,3 +1,5 @@
+#include "NiKomStr.h"
+
 enum LogFiles {
   USAGE_LOG = 0,
   SYSTEM_LOG = 1,
