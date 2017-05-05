@@ -35,18 +35,12 @@ struct InitTable {
 extern char __far _LibID[];             /* ID string                        */
 extern char __far _LibName[];           /* Name string                      */
 extern char __far RESLEN;               /* size of init data                */
-extern long __far NEWDATAL;             /* size of global data              */
-extern long __far NUMJMPS;              /* number of jmp vectors to copy    */
 extern myPFL _LibFuncTab[];             /* my function table                */
 extern long __far _LibVersion;          /* Version of library               */
 extern long __far _LibRevision;         /* Revision of library              */
 #define MYVERSION ((long)&_LibVersion)
 #define MYREVISION ((long)&_LibRevision)
-#define DATAWORDS ((long)&NEWDATAL)     /* magic to get right type of reloc */
 
-
-/* From libent.o, needed to determine where data is loaded by loadseg       */
-extern long __far _Libmergeddata;
 
 #define NIKOMBASESIZE ((sizeof(struct NiKomBase) +3) & ~3)
 
@@ -63,13 +57,6 @@ ULONG __saveds AASM
 _LibInit(register __a0 APTR seglist AREG(a0),
 	 register __d0 struct NiKomBase *NiKomBase AREG(d0))
 {
-#if 0
-    long *reloc;
-    long *sdata;
-    char *ddata;
-    long nrelocs;
-#endif
-
     NiKomBase->seglist = (ULONG) seglist;
 
     /* init. library structure (since I don't do automatic data init.) */
@@ -79,27 +66,6 @@ _LibInit(register __a0 APTR seglist AREG(a0),
     NiKomBase->lib.lib_Version = MYVERSION;
     NiKomBase->lib.lib_Revision = MYREVISION;
     NiKomBase->lib.lib_IdString = (APTR) _LibID;
-
-#if 0
-     /* Start of copy of global data after structure */
-    ddata = (char *)NiKomBase + NIKOMBASESIZE;
-
-    sdata = (long *)&_Libmergeddata; /* where loadseg loaded the data */
-    memcpy(ddata, (void *)sdata, DATAWORDS*4);
-
-    /* perform relocs if we want one global section for all programs */
-    /* that have this lib open. If we want a global section for each */
-    /* open, copy the relocs, and do them on each open call.         */
-    sdata = sdata + DATAWORDS;
-    nrelocs = *sdata;
-    sdata++;
-    while (nrelocs > 0)
-    {
-       reloc = (long *)((long)ddata + *sdata++);
-       *reloc += (long)ddata;
-       nrelocs--;
-    }
-#endif
 
     if (__UserLibInit(NiKomBase) != 0) {
        return NULL;   /* abort if user init failed */
