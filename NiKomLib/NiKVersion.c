@@ -8,7 +8,7 @@
 #include "Funcs.h"
 #include "VersionStrings.h"
 
-const char dosversion[] = "$VER: nikom.library_" NIKRELEASE " " NIKLIBVERSIONSTR "." NIKLIBREVISIONSTR " " __AMIGADATE__;
+const char dosversion[] = DOSVERSION;
 
 char * __saveds AASM LIBGetBuildTime(void) {
   return __DATE__ " " __TIME__;
