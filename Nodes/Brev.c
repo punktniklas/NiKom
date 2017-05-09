@@ -661,7 +661,7 @@ int updatenextletter(int user) {
 }
 
 void sparabrev(void) {
-  BPTR fh, lock = NULL;
+  BPTR fh, lock = 0;
   struct EditLine *el;
   char buf[100], orgfilename[50], *motstr;
   int userId, nr, mot;

@@ -434,7 +434,7 @@ int updatenextletter(int user) {
 }
 
 void createletter(struct RexxMsg *mess) {
-        BPTR fhin,fhout,lock=NULL;
+        BPTR fhin,fhout,lock=0;
         int fromuser,tempto,x,letternr,mot;
         long tid;
         struct tm *ts;
