@@ -128,7 +128,7 @@ void rexxgetstring(struct RexxMsg *tempmess) {
 	char defaultstring[257];
 	int ra1=0,ra2=0;
 
-	defaultstring[0] = NULL;
+	defaultstring[0] = '\0';
 	rexxargs1=hittaefter(tempmess->rm_Args[0]);
 	if(rexxargs1[0]) {
 		if(!(ra1=atoi(rexxargs1))) ra1=50;
@@ -143,7 +143,7 @@ void rexxgetstring(struct RexxMsg *tempmess) {
 		ra1=50;
 		ra2=EKO;
 	}
-	if(defaultstring[0] != NULL)
+	if(defaultstring[0] != '\0')
 	{
 		if(getstring(ra2,ra1,defaultstring))
 		{

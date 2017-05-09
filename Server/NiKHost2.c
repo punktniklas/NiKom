@@ -1040,7 +1040,7 @@ void chgfile(struct RexxMsg *mess) {
                         }
                         break;
 			case 'l' : case 'L' :
-				if(mess->rm_Args[2][0] == NULL)
+				if(mess->rm_Args[2][0] == '\0')
 				{
 					filpek->flaggor |= !FILE_LONGDESC;
 				}
@@ -1133,7 +1133,7 @@ void keyinfo(struct RexxMsg *mess) {
                         else
                         {
                                 sprintf(str,"%s",Servermem->Nyckelnamn[nr]);
-                                str[strlen(str)-1] = NULL;
+                                str[strlen(str)-1] = '\0';
 						}
                         break;
                 default :

@@ -235,7 +235,7 @@ void waitconnect(void) {
 		(nodestate & NIKSTATE_CLOSESER) ? "closed" : "open",
 		(nodestate & NIKSTATE_NOANSWER) ? "not " : "");
 	conputtekn(outbuffer,-1);
-	CallerIDHost[0] = CallerIDHostIP[0] = NULL;
+	CallerIDHost[0] = CallerIDHostIP[0] = '\0';
 
 	for(;;) {
 		memset(buf,0,50);

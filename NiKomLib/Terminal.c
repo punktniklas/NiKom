@@ -129,7 +129,7 @@ void __saveds AASM LIBStripAnsiSequences(register __a0 char *ansistr AREG(a0), r
                         index++;
                         while( ((strptr[index]>='0' && strptr[index]<='9')
                                         || strptr[index]==';')
-                                && strptr[index]!=NULL)
+                                && strptr[index]!='\0')
                         {
                                 index++;
                                 if(strptr[index]==';')
@@ -140,7 +140,7 @@ void __saveds AASM LIBStripAnsiSequences(register __a0 char *ansistr AREG(a0), r
                                 }
                         }
                 }
-                if(strptr[index]==NULL)
+                if(strptr[index]=='\0')
                         return;
                 if(strptr[index]=='m')
                 {
