@@ -1,5 +1,6 @@
+#include "NiKomCompat.h"
 #include <proto/exec.h>
-#ifdef __GNUC__
+#ifdef HAVE_PROTO_ALIB_H
 /* For DeletePort() */
 # include <proto/alib.h>
 #endif
