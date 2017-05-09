@@ -68,7 +68,7 @@ _LibInit(register __a0 APTR seglist AREG(a0),
     NiKomBase->lib.lib_IdString = (APTR) _LibID;
 
     if (__UserLibInit(NiKomBase) != 0) {
-       return NULL;   /* abort if user init failed */
+       return 0;   /* abort if user init failed */
     }
     return((ULONG)NiKomBase);
 }
