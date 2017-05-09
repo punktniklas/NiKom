@@ -598,7 +598,7 @@ void textinfo(struct RexxMsg *mess) {
                                 ts->tm_mon + 1, ts->tm_mday, ts->tm_hour,
                                 ts->tm_min);
                         break;
-                defualt :
+                default :
                         str[0]=0;
                         break;
         }
