@@ -79,8 +79,8 @@ static long __saveds __regargs nik_fopen(char *filename,char *accessmode) {
 
 static long __saveds __regargs nik_fclose(LONG *fh) {
 	/* printf("Xpr_fclose anropad, fp=%d\n",fp); */
-	if(!fh) return(NULL);
-	if(Close((BPTR)fh)) return(NULL);
+	if(!fh) return(0);
+	if(Close((BPTR)fh)) return(0);
 	else return(EOF);
 }
 
