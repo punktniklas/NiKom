@@ -508,7 +508,7 @@ int fido_brev(char *tillpers,char *adr,struct Mote *motpek) {
   ft.attribut = FIDOT_PRIVATE | FIDOT_LOCAL;
   makefidousername(ft.fromuser, inloggad);
   makefidodate(ft.date);
-  SendString("\r\n\%s\r\n", CATSTR(MSG_MAIL_MAILBOX));
+  SendString("\r\n%s\r\n", CATSTR(MSG_MAIL_MAILBOX));
   SendStringCat("%s\n\r", CATSTR(MSG_MAIL_FIDO_MAIL), ft.date);
   SendString(CATSTR(MSG_MAIL_FROM), ft.fromuser);
   SendString(CATSTR(MSG_MAIL_FROM), ft.fromuser);
