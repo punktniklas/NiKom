@@ -77,7 +77,7 @@ int sendrexx(int komnr) {
 			sprintf(outbuffer,"\r\n\nKan inte hantera: %s\r\n",tempmess->rm_Args[0]);
 			puttekn(outbuffer,-1);
 			tempmess->rm_Result1=5;
-			tempmess->rm_Result2=NULL;
+			tempmess->rm_Result2=0;
 		}
 		ReplyMsg((struct Message *)tempmess);
 	}
@@ -148,7 +148,7 @@ void rexxgetstring(struct RexxMsg *tempmess) {
 		if(getstring(ra2,ra1,defaultstring))
 		{
 			tempmess->rm_Result1=100;
-			tempmess->rm_Result2=NULL;
+			tempmess->rm_Result2=0;
 			return;
 		}
 	}
@@ -156,7 +156,7 @@ void rexxgetstring(struct RexxMsg *tempmess) {
 	{
 		if(getstring(ra2,ra1,NULL)) {
 			tempmess->rm_Result1=100;
-			tempmess->rm_Result2=NULL;
+			tempmess->rm_Result2=0;
 			return;
 		}
 	}
@@ -173,7 +173,7 @@ void rexxgettekn(struct RexxMsg *mess) {
 	foo[1]=0;
 	if(ImmediateLogout()) {
 		mess->rm_Result1=100;
-		mess->rm_Result2=NULL;
+		mess->rm_Result2=0;
 	} else {
 		mess->rm_Result1=0;
 		if(mess->rm_Action & 1L<<RXFB_RESULT) {
@@ -225,11 +225,11 @@ void rxsetlinecount(struct RexxMsg *mess) {
 	else if(!stricmp(arg,"OFF")) rxlinecount=FALSE;
 	else {
 		mess->rm_Result1=10;
-		mess->rm_Result2=NULL;
+		mess->rm_Result2=0;
 		return;
 	}
 	mess->rm_Result1=0;
-	mess->rm_Result2=NULL;
+	mess->rm_Result2=0;
 }
 
 void rxsendchar(struct RexxMsg *mess) {
@@ -237,10 +237,10 @@ void rxsendchar(struct RexxMsg *mess) {
 	arg=hittaefter(mess->rm_Args[0]);
 	if(arg[0]!='/' || arg[1]==0) {
 		mess->rm_Result1=10;
-		mess->rm_Result2=NULL;
+		mess->rm_Result2=0;
 		return;
 	}
 	eka(arg[1]);
 	mess->rm_Result1=0;
-	mess->rm_Result2=NULL;
+	mess->rm_Result2=0;
 }

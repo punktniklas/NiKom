@@ -93,7 +93,7 @@ void rexxnodeinfo(struct RexxMsg *mess) {
         int nod;
         if((!mess->rm_Args[1]) || (!mess->rm_Args[2])) {
                 mess->rm_Result1=1;
-                mess->rm_Result2=NULL;
+                mess->rm_Result2=0;
                 return;
         }
         nod=atoi(mess->rm_Args[1]);
@@ -148,7 +148,7 @@ void rexxnextfile(struct RexxMsg *mess) {
 	int area;
 	if((!mess->rm_Args[1]) || (!mess->rm_Args[2])) {
 		mess->rm_Result1=1;
-		mess->rm_Result2=NULL;
+		mess->rm_Result2=0;
 		return;
 	}
 	area=atoi(mess->rm_Args[2]);
@@ -184,7 +184,7 @@ void rexxnextpatternfile(struct RexxMsg *mess)
 
 	if((!mess->rm_Args[1]) || (!mess->rm_Args[2]) || (!mess->rm_Args[3])) {
 		mess->rm_Result1=1;
-		mess->rm_Result2=NULL;
+		mess->rm_Result2=0;
 		return;
 	}
 	area=atoi(mess->rm_Args[2]);
@@ -243,7 +243,7 @@ void rexxraderafil(struct RexxMsg *mess) {
         int area;
         if((!mess->rm_Args[1]) || (!mess->rm_Args[2])) {
                 mess->rm_Result1=1;
-                mess->rm_Result2=NULL;
+                mess->rm_Result2=0;
                 return;
         }
         area=atoi(mess->rm_Args[2]);
@@ -302,7 +302,7 @@ void createtext(struct RexxMsg *mess) {
         char str[20],rlbuf[99];
         if((!mess->rm_Args[1]) || (!mess->rm_Args[2]) || (!mess->rm_Args[3]) || (!mess->rm_Args[4]) || (!mess->rm_Args[5])) {
                 mess->rm_Result1=1;
-                mess->rm_Result2=NULL;
+                mess->rm_Result2=0;
                 return;
         }
         if((!mess->rm_Args[2][0]) && (!mess->rm_Args[1][0])) {
@@ -441,7 +441,7 @@ void createletter(struct RexxMsg *mess) {
         char tostring[100]="",tempstr[15],orgfilename[50],bugbuf[80],*motstr;
         if((!mess->rm_Args[1]) || (!mess->rm_Args[2]) || (!mess->rm_Args[3]) || (!mess->rm_Args[4])) {
                 mess->rm_Result1=1;
-                mess->rm_Result2=NULL;
+                mess->rm_Result2=0;
                 return;
         }
         if(!userexists(fromuser=atoi(mess->rm_Args[1]))) {
@@ -547,7 +547,7 @@ void textinfo(struct RexxMsg *mess) {
         char str[100];
         if((!mess->rm_Args[1]) || (!mess->rm_Args[2])) {
                 mess->rm_Result1=1;
-                mess->rm_Result2=NULL;
+                mess->rm_Result2=0;
                 return;
         }
         nummer=atoi(mess->rm_Args[1]);
@@ -615,7 +615,7 @@ void nextunread(struct RexxMsg *mess) {
 
         if((!mess->rm_Args[1]) || (!mess->rm_Args[2]) || (!mess->rm_Args[3])) {
                 mess->rm_Result1=1;
-                mess->rm_Result2=NULL;
+                mess->rm_Result2=0;
                 return;
         }
         text=atoi(mess->rm_Args[1]);
@@ -719,7 +719,7 @@ void meetright(struct RexxMsg *mess) {
         struct User meetrightuser;
         if((!mess->rm_Args[1]) || (!mess->rm_Args[2])) {
                 mess->rm_Result1=1;
-                mess->rm_Result2=NULL;
+                mess->rm_Result2=0;
                 return;
         }
         anvnr=atoi(mess->rm_Args[1]);
@@ -757,7 +757,7 @@ void meetmember(struct RexxMsg *mess) {
 	struct User meetmemberuser;
 	if((!mess->rm_Args[1]) || (!mess->rm_Args[2])) {
 		mess->rm_Result1=1;
-		mess->rm_Result2=NULL;
+		mess->rm_Result2=0;
 		return;
 	}
 	anvnr=atoi(mess->rm_Args[1]);
@@ -794,7 +794,7 @@ void chgmeetright(struct RexxMsg *mess) {
         struct User chguser;
         if((!mess->rm_Args[1]) || (!mess->rm_Args[2]) || (!mess->rm_Args[3])) {
                 mess->rm_Result1=1;
-                mess->rm_Result2=NULL;
+                mess->rm_Result2=0;
                 return;
         }
         anvnr=atoi(mess->rm_Args[1]);
@@ -871,7 +871,7 @@ void movefile(struct RexxMsg *mess) {
         struct MinNode *sokpek;
         if((!mess->rm_Args[1]) || (!mess->rm_Args[2]) || (!mess->rm_Args[3])) {
                 mess->rm_Result1=1;
-                mess->rm_Result2=NULL;
+                mess->rm_Result2=0;
                 return;
         }
         area=atoi(mess->rm_Args[2]);
@@ -942,7 +942,7 @@ void chgfile(struct RexxMsg *mess) {
         char fromfile[100],tofile[100], str[256];
         if((!mess->rm_Args[1]) || (!mess->rm_Args[2]) || (!mess->rm_Args[3]) || (!mess->rm_Args[4])) {
                 mess->rm_Result1=1;
-                mess->rm_Result2=NULL;
+                mess->rm_Result2=0;
                 return;
         }
         area=atoi(mess->rm_Args[4]);
@@ -1122,7 +1122,7 @@ void keyinfo(struct RexxMsg *mess) {
         int nr;
         if((!mess->rm_Args[1]) || (!mess->rm_Args[2])) {
                 mess->rm_Result1=1;
-                mess->rm_Result2=NULL;
+                mess->rm_Result2=0;
                 return;
         }
         switch(mess->rm_Args[2][0]) {
@@ -1151,7 +1151,7 @@ void getdir(struct RexxMsg *mess) {
         int nyckel, cnt, dirnr, areanum;
         if((!mess->rm_Args[1]) || (!mess->rm_Args[2])) {
                 mess->rm_Result1=1;
-                mess->rm_Result2=NULL;
+                mess->rm_Result2=0;
                 return;
         }
         switch(mess->rm_Args[1][0]) {
