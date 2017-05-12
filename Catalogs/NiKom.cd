@@ -386,7 +386,7 @@ Closed
 MSG_FORUM_CREATE_CLOSED_NO (806//)
 Open
 MSG_FORUM_CREATE_GROUPS (807//)
-WHat groups should have access to the forum? (? for a list)
+What groups should have access to the forum? (? for a list)
 MSG_FORUM_CREATE_WRITE (808//)
 Should the forum be write protected?
 MSG_FORUM_CREATE_PROTECTED (809//)
@@ -580,6 +580,121 @@ Name                              Text    Comm  Date   Subject
 MSG_DELETE_NOTE_DONE (1010//)
 Note deleted.
 ;
+MSG_MOVE_TEXT_SYNTAX (1020//)
+Syntax: Move Text <text number> <forum>
+MSG_MOVE_TEXT_WHICH_FORUM (1021//)
+To which forum
+MSG_MOVE_TEXT_ALREADY_THERE (1022//)
+The text is already in that forum.
+MSG_MOVE_TEXT_NO_PERM_TEXT (1023//)
+You don't have permission to move that text.
+MSG_MOVE_TEXT_NO_PERM_FORUM (1024//)
+You don't have permission to move the text to that forum.
+MSG_MOVE_TEXT_MOVED (1025//)
+Moving text to %s.
+;
+MSG_USER_GET_DELETED (1030//)
+Deleted user
+MSG_USER_GET_INVALID (1031//)
+Invalid user id
+;
+MSG_CREATE_GROUP_NO_PERM (1040//)
+You don't have permission to create groups.
+MSG_CREATE_GROUP_MAX (1041//)
+Maximum number of user groups have been reached.
+MSG_CREATE_GROUP_NAME (1042//)
+Group name
+MSG_CREATE_GROUP_ALREADY (1043//)
+There already is a group with that name.
+MSG_CREATE_GROUP_STATUS_1 (1044//)
+At which status level should users automatically become members?
+MSG_CREATE_GROUP_STATUS_2 (1045//)
+all users are automatically members.
+MSG_CREATE_GROUP_STATUS_3 (1046//)
+no users are automatically members.
+MSG_CREATE_GROUP_SECRET (1047//)
+Should the group be secret?
+MSG_CREATE_GROUP_ADMIN (1048//)
+Which user should be administrator of the group
+;
+MSG_CHANGE_GROUPMEM_WHICH (1050//)
+Which group?
+MSG_CHANGE_GROUPMEM_NOPERM (1051//)
+You don't have permission to change membership in that group.
+MSG_CHANGE_GROUPMEM_ADDED (1052//)
+%s added to %s.
+MSG_CHANGE_GROUPMEM_REMOVED (1053//)
+%s removed from %s.
+MSG_CHANGE_GROUPMEM_WHOADD (1054//)
+Who should be added?
+MSG_CHANGE_GROUPMEM_WHOREM (1055//)
+Who should be removed?
+;
+MSG_CHANGE_GROUP_SYNTAX (1060//)
+Syntax: Change Group <group>
+MSG_CHANGE_GROUP_NOPERM (1061//)
+You don't have permission to change that group.
+;
+MSG_DELETE_GROUP_SYNTAX (1070//)
+Syntax: Delete Group <group>
+MSG_DELETE_GROUP_NOPERM (1071//)
+You don't have permissions to delete that group.
+MSG_DELETE_GROUP_CONFIRM (1072//)
+Delete the group %s?
+;
+MSG_GET_GROUP_DELETED (1080//)
+Deleted group
+MSG_GET_GROUP_INVALID (1081//)
+Invalid group id
+;
+MSG_EDIT_GROUPS_AVAILABLE (1090//)
+'!' to see what groups have been chosen.
+MSG_EDIT_GROUPS_CHOSEN (1091//)
+The following groups are chosen
+;
+MSG_FORUM_STATUS_SYNTAX (1100//)
+Syntax: Forum Status <forum>
+MSG_FORUM_STATUS_CREATED_BY (1101//)
+Created by
+MSG_FORUM_STATUS_CREATED_TIME (1102//)
+Created time
+MSG_FORUM_STATUS_ID (1103//)
+Forum id
+MSG_FORUM_STATUS_MAD (1104//)
+Admin
+MSG_FORUM_STATUS_TYPE (1105//)
+Forum type
+MSG_FORUM_STATUS_TAG (1106//)
+Tag name
+MSG_FORUM_STATUS_DIR (1107//)
+Directory
+MSG_FORUM_STATUS_GROUPS (1108//)
+These groups have access to the forum
+;
+MSG_SKIP_SUBJECT_SYNTAX (1110//)
+Syntax: Skip Subject <start of subject line>
+MSG_SKIP_SUBJECT_MAIL (1111//)
+You can not use Skip Sibject in the mailbox.
+MSG_SKIP_SUBJECT_TOO_LONG (1112//)
+A subject line can be max 40 characters.
+MSG_SKIP_SUBJECT_NONE (1113//)
+No texts were skipped.
+MSG_SKIP_SUBJECT_ONE (1114//)
+One text was skipped.
+MSG_SKIP_SUBJECT_MANY (1115//)
+%d texts were skipped.
+;
+MSG_LIST_GROUPMEM_SYNTAX (1120//)
+Syntax: List Members -g <group>
+;
+MSG_ALIAS_NOSUCH (1121//)
+There is no such alias defined.
+;
+MSG_MOVE_BRANCH_SYNTAX (1130//)
+Syntax: Move Branch <root text> <forum>
+MSG_MOVE_BRANCH_MOVED (1131//)
+Moved %d texts.
+;
 ; ******** Dealing with flags **********
 MSG_FLAG_ON (9000//)
 On
@@ -631,3 +746,5 @@ MSG_COMMON_ABORTING (20005//)
 Aborting
 MSG_COMMON_ENTERING_EDITOR (20006//)
 Entering the editor.
+MSG_COMMON_NO_SUCH_GROUP (20007//)
+There is no such group.

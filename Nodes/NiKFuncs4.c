@@ -25,12 +25,13 @@
 #include "ServerMemUtils.h"
 #include "StringUtils.h"
 #include "BasicIO.h"
+#include "Languages.h"
 
 #define EKO		1
 
 extern struct System *Servermem;
 extern int nodnr,inloggad,mote2,senast_text_typ,radcnt;
-extern char outbuffer[],inmat[],*argument,usernamebuf[];
+extern char inmat[],*argument,usernamebuf[];
 extern struct Inloggning Statstr;
 extern struct Header readhead;
 extern struct MinList aliaslist, edit_list;
@@ -38,94 +39,115 @@ extern struct MinList aliaslist, edit_list;
 char gruppnamebuf[41];
 
 int movetext(void) {
-  int nummer, newConf, oldConf;
-  struct Mote *motpek;
+  int textId, newConfId, oldConfId;
+  struct Mote *conf;
   struct Header movehead;
+
   if(!IzDigit(argument[0])) {
-    puttekn("\r\n\nSkriv: Flytta Text <textnummer> <möte>\r\n",-1);
-    return(0);
+    SendString("\r\n\n%s\r\n", CATSTR(MSG_MOVE_TEXT_SYNTAX));
+    return 0;
   }
-  if((nummer=atoi(argument))<Servermem->info.lowtext || nummer>Servermem->info.hightext) {
-    puttekn("\r\n\nTexten finns inte!\r\n",-1);
-    return(0);
+  textId = atoi(argument);
+  if(textId < Servermem->info.lowtext || textId > Servermem->info.hightext) {
+    SendString("\r\n\n%s\r\n", CATSTR(MSG_FORUMS_NO_SUCH_TEXT));
+    return 0;
   }
-  argument=hittaefter(argument);
+  argument = hittaefter(argument);
   if(!argument[0]) {
-    puttekn("\r\n\nTill vilket möte: ",-1);
-    if(getstring(EKO,45,NULL)) return(1);
-    if(!inmat[0]) return(0);
-    argument=inmat;
+    SendString("\r\n\n%s: ", CATSTR(MSG_MOVE_TEXT_WHICH_FORUM));
+    if(getstring(EKO,45,NULL)) {
+      return 1;
+    }
+    if(!inmat[0]) {
+      return 0;
+    }
+    argument = inmat;
   }
-  if((newConf = parsemot(argument))==-1) {
-    puttekn("\r\n\nMötet finns inte!\r\n",-1);
-    return(0);
+  if((newConfId = parsemot(argument)) == -1) {
+    SendString("\r\n\n%s\r\n", CATSTR(MSG_GO_NO_SUCH_FORUM));
+    return 0;
   }
-  oldConf = GetConferenceForText(nummer);
-  if(newConf == oldConf) {
-    puttekn("\r\n\nTexten är redan i det mötet!\r\n",-1);
-    return(0);
+  oldConfId = GetConferenceForText(textId);
+  if(newConfId == oldConfId) {
+    SendString("\r\n\n%s\r\n", CATSTR(MSG_MOVE_TEXT_ALREADY_THERE));
+    return 0;
   }
-  if(readtexthead(nummer,&movehead)) return(0);
-  motpek=getmotpek(oldConf);
-  if(!motpek) {
-    puttekn("\n\n\rTexten är inte i något möte\n\r",-1);
-    return(0);
+  if(readtexthead(textId, &movehead)) {
+    return 0;
+  }
+  conf = getmotpek(oldConfId);
+  if(!conf) {
+    LogEvent(SYSTEM_LOG, ERROR, "Could not find confId %d", oldConfId);
+    DisplayInternalError();
+    return 0;
   }
   if(movehead.person != inloggad
-     && !MayAdminConf(motpek->nummer, inloggad, &Servermem->inne[nodnr])) {
-    puttekn("\r\n\nDu har ingen rätt att flytta den texten\r\n",-1);
-    return(0);
+     && !MayAdminConf(conf->nummer, inloggad, &Servermem->inne[nodnr])) {
+    SendString("\r\n\n%s\r\n", CATSTR(MSG_MOVE_TEXT_NO_PERM_TEXT));
+    return 0;
   }
-  if(!MayWriteConf(newConf, inloggad, &Servermem->inne[nodnr])
-     || !MayReplyConf(newConf, inloggad, &Servermem->inne[nodnr])) {
-    puttekn("\n\n\rDu har ingen rätt att flytta texten till det mötet.\n\r",-1);
-    return(0);
+  if(!MayWriteConf(newConfId, inloggad, &Servermem->inne[nodnr])
+     || !MayReplyConf(newConfId, inloggad, &Servermem->inne[nodnr])) {
+    SendString("\n\n\r%s\n\r", CATSTR(MSG_MOVE_TEXT_NO_PERM_FORUM));
+    return 0;
   }
-  motpek = getmotpek(newConf);
-  sprintf(outbuffer,"\r\n\nFlyttar texten till %s.\r\n",motpek->namn);
-  puttekn(outbuffer,-1);
-  movehead.mote = newConf;
-  if(writetexthead(nummer,&movehead)) return(0);
-  SetConferenceForText(nummer, newConf, TRUE);
+  conf = getmotpek(newConfId);
+  SendStringCat("\r\n\n%s\r\n", CATSTR(MSG_MOVE_TEXT_MOVED), conf->namn);
+  movehead.mote = newConfId;
+  if(writetexthead(textId,&movehead)) {
+    return 0;
+  }
+  SetConferenceForText(textId, newConfId, TRUE);
   return 0;
 }
 
-char *getusername(int nummer) {
-	struct ShortUser *letpek;
-	int found=FALSE;
-	for(letpek=(struct ShortUser *)Servermem->user_list.mlh_Head;letpek->user_node.mln_Succ;letpek=(struct ShortUser *)letpek->user_node.mln_Succ)
-	{
-		if(letpek->nummer==nummer) {
-			if(letpek->namn[0]) sprintf(usernamebuf,"%s #%d",letpek->namn,nummer);
-			else strcpy(usernamebuf,"<Raderad Användare>");
-			found=TRUE;
-			break;
-		}
-	}
-	if(!found) strcpy(usernamebuf,"<Felaktigt användarnummer>");
-	return(usernamebuf);
+char *getusername(int userId) {
+  struct ShortUser *user;
+  int found = FALSE;
+
+  ITER_EL(user, Servermem->user_list, user_node, struct ShortUser *) {
+    if(user->nummer == userId) {
+      if(user->namn[0]) {
+        sprintf(usernamebuf, "%s #%d", user->namn, userId);
+      } else {
+        sprintf(usernamebuf, "<%s>", CATSTR(MSG_USER_GET_DELETED));
+      }
+      found = TRUE;
+      break;
+    }
+  }
+  if(!found) {
+    sprintf(usernamebuf, "<%s>", CATSTR(MSG_USER_GET_INVALID));
+  }
+  return usernamebuf;
 }
 
-int namematch(char *pat,char *fac) {
-	char *pat2,*fac2;
-	if(!matchar(pat,fac)) return(FALSE);
-	pat2=hittaefter(pat);
-	fac2=hittaefter(fac);
-	if(!pat2[0]) return(TRUE);
-	if(!matchar(pat2,fac2)) {
-		fac2=hittaefter(fac2);
-		if(!matchar(pat2,fac2)) return(FALSE);
-	}
-	return(TRUE);
+int namematch(char *pattern, char *str) {
+  char *pattern2, *str2;
+  if(!matchar(pattern, str)) {
+    return FALSE;
+  }
+  pattern2 = hittaefter(pattern);
+  str2 = hittaefter(str);
+  if(!pattern2[0]) {
+    return TRUE;
+  }
+  if(!matchar(pattern2, str2)) {
+    str2 = hittaefter(str2);
+    if(!matchar(pattern2,str2)) {
+      return FALSE;
+    }
+  }
+  return TRUE;
 }
 
 int skapagrupp(void) {
-  struct UserGroup *newUserGroup,*userGroup;
+  struct UserGroup *newUserGroup, *userGroup;
   int groupadmin, groupId;
   char buff[9];
   
   if(Servermem->inne[nodnr].status < Servermem->cfg.st.grupper) {
-    SendString("\r\n\nDu har inte rättigheter att skapa grupper!\r\n");
+    SendString("\r\n\n%s\r\n", CATSTR(MSG_CREATE_GROUP_NO_PERM));
     return 0;
   }
 
@@ -137,7 +159,7 @@ int skapagrupp(void) {
     groupId++;
   }
   if(groupId >= 32) {
-    SendString("\r\n\nSorry, det finns redan maximalt med användargrupper.\r\n");
+    SendString("\r\n\n%s\r\n", CATSTR(MSG_CREATE_GROUP_MAX));
     return 0;
   }
   if(!(newUserGroup = AllocMem(sizeof(struct UserGroup),
@@ -150,7 +172,7 @@ int skapagrupp(void) {
   newUserGroup->nummer = groupId;
 
   if(!argument[0]) {
-    SendString("\r\n\nNamn: ");
+    SendString("\r\n\n%s: ", CATSTR(MSG_CREATE_GROUP_NAME));
     if(GetString(40, NULL)) {
       FreeMem(newUserGroup, sizeof(struct UserGroup));
       return 1;
@@ -164,29 +186,30 @@ int skapagrupp(void) {
     strcpy(newUserGroup->namn, argument);
   }
   if(parsegrupp(newUserGroup->namn) != -1) {
-    SendString("\n\n\rFinns redan en grupp med det namnet.\n\r");
+    SendString("\n\n\r%s\n\r", CATSTR(MSG_CREATE_GROUP_ALREADY));
     FreeMem(newUserGroup, sizeof(struct UserGroup));
     return 0;
   }
-  SendString("\r\n\nVid vilken statusnivå ska man bli automatiskt medlem i gruppen?\r\n");
-  SendString("0  = alla blir automatiskt medlemmar.\r\n");
-  SendString("-1 = ingen blir automatiskt medlem.\r\n");
+  SendString("\r\n\n%s\r\n", CATSTR(MSG_CREATE_GROUP_STATUS_1));
+  SendString("0  = %s\r\n", CATSTR(MSG_CREATE_GROUP_STATUS_2));
+  SendString("-1 = %s\r\n", CATSTR(MSG_CREATE_GROUP_STATUS_3));
   newUserGroup->autostatus = GetNumber(-1, 100, NULL);
 
-  if(EditBitFlagChar("\r\n", "Ska gruppen vara hemlig?", "j", "n", "Ja\r\n", "Nej\r\n",
+  if(EditBitFlagChar("\r\n", CATSTR(MSG_CREATE_GROUP_SECRET), NULL, NULL,
+                     CATSTR(MSG_COMMON_YES), CATSTR(MSG_COMMON_NO),
                      &newUserGroup->flaggor, HEMLIGT)) {
     return 1;
   }
 
   for(;;) {
-    SendString("\r\nVilken användare ska vara administratör för denna grupp: ");
+    SendString("\r\n%s: ", CATSTR(MSG_CREATE_GROUP_ADMIN));
     sprintf(buff,"%d",inloggad);
     if(GetString(40 ,buff)) {
       return 1;
     }
     if(inmat[0]) {
       if((groupadmin = parsenamn(inmat)) == -1) {
-        SendString("\r\nFinns ingen sådan användare!",-1);
+        SendString("\r\n%s", CATSTR(MSG_COMMON_NO_SUCH_USER));
       } else {
         newUserGroup->groupadmin = groupadmin;
         break;
@@ -205,160 +228,162 @@ int skapagrupp(void) {
   return 0;
 }
 
-int writegrupp(int nummer,struct UserGroup *pek) {
-	BPTR fh;
-	if(!(fh=Open("NiKom:DatoCfg/Grupper.dat",MODE_OLDFILE))) {
-		puttekn("\r\nKunde inte öppna Grupper.dat!\r\n",-1);
-		return(1);
-	}
-	if(Seek(fh,nummer*sizeof(struct UserGroup),OFFSET_BEGINNING)==-1) {
-		puttekn("\r\nKunde inte söka i Grupper.dat!\r\n",-1);
-		Close(fh);
-		return(1);
-	}
-	if(Write(fh,(void *)pek,sizeof(struct UserGroup))==-1) {
-		puttekn("\r\nKunde inte skriva i Grupper.dat!\r\n",-1);
-		Close(fh);
-		return(1);
-	}
-	Close(fh);
-	return(0);
+int writegrupp(int groupId, struct UserGroup *group) {
+  BPTR fh;
+  if(!(fh = Open("NiKom:DatoCfg/Grupper.dat", MODE_OLDFILE))) {
+    LogEvent(SYSTEM_LOG, ERROR, "Could not open Grupper.dat");
+    DisplayInternalError();
+    return 1;
+  }
+  if(Seek(fh, groupId * sizeof(struct UserGroup), OFFSET_BEGINNING) == -1) {
+    LogEvent(SYSTEM_LOG, ERROR, "Could not seek to position %d in Grupper.dat",
+             groupId * sizeof(struct UserGroup));
+    DisplayInternalError();
+    Close(fh);
+    return 1;
+  }
+  if(Write(fh, (void *)group, sizeof(struct UserGroup)) == -1) {
+    LogEvent(SYSTEM_LOG, ERROR, "Could not write to Grupper.dat");
+    DisplayInternalError();
+    Close(fh);
+    return 1;
+  }
+  Close(fh);
+  return 0;
 }
 
 void listagrupper(void) {
-	struct UserGroup *listpek;
-	puttekn("\r\n\n",-1);
-	for(listpek=(struct UserGroup *)Servermem->grupp_list.mlh_Head;listpek->grupp_node.mln_Succ;listpek=(struct UserGroup *)listpek->grupp_node.mln_Succ) {
-		if((listpek->flaggor & HEMLIGT) && !gruppmed(listpek,Servermem->inne[nodnr].status,Servermem->inne[nodnr].grupper && Servermem->inloggad[nodnr] != listpek->groupadmin)) continue;
-		if(gruppmed(listpek,Servermem->inne[nodnr].status,Servermem->inne[nodnr].grupper))
-			sprintf(outbuffer,"  %s\r\n",listpek->namn);
-		else sprintf(outbuffer,"* %s\r\n",listpek->namn);
-		if(puttekn(outbuffer,-1)) break;
-	}
+  struct UserGroup *group;
+  int isMember;
+
+  SendString("\r\n\n");
+  ITER_EL(group, Servermem->grupp_list, grupp_node, struct UserGroup *) {
+    isMember = gruppmed(group, Servermem->inne[nodnr].status, Servermem->inne[nodnr].grupper);
+    if((group->flaggor & HEMLIGT)
+       && !isMember
+       && Servermem->inloggad[nodnr] != group->groupadmin) {
+      continue;
+    }
+    if(SendString("%c %s\r\n", isMember ? '*' : ' ', group->namn)) {
+      break;
+    }
+  }
 }
 
-int adderagruppmedlem(void) {
-	int x,vem,grupp;
-	struct User anv;
-	struct ShortUser *letpek;
-	struct UserGroup *grouppek;
+static void changeGroupMembership(int isAdd) {
+  int i, userId, groupId;
+  struct User anv;
+  struct ShortUser *user;
+  struct UserGroup *group;
+  
+  if(!argument[0]) {
+    SendString("\r\n\n%s ", isAdd ? CATSTR(MSG_CHANGE_GROUPMEM_WHOADD) : CATSTR(MSG_CHANGE_GROUPMEM_WHOREM));
+    if(getstring(EKO, 40, NULL)) {
+      return;
+    }
+    if(!inmat[0]) {
+      return;
+    }
+    argument = inmat;
+  }
+  if((userId = parsenamn(argument)) == -1) {
+    SendString("\r\n\n%s\r\n", CATSTR(MSG_COMMON_NO_SUCH_USER));
+    return;
+  }
+  SendString("\r\n\n%s ", CATSTR(MSG_CHANGE_GROUPMEM_WHICH));
+  if(getstring(EKO, 40, NULL)) {
+    return;
+  }
+  if(!inmat[0]) {
+    return;
+  }
+  if((groupId = parsegrupp(inmat)) == -1) {
+    SendString("\r\n\n%s\r\n", CATSTR(MSG_COMMON_NO_SUCH_GROUP));
+    return;
+  }
+  group = FindUserGroup(groupId);
+  if(inloggad != group->groupadmin && Servermem->inne[nodnr].status < Servermem->cfg.st.grupper) {
+    SendString("\r\n\n%s\r\n", CATSTR(MSG_CHANGE_GROUPMEM_NOPERM));
+    return;
+  }
+  for(i = 0; i < MAXNOD; i++) {
+    if(Servermem->inloggad[i] == userId) { break; }
+  }
+  if(i == MAXNOD) {
+    if(readuser(userId, &anv)) {
+      return;
+    }
+    if(isAdd) {
+      BAMSET((char *)&anv.grupper, groupId);
+    } else {
+      BAMCLEAR((char *)&anv.grupper, groupId);
+    }
+    if(writeuser(userId,&anv)) {
+      return;
+    }
+  } else {
+    if(isAdd) {
+      BAMSET((char *)&Servermem->inne[i].grupper, groupId);
+    } else {
+      BAMCLEAR((char *)&Servermem->inne[i].grupper, groupId);
+    }
+  }
 
-	if(!argument[0]) {
-		puttekn("\r\n\nVem ska adderas? ",-1);
-		if(getstring(EKO,40,NULL)) return(1);
-		if(!inmat[0]) return(0);
-		argument=inmat;
-	}
-	if((vem=parsenamn(argument))==-1) {
-		puttekn("\r\n\nFinns ingen sådan användare!\r\n",-1);
-		return(0);
-	}
-	puttekn("\r\n\nTill vilken grupp? ",-1);
-	if(getstring(EKO,40,NULL)) return(1);
-	if(!inmat[0]) return(0);
-	if((grupp=parsegrupp(inmat))==-1) {
-		puttekn("\r\n\nFinns ingen sådan grupp!\r\n",-1);
-		return(0);
-	}
-	grouppek = FindUserGroup(grupp);
-	if(inloggad != grouppek->groupadmin && Servermem->inne[nodnr].status < Servermem->cfg.st.grupper)
-	{
-		puttekn("\r\n\nDu har inte rättigheter att addera gruppmedlemmar till denna grupp!\r\n",-1);
-		return(0);
-	}
-	for(x=0;x<MAXNOD;x++) if(Servermem->inloggad[x]==vem) break;
-	if(x==MAXNOD) {
-		if(readuser(vem,&anv)) return(0);
-		BAMSET((char *)&anv.grupper,grupp);
-		if(writeuser(vem,&anv)) return(0);
-	} else BAMSET((char *)&Servermem->inne[x].grupper,grupp);
-	sprintf(outbuffer,"\r\n\n%s adderad till %s.\r\n",getusername(vem),getgruppname(grupp));
-	puttekn(outbuffer,-1);
-	for(letpek=(struct ShortUser *)Servermem->user_list.mlh_Head;letpek->user_node.mln_Succ;letpek=(struct ShortUser *)letpek->user_node.mln_Succ)
-		if(letpek->nummer==vem) break;
-	if(letpek->user_node.mln_Succ) BAMSET((char *)&letpek->grupper,grupp);
-	else {
-		puttekn("\r\n\nHittade inte ShortUser-strukturen!\r\n",-1);
-		return(0);
-	}
-	return(0);
+  SendStringCat("\r\n\n%s\r\n",
+                isAdd ? CATSTR(MSG_CHANGE_GROUPMEM_ADDED) : CATSTR(MSG_CHANGE_GROUPMEM_REMOVED),
+                getusername(userId), getgruppname(groupId));
+  ITER_EL(user, Servermem->user_list, user_node, struct ShortUser *) {
+    if(user->nummer == userId) { break; }
+  }
+  if(user->user_node.mln_Succ) {
+    if(isAdd) {
+      BAMSET((char *)&user->grupper, groupId);
+    } else {
+      BAMCLEAR((char *)&user->grupper, groupId);
+    }
+  } else {
+    LogEvent(SYSTEM_LOG, ERROR, "Could not find ShortUser entry for user %d", userId);
+    DisplayInternalError();
+  }
 }
 
-int subtraheragruppmedlem(void) {
-	int x,vem,grupp;
-	struct User anv;
-	struct ShortUser *letpek;
-	struct UserGroup *grouppek;
-
-	if(!argument[0]) {
-		puttekn("\r\n\nVem ska subtraheras? ",-1);
-		if(getstring(EKO,40,NULL)) return(1);
-		if(!inmat[0]) return(0);
-		argument=inmat;
-	}
-	if((vem=parsenamn(argument))==-1) {
-		puttekn("\r\n\nFinns ingen sådan användare!\r\n",-1);
-		return(0);
-	}
-	puttekn("\r\n\nFrån vilken grupp? ",-1);
-	if(getstring(EKO,40,NULL)) return(1);
-	if(!inmat[0]) return(0);
-	if((grupp=parsegrupp(inmat))==-1) {
-		puttekn("\r\n\nFinns ingen sådan grupp!\r\n",-1);
-		return(0);
-	}
-	grouppek = FindUserGroup(grupp);
-	if(inloggad != grouppek->groupadmin && Servermem->inne[nodnr].status < Servermem->cfg.st.grupper)
-	{
-		puttekn("\r\n\nDu har inte rättigheter att subtrahera gruppmedlemmar från denna grupp!\r\n",-1);
-		return(0);
-	}
-	for(x=0;x<MAXNOD;x++) if(Servermem->inloggad[x]==vem) break;
-	if(x==MAXNOD) {
-		if(readuser(vem,&anv)) return(0);
-		BAMCLEAR((char *)&anv.grupper,grupp);
-		if(writeuser(vem,&anv)) return(0);
-	} else BAMCLEAR((char *)&Servermem->inne[x].grupper,grupp);
-	sprintf(outbuffer,"\r\n\n%s subtraherad från %s.\r\n",getusername(vem),getgruppname(grupp));
-	puttekn(outbuffer,-1);
-	for(letpek=(struct ShortUser *)Servermem->user_list.mlh_Head;letpek->user_node.mln_Succ;letpek=(struct ShortUser *)letpek->user_node.mln_Succ)
-		if(letpek->nummer==vem) break;
-	if(letpek->user_node.mln_Succ) BAMCLEAR((char *)&letpek->grupper,grupp);
-	else {
-		puttekn("\r\n\nHittade inte ShortUser-strukturen!\r\n",-1);
-		return(0);
-	}
-	return(0);
+void adderagruppmedlem(void) {
+  changeGroupMembership(TRUE);
 }
 
-int parsegrupp(char *skri) {
-	int going=TRUE,going2=TRUE,found=-1;
-	char *faci,*skri2;
-	struct UserGroup *letpek;
-	if(skri[0]==0 || skri[0]==' ') return(-3);
-	letpek=(struct UserGroup *)Servermem->grupp_list.mlh_Head;
-	while(letpek->grupp_node.mln_Succ && going) {
-		faci=letpek->namn;
-		skri2=skri;
-		going2=TRUE;
-		if(matchar(skri2,faci)) {
-			while(going2) {
-				skri2=hittaefter(skri2);
-				faci=hittaefter(faci);
-				if(skri2[0]==0) {
-					found=letpek->nummer;
-					going2=going=FALSE;
-				}
-				else if(faci[0]==0) going2=FALSE;
-				else if(!matchar(skri2,faci)) {
-					faci=hittaefter(faci);
-					if(faci[0]==0 || !matchar(skri2,faci)) going2=FALSE;
-				}
-			}
-		}
-		letpek=(struct UserGroup *)letpek->grupp_node.mln_Succ;
-	}
-	return(found);
+void subtraheragruppmedlem(void) {
+  changeGroupMembership(FALSE);
+}
+
+int parsegrupp(char *pattern) {
+  char *str, *pattern2;
+  struct UserGroup *group;
+
+  if(pattern[0] == '\0' || pattern[0] == ' ') {
+    return -3;
+  }
+  ITER_EL(group, Servermem->grupp_list, grupp_node, struct UserGroup *) {
+    str = group->namn;
+    pattern2 = pattern;
+    if(matchar(pattern2, str)) {
+      for(;;) {
+        pattern2 = hittaefter(pattern2);
+        str = hittaefter(str);
+        if(pattern2[0] == '\0') {
+          return group->nummer;
+        }
+        else if(str[0] == '\0') {
+          break;
+        } else if(!matchar(pattern2, str)) {
+          str = hittaefter(str);
+          if(str[0] == '\0' || !matchar(pattern2, str)) {
+            break;
+          }
+        }
+      }
+    }
+  }
+  return -1;
 }
 
 int andragrupp(void) {
@@ -367,11 +392,11 @@ int andragrupp(void) {
   char buff[9];
   
   if(!argument[0]) {
-    SendString("\r\n\nSkriv: Ändra Grupp <gruppnamn>\r\n");
+    SendString("\r\n\n%s\r\n", CATSTR(MSG_CHANGE_GROUP_SYNTAX));
     return 0;
   }
   if((groupId = parsegrupp(argument)) == -1) {
-    SendString("\r\n\nFinns ingen sådan grupp!\r\n");
+    SendString("\r\n\n%s\r\n", CATSTR(MSG_COMMON_NO_SUCH_GROUP));
     return 0;
   }
 
@@ -382,32 +407,33 @@ int andragrupp(void) {
   }
   if(inloggad != userGroup->groupadmin
      && Servermem->inne[nodnr].status < Servermem->cfg.st.grupper) {
-    SendString("\r\n\nDu har inte rättigheter att ändra denna grupp!\r\n");
+    SendString("\r\n\n%s\r\n", CATSTR(MSG_CHANGE_GROUP_NOPERM));
     return 0;
   }
   memcpy(&tmpUserGroup, userGroup, sizeof(struct UserGroup));
 
-  MaybeEditString("Namn", tmpUserGroup.namn, 40);
+  MaybeEditString(CATSTR(MSG_CREATE_GROUP_NAME), tmpUserGroup.namn, 40);
 
-  SendString("\r\nVid vilken statusnivå ska man bli automatiskt medlem i gruppen?\r\n");
-  SendString("0  = alla blir automatiskt medlemmar.\r\n");
-  SendString("-1 = ingen blir automatiskt medlem.\r\n");
+  SendString("\r\n%s\r\n", CATSTR(MSG_CREATE_GROUP_STATUS_1));
+  SendString("0  = %s\r\n", CATSTR(MSG_CREATE_GROUP_STATUS_2));
+  SendString("-1 = %s\r\n", CATSTR(MSG_CREATE_GROUP_STATUS_3));
   MaybeEditNumberChar("Status", &tmpUserGroup.autostatus, 3, -1, 100);
 
-  if(EditBitFlagChar("\r\n", "Ska gruppen vara hemlig?", "j", "n", "Ja", "Nej",
+  if(EditBitFlagChar("\r\n", CATSTR(MSG_CREATE_GROUP_SECRET), NULL, NULL,
+                     CATSTR(MSG_COMMON_YES), CATSTR(MSG_COMMON_NO),
                      &tmpUserGroup.flaggor, HEMLIGT)) {
     return 1;
   }
 
   for(;;) {
-    SendString("\r\nVilken användare ska vara administratör för denna grupp: ");
+    SendString("\r\n%s: ", CATSTR(MSG_CREATE_GROUP_ADMIN));
     sprintf(buff, "%d", userGroup->groupadmin);
     if(GetString(40, buff)) {
       return 1;
     }
     if(inmat[0]) {
       if((groupadmin = parsenamn(inmat)) == -1) {
-        SendString("\r\nFinns ingen sådan användare!");
+        SendString("\r\n%s", CATSTR(MSG_COMMON_NO_SUCH_USER));
       } else {
         tmpUserGroup.groupadmin = groupadmin;
         break;
@@ -415,7 +441,8 @@ int andragrupp(void) {
     }
   }
 
-  if(GetYesOrNo("\r\n\n", "Är allt korrekt?", NULL, NULL, "Ja", "Nej", "\r\n",
+  if(GetYesOrNo("\r\n\n", CATSTR(MSG_COMMON_IS_CORRECT), NULL, NULL,
+                CATSTR(MSG_COMMON_YES), CATSTR(MSG_COMMON_NO), "\r\n",
                 TRUE, &isCorrect)) {
     return 1;
   }
@@ -433,11 +460,11 @@ void raderagrupp(void) {
   int groupId, isCorrect;
 
   if(!argument[0]) {
-    SendString("\r\n\nSkriv: Radera Grupp <grupp>\r\n");
+    SendString("\r\n\n%s\r\n", CATSTR(MSG_DELETE_GROUP_SYNTAX));
     return;
   }
   if((groupId = parsegrupp(argument)) == -1) {
-    SendString("\r\n\nFinns ingen sådan grupp!\r\n");
+    SendString("\r\n\n%s\r\n", CATSTR(MSG_COMMON_NO_SUCH_GROUP));
     return;
   }
   if((userGroup = FindUserGroup(groupId)) == NULL) {
@@ -447,11 +474,13 @@ void raderagrupp(void) {
   }
   if(inloggad != userGroup->groupadmin
      && Servermem->inne[nodnr].status < Servermem->cfg.st.grupper) {
-    SendString("\r\n\nDu har inte rättigheter att radera denna grupp!\r\n");
+    SendString("\r\n\n%s\r\n", CATSTR(MSG_DELETE_GROUP_NOPERM));
     return;
   }
-  SendString("\r\n\nRadera gruppen %s?",userGroup->namn);
-  if(GetYesOrNo(NULL, NULL, NULL, NULL, "Ja", "Nej", "\r\n", FALSE, &isCorrect)) {
+  SendStringCat("\r\n\n%s", CATSTR(MSG_DELETE_GROUP_CONFIRM), userGroup->namn);
+  if(GetYesOrNo(NULL, NULL, NULL, NULL,
+                CATSTR(MSG_COMMON_YES), CATSTR(MSG_COMMON_NO),
+                "\r\n", FALSE, &isCorrect)) {
     return;
   }
   if(!isCorrect) {
@@ -464,264 +493,286 @@ void raderagrupp(void) {
 }
 
 void initgrupp(void) {
-	struct UserGroup *pek;
-	for(pek=(struct UserGroup *)Servermem->grupp_list.mlh_Head;pek->grupp_node.mln_Succ;pek=(struct UserGroup *)pek->grupp_node.mln_Succ) {
-		if(pek->autostatus!=-1) if(Servermem->inne[nodnr].status>=pek->autostatus) BAMSET((char *)&Servermem->inne[nodnr].grupper,pek->nummer);
-	}
+  struct UserGroup *group;
+  ITER_EL(group, Servermem->grupp_list, grupp_node, struct UserGroup *) {
+    if(group->autostatus != -1 && Servermem->inne[nodnr].status >= group->autostatus) {
+      BAMSET((char *)&Servermem->inne[nodnr].grupper, group->nummer);
+    }
+  }
 }
 
-char *getgruppname(int nummer) {
-	struct UserGroup *letpek;
-	int found=FALSE;
-	for(letpek=(struct UserGroup *)Servermem->grupp_list.mlh_Head;letpek->grupp_node.mln_Succ;letpek=(struct UserGroup *)letpek->grupp_node.mln_Succ) {
-		if(letpek->nummer==nummer) {
-			if(letpek->namn[0]) strcpy(gruppnamebuf,letpek->namn);
-			else strcpy(gruppnamebuf,"<Raderad Grupp>");
-			found=TRUE;
-			break;
-		}
-	}
-	if(!found) strcpy(gruppnamebuf,"<Felaktigt gruppnummer>");
-	return(gruppnamebuf);
+char *getgruppname(int groupId) {
+  struct UserGroup *group;
+  int found=FALSE;
+
+  ITER_EL(group, Servermem->grupp_list, grupp_node, struct UserGroup *) {
+    if(group->nummer == groupId) {
+      if(group->namn[0]) {
+        strcpy(gruppnamebuf, group->namn);
+      } else {
+        sprintf(gruppnamebuf, "<%s>", CATSTR(MSG_GET_GROUP_DELETED));
+      }
+      found = TRUE;
+      break;
+    }
+  }
+  if(!found) {
+    sprintf(gruppnamebuf,"<%s>", CATSTR(MSG_GET_GROUP_INVALID));
+  }
+  return gruppnamebuf;
 }
 
 int editgrupp(char *bitmap) {
-	int grupp;
-	struct UserGroup *pek;
-	do {
-		if(getstring(EKO,40,NULL)) return(1);
-		if(inmat[0]=='?') {
-			listagrupper();
-			puttekn("'!' för att se vilka grupper du har satt.\r\n",-1);
-		} else if(inmat[0]=='!') {
-			puttekn("\r\nFöljande grupper är satta:\r\n",-1);
-			for(pek=(struct UserGroup *)Servermem->grupp_list.mlh_Head;pek->grupp_node.mln_Succ;pek=(struct UserGroup *)pek->grupp_node.mln_Succ)
-				if(BAMTEST(bitmap,pek->nummer)) {
-				sprintf(outbuffer,"%s\r\n",pek->namn);
-				puttekn(outbuffer,-1);
-			}
-		} else if(inmat[0]!=0) {
-			if((grupp=parsegrupp(inmat))==-1) puttekn("\r\nFinns ingen sådan grupp\r\n",-1);
-			else if(grupp>=0) {
-				sprintf(outbuffer,"\r%s\r\n",getgruppname(grupp));
-				puttekn(outbuffer,-1);
-				if(BAMTEST(bitmap,grupp)) BAMCLEAR(bitmap,grupp);
-				else BAMSET(bitmap,grupp);
-			}
-		}
-	} while(inmat[0]!=0);
-	return(0);
+  int groupId;
+  struct UserGroup *group;
+
+  do {
+    if(getstring(EKO, 40, NULL)) {
+      return 1;
+    }
+    if(inmat[0] == '?') {
+      listagrupper();
+      SendString("%s\r\n", CATSTR(MSG_EDIT_GROUPS_AVAILABLE));
+    } else if(inmat[0] == '!') {
+      SendString("\r\n%s:\r\n", CATSTR(MSG_EDIT_GROUPS_CHOSEN));
+      ITER_EL(group, Servermem->grupp_list, grupp_node, struct UserGroup *) {
+        if(BAMTEST(bitmap, group->nummer)) {
+          SendString("%s\r\n", group->namn);
+        }
+      }
+    } else if(inmat[0] != '\0') {
+      if((groupId = parsegrupp(inmat)) == -1) {
+        SendString("\r\n%s\r\n", CATSTR(MSG_COMMON_NO_SUCH_GROUP));
+      } else if(groupId >= 0) {
+        SendString("\r%s\r\n", getgruppname(groupId));
+        if(BAMTEST(bitmap, groupId)) {
+          BAMCLEAR(bitmap, groupId);
+        } else {
+          BAMSET(bitmap, groupId);
+        }
+      }
+    }
+  } while(inmat[0] != '\0');
+  return 0;
 }
 
 void motesstatus(void) {
-	int motnr;
-	struct Mote *motpek;
-	struct tm *ts;
-	struct UserGroup *pek;
-	char filnamn[50];
-	if(!argument[0]) {
-		if(mote2!=-1) motnr=mote2;
-		else {
-			puttekn("\r\n\nSkriv: Mötesstatus <möte>\r\n",-1);
-			return;
-		}
-	} else {
-		motnr=parsemot(argument);
-		if(motnr==-1) {
-			puttekn("\r\n\nFinns inget sådant möte!\r\n",-1);
-			return;
-		}
-	}
-	motpek=getmotpek(motnr);
-	sprintf(outbuffer,"\r\n\nNamn:            %s",motpek->namn);
-	puttekn(outbuffer,-1);
-	sprintf(outbuffer,"\r\nSkapat av:       %s",getusername(motpek->skapat_av));
-	puttekn(outbuffer,-1);
-	ts=localtime(&motpek->skapat_tid);
-	sprintf(outbuffer,"\r\nSkapat tid:      %4d%02d%02d  %02d:%02d",
-                ts->tm_year + 1900, ts->tm_mon + 1, ts->tm_mday, ts->tm_hour,
-                ts->tm_min);
-	puttekn(outbuffer,-1);
-	sprintf(outbuffer,"\r\nMötesnummer:     %d",motpek->nummer);
-	puttekn(outbuffer,-1);
-	sprintf(outbuffer,"\r\nSorteringsvärde: %ld",motpek->sortpri);
-	puttekn(outbuffer,-1);
-	sprintf(outbuffer,"\r\nMAD:             %s",getusername(motpek->mad));
-	puttekn(outbuffer,-1);
-	puttekn("\r\nMötestyp:        ",-1);
-	if(motpek->type == MOTE_ORGINAL) puttekn("lokalt möte.",-1);
-	else if(motpek->type == MOTE_FIDO)
-	{
-	          puttekn("FidoNet möte.",-1);
-		sprintf(outbuffer,"\r\nTagnamn:         %s",motpek->tagnamn);
-		puttekn(outbuffer,-1);
-		sprintf(outbuffer,"\r\nBibliotek:       %s",motpek->dir);
-		puttekn(outbuffer,-1);
-		sprintf(outbuffer,"\r\nOrigin:          %s\r\n",motpek->origin);
-		puttekn(outbuffer,-1);
-	}
-	else
-		puttekn("\r\n", -1);
+  int confId;
+  struct Mote *conf;
+  struct tm *ts;
+  struct UserGroup *group;
+  char filename[50];
 
-/*
-struct Mote {
-   struct MinNode mot_node;
-   long skapat_tid,grupper,skapat_av,mad,sortpri,lowtext,domain,texter, renumber_offset,
-  	   reserv1, reserv2, reserv3, reserv4, reserv5;
-   short gren,status,charset,nummer;
-   char type,namn[41],origin[70],tagnamn[50],dir[80];
-};
-*/
-	if(motpek->status & KOMSKYDD) puttekn("Kommentarsskyddat  ",-1);
-	if(motpek->status & SKRIVSKYDD) puttekn("Skrivskyddat  ",-1);
-	if(motpek->status & SLUTET) puttekn("Slutet  ",-1);
-	if(motpek->status & HEMLIGT) puttekn("Hemligt  ",-1);
-	if(motpek->status & AUTOMEDLEM) puttekn("Auto ",-1);
-	if(motpek->status & SKRIVSTYRT) puttekn("Skrivstyrt  ",-1);
-	if(motpek->status & SUPERHEMLIGT) puttekn("ARexx-åtkomst  ",-1);
-	puttekn("\r\n\n",-1);
-	if((motpek->status & (SLUTET | SKRIVSTYRT)) && motpek->grupper) {
-		puttekn("Följande grupper har tillgång till mötet:\r\n",-1);
-		for(pek=(struct UserGroup *)Servermem->grupp_list.mlh_Head;pek->grupp_node.mln_Succ;pek=(struct UserGroup *)pek->grupp_node.mln_Succ) {
-			if(!BAMTEST((char *)&motpek->grupper,pek->nummer)) continue;
-			if((pek->flaggor & HEMLIGT) && !gruppmed(pek,Servermem->inne[nodnr].status,Servermem->inne[nodnr].grupper)) continue;
-			sprintf(outbuffer,"%s\r\n",pek->namn);
-			puttekn(outbuffer,-1);
-		}
-	}
-	sprintf(filnamn,"NiKom:Lappar/%d.motlapp",motnr);
-	if(!access(filnamn,0)) sendfile(filnamn);
+  if(!argument[0]) {
+    if(mote2 != -1) {
+      confId = mote2;
+    } else {
+      SendString("\r\n\n%s\r\n", CATSTR(MSG_FORUM_STATUS_SYNTAX));
+      return;
+    }
+  } else {
+    confId = parsemot(argument);
+    if(confId == -1) {
+      SendString("\r\n\n%s\r\n", CATSTR(MSG_GO_NO_SUCH_FORUM));
+      return;
+    }
+  }
+  conf = getmotpek(confId);
+  SendString("\r\n\n%-18s: %s",CATSTR(MSG_FORUM_CREATE_NAME), conf->namn);
+  SendString("\r\n%-18s: %s",CATSTR(MSG_FORUM_STATUS_CREATED_BY), getusername(conf->skapat_av));
+  ts = localtime(&conf->skapat_tid);
+  SendString("\r\n%-18s: %4d%02d%02d  %02d:%02d", CATSTR(MSG_FORUM_STATUS_CREATED_TIME),
+             ts->tm_year + 1900, ts->tm_mon + 1, ts->tm_mday, ts->tm_hour,
+             ts->tm_min);
+  SendString("\r\n%-18s: %d", CATSTR(MSG_FORUM_STATUS_ID), conf->nummer);
+  SendString("\r\n%-18s: %ld", CATSTR(MSG_FORUM_CREATE_SORT), conf->sortpri);
+  SendString("\r\n%-18s: %s", CATSTR(MSG_FORUM_STATUS_MAD), getusername(conf->mad));
+  SendString("\r\n%-18s: ", CATSTR(MSG_FORUM_STATUS_TYPE));
+  if(conf->type == MOTE_ORGINAL) {
+    SendString("%s\r\n", CATSTR(MSG_FORUM_CREATE_TYPE_LOCAL));
+  } else if(conf->type == MOTE_FIDO) {
+    SendString(CATSTR(MSG_FORUM_CREATE_TYPE_FIDO));
+    SendString("\r\n%-18s: %s", CATSTR(MSG_FORUM_STATUS_TAG), conf->tagnamn);
+    SendString("\r\n%-18s: %s", CATSTR(MSG_FORUM_STATUS_DIR), conf->dir);
+    SendString("\r\n%-18s: %s\r\n", CATSTR(MSG_FORUM_CREATE_FIDO_ORIGIN), conf->origin);
+  } else {
+    SendString("\r\n");
+  }
+
+  if(conf->status & KOMSKYDD) SendString("%s  ", CATSTR(MSG_FORUM_LIST_COMMPROT));
+  if(conf->status & SKRIVSKYDD) SendString("%s  ", CATSTR(MSG_FORUM_LIST_WRITEPROT));
+  if(conf->status & SLUTET) SendString("%s  ", CATSTR(MSG_FORUM_LIST_CLOSED));
+  if(conf->status & HEMLIGT) SendString("%s  ", CATSTR(MSG_FORUM_LIST_SECRET));
+  if(conf->status & AUTOMEDLEM) SendString("%s  ", CATSTR(MSG_FORUM_LIST_AUTO));
+  if(conf->status & SKRIVSTYRT) SendString("%s  ", CATSTR(MSG_FORUM_LIST_WRITECTRL));
+  if(conf->status & SUPERHEMLIGT) SendString("%s  ", CATSTR(MSG_FORUM_LIST_AREXX));
+  SendString("\r\n\n");
+  if((conf->status & (SLUTET | SKRIVSTYRT)) && conf->grupper) {
+    SendString("%s:\r\n", CATSTR(MSG_FORUM_STATUS_GROUPS));
+    ITER_EL(group, Servermem->grupp_list, grupp_node, struct UserGroup *) {
+      if(!BAMTEST((char *)&conf->grupper, group->nummer)) {
+        continue;
+      }
+      if((group->flaggor & HEMLIGT)
+         && !gruppmed(group, Servermem->inne[nodnr].status, Servermem->inne[nodnr].grupper)) {
+        continue;
+      }
+      SendString("%s\r\n", group->namn);
+    }
+  }
+  sprintf(filename, "NiKom:Lappar/%d.motlapp", confId);
+  if(access(filename,0) == 0) {
+    sendfile(filename);
+  }
 }
 
 void hoppaarende(void) {
-	struct Header hoppahead;
-	int hoppade=0, nextUnread;
-	if(!argument[0]) {
-		if(senast_text_typ!=TEXT) {
-			puttekn("\r\n\nSkriv: Hoppa Ärende <början av ärendet>\r\n",-1);
-			return;
-		} else argument=readhead.arende;
-	}
-	if(mote2==-1) {
-		sprintf(outbuffer,"\r\n\nDu kan inte utföra Hoppa Ärende i brevlådan.\r\n");
-		puttekn(outbuffer,-1);
-		return;
-	}
-	if(strlen(argument)>40) {
-		puttekn("\r\n\nEtt ärende kan inte vara så långt...\r\n",-1);
-		return;
-	}
-        nextUnread = -1;
-        while((nextUnread = FindNextUnreadText(nextUnread + 1, mote2,
-            &Servermem->unreadTexts[nodnr])) != -1) {
-          if(readtexthead(nextUnread, &hoppahead)) {
-            return;
-          }
-          if(!strncmp(hoppahead.arende,argument,strlen(argument))) {
-            ChangeUnreadTextStatus(nextUnread, 0, &Servermem->unreadTexts[nodnr]);
-            hoppade++;
-          }
-	}
-	if(!hoppade) puttekn("\r\n\nInga texter överhoppade.\r\n",-1);
-	else if(hoppade==1) puttekn("\r\n\n1 text överhoppad.\r\n",-1);
-	else {
-		sprintf(outbuffer,"\r\n\n%d texter överhoppade.\r\n",hoppade);
-		puttekn(outbuffer,-1);
-	}
+  struct Header header;
+  int skipped = 0, nextUnread;
+
+  if(!argument[0]) {
+    if(senast_text_typ != TEXT) {
+      SendString("\r\n\n%s\r\n", CATSTR(MSG_SKIP_SUBJECT_SYNTAX));
+      return;
+    } else {
+      argument = readhead.arende;
+    }
+  }
+  if(mote2 == -1) {
+    SendString("\r\n\n%s\r\n", CATSTR(MSG_SKIP_SUBJECT_MAIL));
+    return;
+  }
+  if(strlen(argument) > 40) {
+    SendString("\r\n\n%s\r\n", CATSTR(MSG_SKIP_SUBJECT_TOO_LONG));
+    return;
+  }
+  nextUnread = -1;
+  while((nextUnread = FindNextUnreadText(nextUnread + 1, mote2,
+                                         &Servermem->unreadTexts[nodnr])) != -1) {
+    if(readtexthead(nextUnread, &header)) {
+      return;
+    }
+    if(!strncmp(header.arende, argument, strlen(argument))) {
+      ChangeUnreadTextStatus(nextUnread, 0, &Servermem->unreadTexts[nodnr]);
+      skipped++;
+    }
+  }
+  if(!skipped) {
+    SendString("\r\n\n%s\r\n", CATSTR(MSG_SKIP_SUBJECT_NONE));
+  } else if(skipped==1) {
+    SendString("\r\n\n%s\r\n", CATSTR(MSG_SKIP_SUBJECT_ONE));
+  } else {
+    SendStringCat("\r\n\n%s\r\n", CATSTR(MSG_SKIP_SUBJECT_MANY), skipped);
+  }
 }
 
-int arearatt(int area, int usrnr, struct User *usr)
-{
-	int x=0;
-	if(usr->status>=Servermem->cfg.st.bytarea) return(1);
-	if(Servermem->areor[area].mote==-1 || MayBeMemberConf(Servermem->areor[area].mote, usrnr, usr)) x++;
-	if(!Servermem->areor[area].grupper || (Servermem->areor[area].grupper & usr->grupper)) x++;
-	return(x==2 ? 1 : 0);
+int arearatt(int area, int usrnr, struct User *usr) {
+  if(usr->status >= Servermem->cfg.st.bytarea) {
+    return 1;
+  }
+  return (Servermem->areor[area].mote==-1 || MayBeMemberConf(Servermem->areor[area].mote, usrnr, usr))
+    && (!Servermem->areor[area].grupper || (Servermem->areor[area].grupper & usr->grupper)); 
 }
 
-int gruppmed(struct UserGroup *grupp,char status,long grupper) {
-	if(status>=Servermem->cfg.st.medmoten) return(1);
-	if(status >= grupp->autostatus) return(1);
-	if(BAMTEST((char *)&grupper,grupp->nummer)) return(1);
-	return(0);
+int gruppmed(struct UserGroup *grupp, char status, long grupper) {
+  if(status >= Servermem->cfg.st.medmoten) {
+    return 1;
+  }
+  if(grupp->autostatus != -1 && status >= grupp->autostatus) {
+    return 1;
+  }
+  if(BAMTEST((char *)&grupper,grupp->nummer)) {
+    return 1;
+  }
+  return 0;
 }
 
 void listgruppmed(void) {
-	struct ShortUser *listpek;
-	int grupp;
-	if(!argument[0]) {
-		puttekn("\r\n\nSkriv: Lista Medlemmar -g <grupp>\r\n",-1);
-		return;
-	}
-	if((grupp=parsegrupp(argument))==-1) {
-		puttekn("\r\n\nFinns ingen sådan grupp!\r\n",-1);
-		return;
-	}
-	puttekn("\r\n\n",-1);
-	for(listpek=(struct ShortUser *)Servermem->user_list.mlh_Head;listpek->user_node.mln_Succ;listpek=(struct ShortUser *)listpek->user_node.mln_Succ) {
-		if(BAMTEST((char *)&listpek->grupper,grupp)) {
-			sprintf(outbuffer,"%s #%ld\r\n",listpek->namn,listpek->nummer);
-			if(puttekn(outbuffer,-1)) return;
-		}
-	}
+  struct ShortUser *user;
+  int groupId;
+
+  if(!argument[0]) {
+    SendString("\r\n\n%s\r\n", CATSTR(MSG_LIST_GROUPMEM_SYNTAX));
+    return;
+  }
+  if((groupId = parsegrupp(argument)) == -1) {
+    SendString("\r\n\n%s\r\n", CATSTR(MSG_COMMON_NO_SUCH_GROUP));
+    return;
+  }
+  SendString("\r\n\n");
+  ITER_EL(user, Servermem->user_list, user_node, struct ShortUser *) {
+    if(BAMTEST((char *)&user->grupper, groupId)) {
+      if(SendString("%s #%ld\r\n", user->namn, user->nummer)) {
+        return;
+      }
+    }
+  }
 }
 
 struct Alias *parsealias(char *skri) {
-	struct Alias *pek;
-	int x;
-	for(pek=(struct Alias *)aliaslist.mlh_Head;pek->alias_node.mln_Succ;pek=(struct Alias *)pek->alias_node.mln_Succ)
-	{
-		for(x=0;pek->namn[x]!=' ' && pek->namn[x]!=0;x++);
-		if(!strnicmp(skri,pek->namn,x) && (skri[x]==' ' || skri[x]==0)) return(pek);
-/*		if(!strnicmp(skri,pek->namn,strlen(pek->namn))) return(pek); */
-	}
-	return(NULL);
+  struct Alias *alias;
+  int i;
+
+  ITER_EL(alias, aliaslist, alias_node, struct Alias *) {
+    for(i = 0; alias->namn[i] != ' ' && alias->namn[i] != 0; i++);
+    if(!strnicmp(skri, alias->namn, i) && (skri[i] == ' ' || skri[i] == 0)) {
+      return alias;
+    }
+  }
+  return NULL;
 }
 
 void listalias(void) {
-	struct Alias *pek;
-	puttekn("\r\n\n",-1);
-	for(pek=(struct Alias *)aliaslist.mlh_Head;pek->alias_node.mln_Succ;pek=(struct Alias *)pek->alias_node.mln_Succ) {
-		sprintf(outbuffer,"%-21s = %s\r\n",pek->namn,pek->blirtill);
-		puttekn(outbuffer,-1);
-	}
+  struct Alias *alias;
+  SendString("\r\n\n");
+  ITER_EL(alias, aliaslist, alias_node, struct Alias *) {
+    SendString("%-21s = %s\r\n", alias->namn, alias->blirtill);
+  }
 }
 
 void remalias(void) {
-	struct Alias *rempek;
-	if(!(rempek=parsealias(argument))) {
-		puttekn("\r\n\nFinns inget sådant alias definierat!\r\n",-1);
-		return;
-	}
-	Remove((struct Node *)rempek);
-	FreeMem(rempek,sizeof(struct Alias));
+  struct Alias *alias;
+  if(!(alias = parsealias(argument))) {
+    SendString("\r\n\n%s\r\n", CATSTR(MSG_ALIAS_NOSUCH));
+    return;
+  }
+  Remove((struct Node *)alias);
+  FreeMem(alias, sizeof(struct Alias));
 }
 
 void defalias(void) {
-	struct Alias *defpek;
-	char *andra, *pek;
-	andra=hittaefter(argument);
-	pek = &argument[0];
-	while(pek[0] != ' ' && pek[0]) pek++;
-	pek[0] = NULL;
-	if((defpek=parsealias(argument))) {
-		strncpy(defpek->blirtill,andra,40);
-	} else {
-		if(!(defpek=AllocMem(sizeof(struct Alias),MEMF_CLEAR))) {
-			puttekn("\r\n\nKunde inte allokera minne till en alias-struktur!\r\n",-1);
-			return;
-		}
-		strncpy(defpek->namn,argument,20);
-		strncpy(defpek->blirtill,andra,40);
-		AddTail((struct List *)&aliaslist,(struct Node *)defpek);
-	}
+  struct Alias *alias;
+  char *secondArg, *str;
+
+  secondArg = hittaefter(argument);
+  str = argument;
+  while(str[0] != ' ' && str[0]) {
+    str++;
+  }
+  str[0] = '\0';
+  if((alias = parsealias(argument))) {
+    strncpy(alias->blirtill, secondArg, 40);
+  } else {
+    if(!(alias = AllocMem(sizeof(struct Alias), MEMF_CLEAR))) {
+      LogEvent(SYSTEM_LOG, ERROR, "Could not allocate %d bytes", sizeof(struct Alias));
+      DisplayInternalError();
+      return;
+    }
+    strncpy(alias->namn, argument, 20);
+    strncpy(alias->blirtill, secondArg, 40);
+    AddTail((struct List *)&aliaslist, (struct Node *)alias);
+  }
 }
 
 void alias(void) {
-	char *pekare=hittaefter(argument);
-	if(!argument[0]) listalias();
-	else if(!pekare[0]) remalias();
-	else defalias();
+  char *secondArg = hittaefter(argument);
+  if(!argument[0]) {
+    listalias();
+  } else if(!secondArg[0]) {
+    remalias();
+  } else {
+    defalias();
+  }
 }
 
 int readtextlines(long pos, int lines, int textId) {
@@ -774,47 +825,52 @@ int readtextlines(long pos, int lines, int textId) {
 }
 
 void freeeditlist(void) {
-	struct EditLine *el;
-	while((el=(struct EditLine *)RemHead((struct List *)&edit_list)))
-		FreeMem(el,sizeof(struct EditLine));
-	NewList((struct List *)&edit_list);
+  struct EditLine *el;
+  while((el = (struct EditLine *)RemHead((struct List *)&edit_list))) {
+    FreeMem(el, sizeof(struct EditLine));
+  }
+  NewList((struct List *)&edit_list);
 }
 
-int rek_flyttagren(int rot,int ack,int tomeet) {
-	static struct Header flyttahead;
-	int x=0;
-	long kom_i[MAXKOM];
-	if(readtexthead(rot,&flyttahead)) return(ack);
-	memcpy(kom_i,flyttahead.kom_i,MAXKOM*sizeof(long));
-	flyttahead.mote=tomeet;
-	if(writetexthead(rot,&flyttahead)) return(ack);
-        SetConferenceForText(rot, tomeet, TRUE);
-	ack++;
-	while(kom_i[x]!=-1 && x<MAXKOM) {
-		ack=rek_flyttagren(kom_i[x],ack,tomeet);
-		x++;
-	}
-	return(ack);
+int rek_flyttagren(int rootTextId, int count, int targetConfId) {
+  static struct Header header;
+  int i = 0;
+  long commentIn[MAXKOM];
+
+  if(readtexthead(rootTextId, &header)) {
+    return count;
+  }
+  memcpy(commentIn, header.kom_i, MAXKOM * sizeof(long));
+  header.mote = targetConfId;
+  if(writetexthead(rootTextId, &header)) {
+    return count;
+  }
+  SetConferenceForText(rootTextId, targetConfId, TRUE);
+  count++;
+  while(commentIn[i] != -1 && i < MAXKOM) {
+    count = rek_flyttagren(commentIn[i], count, targetConfId);
+    i++;
+  }
+  return count;
 }
 
 void flyttagren(void) {
-	char *meetnamn=hittaefter(argument);
-	int rot,motnr;
-	if(!argument[0] || !meetnamn[0]) {
-		puttekn("\n\r\rSkriv: Flytta Gren <rot-textnr> <möte>\n\r",-1);
-		return;
-	}
-	rot=atoi(argument);
-	if(rot<Servermem->info.lowtext || rot>Servermem->info.hightext) {
-		puttekn("\n\n\rTexten finns inte!\n\r",-1);
-		return;
-	}
-	motnr=parsemot(meetnamn);
-	if(motnr==-1) {
-		puttekn("\n\n\rFinns inget sådant möte\n\r",-1);
-		return;
-	}
-	sprintf(outbuffer,"\n\n\rFlyttade %d texter\n\r",rek_flyttagren(rot,0,motnr));
-	puttekn(outbuffer,-1);
-}
+  char *confName = hittaefter(argument);
+  int rootTextId, confId;
 
+  if(!argument[0] || !confName[0]) {
+    SendString("\n\r\r%s\n\r", CATSTR(MSG_MOVE_BRANCH_SYNTAX));
+    return;
+  }
+  rootTextId = atoi(argument);
+  if(rootTextId < Servermem->info.lowtext || rootTextId > Servermem->info.hightext) {
+    SendString("\n\n\r%s\n\r", CATSTR(MSG_FORUMS_NO_SUCH_TEXT));
+    return;
+  }
+  confId = parsemot(confName);
+  if(confId == -1) {
+    SendString("\n\n\r%s\n\r", CATSTR(MSG_GO_NO_SUCH_FORUM));
+    return;
+  }
+  SendStringCat("\n\n\r%s\n\r", CATSTR(MSG_MOVE_BRANCH_MOVED), rek_flyttagren(rootTextId,0,confId));
+}

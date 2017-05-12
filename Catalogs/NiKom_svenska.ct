@@ -584,6 +584,121 @@ Namn                              Text    Kom   Datum  Ärende
 MSG_DELETE_NOTE_DONE
 Lappen raderad.
 ;
+MSG_MOVE_TEXT_SYNTAX
+Skriv: Flytta Text <textnummer> <möte>
+MSG_MOVE_TEXT_WHICH_FORUM
+Till vilket möte
+MSG_MOVE_TEXT_ALREADY_THERE
+Texten är redan i det mötet.
+MSG_MOVE_TEXT_NO_PERM_TEXT
+Du har ingen rätt att flytta den texten.
+MSG_MOVE_TEXT_NO_PERM_FORUM
+Du har ingen rätt att flytta texten till det mötet.
+MSG_MOVE_TEXT_MOVED
+Flyttar texten till %s.
+;
+MSG_USER_GET_DELETED
+Raderad användare
+MSG_USER_GET_INVALID
+Felaktigt användarnummer
+;
+MSG_CREATE_GROUP_NO_PERM
+Du har inte rättigheter att skapa grupper.
+MSG_CREATE_GROUP_MAX
+Sorry, det finns redan maximalt med användargrupper.
+MSG_CREATE_GROUP_NAME
+Gruppnamn
+MSG_CREATE_GROUP_ALREADY
+Finns redan en grupp med det namnet.
+MSG_CREATE_GROUP_STATUS_1
+Vid vilken statusnivå ska man bli automatiskt medlem i gruppen?
+MSG_CREATE_GROUP_STATUS_2
+alla blir automatiskt medlemmar.
+MSG_CREATE_GROUP_STATUS_3
+ingen blir automatiskt medlem.
+MSG_CREATE_GROUP_SECRET
+Ska gruppen vara hemlig?
+MSG_CREATE_GROUP_ADMIN
+Vilken användare ska vara administratör för denna grupp
+;
+MSG_CHANGE_GROUPMEM_WHICH
+Vilken grupp?
+MSG_CHANGE_GROUPMEM_NOPERM
+Du har inte rättigheter att ändra medlemskap i denna grupp.
+MSG_CHANGE_GROUPMEM_ADDED
+%s adderad till %s.
+MSG_CHANGE_GROUPMEM_REMOVED
+%s subtraherad från %s.
+MSG_CHANGE_GROUPMEM_WHOADD
+Vem ska adderas?
+MSG_CHANGE_GROUPMEM_WHOREM
+Vem ska subtraheras?
+;
+MSG_CHANGE_GROUP_SYNTAX
+Skriv: Ändra Grupp <gruppnamn>
+MSG_CHANGE_GROUP_NOPERM
+Du har inte rättigheter att ändra denna grupp.
+;
+MSG_DELETE_GROUP_SYNTAX
+Skriv: Radera Grupp <grupp>
+MSG_DELETE_GROUP_NOPERM
+Du har inte rättigheter att radera denna grupp.
+MSG_DELETE_GROUP_CONFIRM
+Radera gruppen %s?
+;
+MSG_GET_GROUP_DELETED
+Raderad grupp
+MSG_GET_GROUP_INVALID
+Felaktigt gruppnummer
+;
+MSG_EDIT_GROUPS_AVAILABLE
+'!' för att se vilka grupper du har satt.
+MSG_EDIT_GROUPS_CHOSEN
+Följande grupper är satta
+;
+MSG_FORUM_STATUS_SYNTAX
+Skriv: Mötesstatus <möte>
+MSG_FORUM_STATUS_CREATED_BY
+Skapat av
+MSG_FORUM_STATUS_CREATED_TIME
+Skapat tid
+MSG_FORUM_STATUS_ID
+Mötesnummer
+MSG_FORUM_STATUS_MAD
+MAD
+MSG_FORUM_STATUS_TYPE
+Mötestyp
+MSG_FORUM_STATUS_TAG
+Tagnamn
+MSG_FORUM_STATUS_DIR
+Bibliotek
+MSG_FORUM_STATUS_GROUPS
+Följande grupper har tillgång till mötet
+;
+MSG_SKIP_SUBJECT_SYNTAX
+Skriv: Hoppa Ärende <början av ärendet>
+MSG_SKIP_SUBJECT_MAIL
+Du kan inte utföra Hoppa Ärende i brevlådan.
+MSG_SKIP_SUBJECT_TOO_LONG
+En ärenderad kan max vara 40 tecken.
+MSG_SKIP_SUBJECT_NONE
+Inga texter överhoppade.
+MSG_SKIP_SUBJECT_ONE
+En text överhoppad.
+MSG_SKIP_SUBJECT_MANY
+%d texter överhoppade.
+;
+MSG_LIST_GROUPMEM_SYNTAX
+Skriv: Lista Medlemmar -g <grupp>
+;
+MSG_ALIAS_NOSUCH
+Finns inget sådant alias definierat.
+;
+MSG_MOVE_BRANCH_SYNTAX
+Skriv: Flytta Gren <rot-textnr> <möte>
+MSG_MOVE_BRANCH_MOVED
+Flyttade %d texter
+;
 ; ******** Dealing with flags **********
 MSG_FLAG_ON
 På
@@ -635,3 +750,5 @@ MSG_COMMON_ABORTING
 Avbryter
 MSG_COMMON_ENTERING_EDITOR
 Går in i editorn.
+MSG_COMMON_NO_SUCH_GROUP
+Finns ingen sådan grupp.
