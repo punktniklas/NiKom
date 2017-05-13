@@ -21,66 +21,84 @@ extern struct System *Servermem;
 extern int nodnr, inloggad;
 extern char outbuffer[],inmat[], *argument;
 
-struct Mote *getmotpek(int motnr) {
-	struct Mote *letpek=(struct Mote *)Servermem->mot_list.mlh_Head;
-	for(;letpek->mot_node.mln_Succ;letpek=(struct Mote *)letpek->mot_node.mln_Succ)
-		if(letpek->nummer==motnr) return(letpek);
-	return(NULL);
+struct Mote *getmotpek(int confId) {
+  struct Mote *conf;
+  ITER_EL(conf, Servermem->mot_list, mot_node, struct Mote *) {
+    if(conf->nummer == confId) {
+      return conf;
+    }
+  }
+  return NULL;
 }
 
-char *getmotnamn(int motnr) {
-	struct Mote *motpek=getmotpek(motnr);
-	if(!motpek) return("<Okänt möte>");
-	return(motpek->namn);
+char *getmotnamn(int confId) {
+  static char buf[40];
+  struct Mote *conf = getmotpek(confId);
+
+  if(!conf) {
+    sprintf(buf, "<%s>", CATSTR(MSG_FORUMS_UNKNOWN));
+    return buf;
+  }
+  return conf->namn;
 }
 
-struct Kommando *getkmdpek(int kmdnr) {
-	struct Kommando *letpek=(struct Kommando *)Servermem->kom_list.mlh_Head;
-	for(;letpek->kom_node.mln_Succ;letpek=(struct Kommando *)letpek->kom_node.mln_Succ)
-		if(letpek->nummer==kmdnr) return(letpek);
-	return(NULL);
+struct Kommando *getkmdpek(int cmdId) {
+  struct Kommando *cmd;
+  ITER_EL(cmd, Servermem->kom_list, kom_node, struct Kommando *) {
+    if(cmd->nummer == cmdId) {
+      return cmd;
+    }
+  }
+  return NULL;
 }
 
 int bytnodtyp(void) {
-	int going=TRUE,nr,x;
-	struct NodeType *nt=NULL;
-	puttekn("\n\n\rVilken nodtyp vill du ha som förinställd?\n\n\r",-1);
-	puttekn(" 0: Ingen, jag vill bli tillfrågad vid inloggning.\n\r",-1);
-	for(x=0; x<MAXNODETYPES; x++) {
-		if(Servermem->nodetypes[x].nummer==0) break;
-		sprintf(outbuffer,"%2d: %s\n\r",Servermem->nodetypes[x].nummer,Servermem->nodetypes[x].desc);
-		putstring(outbuffer,-1,0);
-	}
-	while(going) {
-		putstring("\n\rVal: ",-1,0);
-		if(getstring(EKO,2,NULL)) return(1);
-		nr = atoi(inmat);
-		if(nr<0) putstring("\n\rDu måste ange ett positivt heltal.\n\r",-1,0);
-		else if(nr==0) going=FALSE;
-		else if(!(nt=GetNodeType(atoi(inmat)))) putstring("\n\rFinns ingen sådan nodtyp.\n\r",-1,0);
-		else going=FALSE;
-	}
-	if(!nt) {
-		Servermem->inne[nodnr].shell=0;
-		puttekn("\n\n\rDu har nu ingen förinställd nodtyp.\n\r",-1);
-	} else {
-		Servermem->inne[nodnr].shell = nt->nummer;
-		puttekn("\n\n\rDin förinställda nodtyp är nu:\n\r",-1);
-		puttekn(nt->desc,-1);
-		puttekn("\n\n\r",-1);
-	}
-	return(0);
+  int nr,i;
+  struct NodeType *nt=NULL;
+
+  SendString("\n\n\r%s\n\n\r", CATSTR(MSG_CHANGE_NODETYPE_HEAD_1));
+  SendString(" 0: %s\n\r", CATSTR(MSG_CHANGE_NODETYPE_HEAD_2));
+  for(i = 0; i < MAXNODETYPES; i++) {
+    if(Servermem->nodetypes[i].nummer == 0) {
+      break;
+    }
+    SendString("%2d: %s\n\r", Servermem->nodetypes[i].nummer, Servermem->nodetypes[i].desc);
+  }
+  for(;;) {
+    SendString("\n\r%s ", CATSTR(MSG_COMMON_CHOICE));
+    if(getstring(EKO, 2, NULL)) {
+      return 1;
+    }
+    nr = atoi(inmat);
+    if(nr < 0) {
+      SendString("\n\r%s\n\r", CATSTR(MSG_CHANGE_NODETYPE_BADNUM));
+    } else if(nr == 0) {
+      break;
+    } else if(!(nt = GetNodeType(atoi(inmat)))) {
+      SendString("\n\r%s\n\r", CATSTR(MSG_CHANGE_NODETYPE_NOSUCH));
+    } else {
+      break;
+    }
+  }
+  if(!nt) {
+    Servermem->inne[nodnr].shell = 0;
+    SendString("\n\n\r%s\n\r", CATSTR(MSG_CHANGE_NODETYPE_NOSELECT));
+  } else {
+    Servermem->inne[nodnr].shell = nt->nummer;
+    SendString("\n\n\r%s:\n\r%s\n\n\r", CATSTR(MSG_CHANGE_NODETYPE_SELECTED), nt->desc);
+  }
+  return 0;
 }
 
 void dellostsay(void) {
-	struct SayString *pek, *tmppek;
-	pek = Servermem->say[nodnr];
-	Servermem->say[nodnr]=NULL;
-	while(pek) {
-		tmppek = pek->NextSay;
-		FreeMem(pek,sizeof(struct SayString));
-		pek = tmppek;
-	}
+  struct SayString *say, *tmp;
+  say = Servermem->say[nodnr];
+  Servermem->say[nodnr] = NULL;
+  while(say) {
+    tmp = say->NextSay;
+    FreeMem(say, sizeof(struct SayString));
+    say = tmp;
+  }
 }
 
 void bytteckenset(void) {
@@ -124,12 +142,8 @@ void bytteckenset(void) {
   AskUserForCharacterSet(FALSE, showExample);
 }
 
-void SaveCurrentUser(int inloggad, int nodnr)
-{
-	long tid;
-
-	time(&tid);
-	Servermem->inne[nodnr].senast_in=tid;
-	writeuser(inloggad,&Servermem->inne[nodnr]);
-        WriteUnreadTexts(&Servermem->unreadTexts[nodnr], inloggad);
+void SaveCurrentUser(int userId, int nodeId) {
+  Servermem->inne[nodeId].senast_in = time(NULL);
+  writeuser(userId, &Servermem->inne[nodeId]);
+  WriteUnreadTexts(&Servermem->unreadTexts[nodeId], userId);
 }

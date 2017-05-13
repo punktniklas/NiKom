@@ -39,6 +39,8 @@ Utloggning p.g.a inaktivitet
 ; ******** Forums **********
 MSG_FORUMS_NO_SUCH_TEXT
 Finns ingen sådan text.
+MSG_FORUMS_UNKNOWN
+Okänt möte
 MSG_ORG_TEXT_LINE1
 Text %d  Möte: %s
 MSG_ORG_TEXT_LINE2
@@ -698,6 +700,19 @@ MSG_MOVE_BRANCH_SYNTAX
 Skriv: Flytta Gren <rot-textnr> <möte>
 MSG_MOVE_BRANCH_MOVED
 Flyttade %d texter
+;
+MSG_CHANGE_NODETYPE_HEAD_1
+Vilken nodtyp vill du ha som förinställd?
+MSG_CHANGE_NODETYPE_HEAD_2
+Ingen, jag vill bli tillfrågad vid inloggning.
+MSG_CHANGE_NODETYPE_BADNUM
+Du måste ange ett positivt heltal.
+MSG_CHANGE_NODETYPE_NOSUCH
+Finns ingen sådan nodtyp.
+MSG_CHANGE_NODETYPE_NOSELECT
+Du har nu ingen förinställd nodtyp.
+MSG_CHANGE_NODETYPE_SELECTED
+Din förinställda nodtyp är nu
 ;
 ; ******** Dealing with flags **********
 MSG_FLAG_ON

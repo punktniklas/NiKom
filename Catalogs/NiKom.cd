@@ -35,6 +35,8 @@ Logout due to inactivity
 ; ******** Forums **********
 MSG_FORUMS_NO_SUCH_TEXT (200//)
 There is no such text.
+MSG_FORUMS_UNKNOWN (201//)
+Unknown forum
 MSG_ORG_TEXT_LINE1 (210//)
 Text: %d  Forum: %s
 MSG_ORG_TEXT_LINE2 (211//)
@@ -694,6 +696,19 @@ MSG_MOVE_BRANCH_SYNTAX (1130//)
 Syntax: Move Branch <root text> <forum>
 MSG_MOVE_BRANCH_MOVED (1131//)
 Moved %d texts.
+;
+MSG_CHANGE_NODETYPE_HEAD_1 (1140//)
+Which node type do you want to be selected?
+MSG_CHANGE_NODETYPE_HEAD_2 (1141//)
+None, you will be prompted for a node type at each login.
+MSG_CHANGE_NODETYPE_BADNUM (1142//)
+You must enter a positive integer.
+MSG_CHANGE_NODETYPE_NOSUCH (1143//)
+There is no such node type.
+MSG_CHANGE_NODETYPE_NOSELECT (1144//)
+You now have no selected node type.
+MSG_CHANGE_NODETYPE_SELECTED (1145//)
+Your selected node type is now
 ;
 ; ******** Dealing with flags **********
 MSG_FLAG_ON (9000//)
