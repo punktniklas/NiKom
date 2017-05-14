@@ -68,8 +68,10 @@ struct Window *openmywindow(char *screenname) {
 
 
 void cleanup(int errorCode, char *text) {
-  LogEvent(SYSTEM_LOG, ERROR, "PreNode (%d) is exiting with error code %d: %s",
-           nodnr, errorCode, text);
+  if(errorCode > 0) {
+    LogEvent(SYSTEM_LOG, ERROR, "PreNode (%d) is exiting with error code %d: %s",
+             nodnr, errorCode, text);
+  }
 
   CloseCatalog(g_Catalog);
   shutdownnode(NODSER);
