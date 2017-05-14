@@ -164,6 +164,7 @@ void radtext(void) {
     return;
   }
   SetConferenceForText(textId, -1, TRUE);
+  SendStringCat("\r\n\n%s\r\n", CATSTR(MSG_DELTEXT_DELETED), textId);
 }
 
 int radmot(void) {

@@ -507,6 +507,8 @@ MSG_DELTEXT_ONLY_LOCAL
 Du kan bara radera texter i interna möten.
 MSG_DELTEXT_ONLY_SELF
 Du kan bara radera texter av dig själv.
+MSG_DELTEXT_DELETED
+Text %d har raderats.
 ;
 MSG_DELFORUM_SYNTAX
 Skriv: Radera Möte <mötesnamn>

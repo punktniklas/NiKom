@@ -503,6 +503,8 @@ MSG_DELTEXT_ONLY_LOCAL (920//)
 You can only delete texts in local forums.
 MSG_DELTEXT_ONLY_SELF (921//)
 You can only delete your own texts.
+MSG_DELTEXT_DELETED (922//)
+Text %d has been deleted.
 ;
 MSG_DELFORUM_SYNTAX (930//)
 Syntax: Delete Forum <forum>
