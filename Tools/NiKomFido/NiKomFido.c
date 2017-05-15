@@ -34,6 +34,7 @@ int rescanConf(int argc, char *argv[]) {
   printf("Rescanning Fido conference %d\n", conf);
   
   ReScanFidoConf(NULL, conf);
+  return 0;
 }
 
 void rescanAllConf(void) {
