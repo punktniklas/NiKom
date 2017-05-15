@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
       state |= NIKSTATE_AUTOLOGOUT;
     }
   }
-  if(NiKomBase = OpenLibrary("nikom.library",0)) {
+  if((NiKomBase = OpenLibrary("nikom.library",0))) {
     if(SetNodeState(nodnr,state)) {
       puts("Suceeded");
     } else {
