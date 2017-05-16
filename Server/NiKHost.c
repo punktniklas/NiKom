@@ -189,7 +189,7 @@ void userinfo(struct RexxMsg *mess) {
 
 	if((!mess->rm_Args[1]) || (!mess->rm_Args[2])) {
 		mess->rm_Result1=1;
-		mess->rm_Result2=NULL;
+		mess->rm_Result2=0;
 		return;
 	}
 	if(!userexists(nummer=atoi(mess->rm_Args[1]))) {
@@ -208,7 +208,7 @@ void userinfo(struct RexxMsg *mess) {
 			if(readuser(nummer,&userinfouser))
 			{
 				mess->rm_Result1=3;
-				mess->rm_Result2=NULL;
+				mess->rm_Result2=0;
 				return;
 			}
 			usrloggedin = 0;
@@ -370,7 +370,7 @@ void motesinfo(struct RexxMsg *mess) {
 	struct tm *ts;
 	if((!mess->rm_Args[1]) || (!mess->rm_Args[2])) {
 		mess->rm_Result1=1;
-		mess->rm_Result2=NULL;
+		mess->rm_Result2=0;
 		return;
 	}
 	motpek=getmotpek(nummer=atoi(mess->rm_Args[1]));
@@ -443,7 +443,7 @@ void chgmote(struct RexxMsg *mess)
 	if((!mess->rm_Args[1]) || (!mess->rm_Args[2]) || (!mess->rm_Args[3]))
 	{
 		mess->rm_Result1=1;
-		mess->rm_Result2=NULL;
+		mess->rm_Result2=0;
 		return;
 	}
 	motpek=getmotpek(nummer=atoi(mess->rm_Args[1]));
@@ -544,7 +544,7 @@ void nikparse(struct RexxMsg *mess) {
 	char str[10];
 	if((!mess->rm_Args[1]) || (!mess->rm_Args[2])) {
 		mess->rm_Result1=1;
-		mess->rm_Result2=NULL;
+		mess->rm_Result2=0;
 		return;
 	}
 	switch(mess->rm_Args[2][0]) {
@@ -578,7 +578,7 @@ void senaste(struct RexxMsg *mess) {
 	char str[100];
 	if((!mess->rm_Args[1]) || (!mess->rm_Args[2])) {
 		mess->rm_Result1=1;
-		mess->rm_Result2=NULL;
+		mess->rm_Result2=0;
 		return;
 	}
 	if((nummer=atoi(mess->rm_Args[1]))<0 || nummer>=MAXSENASTE) {
@@ -640,7 +640,7 @@ void sysinfo(struct RexxMsg *mess) {
 	char str[100], *args1;
 	if(!mess->rm_Args[1]) {
 		mess->rm_Result1=1;
-		mess->rm_Result2=NULL;
+		mess->rm_Result2=0;
 		return;
 	}
 	switch(mess->rm_Args[1][0]) {
@@ -1001,7 +1001,7 @@ void kominfo(struct RexxMsg *mess) {
 	struct Kommando *kompek;
 	if((!mess->rm_Args[1]) || (!mess->rm_Args[2])) {
 		mess->rm_Result1=1;
-		mess->rm_Result2=NULL;
+		mess->rm_Result2=0;
 		return;
 	}
 	nummer=atoi(mess->rm_Args[1]);
@@ -1055,7 +1055,7 @@ void filinfo(struct RexxMsg *mess) {
 	char str[256];
 	if(!mess->rm_Args[1] || !mess->rm_Args[2] || !mess->rm_Args[3]) {
 		mess->rm_Result1=1;
-		mess->rm_Result2=NULL;
+		mess->rm_Result2=0;
 		return;
 	}
 	area=atoi(mess->rm_Args[3]);
@@ -1134,7 +1134,7 @@ void areainfo(struct RexxMsg *mess) {
 	struct tm *ts;
 	if((!mess->rm_Args[1]) || (!mess->rm_Args[2])) {
 		mess->rm_Result1=1;
-		mess->rm_Result2=NULL;
+		mess->rm_Result2=0;
 		return;
 	}
 	if((nummer=atoi(mess->rm_Args[1]))<0 || nummer>=Servermem->info.areor) {
@@ -1196,7 +1196,7 @@ void chguser(struct RexxMsg *mess) {
 
 	if(!mess->rm_Args[1] || !mess->rm_Args[2] || !mess->rm_Args[3]) {
 		mess->rm_Result1=1;
-		mess->rm_Result2=NULL;
+		mess->rm_Result2=0;
 		return;
 	}
 	if(!userexists(user=atoi(mess->rm_Args[1]))) {
@@ -1212,7 +1212,7 @@ void chguser(struct RexxMsg *mess) {
 		if(readuser(user,&chguseruser))
 		{
 			mess->rm_Result1=3;
-			mess->rm_Result2=NULL;
+			mess->rm_Result2=0;
 			return;
 		}
 	}
@@ -1325,7 +1325,7 @@ void skapafil(struct RexxMsg *mess) {
 
 	if(!mess->rm_Args[1] || !mess->rm_Args[2] || !mess->rm_Args[3] || !mess->rm_Args[4] || !mess->rm_Args[5]) {
 		mess->rm_Result1=1;
-		mess->rm_Result2=NULL;
+		mess->rm_Result2=0;
 		return;
 	}
 	if((area=atoi(mess->rm_Args[2]))<0 || area>=Servermem->info.areor || !Servermem->areor[area].namn[0]) {
@@ -1363,21 +1363,21 @@ void skapafil(struct RexxMsg *mess) {
 	if(!(fil=(struct Fil *)AllocMem(sizeof(struct Fil),MEMF_CLEAR | MEMF_PUBLIC))) {
 		printf("Kunde inte allokera minne för filen!\n");
 		mess->rm_Result1=2;
-		mess->rm_Result2=NULL;
+		mess->rm_Result2=0;
 		return;
 	}
 	fil->tid=fil->validtime=time(&tid);
 	if(!(lock=Lock(filnamn,ACCESS_READ))) {
 		printf("Kunde inte få ett lock för filen!\n");
 		mess->rm_Result1=3;
-		mess->rm_Result2=NULL;
+		mess->rm_Result2=0;
 		FreeMem(fil,sizeof(struct Fil));
 		return;
 	}
 	if(!(fib=(struct FileInfoBlock *)AllocMem(sizeof(struct FileInfoBlock),MEMF_CLEAR))) {
 		printf("Kunde inte allokera minne för en FileInfoBlock-struktur!\n");
 		mess->rm_Result1=4;
-		mess->rm_Result2=NULL;
+		mess->rm_Result2=0;
 		FreeMem(fil,sizeof(struct Fil));
 		UnLock(lock);
 		return;
@@ -1385,7 +1385,7 @@ void skapafil(struct RexxMsg *mess) {
 	if(!Examine(lock,fib)) {
 		printf("Kunde inte göra Examine() på filen!\n");
 		mess->rm_Result1=5;
-		mess->rm_Result2=NULL;
+		mess->rm_Result2=0;
 		FreeMem(fil,sizeof(struct Fil));
 		UnLock(lock);
 		FreeMem(fib,sizeof(struct FileInfoBlock));
@@ -1406,7 +1406,7 @@ void skapafil(struct RexxMsg *mess) {
 	if(writefiles(area)) {
 		printf("Kunde inte öppna datafilen\n");
 		mess->rm_Result1=6;
-		mess->rm_Result2=NULL;
+		mess->rm_Result2=0;
 		return;
 	}
 	mess->rm_Result1=0;

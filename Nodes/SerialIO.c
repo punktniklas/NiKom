@@ -1,8 +1,9 @@
+#include "NiKomCompat.h"
 #include <exec/types.h>
 #include <dos/dos.h>
 #include <intuition/intuition.h>
 #include <proto/exec.h>
-#ifdef __GNUC__
+#ifdef HAVE_PROTO_ALIB_H
 /* For NewList() */
 # include <proto/alib.h>
 #endif
@@ -1077,7 +1078,7 @@ int serputtekn(char *pekare,int size)
 			if(tmppek != pekare)
 			{
 				tmppek[0] = 0;
-				if(pekare[0] != NULL)
+				if(pekare[0] != '\0')
 					strcpy(buffer, pekare);
 
 				strcat(buffer, "\n");
@@ -1086,7 +1087,7 @@ int serputtekn(char *pekare,int size)
 			else
 			{
 				buffer[0] = '\n';
-				buffer[1] = NULL;
+				buffer[1] = '\0';
 				pekare = ++tmppek;
 			}
 

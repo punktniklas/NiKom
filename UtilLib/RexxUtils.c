@@ -12,11 +12,11 @@ void SetRexxResultString(struct RexxMsg *mess, char *resultStr) {
       LogEvent(SYSTEM_LOG, ERROR, "Couldn't allocate an ARexx ArgString.");
     }
   } else {
-    mess->rm_Result2 = NULL;
+    mess->rm_Result2 = 0;
   }
 }
 
 void SetRexxErrorResult(struct RexxMsg *mess, int errorCode) {
   mess->rm_Result1 = errorCode;
-  mess->rm_Result2 = NULL;
+  mess->rm_Result2 = 0;
 }

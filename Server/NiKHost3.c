@@ -24,7 +24,7 @@ void rxsendnodemess(struct RexxMsg *mess) {
 	char *str, retstr[5];
 	if(!mess->rm_Args[1] || !mess->rm_Args[2] || !mess->rm_Args[3]) {
 		mess->rm_Result1=1;
-		mess->rm_Result2=NULL;
+		mess->rm_Result2=0;
 		return;
 	}
 	nodnr = atoi(mess->rm_Args[1]);
@@ -56,7 +56,7 @@ void rexxstatusinfo(struct RexxMsg *mess)
 	char str[100];
 	if(!mess->rm_Args[1] || !mess->rm_Args[2]) {
 		mess->rm_Result1=1;
-		mess->rm_Result2=NULL;
+		mess->rm_Result2=0;
 		return;
 	}
 
@@ -64,7 +64,7 @@ void rexxstatusinfo(struct RexxMsg *mess)
 	if(status < 0 || status > 100)
 	{
 		mess->rm_Result1=1;
-		mess->rm_Result2=NULL;
+		mess->rm_Result2=0;
 		return;
 	}
 
@@ -102,7 +102,7 @@ void rexxsysteminfo(struct RexxMsg *mess)
 	if(!mess->rm_Args[1])
 	{
 		mess->rm_Result1=1;
-		mess->rm_Result2=NULL;
+		mess->rm_Result2=0;
 		return;
 	}
 
@@ -168,7 +168,7 @@ void rexxarearight(struct RexxMsg *mess)
 
 	if(!mess->rm_Args[1] || !mess->rm_Args[2]) {
 		mess->rm_Result1=1;
-		mess->rm_Result2=NULL;
+		mess->rm_Result2=0;
 		return;
 	}
 

@@ -66,6 +66,20 @@ int __saveds AASM LIBCreateUser(register __d0 LONG AREG(d0), register __a0 struc
 int __saveds AASM LIBNiKParse(register __a0 char *string AREG(a0), register __d0 char subject AREG(d0), register __a6 struct NiKomBase *NiKomBase AREG(a6));
 int __saveds AASM LIBSysInfo(register __a0 char *subject AREG(a0), register __a6 struct NiKomBase *NiKomBase AREG(a6));
 
+int __saveds AASM LIBCheckPassword(
+  register __a0 char *clearText AREG(a0),
+  register __a1 char *correctPassword AREG(a1),
+  register __a6 struct NiKomBase *NiKomBase AREG(a6));
+char *__saveds AASM LIBCryptPassword(
+  register __a0 char *clearText AREG(a0),
+  register __a1 char *resultBuf AREG(a1),
+  register __a6 struct NiKomBase *NiKomBase AREG(a6));
+
+void __saveds AASM LIBInitServermem(
+  register __a0 struct System *Servermem AREG(a0),
+  register __a6 struct NiKomBase *NiKomBase AREG(a6));
+
+
 /* Other useful little functions */
 
 /* Matrix.c */

@@ -1,8 +1,9 @@
+#include "NiKomCompat.h"
 #include <exec/types.h>
 #include <exec/memory.h>
 #include <dos/dos.h>
 #include <proto/exec.h>
-#ifdef __GNUC__
+#ifdef HAVE_PROTO_ALIB_H
 /* For NewList() */
 # include <proto/alib.h>
 #endif
@@ -56,7 +57,7 @@ extern int writefiles(int);
 extern int updatefile(int,struct Fil *);
 
 static long __saveds __regargs nik_fopen(char *filename,char *accessmode) {
-	BPTR fh = NULL;
+	BPTR fh = 0;
 	switch(accessmode[0]) {
 		case 'r' :
 			fh=Open(filename,MODE_OLDFILE);
@@ -78,8 +79,8 @@ static long __saveds __regargs nik_fopen(char *filename,char *accessmode) {
 
 static long __saveds __regargs nik_fclose(LONG *fh) {
 	/* printf("Xpr_fclose anropad, fp=%d\n",fp); */
-	if(!fh) return(NULL);
-	if(Close((BPTR)fh)) return(NULL);
+	if(!fh) return(0);
+	if(Close((BPTR)fh)) return(0);
 	else return(EOF);
 }
 

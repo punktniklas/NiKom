@@ -1,9 +1,10 @@
+#include "NiKomCompat.h"
 #include <exec/types.h>
 #include <exec/memory.h>
 #include <intuition/intuition.h>
 #include <dos/dos.h>
 #include <proto/exec.h>
-#ifdef __GNUC__
+#ifdef HAVE_PROTO_ALIB_H
 /* For NewList() */
 # include <proto/alib.h>
 #endif

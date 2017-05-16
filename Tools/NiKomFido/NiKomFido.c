@@ -34,6 +34,7 @@ int rescanConf(int argc, char *argv[]) {
   printf("Rescanning Fido conference %d\n", conf);
   
   ReScanFidoConf(NULL, conf);
+  return 0;
 }
 
 void rescanAllConf(void) {
@@ -82,7 +83,7 @@ int renumberConf(int argc, char *argv[]) {
   return error;
 }
 
-void main(int argc, char *argv[]) {
+int main(int argc, char *argv[]) {
   int ret = 0;
 
   if(argc < 2) {
@@ -109,7 +110,7 @@ void main(int argc, char *argv[]) {
   }
 
   CloseLibrary(NiKomBase);
-  exit(ret);
+  return ret;
 }
 
 

@@ -14,6 +14,7 @@
 * +------+-----------+-----------+
 */
 
+#include "NiKomCompat.h"
 #include <exec/types.h>
 #include <exec/memory.h>
 #include <dos/dos.h>
@@ -21,7 +22,7 @@
 #include <utility/tagitem.h>
 #include <proto/dos.h>
 #include <proto/exec.h>
-#ifdef __GNUC__
+#ifdef HAVE_PROTO_ALIB_H
 /* For NewList() */
 # include <proto/alib.h>
 #endif
@@ -415,10 +416,10 @@ int __saveds AASM LIBWriteFidoText(register __a0 struct FidoText *fidotext AREG(
 
 	if(!NiKomBase->Servermem) return(FALSE);
 
-	dir=(UBYTE *)GetTagData(WFT_MailDir,NULL,taglist);
+	dir=(UBYTE *)GetTagData(WFT_MailDir,0,taglist);
 	charset=GetTagData(WFT_CharSet,CHRS_LATIN1,taglist);
-	domain=(UBYTE *)GetTagData(WFT_Domain,NULL,taglist);
-	reply=(UBYTE *)GetTagData(WFT_Reply,NULL,taglist);
+	domain=(UBYTE *)GetTagData(WFT_Domain,0,taglist);
+	reply=(UBYTE *)GetTagData(WFT_Reply,0,taglist);
 	if(!dir) return(0);
 	memset(ftshead,0,190);
 	strncpy(&ftshead[0],fidotext->fromuser,35);
