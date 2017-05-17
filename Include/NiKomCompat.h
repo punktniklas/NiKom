@@ -10,6 +10,13 @@ typedef struct LocaleBase NiKomLocaleType;
 typedef struct Library NiKomLocaleType;
 #endif
 
+/* SAS/C specific functions. */
+#ifndef __SASC__
+int dfind(struct FileInfoBlock *info, const char *name, int attr);
+long getft(char *name);
+int stcgfn(char *node, const char *name);
+#endif
+
 /*
  * Support argument passing in registers.
  *
