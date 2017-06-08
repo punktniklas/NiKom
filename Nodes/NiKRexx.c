@@ -698,9 +698,9 @@ void rxextratime(struct RexxMsg *mess) {
 void rxgettime(struct RexxMsg *mess) {
   long limit, timeLeft, now;
   char buf[10];
-  if(Servermem->cfg.maxtid[Servermem->inne[nodnr].status] > 0) {
+  if(Servermem->cfg->maxtid[Servermem->inne[nodnr].status] > 0) {
     time(&now);
-    limit = 60 * Servermem->cfg.maxtid[Servermem->inne[nodnr].status] + extratime;
+    limit = 60 * Servermem->cfg->maxtid[Servermem->inne[nodnr].status] + extratime;
     timeLeft = limit - (now - logintime);
   } else {
     timeLeft=0;

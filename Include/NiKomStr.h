@@ -180,13 +180,40 @@ struct AutoRexxCfg {
 #define NICFG_LOCALCOLOURS     8
 #define NICFG_CRYPTEDPASSWORDS 16
 
+struct NodeType {
+  int nummer;
+  char path[50], desc[80];
+};
+
+struct FidoDomain {
+  short zone, net, node, point, nummer, chrs;
+  char domain[20], zones[50];
+};
+
+struct FidoAlias {
+  long nummer;
+  char namn[36];
+};
+
+struct FidoConfig {
+  struct FidoDomain fd[10];
+  struct FidoAlias fa[20];
+  long lastmatrix,mailgroups;
+  char mailstatus, bounce, crashstatus, matrixdir[100],defaultorigin[70],
+    littleEndianByteOrder;
+};
+
 struct Config {
-   struct Statuscfg st;
-   struct AutoRexxCfg ar;
-   long defaultflags, diskfree, logmask, cfgflags;
-   short maxtid[101],logintries;
-   char uldlratio[101], defaultrader, defaultstatus, defaultcharset,
-     ny[21],ultmp[100];
+  struct NodeType nodetypes[MAXNODETYPES];
+  struct Statuscfg st;
+  struct AutoRexxCfg ar;
+  struct MinList kom_list;
+  struct FidoConfig fidoConfig;
+  char fileKeys[MAXNYCKLAR][41];
+  long defaultflags, diskfree, logmask, cfgflags;
+  short maxtid[101], logintries, noOfFileKeys, noOfCommands;
+  char uldlratio[101], defaultrader, defaultstatus, defaultcharset,
+    ny[21],ultmp[100];
 };
 
 struct ReadLetter {
@@ -277,7 +304,7 @@ struct Kommando {
 struct SysInfo {
    long hightext,lowtext,inloggningar,skrivna,lasta,uloads,dloads,
       radbytes,lowbrev,highbrev,radbytesbrev,users;
-   short nycklar,kommandon,moten,areor;
+   short moten,areor;
    long bps[50], antbps[50];
 };
 
@@ -338,29 +365,6 @@ struct EditLine {
    char text[81];
 };
 
-struct FidoDomain {
-	short zone,net,node,point,nummer,chrs;
-	char domain[20],zones[50];
-};
-
-struct FidoAlias {
-	long nummer;
-	char namn[36];
-};
-
-struct FidoData {
-  struct FidoDomain fd[10];
-  struct FidoAlias fa[20];
-  long lastmatrix,mailgroups;
-  char mailstatus, bounce, crashstatus, matrixdir[100],defaultorigin[70],
-    littleEndianByteOrder;
-};
-
-struct NodeType {
-	int nummer;
-	char path[50],desc[80];
-};
-
 struct LegacyConversionData {
   long lowTextWhenBitmap0ConversionStarted;
 };
@@ -374,7 +378,6 @@ struct ConferenceTexts {
 
 struct System {
   struct ConferenceTexts confTexts;
-  struct MinList kom_list;
   struct User inne[MAXNOD];
   struct UnreadTexts unreadTexts[MAXNOD];
   long nodtyp[MAXNOD],inloggad[MAXNOD],action[MAXNOD],varmote[MAXNOD],
@@ -386,14 +389,11 @@ struct System {
   struct MinList user_list;
   struct MinList shell_list;
   struct MinList grupp_list;
-  struct Config cfg;
+  struct Config *cfg;
   struct SysInfo info;
   struct SayString *say[MAXNOD];
   struct Inloggning senaste[MAXSENASTE];
   struct Area areor[MAXAREA];
-  char Nyckelnamn[MAXNYCKLAR][41];
-  struct FidoData fidodata;
-  struct NodeType nodetypes[MAXNODETYPES];
   struct SignalSemaphore semaphores[NIKSEM_NOOF];
   struct LegacyConversionData legacyConversionData;
   char *languages[NUM_LANGUAGES];

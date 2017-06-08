@@ -292,7 +292,7 @@ void waitconnect(void) {
 						strcpy(Servermem->CallerID[nodnr], CallerIDHostIP);
 				}
 
-				if(Servermem->cfg.logmask & LOG_CONNECTION) {
+				if(Servermem->cfg->logmask & LOG_CONNECTION) {
                                   len=strlen(buf);
                                   if(buf[len-1]=='\r') buf[len-1]=0;
                                   if(Servermem->CallerID[nodnr]) {
@@ -348,7 +348,7 @@ void waitconnect(void) {
 				nodestate = nodestate & (NIKSTATE_CLOSESER | NIKSTATE_NOANSWER);
 				return;
 			} else if(!strncmp(buf,"NO CARRIER",10)) {
-				if(Servermem->cfg.logmask & LOG_NOCONNECT) {
+				if(Servermem->cfg->logmask & LOG_NOCONNECT) {
                                   LogEvent(USAGE_LOG, INFO, "RING på nod %d, men ingen CONNECT", nodnr);
 				}
 				Servermem->inloggad[nodnr] = -1;

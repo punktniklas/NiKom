@@ -35,7 +35,7 @@ struct NiKomBase {
     CP866ToAmiga[256], AmigaToCP866[256];
 };
 
-#define NIK_LITTLE_ENDIAN NiKomBase->Servermem->fidodata.littleEndianByteOrder
+#define NIK_LITTLE_ENDIAN NiKomBase->Servermem->cfg->fidoConfig.littleEndianByteOrder
 
 #define NIKOMBASE_H
 #endif /* NIKOMBASE */

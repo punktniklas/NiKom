@@ -651,7 +651,7 @@ void sysinfo(struct RexxMsg *mess) {
 			sprintf(str,"%ld",Servermem->info.hightext);
 			break;
 		case 'k' : case 'K' :
-			sprintf(str,"%d",Servermem->info.kommandon);
+			sprintf(str,"%d",Servermem->cfg->noOfCommands);
 			break;
 		case 'l' : case 'L' :
 			sprintf(str,"%ld",Servermem->info.lowtext);
@@ -663,7 +663,7 @@ void sysinfo(struct RexxMsg *mess) {
 			sprintf(str,"%d",nummer);
 			break;
 		case 'n' : case 'N' :
-			sprintf(str,"%d",Servermem->info.nycklar);
+			sprintf(str,"%d",Servermem->cfg->noOfFileKeys);
 			break;
 		case 'o' : case 'O' :
 			sprintf(str,"%d",Servermem->info.areor);
@@ -732,13 +732,7 @@ void swapbps(long *bps, long *bps2)
 }
 
 void rexxreadcfg(struct RexxMsg *mess) {
-  ReadSystemConfig();
-  ReadCommandConfig();
-  ReadFileKeyConfig();
-  ReadStatusConfig();
-  ReadNodeTypesConfig();
-  ReadFidoConfig();
-  SetRexxResultString(mess, "");
+  SetRexxResultString(mess, ReReadConfigs() ? "1" : "0");
 }
 
 int parsenamn(skri)
@@ -813,7 +807,7 @@ int parse(char *skri) {
 	if(IzDigit(arg2[0])) argtyp=KOMARGNUM;
 	else if(!arg2[0]) argtyp=KOMARGINGET;
 	else argtyp=KOMARGCHAR;
-	for(kompek=(struct Kommando *)Servermem->kom_list.mlh_Head;kompek->kom_node.mln_Succ;kompek=(struct Kommando *)kompek->kom_node.mln_Succ) {
+	for(kompek=(struct Kommando *)Servermem->cfg->kom_list.mlh_Head;kompek->kom_node.mln_Succ;kompek=(struct Kommando *)kompek->kom_node.mln_Succ) {
 		if(matchar(skri,kompek->langCmd[0].name)) {
 			ord2=FindNextWord(kompek->langCmd[0].name);
 			if((kompek->langCmd[0].words == 2 && matchar(arg2,ord2) && arg2[0]) || kompek->langCmd[0].words == 1) {
@@ -906,8 +900,8 @@ char *skri;
 		going=FALSE;
 	}
 	while(going) {
-		if(count==Servermem->info.nycklar) going=FALSE;
-		faci=Servermem->Nyckelnamn[count];
+		if(count==Servermem->cfg->noOfFileKeys) going=FALSE;
+		faci=Servermem->cfg->fileKeys[count];
 		skri2=skri;
 		going2=TRUE;
 		if(matchar(skri2,faci)) {
@@ -1005,7 +999,7 @@ void kominfo(struct RexxMsg *mess) {
 		return;
 	}
 	nummer=atoi(mess->rm_Args[1]);
-	for(kompek=(struct Kommando *)Servermem->kom_list.mlh_Head;kompek->kom_node.mln_Succ;kompek=(struct Kommando *)kompek->kom_node.mln_Succ)
+	for(kompek=(struct Kommando *)Servermem->cfg->kom_list.mlh_Head;kompek->kom_node.mln_Succ;kompek=(struct Kommando *)kompek->kom_node.mln_Succ)
 		if(kompek->nummer==nummer) {
 			found=TRUE;
 			break;
@@ -1299,7 +1293,7 @@ void chguser(struct RexxMsg *mess) {
 			else Servermem->inne[x].upload=atoi(mess->rm_Args[2]);
 			break;
 		case 'x' : case 'X' :
-                  if(Servermem->cfg.cfgflags & NICFG_CRYPTEDPASSWORDS) {
+                  if(Servermem->cfg->cfgflags & NICFG_CRYPTEDPASSWORDS) {
                     CryptPassword(mess->rm_Args[2], temp);
                   } else {
                     strncpy(temp, mess->rm_Args[2], 15);
@@ -1399,7 +1393,7 @@ void skapafil(struct RexxMsg *mess) {
 	fil->status=atoi(mess->rm_Args[5]);
 	strncpy(fil->beskr,mess->rm_Args[4],70);
 	fil->dir=x;
-	if(Servermem->cfg.cfgflags & NICFG_VALIDATEFILES) fil->flaggor = FILE_NOTVALID;
+	if(Servermem->cfg->cfgflags & NICFG_VALIDATEFILES) fil->flaggor = FILE_NOTVALID;
 	for(cnt=6;cnt<16 && mess->rm_Args[cnt];cnt++)
 		if((nyckel=parsenyckel(mess->rm_Args[cnt]))!=-1) BAMSET(fil->nycklar,nyckel);
 	AddTail((struct List *)&Servermem->areor[area].ar_list,(struct Node *)fil);

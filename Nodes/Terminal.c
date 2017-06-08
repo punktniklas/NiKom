@@ -692,7 +692,7 @@ int MaybeEditPassword(char *label1, char *label2, char *pwd, int maxlen) {
       return 1;
     }
     if(strcmp(inmat, tmpStr) == 0) {
-      if(Servermem->cfg.cfgflags & NICFG_CRYPTEDPASSWORDS) {
+      if(Servermem->cfg->cfgflags & NICFG_CRYPTEDPASSWORDS) {
         CryptPassword(inmat, pwd);
       } else {
         strncpy(pwd, inmat, maxlen + 1);

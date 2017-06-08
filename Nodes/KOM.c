@@ -109,9 +109,9 @@ int FindNextUnreadConf(int currentConfId) {
 
 int isUserOutOfTime(void) {
   int limitSeconds, secondsLoggedIn;
-  limitSeconds = 60 * Servermem->cfg.maxtid[Servermem->inne[nodnr].status]
+  limitSeconds = 60 * Servermem->cfg->maxtid[Servermem->inne[nodnr].status]
     + extratime;
-  if(Servermem->cfg.maxtid[Servermem->inne[nodnr].status] != 0) {
+  if(Servermem->cfg->maxtid[Servermem->inne[nodnr].status] != 0) {
     secondsLoggedIn = time(NULL) - logintime;
     if(secondsLoggedIn > limitSeconds) {
       SendInfoFile("OutOfTime.txt", 0);
@@ -160,8 +160,8 @@ struct Kommando *getCommandToExecute(int defaultCmd) {
 
   case -4:
     SendString("\r\n\n%s\r\n", CATSTR(MSG_KOM_NO_PERMISSION));
-    if(Servermem->cfg.ar.noright) {
-      sendautorexx(Servermem->cfg.ar.noright);
+    if(Servermem->cfg->ar.noright) {
+      sendautorexx(Servermem->cfg->ar.noright);
     }
     return NULL;
 
@@ -328,40 +328,40 @@ void displayPrompt(int defaultCmd) {
   Servermem->varmote[nodnr] = mote2;
   switch(defaultCmd) {
   case CMD_NEXTCONF:
-    if(Servermem->cfg.ar.nextmeet) {
-      sendautorexx(Servermem->cfg.ar.nextmeet);
+    if(Servermem->cfg->ar.nextmeet) {
+      sendautorexx(Servermem->cfg->ar.nextmeet);
     }
     cmdStr = CATSTR(MSG_PROMPT_GO_TO_NEXT_FORUM);
     break;
   case CMD_NEXTTEXT:
     if(mote2 == MAILBOX_CONFID) {
-      if(Servermem->cfg.ar.nextletter) {
-        sendautorexx(Servermem->cfg.ar.nextletter);
+      if(Servermem->cfg->ar.nextletter) {
+        sendautorexx(Servermem->cfg->ar.nextletter);
       }
       cmdStr = CATSTR(MSG_PROMPT_READ_NEXT_MAIL);
     } else {
-      if(Servermem->cfg.ar.nexttext) {
-        sendautorexx(Servermem->cfg.ar.nexttext);
+      if(Servermem->cfg->ar.nexttext) {
+        sendautorexx(Servermem->cfg->ar.nexttext);
       }
       cmdStr = CATSTR(MSG_PROMPT_READ_NEXT_TEXT);
     }
     break;
   case CMD_NEXTREPLY:
-    if(Servermem->cfg.ar.nextkom) {
-      sendautorexx(Servermem->cfg.ar.nextkom);
+    if(Servermem->cfg->ar.nextkom) {
+      sendautorexx(Servermem->cfg->ar.nextkom);
     }
     cmdStr = CATSTR(MSG_PROMPT_READ_NEXT_COMMENT);
     break;
   case CMD_SEETIME:
     Servermem->action[nodnr] = INGET;
-    if(Servermem->cfg.ar.setid) {
-      sendautorexx(Servermem->cfg.ar.setid);
+    if(Servermem->cfg->ar.setid) {
+      sendautorexx(Servermem->cfg->ar.setid);
     }
     cmdStr = CATSTR(MSG_PROMPT_SEE_TIME);
     break;
   case CMD_GOMAIL:
-    if(Servermem->cfg.ar.nextmeet) {
-      sendautorexx(Servermem->cfg.ar.nextmeet);
+    if(Servermem->cfg->ar.nextmeet) {
+      sendautorexx(Servermem->cfg->ar.nextmeet);
     }
     cmdStr = CATSTR(MSG_PROMPT_GO_TO_MAILBOX);
     break;

@@ -107,7 +107,7 @@ int brev_kommentera(void) {
       }
     } else {
       if(anv != inloggad && inloggad != atoi(brevread.from)
-         && Servermem->inne[nodnr].status < Servermem->cfg.st.brev) {
+         && Servermem->inne[nodnr].status < Servermem->cfg->st.brev) {
         SendString("\r\n\n%s\r\n\n", CATSTR(MSG_MAIL_NOT_WRITTEN));
         return 0;
       }
@@ -223,7 +223,7 @@ void visabrev(int brev,int anv) {
     mottagare = hittaefter(mottagare);
   }
   if(!tillmig && inloggad != atoi(brevread.from)
-     && Servermem->inne[nodnr].status < Servermem->cfg.st.brev) {
+     && Servermem->inne[nodnr].status < Servermem->cfg->st.brev) {
     SendString("\n\n\r%s\n\r", CATSTR(MSG_MAIL_NO_READ_PERM));
     return;
   }
@@ -274,7 +274,7 @@ void visabrev(int brev,int anv) {
 void visafidobrev(struct ReadLetter *brevread, BPTR fh, int brev, int anv) {
   int length, i;
   char textbuf[100];
-  if(anv != inloggad && Servermem->inne[nodnr].status < Servermem->cfg.st.brev) {
+  if(anv != inloggad && Servermem->inne[nodnr].status < Servermem->cfg->st.brev) {
     SendString("\n\n\rDu har inte rätt att läsa det brevet!\n\r");
     return;
   }
@@ -433,8 +433,8 @@ int fido_brev(char *tillpers,char *adr,struct Mote *motpek) {
   struct MinNode *first, *last;
   char *foo, tmpfrom[100], fullpath[100], filnamn[20], subject[80], msgid[50];
 
-  if(!(Servermem->inne[nodnr].grupper & Servermem->fidodata.mailgroups)
-     && Servermem->inne[nodnr].status < Servermem->fidodata.mailstatus) {
+  if(!(Servermem->inne[nodnr].grupper & Servermem->cfg->fidoConfig.mailgroups)
+     && Servermem->inne[nodnr].status < Servermem->cfg->fidoConfig.mailstatus) {
     SendString("\n\n\rDu har ingen rätt att skicka FidoNet NetMail.\n\r");
     return 0;
   }
@@ -591,19 +591,19 @@ int fido_brev(char *tillpers,char *adr,struct Mote *motpek) {
   last->mln_Succ = (struct MinNode *)&ft.text.mlh_Tail;
   first->mln_Pred = (struct MinNode *)&ft.text;
   if(tillpers) {
-    textId = WriteFidoTextTags(&ft,WFT_MailDir,Servermem->fidodata.matrixdir,
+    textId = WriteFidoTextTags(&ft,WFT_MailDir,Servermem->cfg->fidoConfig.matrixdir,
                                WFT_Domain,fd->domain,
                                WFT_CharSet,chrs,
                                TAG_DONE);
   } else {
-    textId = WriteFidoTextTags(&ft,WFT_MailDir,Servermem->fidodata.matrixdir,
+    textId = WriteFidoTextTags(&ft,WFT_MailDir,Servermem->cfg->fidoConfig.matrixdir,
                                WFT_Domain,fd->domain,
                                WFT_Reply,msgid,
                                WFT_CharSet,chrs,
                                TAG_DONE);
   }
   SendString("%s\r\n\n", CATSTR(MSG_MAIL_GOT_NUMBER), textId);
-  if(Servermem->cfg.logmask & LOG_BREV) {
+  if(Servermem->cfg->logmask & LOG_BREV) {
     LogEvent(USAGE_LOG, INFO, "%s skickar brev %d till %s (%d:%d/%d.%d)",
              getusername(inloggad), textId,
              ft.touser, ft.tozone, ft.tonet, ft.tonode, ft.topoint);
@@ -706,7 +706,7 @@ void sparabrev(void) {
   Close(fh);
   freeeditlist();
   SendStringCat("\r\n%s\r\n", CATSTR(MSG_MAIL_GOT_NUMBER_AT_USER), nr, getusername(userId));
-  if(Servermem->cfg.logmask & LOG_BREV) {
+  if(Servermem->cfg->logmask & LOG_BREV) {
     strcpy(buf, getusername(inloggad));
     LogEvent(USAGE_LOG, INFO, "%s skickar brev %d till %s",
              buf, nr, getusername(userId));
@@ -733,7 +733,7 @@ void sparabrev(void) {
       return;
     }
     SendStringCat("\r\n%s\r\n", CATSTR(MSG_MAIL_GOT_NUMBER_AT_USER), nr, getusername(userId));
-    if(Servermem->cfg.logmask & LOG_BREV) {
+    if(Servermem->cfg->logmask & LOG_BREV) {
       strcpy(buf, getusername(inloggad));
       LogEvent(USAGE_LOG, INFO, "%s skickar brev %d till %s",
                buf, nr, getusername(mot));

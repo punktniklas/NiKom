@@ -110,16 +110,16 @@ struct NodeType *selectNodeType(void) {
   struct NodeType *nt = NULL;
   int going, i, isCorrect;
 
-  if(Servermem->nodetypes[0].nummer == 0) {
+  if(Servermem->cfg->nodetypes[0].nummer == 0) {
     LogEvent(SYSTEM_LOG, ERROR, "Can't login user, no valid node types found.");
     putstring("\n\n\r*** System error ***\n\n\r", -1, 0);
     return NULL;
   }
-  if(Servermem->nodetypes[1].nummer == 0) {
-    if((nt = GetNodeType(Servermem->nodetypes[0].nummer)) == NULL) {
+  if(Servermem->cfg->nodetypes[1].nummer == 0) {
+    if((nt = GetNodeType(Servermem->cfg->nodetypes[0].nummer)) == NULL) {
       LogEvent(SYSTEM_LOG, ERROR,
         "Can't login user, the only configured node type (%d) can not be found.",
-        Servermem->nodetypes[0].nummer);
+        Servermem->cfg->nodetypes[0].nummer);
       putstring("\n\n\r*** System error ***\n\n\r", -1, 0);
     }
     return nt;
@@ -134,11 +134,11 @@ struct NodeType *selectNodeType(void) {
   if(Servermem->inne[nodnr].shell == 0) {
     putstring("\n\n\rDu har ingen förinställd nodtyp.\n\n\rVälj mellan:\n\n\r",-1,0);
     for(i = 0; i < MAXNODETYPES; i++) {
-      if(Servermem->nodetypes[i].nummer == 0) {
+      if(Servermem->cfg->nodetypes[i].nummer == 0) {
         break;
       }
       sprintf(outbuffer, "%2d: %s\n\r",
-              Servermem->nodetypes[i].nummer, Servermem->nodetypes[i].desc);
+              Servermem->cfg->nodetypes[i].nummer, Servermem->cfg->nodetypes[i].desc);
       putstring(outbuffer, -1, 0);
     }
     going = TRUE;
@@ -226,21 +226,21 @@ int main(int argc,char *argv[]) {
     Servermem->inloggad[nodnr]=-2; /* Sätt till <Uppringd> för att även hantera -getty-fallet */
   reloginspec:
     UpdateInactive();
-    Servermem->inne[nodnr].flaggor = Servermem->cfg.defaultflags;
+    Servermem->inne[nodnr].flaggor = Servermem->cfg->defaultflags;
     if(!getty) Delay(100);
     Servermem->inne[nodnr].rader=0;
     Servermem->inne[nodnr].chrset = CHRS_LATIN1;
     sendfile("NiKom:Texter/Login.txt");
-    if(Servermem->cfg.ar.preinlogg) sendrexx(Servermem->cfg.ar.preinlogg);
+    if(Servermem->cfg->ar.preinlogg) sendrexx(Servermem->cfg->ar.preinlogg);
     car=TRUE;
     Servermem->inne[nodnr].chrset = 0;
     memset(commandhistory,0,1000);
     going=1;
-    while(going && going<=Servermem->cfg.logintries) {
+    while(going && going<=Servermem->cfg->logintries) {
       SendStringNoBrk("\r\nName: ");
       if(getstring(EKO,40,NULL)) { car=FALSE; break; }
-      if(!stricmp(inmat,Servermem->cfg.ny)
-         && !(Servermem->cfg.cfgflags & NICFG_CLOSEDBBS)) {
+      if(!stricmp(inmat,Servermem->cfg->ny)
+         && !(Servermem->cfg->cfgflags & NICFG_CLOSEDBBS)) {
         tmp = RegisterNewUser();
         if(tmp == 2) {
           goto panik;
@@ -269,7 +269,7 @@ int main(int argc,char *argv[]) {
               going=FALSE;
             } else forsok--;
         }
-        if(going && (Servermem->cfg.logmask & LOG_FAILINLOGG)) {
+        if(going && (Servermem->cfg->logmask & LOG_FAILINLOGG)) {
           LogEvent(USAGE_LOG, WARN, "Nod %d, %s angivet som namn, fel lösen.",
                    nodnr, getusername(inloggad));
         }

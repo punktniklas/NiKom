@@ -711,7 +711,7 @@ int puttekn(char *pekare,int size)
 
 	strncpy(localconstring,pekare,1199);
 	localconstring[1199]=0;
-	if(Servermem->cfg.cfgflags & NICFG_LOCALCOLOURS) {
+	if(Servermem->cfg->cfgflags & NICFG_LOCALCOLOURS) {
 		bytes=ConvMBChrsFromAmiga(serpekare,pekare,1199,Servermem->inne[nodnr].chrset,0);
 		serpekare[bytes] = '\0';
 		if(!(Servermem->inne[nodnr].flaggor & ANSICOLOURS)) StripAnsiSequences(serpekare);

@@ -142,8 +142,8 @@ void tiden(void) {
           weekdayNames[Servermem->inne[nodnr].language][ts->tm_wday], ts->tm_mday,
           monthNames[Servermem->inne[nodnr].language][ts->tm_mon],
           1900 + ts->tm_year, ts->tm_hour, ts->tm_min);
-  if(Servermem->cfg.maxtid[Servermem->inne[nodnr].status]) {
-    timeLimitSeconds = 60 * (Servermem->cfg.maxtid[Servermem->inne[nodnr].status]) + extratime;
+  if(Servermem->cfg->maxtid[Servermem->inne[nodnr].status]) {
+    timeLimitSeconds = 60 * (Servermem->cfg->maxtid[Servermem->inne[nodnr].status]) + extratime;
     SendStringCat("\n%s\r\n", CATSTR(MSG_KOM_TIME_LEFT), (timeLimitSeconds - (now - logintime)) / 60);
   }
 }
@@ -275,7 +275,7 @@ int skapmot(void) {
     if(EditString(CATSTR(MSG_FORUM_CREATE_FIDO_TAG), tmpConf.tagnamn, 49, TRUE)) {
       return 1;
     }
-    strcpy(tmpConf.origin, Servermem->fidodata.defaultorigin);
+    strcpy(tmpConf.origin, Servermem->cfg->fidoConfig.defaultorigin);
     if(MaybeEditString(CATSTR(MSG_FORUM_CREATE_FIDO_ORIGIN), tmpConf.origin, 69)) {
       return 1;
     }
@@ -316,17 +316,17 @@ int skapmot(void) {
     SendString("%s\n\r", CATSTR(MSG_FORUM_CREATE_DOMAIN));
     highestId = 0;
     for(i = 0; i < 10; i++) {
-      if(!Servermem->fidodata.fd[i].domain[0]) {
+      if(!Servermem->cfg->fidoConfig.fd[i].domain[0]) {
         break;
       }
-      highestId = max(highestId, Servermem->fidodata.fd[i].nummer);
+      highestId = max(highestId, Servermem->cfg->fidoConfig.fd[i].nummer);
       SendString("%3d: %s (%d:%d/%d.%d)\n\r",
-                 Servermem->fidodata.fd[i].nummer,
-                 Servermem->fidodata.fd[i].domain,
-                 Servermem->fidodata.fd[i].zone,
-                 Servermem->fidodata.fd[i].net,
-                 Servermem->fidodata.fd[i].node,
-                 Servermem->fidodata.fd[i].point);
+                 Servermem->cfg->fidoConfig.fd[i].nummer,
+                 Servermem->cfg->fidoConfig.fd[i].domain,
+                 Servermem->cfg->fidoConfig.fd[i].zone,
+                 Servermem->cfg->fidoConfig.fd[i].net,
+                 Servermem->cfg->fidoConfig.fd[i].node,
+                 Servermem->cfg->fidoConfig.fd[i].point);
     }
     if(i == 0) {
       SendString("\n\r%s\n\r", CATSTR(MSG_FORUM_CREATE_NO_DOMAIN));
@@ -487,7 +487,7 @@ void listmot(char *pattern) {
     if(conf->status & SKRIVSTYRT) {
       if(SendString(" (%s)", CATSTR(MSG_FORUM_LIST_WRITECTRL))) { return; }
     }
-    if((conf->status & SUPERHEMLIGT) && Servermem->inne[nodnr].status >= Servermem->cfg.st.medmoten) {
+    if((conf->status & SUPERHEMLIGT) && Servermem->inne[nodnr].status >= Servermem->cfg->st.medmoten) {
       if(SendString(" (%s)", CATSTR(MSG_FORUM_LIST_AREXX))) { return; }
     }
     if(SendString("\r\n")) { return; }
@@ -530,7 +530,7 @@ int parse(char *str) {
     argType = KOMARGCHAR;
   }
 
-  ITER_EL(cmd, Servermem->kom_list, kom_node, struct Kommando *) {
+  ITER_EL(cmd, Servermem->cfg->kom_list, kom_node, struct Kommando *) {
     if(cmd->secret) {
       if(cmd->status > Servermem->inne[nodnr].status) continue;
       if(cmd->minlogg > Servermem->inne[nodnr].loggin) continue;
@@ -756,7 +756,7 @@ void connection(void) {
   strcpy(vilkabuf,"loggar in");
   Servermem->vilkastr[nodnr]=vilkabuf;
   senast_text_typ=0;
-  if(Servermem->cfg.logmask & LOG_INLOGG) {
+  if(Servermem->cfg->logmask & LOG_INLOGG) {
     LogEvent(USAGE_LOG, INFO, "%s loggar in på nod %d",
              getusername(inloggad), nodnr);
   }
@@ -767,7 +767,7 @@ void connection(void) {
   initgrupp();
   rxlinecount = TRUE;
   radcnt=0;
-  if(Servermem->cfg.ar.postinlogg) sendautorexx(Servermem->cfg.ar.postinlogg);
+  if(Servermem->cfg->ar.postinlogg) sendautorexx(Servermem->cfg->ar.postinlogg);
   DisplayVersionInfo();
   var(mote2);
   KomLoop();

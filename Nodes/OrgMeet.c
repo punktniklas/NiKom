@@ -237,7 +237,7 @@ int org_visatext(int textId, char verbose) {
 
   if(GetConferenceForText(textId) == -1) {
     SendStringCat("\n\n\r%s\n\n\r", CATSTR(MSG_TEXT_DELETED), textId);
-    if(Servermem->inne[nodnr].status < Servermem->cfg.st.medmoten) {
+    if(Servermem->inne[nodnr].status < Servermem->cfg->st.medmoten) {
       return 0;
     }
   }
@@ -330,7 +330,7 @@ void org_sparatext(void) {
   }
   nummer = sendservermess(SPARATEXTEN, (long)&sparhead);
   SendStringCat("\r\n%s\r\n", CATSTR(MSG_WRITE_TEXT_GOT_NUMBER), nummer);
-  if(Servermem->cfg.logmask & LOG_TEXT) {
+  if(Servermem->cfg->logmask & LOG_TEXT) {
     LogEvent(USAGE_LOG, INFO, "%s skriver text %d i %s",
              getusername(inloggad), nummer, getmotnamn(sparhead.mote));
   }

@@ -69,7 +69,7 @@ void Cmd_Status(void) {
   if(SendStringCat("\r\n\n%s\r\n\n", CATSTR(MSG_USER_STATUS_HEADER), readuserstr.namn,userId)) { return; }
   if(SendString("%-21s: %d\r\n", CATSTR(MSG_USER_LEVEL), readuserstr.status)) { return; }
   if(!((readuserstr.flaggor & SKYDDAD)
-       && Servermem->inne[nodnr].status < Servermem->cfg.st.sestatus
+       && Servermem->inne[nodnr].status < Servermem->cfg->st.sestatus
        && inloggad != userId)) {
     if(SendString("%-21s: %s\r\n", CATSTR(MSG_USER_STREET), readuserstr.gata)) { return; }
     if(SendString("%-21s: %s\r\n", CATSTR(MSG_USER_CITY), readuserstr.postadress)) { return; }
@@ -113,7 +113,7 @@ void Cmd_Status(void) {
       }
       if((listpek->flaggor & HEMLIGT)
          && !BAMTEST((char *)&Servermem->inne[nodnr].grupper, listpek->nummer)
-         && Servermem->inne[nodnr].status < Servermem->cfg.st.medmoten) {
+         && Servermem->inne[nodnr].status < Servermem->cfg->st.medmoten) {
         continue;
       }
       if(SendString(" %s\r\n", listpek->namn)) { return; }
@@ -157,7 +157,7 @@ int Cmd_ChangeUser(void) {
   struct User user;
   struct ShortUser *shortUser;
   if(argument[0]) {
-    if(Servermem->inne[nodnr].status < Servermem->cfg.st.anv) {
+    if(Servermem->inne[nodnr].status < Servermem->cfg->st.anv) {
       SendString("\r\n\n%s\r\n\n", CATSTR(MSG_USER_CHANGE_NO_OTHER));
       return 0;
     }
@@ -208,7 +208,7 @@ int Cmd_ChangeUser(void) {
     }
   }
 
-  if(Servermem->inne[nodnr].status >= Servermem->cfg.st.chgstatus) {
+  if(Servermem->inne[nodnr].status >= Servermem->cfg->st.chgstatus) {
     if(MaybeEditNumberChar(CATSTR(MSG_USER_LEVEL), &user.status, 3, 0, 100)) { return 1; }
   }
   if(MaybeEditString(CATSTR(MSG_USER_STREET), user.gata, 40)) { return 1; }
@@ -220,7 +220,7 @@ int Cmd_ChangeUser(void) {
   if(MaybeEditString(CATSTR(MSG_USER_PROMPT), user.prompt, 5)) { return 1; }
   if(MaybeEditNumberChar(CATSTR(MSG_USER_LINES), &user.rader, 5, 0, 127)) { return 1; }
 
-  if(Servermem->inne[nodnr].status>=Servermem->cfg.st.anv) {
+  if(Servermem->inne[nodnr].status>=Servermem->cfg->st.anv) {
     if(MaybeEditNumber(CATSTR(MSG_USER_READ), (int *)&user.read, 8, 0, INT_MAX)) { return 1; }
     if(MaybeEditNumber(CATSTR(MSG_USER_WRITTEN), (int *)&user.skrivit, 8, 0, INT_MAX)) { return 1; }
     if(MaybeEditNumber(CATSTR(MSG_USER_DL_FILES), (int *)&user.download, 8, 0, INT_MAX)) { return 1; }

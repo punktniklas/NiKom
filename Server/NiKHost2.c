@@ -693,7 +693,7 @@ int motesratt(int mote,struct User *usr) {
 	struct Mote *motpek;
 	motpek=getmotpek(mote);
 	if(!motpek) return(0);
-	if(usr->status>=Servermem->cfg.st.medmoten) return(1);
+	if(usr->status >= Servermem->cfg->st.medmoten) return(1);
 	if(motpek->status & SUPERHEMLIGT) return(1);
 	if(motpek->status & AUTOMEDLEM && !(motpek->status & SKRIVSTYRT)) return(1);
 	if(BAMTEST(usr->motratt,mote)) return(1);
@@ -1128,11 +1128,11 @@ void keyinfo(struct RexxMsg *mess) {
         switch(mess->rm_Args[2][0]) {
                 case 'n' : case 'N' :
                         nr=atoi(mess->rm_Args[1]);
-                        if(nr<0 || nr>Servermem->info.nycklar)
+                        if(nr < 0 || nr > Servermem->cfg->noOfFileKeys)
                                 sprintf(str,"%d",-1);
                         else
                         {
-                                sprintf(str,"%s",Servermem->Nyckelnamn[nr]);
+                                sprintf(str,"%s",Servermem->cfg->fileKeys[nr]);
                                 str[strlen(str)-1] = '\0';
 						}
                         break;

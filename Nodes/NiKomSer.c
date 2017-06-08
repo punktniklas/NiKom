@@ -158,11 +158,11 @@ int main(int argc,char *argv[]) {
 
   if(nodestate & NIKSTATE_NOCARRIER) {
     conputtekn("\nCarrier dropped\n",-1);
-    if(Servermem->cfg.logmask & LOG_CARDROPPED) {
+    if(Servermem->cfg->logmask & LOG_CARDROPPED) {
       LogEvent(USAGE_LOG, WARN, "%s släpper carriern (nod %d)",
                getusername(inloggad), nodnr);
     }
-    if(Servermem->cfg.ar.cardropped) sendautorexx(Servermem->cfg.ar.cardropped);
+    if(Servermem->cfg->ar.cardropped) sendautorexx(Servermem->cfg->ar.cardropped);
   } else {
     if(nodestate & NIKSTATE_AUTOLOGOUT) {
       SendString("\n\n\r*** %s ***\n\n\r", CATSTR(MSG_KOM_AUTO_LOGOUT));
@@ -171,11 +171,11 @@ int main(int argc,char *argv[]) {
     }
     radcnt=-174711;
     if(Servermem->say[nodnr]) displaysay();
-    if(Servermem->cfg.ar.utlogg) sendautorexx(Servermem->cfg.ar.utlogg);
+    if(Servermem->cfg->ar.utlogg) sendautorexx(Servermem->cfg->ar.utlogg);
     SendInfoFile("Logout.txt", 0);
   }
   Servermem->inloggad[nodnr]=-1;
-  if(Servermem->cfg.logmask & LOG_UTLOGG) {
+  if(Servermem->cfg->logmask & LOG_UTLOGG) {
     LogEvent(USAGE_LOG, INFO, "%s loggar ut från nod %d",
              getusername(inloggad), nodnr);
   }

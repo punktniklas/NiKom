@@ -549,7 +549,7 @@ void linecrash(void) {
     SendStringNoBrk("\n\rEndast Fido-brev kan skickas som crashmail.\n\r");
     return;
   }
-  if(Servermem->inne[nodnr].status < Servermem->fidodata.crashstatus) {
+  if(Servermem->inne[nodnr].status < Servermem->cfg->fidoConfig.crashstatus) {
     SendStringNoBrk("\n\rDu har inte rätt att skicka crashmail.\n\r");
     return;
   }
@@ -1084,7 +1084,7 @@ void fullcrash(void) {
     GetChar();
     return;
   }
-  if(Servermem->inne[nodnr].status < Servermem->fidodata.crashstatus) {
+  if(Servermem->inne[nodnr].status < Servermem->cfg->fidoConfig.crashstatus) {
     SendStringNoBrk("\rDu har inte rätt att skicka crashmail. <RETURN>");
     GetChar();
     return;

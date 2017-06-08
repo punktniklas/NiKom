@@ -31,16 +31,16 @@ int RegisterNewUser(void) {
   memset(user, 0, sizeof(struct User));
 
   AskUserForLanguage(user);
-  if(Servermem->cfg.defaultcharset == 0) {
+  if(Servermem->cfg->defaultcharset == 0) {
     if(AskUserForCharacterSet(TRUE, FALSE)) {
       return 1;
     }
   } else {
-    Servermem->inne[nodnr].chrset = Servermem->cfg.defaultcharset;
+    Servermem->inne[nodnr].chrset = Servermem->cfg->defaultcharset;
   }
 
   SendString("\r\n\n");
-  user->rader = Servermem->cfg.defaultrader;
+  user->rader = Servermem->cfg->defaultrader;
   SendInfoFile("NewUser.txt", 0);
 
   for(;;) {
@@ -84,14 +84,14 @@ int RegisterNewUser(void) {
   user->senast_in = 0L;
   user->read = 0L;
   user->skrivit = 0L;
-  user->flaggor = Servermem->cfg.defaultflags;
+  user->flaggor = Servermem->cfg->defaultflags;
   user->upload = 0;
   user->download = 0;
   user->loggin = 0;
   user->grupper = 0L;
   user->defarea = 0L;
   user->shell = 0;
-  user->status = Servermem->cfg.defaultstatus;
+  user->status = Servermem->cfg->defaultstatus;
   user->brevpek = 0;
 
   initConfPermissions();
@@ -162,7 +162,7 @@ int RegisterNewUser(void) {
   }
   inloggad = newUserId;
   SendStringCat("\r\n\n%s\r\n", CATSTR(MSG_USER_YOU_GET_ID), inloggad);
-  if(Servermem->cfg.ar.nyanv) sendrexx(Servermem->cfg.ar.nyanv);
+  if(Servermem->cfg->ar.nyanv) sendrexx(Servermem->cfg->ar.nyanv);
   return 0;
 }
 

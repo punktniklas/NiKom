@@ -48,7 +48,7 @@ int __saveds AASM LIBCheckPassword(
 
   char salt[SALTLENGTH+1], cryptbuf[14];
 
-  if(NiKomBase->Servermem->cfg.cfgflags & NICFG_CRYPTEDPASSWORDS) {
+  if(NiKomBase->Servermem->cfg->cfgflags & NICFG_CRYPTEDPASSWORDS) {
     strncpy(salt, correctPassword, SALTLENGTH);
     salt[SALTLENGTH] = 0;
     des_fcrypt(clearText, salt, cryptbuf);

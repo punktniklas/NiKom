@@ -21,11 +21,11 @@
  // TODO: Remove need for these prototypes
 int parsegrupp(char *skri);
 
-void initSystemConfigDefaults(void);
-int handleSystemConfigStatusSection(char *line, BPTR fh);
-int handleSystemConfigLine(char *line, BPTR fh);
-int handleStatusConfigLine(char *line, BPTR fh);
-int handleFidoConfigLine(char *line, BPTR fh);
+void initSystemConfigDefaults(struct Config *cfg);
+int handleSystemConfigStatusSection(char *line, BPTR fh, struct Config *cfg);
+int handleSystemConfigLine(char *line, BPTR fh, struct Config *cfg);
+int handleStatusConfigLine(char *line, BPTR fh, struct Config *cfg);
+int handleFidoConfigLine(char *line, BPTR fh, struct Config *cfg);
 int handleCommandConfigLine(char *line, struct Kommando *command);
 
 int InitLegacyConversionData(void) {
@@ -59,7 +59,8 @@ int InitLegacyConversionData(void) {
   return putsRes == 0;
 }
 
-void readConfigFile(char *filename, int (*handleLine)(char *, BPTR)) {
+int readConfigFile(char *filename, struct Config *cfg,
+                   int (*handleLine)(char *, BPTR, struct Config *)) {
   BPTR fh;
   char buffer[200], *tmp;
   int len;
@@ -67,13 +68,14 @@ void readConfigFile(char *filename, int (*handleLine)(char *, BPTR)) {
   printf("Reading %s\n", filename);
 
   if(!(fh = Open(filename, MODE_OLDFILE))) {
-    cleanup(EXIT_ERROR, "Could not open config file.");
+    printf("Could not open config file %s.", filename);
+    return 0;
   }
 
   for(;;) {
     if(!FGets(fh, buffer, 199)) {
       Close(fh);
-      return;
+      return 1;
     }
     if(buffer[0] == '#' || buffer[0] == '*') {
       continue;
@@ -88,9 +90,9 @@ void readConfigFile(char *filename, int (*handleLine)(char *, BPTR)) {
     if(buffer[len - 1] == '\n') {
       buffer[len - 1] = '\0';
     }
-    if(!handleLine(buffer, fh)) {
+    if(!handleLine(buffer, fh, cfg)) {
       Close(fh);
-      cleanup(EXIT_ERROR, "Invalid config file.");
+      return 0;
     }
   }
 }
@@ -110,48 +112,48 @@ int isMatchingConfigLine(char *line, char *keyword) {
   }
 }
 
-void ReadSystemConfig(void) {
-  initSystemConfigDefaults();
-  readConfigFile("NiKom:DatoCfg/System.cfg", handleSystemConfigLine);
+int readSystemConfig(struct Config *cfg) {
+  initSystemConfigDefaults(cfg);
+  return readConfigFile("NiKom:DatoCfg/System.cfg", cfg, handleSystemConfigLine);
 }
 
-void initSystemConfigDefaults() {
+void initSystemConfigDefaults(struct Config *cfg) {
   int i;
-  Servermem->cfg.defaultflags = 433;
-  Servermem->cfg.defaultstatus = 0;
-  Servermem->cfg.defaultrader = 25;
+  cfg->defaultflags = 433;
+  cfg->defaultstatus = 0;
+  cfg->defaultrader = 25;
   for(i = 0; i <= 100; i++) {
-    Servermem->cfg.maxtid[i] = 0;
-    Servermem->cfg.uldlratio[i] = 0;
+    cfg->maxtid[i] = 0;
+    cfg->uldlratio[i] = 0;
   }
-  Servermem->cfg.cfgflags = NICFG_VALIDATEFILES | NICFG_CRYPTEDPASSWORDS;
-  strcpy(Servermem->cfg.ny, "NY");
-  Servermem->cfg.diskfree = 100000;
-  strcpy(Servermem->cfg.ultmp, "T:");
-  Servermem->cfg.ar.preinlogg = 0;
-  Servermem->cfg.ar.postinlogg = 1;
-  Servermem->cfg.ar.utlogg = 0;
-  Servermem->cfg.ar.nyanv = 0;
-  Servermem->cfg.ar.preup1 = 0;
-  Servermem->cfg.ar.preup2 = 0;
-  Servermem->cfg.ar.postup1 = 0;
-  Servermem->cfg.ar.postup2 = 0;
-  Servermem->cfg.ar.noright = 0;
-  Servermem->cfg.ar.nextmeet = 0;
-  Servermem->cfg.ar.nexttext = 0;
-  Servermem->cfg.ar.nextkom = 0;
-  Servermem->cfg.ar.setid = 0;
-  Servermem->cfg.ar.nextletter = 0;
-  Servermem->cfg.ar.cardropped = 0;
-  Servermem->cfg.logmask = 4095;
+  cfg->cfgflags = NICFG_VALIDATEFILES | NICFG_CRYPTEDPASSWORDS;
+  strcpy(cfg->ny, "NY");
+  cfg->diskfree = 100000;
+  strcpy(cfg->ultmp, "T:");
+  cfg->ar.preinlogg = 0;
+  cfg->ar.postinlogg = 1;
+  cfg->ar.utlogg = 0;
+  cfg->ar.nyanv = 0;
+  cfg->ar.preup1 = 0;
+  cfg->ar.preup2 = 0;
+  cfg->ar.postup1 = 0;
+  cfg->ar.postup2 = 0;
+  cfg->ar.noright = 0;
+  cfg->ar.nextmeet = 0;
+  cfg->ar.nexttext = 0;
+  cfg->ar.nextkom = 0;
+  cfg->ar.setid = 0;
+  cfg->ar.nextletter = 0;
+  cfg->ar.cardropped = 0;
+  cfg->logmask = 4095;
   strcpy(pubscreen, "-");
   xpos = 50;
   ypos = 50;
-  Servermem->cfg.logintries = 5;
-  Servermem->cfg.defaultcharset = 1;
+  cfg->logintries = 5;
+  cfg->defaultcharset = 1;
 }
 
-int handleSystemConfigStatusSection(char *line, BPTR fh) {
+int handleSystemConfigStatusSection(char *line, BPTR fh, struct Config *cfg) {
   int status;
   char buffer[100];
 
@@ -177,11 +179,11 @@ int handleSystemConfigStatusSection(char *line, BPTR fh) {
       if(StartsWith(line, "ENDSTATUS")) {
         return 1;
       } else if(isMatchingConfigLine(line, "MAXTID") || isMatchingConfigLine(line, "MAXTIME")) {
-        if(!GetShortCfgValue(line, &Servermem->cfg.maxtid[status])) {
+        if(!GetShortCfgValue(line, &cfg->maxtid[status])) {
           return 0;
         }
       } else if(isMatchingConfigLine(line, "ULDL")) {
-        if(!GetCharCfgValue(line, &Servermem->cfg.uldlratio[status])) {
+        if(!GetCharCfgValue(line, &cfg->uldlratio[status])) {
           return 0;
         }
       } else if(StartsWith(line, "STATUS")) {
@@ -194,112 +196,112 @@ int handleSystemConfigStatusSection(char *line, BPTR fh) {
   }
 }
 
-int handleSystemConfigLine(char *line, BPTR fh) {
+int handleSystemConfigLine(char *line, BPTR fh, struct Config *cfg) {
   int len;
 
   if(isMatchingConfigLine(line, "DEFAULTFLAGS")) {
-    if(!GetLongCfgValue(line, &Servermem->cfg.defaultflags)) {
+    if(!GetLongCfgValue(line, &cfg->defaultflags)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "DEFAULTSTATUS")) {
-    if(!GetCharCfgValue(line, &Servermem->cfg.defaultstatus)) {
+    if(!GetCharCfgValue(line, &cfg->defaultstatus)) {
       return 0;
     }
-    if(Servermem->cfg.defaultstatus < 0 || Servermem->cfg.defaultstatus > 100) {
+    if(cfg->defaultstatus < 0 || cfg->defaultstatus > 100) {
       printf("Invalid value for DEFAULTSTATUS, must be between 0 and 100.\n");
       return 0;
     }
   } else if(isMatchingConfigLine(line, "DEFAULTRADER") || isMatchingConfigLine(line, "DEFAULTLINES")) {
-    if(!GetCharCfgValue(line, &Servermem->cfg.defaultrader)) {
+    if(!GetCharCfgValue(line, &cfg->defaultrader)) {
       return 0;
     }
   } else if(StartsWith(line, "STATUS")) {
-    if(!handleSystemConfigStatusSection(line, fh)) {
+    if(!handleSystemConfigStatusSection(line, fh, cfg)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "CLOSEDBBS")) {
-    if(!GetBoolCfgFlag(line, &Servermem->cfg.cfgflags, NICFG_CLOSEDBBS)) {
+    if(!GetBoolCfgFlag(line, &cfg->cfgflags, NICFG_CLOSEDBBS)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "NY") || isMatchingConfigLine(line, "NEWUSERLOGIN")) {
-    if(!GetStringCfgValue(line, Servermem->cfg.ny, 20)) {
+    if(!GetStringCfgValue(line, cfg->ny, 20)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "DISKFREE")) {
-    if(!GetLongCfgValue(line, &Servermem->cfg.diskfree)) {
+    if(!GetLongCfgValue(line, &cfg->diskfree)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "ULTMP")) {
-    if(!GetStringCfgValue(line, Servermem->cfg.ultmp, 98)) {
+    if(!GetStringCfgValue(line, cfg->ultmp, 98)) {
       return 0;
     }
-    len = strlen(Servermem->cfg.ultmp);
-    if(Servermem->cfg.ultmp[len - 1] != '/' && Servermem->cfg.ultmp[len - 1] != ':') {
-      Servermem->cfg.ultmp[len] = '/';
-      Servermem->cfg.ultmp[len + 1] = '\0';
+    len = strlen(cfg->ultmp);
+    if(cfg->ultmp[len - 1] != '/' && cfg->ultmp[len - 1] != ':') {
+      cfg->ultmp[len] = '/';
+      cfg->ultmp[len + 1] = '\0';
     }
   } else if(isMatchingConfigLine(line, "PREINLOGG") || isMatchingConfigLine(line, "AREXX_PRELOGIN")) {
-    if(!GetLongCfgValue(line, &Servermem->cfg.ar.preinlogg)) {
+    if(!GetLongCfgValue(line, &cfg->ar.preinlogg)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "POSTINLOGG") || isMatchingConfigLine(line, "AREXX_POSTLOGIN")) {
-    if(!GetLongCfgValue(line, &Servermem->cfg.ar.postinlogg)) {
+    if(!GetLongCfgValue(line, &cfg->ar.postinlogg)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "UTLOGG") || isMatchingConfigLine(line, "AREXX_LOGOUT")) {
-    if(!GetLongCfgValue(line, &Servermem->cfg.ar.utlogg)) {
+    if(!GetLongCfgValue(line, &cfg->ar.utlogg)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "NYANV") || isMatchingConfigLine(line, "AREXX_NEWUSER")) {
-    if(!GetLongCfgValue(line, &Servermem->cfg.ar.nyanv)) {
+    if(!GetLongCfgValue(line, &cfg->ar.nyanv)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "PREUPLOAD1") || isMatchingConfigLine(line, "AREXX_PREUPLOAD1")) {
-    if(!GetLongCfgValue(line, &Servermem->cfg.ar.preup1)) {
+    if(!GetLongCfgValue(line, &cfg->ar.preup1)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "PREUPLOAD2") || isMatchingConfigLine(line, "AREXX_PREUPLOAD2")) {
-    if(!GetLongCfgValue(line, &Servermem->cfg.ar.preup2)) {
+    if(!GetLongCfgValue(line, &cfg->ar.preup2)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "POSTUPLOAD1") || isMatchingConfigLine(line, "AREXX_POSTUPLOAD1")) {
-    if(!GetLongCfgValue(line, &Servermem->cfg.ar.postup1)) {
+    if(!GetLongCfgValue(line, &cfg->ar.postup1)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "POSTUPLOAD2") || isMatchingConfigLine(line, "AREXX_POSTUPLOAD2")) {
-    if(!GetLongCfgValue(line, &Servermem->cfg.ar.postup2)) {
+    if(!GetLongCfgValue(line, &cfg->ar.postup2)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "NORIGHT") || isMatchingConfigLine(line, "AREXX_NOPERMISSION")) {
-    if(!GetLongCfgValue(line, &Servermem->cfg.ar.noright)) {
+    if(!GetLongCfgValue(line, &cfg->ar.noright)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "NEXTMEET") || isMatchingConfigLine(line, "AREXX_NEXTFORUM")) {
-    if(!GetLongCfgValue(line, &Servermem->cfg.ar.nextmeet)) {
+    if(!GetLongCfgValue(line, &cfg->ar.nextmeet)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "NEXTTEXT") || isMatchingConfigLine(line, "AREXX_NEXTTEXT")) {
-    if(!GetLongCfgValue(line, &Servermem->cfg.ar.nexttext)) {
+    if(!GetLongCfgValue(line, &cfg->ar.nexttext)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "NEXTKOM") || isMatchingConfigLine(line, "AREXX_NEXTREPLY")) {
-    if(!GetLongCfgValue(line, &Servermem->cfg.ar.nextkom)) {
+    if(!GetLongCfgValue(line, &cfg->ar.nextkom)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "SETID") || isMatchingConfigLine(line, "AREXX_SEETIME")) {
-    if(!GetLongCfgValue(line, &Servermem->cfg.ar.setid)) {
+    if(!GetLongCfgValue(line, &cfg->ar.setid)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "NEXTLETTER") || isMatchingConfigLine(line, "AREXX_NEXTMAIL")) {
-    if(!GetLongCfgValue(line, &Servermem->cfg.ar.nextletter)) {
+    if(!GetLongCfgValue(line, &cfg->ar.nextletter)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "CARDROPPED") || isMatchingConfigLine(line, "AREXX_AUTOLOGOUT")) {
-    if(!GetLongCfgValue(line, &Servermem->cfg.ar.cardropped)) {
+    if(!GetLongCfgValue(line, &cfg->ar.cardropped)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "LOGMASK")) {
-    if(!GetLongCfgValue(line, &Servermem->cfg.logmask)) {
+    if(!GetLongCfgValue(line, &cfg->logmask)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "SCREEN")) {
@@ -315,24 +317,24 @@ int handleSystemConfigLine(char *line, BPTR fh) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "VALIDERAFILER") || isMatchingConfigLine(line, "UPLOADSNOTVALIDATED")) {
-    if(!GetBoolCfgFlag(line, &Servermem->cfg.cfgflags, NICFG_VALIDATEFILES)) {
+    if(!GetBoolCfgFlag(line, &cfg->cfgflags, NICFG_VALIDATEFILES)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "LOGINTRIES") || isMatchingConfigLine(line, "LOGINATTEMPTS")) {
-    if(!GetShortCfgValue(line, &Servermem->cfg.logintries)) {
+    if(!GetShortCfgValue(line, &cfg->logintries)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "LOCALCOLOURS") || isMatchingConfigLine(line, "LOCALCOLORS")) {
-    if(!GetBoolCfgFlag(line, &Servermem->cfg.cfgflags, NICFG_LOCALCOLOURS)) {
+    if(!GetBoolCfgFlag(line, &cfg->cfgflags, NICFG_LOCALCOLOURS)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "CRYPTEDPASSWORDS")
             || isMatchingConfigLine(line, "ENCRYPTEDPASSWORDS")) {
-    if(!GetBoolCfgFlag(line, &Servermem->cfg.cfgflags, NICFG_CRYPTEDPASSWORDS)) {
+    if(!GetBoolCfgFlag(line, &cfg->cfgflags, NICFG_CRYPTEDPASSWORDS)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "NEWUSERCHARSET")) {
-    if(!GetCharCfgValue(line, &Servermem->cfg.defaultcharset)) {
+    if(!GetCharCfgValue(line, &cfg->defaultcharset)) {
       return 0;
     }
   } else {
@@ -354,16 +356,15 @@ int populateLangCommand(struct LangCommand *langCmd, char *str) {
   return 1;
 }
 
-void ReadCommandConfig(void) {
+int readCommandConfig(struct Config *cfg) {
   BPTR fh;
   struct Kommando *command = NULL;
   char buffer[100];
   int cnt = 0;
   
-  FreeCommandMem();
-  
   if(!(fh = Open("NiKom:DatoCfg/Commands.cfg", MODE_OLDFILE))) {
-    cleanup(EXIT_ERROR, "Kunde inte öppna NiKom:DatoCfg/Commands.cfg\n");
+    printf("Kunde inte öppna NiKom:DatoCfg/Commands.cfg\n");
+    return 0;
   }
 
   while(FGets(fh, buffer, 100)) {
@@ -374,14 +375,16 @@ void ReadCommandConfig(void) {
       if(!(command = (struct Kommando *)AllocMem(sizeof(struct Kommando),
                                                  MEMF_CLEAR | MEMF_PUBLIC))) {
         Close(fh);
-        cleanup(EXIT_ERROR, "Out of memory while reading Commands.cfg\n");
+        printf("Out of memory while reading Commands.cfg\n");
+        return 0;
       }
       buffer[32] = '\0';
       if(!populateLangCommand(&command->langCmd[0], buffer)) {
         Close(fh);
-        cleanup(EXIT_ERROR, "Invalid Commands.cfg");
+        printf("Invalid Commands.cfg\n");
+        return 0;
       }
-      AddTail((struct List *)&Servermem->kom_list, (struct Node *)command);
+      AddTail((struct List *)&cfg->kom_list, (struct Node *)command);
       cnt++;
       continue;
     }
@@ -389,16 +392,17 @@ void ReadCommandConfig(void) {
     if(command == NULL) {
       printf("Found command detail line before command start (\"N=\"): %s\n", buffer);
       Close(fh);
-      cleanup(EXIT_ERROR, "Invalid Commands.cfg");
+      return 0;
     }
     if(!handleCommandConfigLine(buffer, command)) {
       Close(fh);
-      cleanup(EXIT_ERROR, "Invalid Commands.cfg");
+      return 0;
     }
   }
   Close(fh);
-  Servermem->info.kommandon = cnt;
+  cfg->noOfCommands = cnt;
   printf("Read Commands.cfg, %d commands\n", cnt);
+  return 1;
 }
 
 int handleCommandConfigLine(char *line, struct Kommando *command) {
@@ -502,19 +506,13 @@ int handleCommandConfigLine(char *line, struct Kommando *command) {
   return 1;
 }
 
-void FreeCommandMem(void) {
-  struct Kommando *command;
-  while((command = (struct Kommando *)RemHead((struct List *)&Servermem->kom_list))) {
-    FreeMem(command, sizeof(struct Kommando));
-  }
-}
-
-void ReadFileKeyConfig(void) {
+int readFileKeyConfig(struct Config *cfg) {
   BPTR fh;
   char buffer[100];
   int x=0;
   if(!(fh = Open("NiKom:DatoCfg/Nycklar.cfg", MODE_OLDFILE))) {
-    cleanup(EXIT_ERROR,"Could not open Nycklar.cfg");
+    printf("Could not open Nycklar.cfg\n");
+    return 0;
   }
   while(FGets(fh, buffer, 100)) {
     if(x >= MAXNYCKLAR) {
@@ -525,88 +523,88 @@ void ReadFileKeyConfig(void) {
     }
     if(buffer[0] != '\n' && buffer[0] != '*' && buffer[0] != '#') {
       buffer[40] = '\0';
-      strncpy(Servermem->Nyckelnamn[x], buffer, 41);
+      strncpy(cfg->fileKeys[x], buffer, 41);
       x++;
     }
   }
   printf("Read Nycklar.cfg, %d keys\n", x);
   Close(fh);
-  Servermem->info.nycklar = x;
+  cfg->noOfFileKeys = x;
 }
 
-void initStatusConfigDefaults(void) {
-  Servermem->cfg.st.skriv = 99;
-  Servermem->cfg.st.texter = 99;
-  Servermem->cfg.st.brev = 99;
-  Servermem->cfg.st.medmoten = 99;
-  Servermem->cfg.st.radmoten = 99;
-  Servermem->cfg.st.sestatus = 99;
-  Servermem->cfg.st.anv = 99;
-  Servermem->cfg.st.chgstatus = 99;
-  Servermem->cfg.st.bytarea = 99;
-  Servermem->cfg.st.radarea = 99;
-  Servermem->cfg.st.filer = 99;
-  Servermem->cfg.st.laddaner = 99;
-  Servermem->cfg.st.crashmail = 99;
-  Servermem->cfg.st.grupper = 99;
+void initStatusConfigDefaults(struct Config *cfg) {
+  cfg->st.skriv = 99;
+  cfg->st.texter = 99;
+  cfg->st.brev = 99;
+  cfg->st.medmoten = 99;
+  cfg->st.radmoten = 99;
+  cfg->st.sestatus = 99;
+  cfg->st.anv = 99;
+  cfg->st.chgstatus = 99;
+  cfg->st.bytarea = 99;
+  cfg->st.radarea = 99;
+  cfg->st.filer = 99;
+  cfg->st.laddaner = 99;
+  cfg->st.crashmail = 99;
+  cfg->st.grupper = 99;
 }
 
-void ReadStatusConfig(void) {
-  initStatusConfigDefaults();
-  readConfigFile("NiKom:DatoCfg/Status.cfg", handleStatusConfigLine);
+int readStatusConfig(struct Config *cfg) {
+  initStatusConfigDefaults(cfg);
+  return readConfigFile("NiKom:DatoCfg/Status.cfg", cfg, handleStatusConfigLine);
 }
 
-int handleStatusConfigLine(char *line, BPTR fh) {
+int handleStatusConfigLine(char *line, BPTR fh, struct Config *cfg) {
   if(isMatchingConfigLine(line, "SKRIV") || isMatchingConfigLine(line, "WRITE")) {
-    if(!GetCharCfgValue(line, &Servermem->cfg.st.skriv)) {
+    if(!GetCharCfgValue(line, &cfg->st.skriv)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "TEXTER") || isMatchingConfigLine(line, "MANAGETEXTS")) {
-    if(!GetCharCfgValue(line, &Servermem->cfg.st.texter)) {
+    if(!GetCharCfgValue(line, &cfg->st.texter)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "BREV") || isMatchingConfigLine(line, "MANAGEMAIL")) {
-    if(!GetCharCfgValue(line, &Servermem->cfg.st.brev)) {
+    if(!GetCharCfgValue(line, &cfg->st.brev)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "MEDMÖTEN") || isMatchingConfigLine(line, "JOINFORUMS")) {
-    if(!GetCharCfgValue(line, &Servermem->cfg.st.medmoten)) {
+    if(!GetCharCfgValue(line, &cfg->st.medmoten)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "RADMÖTEN") || isMatchingConfigLine(line, "MANAGEFORUMS")) {
-    if(!GetCharCfgValue(line, &Servermem->cfg.st.radmoten)) {
+    if(!GetCharCfgValue(line, &cfg->st.radmoten)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "SESTATUS") || isMatchingConfigLine(line, "VIEWUSERINFO")) {
-    if(!GetCharCfgValue(line, &Servermem->cfg.st.sestatus)) {
+    if(!GetCharCfgValue(line, &cfg->st.sestatus)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "ANVÄNDARE") || isMatchingConfigLine(line, "MANAGEUSERS")) {
-    if(!GetCharCfgValue(line, &Servermem->cfg.st.anv)) {
+    if(!GetCharCfgValue(line, &cfg->st.anv)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "ÄNDSTATUS") || isMatchingConfigLine(line, "MANAGESTATUS")) {
-    if(!GetCharCfgValue(line, &Servermem->cfg.st.chgstatus)) {
+    if(!GetCharCfgValue(line, &cfg->st.chgstatus)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "BYTAREA") || isMatchingConfigLine(line, "JOINAREAS")) {
-    if(!GetCharCfgValue(line, &Servermem->cfg.st.bytarea)) {
+    if(!GetCharCfgValue(line, &cfg->st.bytarea)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "RADAREA") || isMatchingConfigLine(line, "MANAGEAREAS")) {
-    if(!GetCharCfgValue(line, &Servermem->cfg.st.radarea)) {
+    if(!GetCharCfgValue(line, &cfg->st.radarea)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "FILER") || isMatchingConfigLine(line, "MANAGEFILES")) {
-    if(!GetCharCfgValue(line, &Servermem->cfg.st.filer)) {
+    if(!GetCharCfgValue(line, &cfg->st.filer)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "LADDANER") || isMatchingConfigLine(line, "DOWNLOAD")) {
-    if(!GetCharCfgValue(line, &Servermem->cfg.st.laddaner)) {
+    if(!GetCharCfgValue(line, &cfg->st.laddaner)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "GRUPPER") || isMatchingConfigLine(line, "MANAGEGROUPS")) {
-    if(!GetCharCfgValue(line, &Servermem->cfg.st.grupper)) {
+    if(!GetCharCfgValue(line, &cfg->st.grupper)) {
       return 0;
     }
   } else {
@@ -616,15 +614,16 @@ int handleStatusConfigLine(char *line, BPTR fh) {
   return 1;
 }
 
-void ReadNodeTypesConfig(void) {
+int readNodeTypesConfig(struct Config *cfg) {
   BPTR fh;
   int i;
   char buffer[100], *tmp;
   if(!(fh = Open("NiKom:DatoCfg/NodeTypes.cfg", MODE_OLDFILE))) {
-    cleanup(EXIT_ERROR, "Could not find NodeTypes.cfg");
+    printf("Could not find NodeTypes.cfg\n");
+    return 0;
   }
   for(i = 0; i < MAXNODETYPES; i++) {
-    Servermem->nodetypes[i].nummer = 0;
+    cfg->nodetypes[i].nummer = 0;
   }
   printf("Reading NodeTypes.cfg\n");
   while(FGets(fh,buffer,100)) {
@@ -635,65 +634,71 @@ void ReadNodeTypesConfig(void) {
     if(tmp == NULL || strcmp(tmp, "NODETYPE") != 0) {
       printf("Invalid config line: %s\n", buffer);
       Close(fh);
-      cleanup(EXIT_ERROR, "Invalid NodeTypes.cfg");
+      printf("Invalid NodeTypes.cfg\n");
+      return 0;
     }
     for(i = 0; i < MAXNODETYPES; i++) {
-      if(Servermem->nodetypes[i].nummer == 0) {
+      if(cfg->nodetypes[i].nummer == 0) {
         break;
       }
     }
     if(i == MAXNODETYPES) {
       Close(fh);
-      cleanup(EXIT_ERROR, "Too many nodetypes defined in NodeTypes.cfg");
+      printf("Too many nodetypes defined in NodeTypes.cfg\n");
+      return 0;
     }
 
     tmp = strtok(NULL, WHITESPACE);
     if(tmp == NULL) {
       printf("No node type number found on line: %s\n", buffer);
       Close(fh);
-      cleanup(EXIT_ERROR, "Invalid NodeTypes.cfg");
+      printf("Invalid NodeTypes.cfg\n");
+      return 0;
     }
-    Servermem->nodetypes[i].nummer = atoi(tmp);
+    cfg->nodetypes[i].nummer = atoi(tmp);
 
     tmp = strtok(NULL, WHITESPACE);
     if(tmp == NULL) {
       printf("No node type path found on line: %s\n", buffer);
       Close(fh);
-      cleanup(EXIT_ERROR, "Invalid NodeTypes.cfg");
+      printf("Invalid NodeTypes.cfg\n");
+      return 0;
     }
-    strcpy(Servermem->nodetypes[i].path, tmp);
+    strcpy(cfg->nodetypes[i].path, tmp);
 
     tmp = strtok(NULL, "");
     if(tmp == NULL) {
       printf("No node type description found on line: %s\n", buffer);
       Close(fh);
-      cleanup(EXIT_ERROR, "Invalid NodeTypes.cfg");
+      printf("Invalid NodeTypes.cfg\n");
+      return 0;
     }
-    strcpy(Servermem->nodetypes[i].desc, tmp);
+    strcpy(cfg->nodetypes[i].desc, tmp);
   }
   Close(fh);
+  return 1;
 }
 
-void ReadFidoConfig(void) {
+int readFidoConfig(struct Config *cfg) {
   int i;
   for(i = 0; i < 10; i++) {
-    Servermem->fidodata.fd[i].domain[0] = '\0';
+    cfg->fidoConfig.fd[i].domain[0] = '\0';
   }
   for(i = 0; i < 20; i++) {
-    Servermem->fidodata.fa[i].namn[0] = '\0';
+    cfg->fidoConfig.fa[i].namn[0] = '\0';
   }
-  Servermem->fidodata.mailgroups = 0;
+  cfg->fidoConfig.mailgroups = 0;
 
-  readConfigFile("NiKom:DatoCfg/NiKomFido.cfg", handleFidoConfigLine);
+  return readConfigFile("NiKom:DatoCfg/NiKomFido.cfg", cfg, handleFidoConfigLine);
 }
 
-int handleFidoConfigLine(char *line, BPTR fh) {
+int handleFidoConfigLine(char *line, BPTR fh, struct Config *cfg) {
   int i, address[4], group;
   char *tmp1, *tmp2, tmpbuf[50];
 
   if(isMatchingConfigLine(line,"DOMAIN")) {
     for(i = 0; i < 10; i++) {
-      if(!Servermem->fidodata.fd[i].domain[0]) {
+      if(!cfg->fidoConfig.fd[i].domain[0]) {
         break;
       }
     }
@@ -702,30 +707,30 @@ int handleFidoConfigLine(char *line, BPTR fh) {
       return 0;
     }
     tmp1 = FindNextWord(line);
-    Servermem->fidodata.fd[i].nummer = atoi(tmp1);
-    if(Servermem->fidodata.fd[i].nummer <= 0) {
+    cfg->fidoConfig.fd[i].nummer = atoi(tmp1);
+    if(cfg->fidoConfig.fd[i].nummer <= 0) {
       printf("The domain number must be a positive integer: %s\n", line);
       return 0;
     }
     tmp1 = FindNextWord(tmp1);
     tmp2 = FindNextWord(tmp1);
     tmp2[-1] = '\0';
-    strncpy(Servermem->fidodata.fd[i].domain, tmp1, 19);
+    strncpy(cfg->fidoConfig.fd[i].domain, tmp1, 19);
     if(!ParseFidoAddress(tmp2, address)) {
       printf("Invalid FidoNet address '%s'\n", tmp2);
       return 0;
     }
-    Servermem->fidodata.fd[i].zone = address[0];
-    Servermem->fidodata.fd[i].net = address[1];
-    Servermem->fidodata.fd[i].node = address[2];
-    Servermem->fidodata.fd[i].point = address[3];
+    cfg->fidoConfig.fd[i].zone = address[0];
+    cfg->fidoConfig.fd[i].net = address[1];
+    cfg->fidoConfig.fd[i].node = address[2];
+    cfg->fidoConfig.fd[i].point = address[3];
 
     tmp1 = FindNextWord(tmp2);
-    strncpy(Servermem->fidodata.fd[i].zones, tmp1, 49);
+    strncpy(cfg->fidoConfig.fd[i].zones, tmp1, 49);
   }
   else if(isMatchingConfigLine(line, "ALIAS")) {
     for(i = 0; i < 20; i++) {
-      if(!Servermem->fidodata.fa[i].namn[0]) {
+      if(!cfg->fidoConfig.fa[i].namn[0]) {
         break;
       }
     }
@@ -734,19 +739,19 @@ int handleFidoConfigLine(char *line, BPTR fh) {
       return 0;
     }
     tmp1 = FindNextWord(line);
-    Servermem->fidodata.fa[i].nummer = atoi(tmp1);
+    cfg->fidoConfig.fa[i].nummer = atoi(tmp1);
     tmp1 = FindNextWord(tmp1);
-    strncpy(Servermem->fidodata.fa[i].namn, tmp1, 35);
+    strncpy(cfg->fidoConfig.fa[i].namn, tmp1, 35);
   }
   else if(isMatchingConfigLine(line, "BOUNCE")) {
     if(!GetStringCfgValue(line, tmpbuf, 10)) {
       return 0;
     }
     if(tmpbuf[0] == 'Y' || tmpbuf[0] == 'y') {
-      Servermem->fidodata.bounce = TRUE;
+      cfg->fidoConfig.bounce = TRUE;
     }
   } else if(isMatchingConfigLine(line, "MATRIXDIR")) {
-    if(!GetStringCfgValue(line, Servermem->fidodata.matrixdir, 99)) {
+    if(!GetStringCfgValue(line, cfg->fidoConfig.matrixdir, 99)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "MAILGROUP")) {
@@ -758,18 +763,18 @@ int handleFidoConfigLine(char *line, BPTR fh) {
       printf("Unknown user group '%s'\n", tmpbuf);
       return 0;
     }
-    BAMSET((char *)&Servermem->fidodata.mailgroups, group);
+    BAMSET((char *)&cfg->fidoConfig.mailgroups, group);
   }
   else if(isMatchingConfigLine(line, "MAILSTATUS")) {
-    if(!GetCharCfgValue(line, &Servermem->fidodata.mailstatus)) {
+    if(!GetCharCfgValue(line, &cfg->fidoConfig.mailstatus)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "DEFAULTORIGIN")) {
-    if(!GetStringCfgValue(line, Servermem->fidodata.defaultorigin, 69)) {
+    if(!GetStringCfgValue(line, cfg->fidoConfig.defaultorigin, 69)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "CRASHSTATUS")) {
-    if(!GetCharCfgValue(line, &Servermem->fidodata.crashstatus)) {
+    if(!GetCharCfgValue(line, &cfg->fidoConfig.crashstatus)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "MESSAGE_BYTE_ORDER")) {
@@ -777,9 +782,9 @@ int handleFidoConfigLine(char *line, BPTR fh) {
       return 0;
     }
     if(strcmp(tmpbuf, "BIG_ENDIAN") == 0) {
-      Servermem->fidodata.littleEndianByteOrder = 0;
+      cfg->fidoConfig.littleEndianByteOrder = 0;
     } else if(strcmp(tmpbuf, "LITTLE_ENDIAN") == 0) {
-      Servermem->fidodata.littleEndianByteOrder = 1;
+      cfg->fidoConfig.littleEndianByteOrder = 1;
     } else {
       printf("Invalid byte order '%s'\n", tmpbuf);
     }
@@ -788,4 +793,47 @@ int handleFidoConfigLine(char *line, BPTR fh) {
     return 0;
   }
   return 1;
+}
+
+struct Config *ReadAllConfigs(void) {
+  struct Config *cfg;
+
+  cfg = AllocMem(sizeof(struct Config), MEMF_PUBLIC | MEMF_CLEAR);
+  if(cfg == NULL) {
+    printf("Couldn't allocate memory for config (%d bytes)\n", sizeof(struct Config));
+    return NULL;
+  }
+  
+  NewList((struct List *)&cfg->kom_list);
+  
+  if(readSystemConfig(cfg)
+     && readCommandConfig(cfg)
+     && readFileKeyConfig(cfg)
+     && readStatusConfig(cfg)
+     && readNodeTypesConfig(cfg)
+     && readFidoConfig(cfg)) {
+    return cfg;
+  }
+  FreeAllConfigs(cfg);
+  return NULL;
+}
+
+void FreeAllConfigs(struct Config *cfg) {
+  struct Kommando *command;
+  while((command = (struct Kommando *)RemHead((struct List *)&cfg->kom_list))) {
+    FreeMem(command, sizeof(struct Kommando));
+  }
+  FreeMem(cfg, sizeof(struct Config));
+}
+
+int ReReadConfigs(void) {
+  struct Config *newCfg, *oldCfg;
+
+  newCfg = ReadAllConfigs();
+  if(newCfg != NULL) {
+    oldCfg = Servermem->cfg;
+    Servermem->cfg = newCfg;
+    FreeAllConfigs(oldCfg);
+  }
+  return newCfg != NULL;
 }

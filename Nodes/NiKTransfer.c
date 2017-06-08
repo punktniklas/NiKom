@@ -214,7 +214,7 @@ static long __saveds __regargs nik_update(struct XPR_UPDATE *update) {
 				}
 				else
 				{
-					if(Servermem->cfg.logmask & LOG_RECFILE) {
+					if(Servermem->cfg->logmask & LOG_RECFILE) {
                                           LogEvent(USAGE_LOG, INFO, "Tog emot filen %s från %s",
                                                    xprfilnamn, getusername(inloggad));
 					}
@@ -323,8 +323,8 @@ int download(void) {
 		puttekn("\r\n\nVARNING!! Uploads = -1",-1);
 		return(0);
 	}
-	if(Servermem->cfg.uldlratio[Servermem->inne[nodnr].status] && Servermem->cfg.uldlratio[Servermem->inne[nodnr].status] < (Servermem->inne[nodnr].download+1)/(Servermem->inne[nodnr].upload+1)) {
-		sprintf(outbuffer,"\r\n\nDu måste ladda upp en fil per %d filer du laddar ner.\r\n",Servermem->cfg.uldlratio[Servermem->inne[nodnr].status]);
+	if(Servermem->cfg->uldlratio[Servermem->inne[nodnr].status] && Servermem->cfg->uldlratio[Servermem->inne[nodnr].status] < (Servermem->inne[nodnr].download+1)/(Servermem->inne[nodnr].upload+1)) {
+		sprintf(outbuffer,"\r\n\nDu måste ladda upp en fil per %d filer du laddar ner.\r\n",Servermem->cfg->uldlratio[Servermem->inne[nodnr].status]);
 		puttekn(outbuffer,-1);
 		puttekn("Endast filer med fri download tillåts.\n\r",-1);
 		freedlonly=TRUE;
@@ -333,7 +333,7 @@ int download(void) {
 		puttekn("\r\n\nDu befinner dig inte i någon area!\r\n",-1);
 		return(0);
 	}
-	if((!global && Servermem->areor[area2].flaggor & AREA_NODOWNLOAD) && (Servermem->inne[nodnr].status < Servermem->cfg.st.laddaner)) {
+	if((!global && Servermem->areor[area2].flaggor & AREA_NODOWNLOAD) && (Servermem->inne[nodnr].status < Servermem->cfg->st.laddaner)) {
 		puttekn("\n\n\rDu har ingen rätt att ladda ner från den här arean!\n\r",-1);
 		return(0);
 	}
@@ -380,7 +380,7 @@ int download(void) {
 			continue;
 		}
 
-		if(filpek->status>Servermem->inne[nodnr].status && Servermem->inne[nodnr].status<Servermem->cfg.st.laddaner)
+		if(filpek->status>Servermem->inne[nodnr].status && Servermem->inne[nodnr].status<Servermem->cfg->st.laddaner)
 		{
 			sprintf(outbuffer,"Du har ingen rätt att ladda ner %s!\n\r",filpek->namn);
 			puttekn(outbuffer,-1);
@@ -416,7 +416,7 @@ int download(void) {
 	Servermem->varmote[nodnr] = area2;
 	Servermem->vilkastr[nodnr] = NULL;
 	sendbinfile();
-	if(Servermem->cfg.logmask & LOG_DOWNLOAD) {
+	if(Servermem->cfg->logmask & LOG_DOWNLOAD) {
 		for(tf=(struct TransferFiles *)tf_list.mlh_Head;tf->node.mln_Succ;tf=(struct TransferFiles *)tf->node.mln_Succ)
 			if(tf->sucess) {
                           LogEvent(USAGE_LOG, INFO, "%s laddar ner %s (%d cps)",
@@ -455,7 +455,7 @@ int upload(void) {
   char nikfilename[100],errbuff[100],filnamn[50],tmpfullname[100], outbuffer[81];
   struct TransferFiles *tf;
 
-  if(Servermem->cfg.ar.preup1) sendautorexx(Servermem->cfg.ar.preup1);
+  if(Servermem->cfg->ar.preup1) sendautorexx(Servermem->cfg->ar.preup1);
   if(area2==-1) {
     puttekn("\r\nI vilken area? ",-1);
   } else {
@@ -474,14 +474,14 @@ int upload(void) {
     puttekn("\n\rFinns ingen sådan area!\n\r",-1);
     return(0);
   }
-  if((Servermem->areor[area].flaggor & AREA_NOUPLOAD) && (Servermem->inne[nodnr].status < Servermem->cfg.st.laddaner)) {
+  if((Servermem->areor[area].flaggor & AREA_NOUPLOAD) && (Servermem->inne[nodnr].status < Servermem->cfg->st.laddaner)) {
     puttekn("\n\n\rDu har ingen rätt att ladda upp till den arean!\n\r",-1);
     return(0);
   }
   Servermem->action[nodnr] = UPLOAD;
   Servermem->varmote[nodnr] = area;
   Servermem->vilkastr[nodnr] = NULL;
-  if((ret=recbinfile(Servermem->cfg.ultmp))) {
+  if((ret=recbinfile(Servermem->cfg->ultmp))) {
     while((tf=(struct TransferFiles *)RemHead((struct List *)&tf_list)))
       FreeMem(tf,sizeof(struct TransferFiles));
     if(ImmediateLogout()) {
@@ -506,7 +506,7 @@ int upload(void) {
         if(valnamn(inmat,area,errbuff)) break;
       }
       strcpy(filnamn,inmat);
-      sprintf(tmpfullname,"%s%s",Servermem->cfg.ultmp,filnamn);
+      sprintf(tmpfullname,"%s%s",Servermem->cfg->ultmp,filnamn);
       if(!Rename(xprfilnamn,tmpfullname)) {
         sprintf(outbuffer,"\r\n\nKunde inte döpa om filen från '%s'\r\ntill '%s'.\r\n",xprfilnamn,tmpfullname);
         puttekn(outbuffer,-1);
@@ -534,7 +534,7 @@ int upload(void) {
     puttekn("\r\nVilken status ska behövas för att ladda ner filen? (0)",-1);
     if(getstring(EKO,3,NULL)) { FreeMem(allokpek,sizeof(struct Fil)); return(1); }
     allokpek->status=atoi(inmat);
-    if(Servermem->inne[nodnr].status >= Servermem->cfg.st.filer) {
+    if(Servermem->inne[nodnr].status >= Servermem->cfg->st.filer) {
       if(GetYesOrNo("\n\r", "Ska filen valideras?", NULL, NULL, "Ja", "Nej", NULL,
                     TRUE, &isCorrect)) {
         return 1;
@@ -549,7 +549,7 @@ int upload(void) {
       if(isCorrect) {
         allokpek->flaggor|=FILE_FREEDL;
       }
-    } else if(Servermem->cfg.cfgflags & NICFG_VALIDATEFILES) allokpek->flaggor|=FILE_NOTVALID;
+    } else if(Servermem->cfg->cfgflags & NICFG_VALIDATEFILES) allokpek->flaggor|=FILE_NOTVALID;
     sendfile("NiKom:Texter/Nyckelhjälp.txt");
     puttekn("\r\nVilka söknycklar ska filen ha? (? för att få en lista)\r\n",-1);
     if(editkey(allokpek->nycklar)) { FreeMem(allokpek,sizeof(struct Fil)); return(1); }
@@ -577,11 +577,11 @@ int upload(void) {
     
     Servermem->inne[nodnr].upload++;
     Statstr.ul++;
-    if(Servermem->cfg.logmask & LOG_UPLOAD) {
+    if(Servermem->cfg->logmask & LOG_UPLOAD) {
       LogEvent(USAGE_LOG, INFO, "%s laddar upp %s",
                getusername(inloggad), allokpek->namn);
     }
-    if(Servermem->cfg.ar.postup1) sendautorexx(Servermem->cfg.ar.postup1);
+    if(Servermem->cfg->ar.postup1) sendautorexx(Servermem->cfg->ar.postup1);
 
     if(GetYesOrNo("\r\n\n", "Vill du skriva en längre beskrivning?",
                   "j", "n", "Ok, går in i editorn.", "Nej", "\r\n\n",
@@ -630,14 +630,14 @@ int recbinfile(char *dir) {
     return 2;
   }
 
-  if(Servermem->cfg.diskfree != 0
-     && !HasPartitionEnoughFreeSpace(dir, Servermem->cfg.diskfree)) {
+  if(Servermem->cfg->diskfree != 0
+     && !HasPartitionEnoughFreeSpace(dir, Servermem->cfg->diskfree)) {
     puttekn("\r\nTyvärr, gränsen för hur full disken får bli har överskridits!\r\n",-1);
     return 2;
   }
 
-  if(Servermem->cfg.ar.preup2) {
-    sendautorexx(Servermem->cfg.ar.preup2);
+  if(Servermem->cfg->ar.preup2) {
+    sendautorexx(Servermem->cfg->ar.preup2);
   }
   sprintf(zmodeminit,"%s%s",zinitstring,dir);
   if(!(XProtocolBase = (struct Library *) OpenLibrary("xprzmodem.library", 0L))) {
@@ -682,8 +682,8 @@ int recbinfile(char *dir) {
   DoIO((struct IORequest *)serchangereq);
   serreqtkn();
   UpdateInactive();
-  if(Servermem->cfg.ar.postup2) {
-    sendautorexx(Servermem->cfg.ar.postup2);
+  if(Servermem->cfg->ar.postup2) {
+    sendautorexx(Servermem->cfg->ar.postup2);
   }
 
   if(ulfiles > 0) {
@@ -741,7 +741,7 @@ int sendbinfile(void) {
 	DoIO((struct IORequest *)serchangereq);
 	serreqtkn();
 	UpdateInactive();
-	if(Servermem->cfg.logmask & LOG_SENDFILE) {
+	if(Servermem->cfg->logmask & LOG_SENDFILE) {
 		for(tf=(struct TransferFiles *)tf_list.mlh_Head;tf->node.mln_Succ;tf=(struct TransferFiles *)tf->node.mln_Succ)
 			if(tf->sucess) {
                           LogEvent(USAGE_LOG, INFO, "Skickar filen %s till %s",

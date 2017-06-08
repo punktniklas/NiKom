@@ -63,7 +63,7 @@ int grabtext(int text,FILE *fpgrab) {
 	Statstr.read++;
 	if(GetConferenceForText(text) == -1) {
 		puttekn("\r\n\nTexten är raderad!\r\n\n",-1);
-		if(Servermem->inne[nodnr].status<Servermem->cfg.st.medmoten) return(0);
+		if(Servermem->inne[nodnr].status<Servermem->cfg->st.medmoten) return(0);
 	}
 	if(readtexthead(text,&grabhead)) return(2);
 	if(!MayReadConf(grabhead.mote, inloggad, &Servermem->inne[nodnr])) {

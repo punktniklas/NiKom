@@ -11,7 +11,7 @@ struct NodeType * __saveds AASM LIBGetNodeType(register __d0 long number AREG(d0
 	if(!NiKomBase->Servermem) return(NULL);
 
 	for(x=0; x < MAXNODETYPES; x++) {
-		if(NiKomBase->Servermem->nodetypes[x].nummer == number) return(&NiKomBase->Servermem->nodetypes[x]);
+		if(NiKomBase->Servermem->cfg->nodetypes[x].nummer == number) return(&NiKomBase->Servermem->cfg->nodetypes[x]);
 	}
 	return(NULL);
 }

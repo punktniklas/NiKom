@@ -39,7 +39,7 @@ void __saveds AASM LIBMatrix2NiKom(register __a6 struct NiKomBase *NiKomBase ARE
   oldLastMatrix = getlastmatrix();
 
   for(lastMatrix = oldLastMatrix;; lastMatrix++) {
-    strcpy(buffer, NiKomBase->Servermem->fidodata.matrixdir);
+    strcpy(buffer, NiKomBase->Servermem->cfg->fidoConfig.matrixdir);
     sprintf(filename, "%d.msg", lastMatrix);
     AddPart(buffer, filename, 99);
     if(!(fidotext = LIBReadFidoText(buffer, &ti, NiKomBase))) {
@@ -145,7 +145,7 @@ int fidoparsenamn(char *skri,struct System *Servermem) {
 	char *faci,*skri2;
 	struct ShortUser *letpek;
 	for(x=0;x<20;x++) {
-		if(sprattmatchar(skri,Servermem->fidodata.fa[x].namn)) return(Servermem->fidodata.fa[x].nummer);
+		if(sprattmatchar(skri,Servermem->cfg->fidoConfig.fa[x].namn)) return(Servermem->cfg->fidoConfig.fa[x].nummer);
 	}
 	if(sprattmatchar(skri,"sysop")) return(0);
 	letpek=(struct ShortUser *)Servermem->user_list.mlh_Head;

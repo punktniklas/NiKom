@@ -44,7 +44,7 @@ char *getmotnamn(int confId) {
 
 struct Kommando *getkmdpek(int cmdId) {
   struct Kommando *cmd;
-  ITER_EL(cmd, Servermem->kom_list, kom_node, struct Kommando *) {
+  ITER_EL(cmd, Servermem->cfg->kom_list, kom_node, struct Kommando *) {
     if(cmd->nummer == cmdId) {
       return cmd;
     }
@@ -59,10 +59,10 @@ int bytnodtyp(void) {
   SendString("\n\n\r%s\n\n\r", CATSTR(MSG_CHANGE_NODETYPE_HEAD_1));
   SendString(" 0: %s\n\r", CATSTR(MSG_CHANGE_NODETYPE_HEAD_2));
   for(i = 0; i < MAXNODETYPES; i++) {
-    if(Servermem->nodetypes[i].nummer == 0) {
+    if(Servermem->cfg->nodetypes[i].nummer == 0) {
       break;
     }
-    SendString("%2d: %s\n\r", Servermem->nodetypes[i].nummer, Servermem->nodetypes[i].desc);
+    SendString("%2d: %s\n\r", Servermem->cfg->nodetypes[i].nummer, Servermem->cfg->nodetypes[i].desc);
   }
   for(;;) {
     SendString("\n\r%s ", CATSTR(MSG_COMMON_CHOICE));

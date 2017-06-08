@@ -357,17 +357,17 @@ int andmot(void) {
     SendString("\n\n\r");
 
     for(i = 0; i < 10; i++) {
-      if(!Servermem->fidodata.fd[i].domain[0]) {
+      if(!Servermem->cfg->fidoConfig.fd[i].domain[0]) {
         break;
       }
       SendString("%c%3d: %s (%d:%d/%d.%d)\n\r",
-                 tmpConf.domain == Servermem->fidodata.fd[i].nummer ? '*' : ' ',
-                 Servermem->fidodata.fd[i].nummer,
-                 Servermem->fidodata.fd[i].domain,
-                 Servermem->fidodata.fd[i].zone,
-                 Servermem->fidodata.fd[i].net,
-                 Servermem->fidodata.fd[i].node,
-                 Servermem->fidodata.fd[i].point);
+                 tmpConf.domain == Servermem->cfg->fidoConfig.fd[i].nummer ? '*' : ' ',
+                 Servermem->cfg->fidoConfig.fd[i].nummer,
+                 Servermem->cfg->fidoConfig.fd[i].domain,
+                 Servermem->cfg->fidoConfig.fd[i].zone,
+                 Servermem->cfg->fidoConfig.fd[i].net,
+                 Servermem->cfg->fidoConfig.fd[i].node,
+                 Servermem->cfg->fidoConfig.fd[i].point);
     }
     if(i == 0) {
       SendString("\n\r%s\n\r", CATSTR(MSG_FORUM_CREATE_NO_DOMAIN));

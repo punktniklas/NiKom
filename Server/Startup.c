@@ -79,21 +79,21 @@ void startupNiKom(void) {
   readSysInfo();
   readTextInfo();
   readGroupData();
-  ReadCommandConfig();
-  ReadSystemConfig();
   readConferenceData();
   readConferenceTexts();
   readUserData();
-  ReadFidoConfig();
-  ReadNodeTypesConfig();
   readLastLogins();
-  ReadFileKeyConfig();
-  ReadStatusConfig();
   readFileAreas();
   readFileAreaFiles();
   GetServerversion();
   scanFidoConferences();
   InitLegacyConversionData();
+
+  Servermem->cfg = ReadAllConfigs();
+  if(Servermem->cfg == NULL) {
+    cleanup(EXIT_ERROR, "Error reading configs");
+  }
+
   initNodes();
   openWindow();
 }
@@ -165,7 +165,6 @@ void setupServermem(void) {
   NewList((struct List *)&Servermem->user_list);
   NewList((struct List *)&Servermem->grupp_list);
   NewList((struct List *)&Servermem->shell_list);
-  NewList((struct List *)&Servermem->kom_list);
   NewList((struct List *)&Servermem->mot_list);
   for(i = 0; i < MAXAREA; i++) {
     NewList((struct List *)&Servermem->areor[i].ar_list);

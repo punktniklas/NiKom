@@ -213,7 +213,7 @@ void listnyheter(void) {
 			if(!arearatt(x, inloggad, &Servermem->inne[nodnr])) continue;
 			olasta=0;
 			for(sokpek=(struct Fil *)Servermem->areor[x].ar_list.mlh_TailPred;sokpek->f_node.mln_Pred;sokpek=(struct Fil *)sokpek->f_node.mln_Pred) {
-				if((sokpek->flaggor & FILE_NOTVALID) && Servermem->inne[nodnr].status < Servermem->cfg.st.filer && sokpek->uppladdare != inloggad) continue;
+				if((sokpek->flaggor & FILE_NOTVALID) && Servermem->inne[nodnr].status < Servermem->cfg->st.filer && sokpek->uppladdare != inloggad) continue;
 				if(sokpek->validtime < Servermem->inne[nodnr].senast_in) continue;
 				else olasta++;
 			}

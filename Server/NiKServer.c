@@ -181,12 +181,7 @@ int main(void) {
           purgeOldTexts(MyNiKMess->data);
           break;
         case READCFG :
-          ReadSystemConfig();
-          ReadCommandConfig();
-          ReadFileKeyConfig();
-          ReadStatusConfig();
-          ReadNodeTypesConfig();
-          ReadFidoConfig();
+          MyNiKMess->data = ReReadConfigs();
           break;
         case WRITEINFO :
           writeinfo();

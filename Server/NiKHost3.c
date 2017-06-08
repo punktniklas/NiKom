@@ -71,11 +71,11 @@ void rexxstatusinfo(struct RexxMsg *mess)
 	switch(mess->rm_Args[2][0])
 	{
 		case 'r' : case 'R' :
-			sprintf(str,"%d",Servermem->cfg.uldlratio[status]);
+			sprintf(str,"%d",Servermem->cfg->uldlratio[status]);
 			break;
 
 		case 't' : case 'T' :
-			sprintf(str,"%d",Servermem->cfg.maxtid[status]);
+			sprintf(str,"%d",Servermem->cfg->maxtid[status]);
 			break;
 		default :
 			str[0] = 0;
@@ -109,35 +109,35 @@ void rexxsysteminfo(struct RexxMsg *mess)
 	switch(mess->rm_Args[1][0])
 	{
 		case 'f' : case 'F' :
-			sprintf(str,"%ld",Servermem->cfg.defaultflags);
+			sprintf(str,"%ld",Servermem->cfg->defaultflags);
 			break;
 
 		case 'd' : case 'D' :
-			sprintf(str,"%ld",Servermem->cfg.diskfree);
+			sprintf(str,"%ld",Servermem->cfg->diskfree);
 			break;
 
 		case 'm' : case 'M' :
-			sprintf(str,"%ld",Servermem->cfg.logmask);
+			sprintf(str,"%ld",Servermem->cfg->logmask);
 			break;
 
 		case 'l' : case 'L' :
-			sprintf(str,"%d",Servermem->cfg.logintries);
+			sprintf(str,"%d",Servermem->cfg->logintries);
 			break;
 
 		case 'r' : case 'R' :
-			sprintf(str,"%d",(int) Servermem->cfg.defaultrader);
+			sprintf(str,"%d",(int) Servermem->cfg->defaultrader);
 			break;
 
 		case 's' : case 'S' :
-			sprintf(str,"%d",(int) Servermem->cfg.defaultstatus);
+			sprintf(str,"%d",(int) Servermem->cfg->defaultstatus);
 			break;
 
 		case 'n' : case 'N' :
-			strcpy(str,Servermem->cfg.ny);
+			strcpy(str,Servermem->cfg->ny);
 			break;
 
 		case 'u' : case 'U' :
-			strcpy(str,Servermem->cfg.ultmp);
+			strcpy(str,Servermem->cfg->ultmp);
 			break;
 
 		default:
@@ -234,7 +234,7 @@ void rexxarearight(struct RexxMsg *mess)
 
 int arearatt(int area, int usrnr, struct User *usr) {
 	int x=0;
-	if(usr->status>=Servermem->cfg.st.bytarea) return(1);
+	if(usr->status>=Servermem->cfg->st.bytarea) return(1);
 	if(Servermem->areor[area].mote==-1 || MayBeMemberConf(Servermem->areor[area].mote, usrnr, usr)) x++;
 	if(!Servermem->areor[area].grupper || (Servermem->areor[area].grupper & usr->grupper)) x++;
 	return(x==2 ? 1 : 0);

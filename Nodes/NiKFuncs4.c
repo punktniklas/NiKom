@@ -147,7 +147,7 @@ int skapagrupp(void) {
   int groupadmin, groupId;
   char buff[9];
   
-  if(Servermem->inne[nodnr].status < Servermem->cfg.st.grupper) {
+  if(Servermem->inne[nodnr].status < Servermem->cfg->st.grupper) {
     SendString("\r\n\n%s\r\n", CATSTR(MSG_CREATE_GROUP_NO_PERM));
     return 0;
   }
@@ -303,7 +303,7 @@ static void changeGroupMembership(int isAdd) {
     return;
   }
   group = FindUserGroup(groupId);
-  if(inloggad != group->groupadmin && Servermem->inne[nodnr].status < Servermem->cfg.st.grupper) {
+  if(inloggad != group->groupadmin && Servermem->inne[nodnr].status < Servermem->cfg->st.grupper) {
     SendString("\r\n\n%s\r\n", CATSTR(MSG_CHANGE_GROUPMEM_NOPERM));
     return;
   }
@@ -407,7 +407,7 @@ int andragrupp(void) {
     return 0;
   }
   if(inloggad != userGroup->groupadmin
-     && Servermem->inne[nodnr].status < Servermem->cfg.st.grupper) {
+     && Servermem->inne[nodnr].status < Servermem->cfg->st.grupper) {
     SendString("\r\n\n%s\r\n", CATSTR(MSG_CHANGE_GROUP_NOPERM));
     return 0;
   }
@@ -474,7 +474,7 @@ void raderagrupp(void) {
     return;
   }
   if(inloggad != userGroup->groupadmin
-     && Servermem->inne[nodnr].status < Servermem->cfg.st.grupper) {
+     && Servermem->inne[nodnr].status < Servermem->cfg->st.grupper) {
     SendString("\r\n\n%s\r\n", CATSTR(MSG_DELETE_GROUP_NOPERM));
     return;
   }
@@ -668,7 +668,7 @@ void hoppaarende(void) {
 }
 
 int arearatt(int area, int usrnr, struct User *usr) {
-  if(usr->status >= Servermem->cfg.st.bytarea) {
+  if(usr->status >= Servermem->cfg->st.bytarea) {
     return 1;
   }
   return (Servermem->areor[area].mote==-1 || MayBeMemberConf(Servermem->areor[area].mote, usrnr, usr))
@@ -676,7 +676,7 @@ int arearatt(int area, int usrnr, struct User *usr) {
 }
 
 int gruppmed(struct UserGroup *grupp, char status, long grupper) {
-  if(status >= Servermem->cfg.st.medmoten) {
+  if(status >= Servermem->cfg->st.medmoten) {
     return 1;
   }
   if(grupp->autostatus != -1 && status >= grupp->autostatus) {

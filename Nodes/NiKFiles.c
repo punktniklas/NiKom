@@ -313,8 +313,8 @@ char *skri;
 		going=FALSE;
 	}
 	while(going) {
-		if(count==Servermem->info.nycklar) going=FALSE;
-		faci=Servermem->Nyckelnamn[count];
+		if(count==Servermem->cfg->noOfFileKeys) going=FALSE;
+		faci=Servermem->cfg->fileKeys[count];
 		skri2=skri;
 		going2=TRUE;
 		if(matchar(skri2,faci)) {
@@ -340,8 +340,8 @@ char *skri;
 void listnyckel(void) {
 	int x;
 	puttekn("\r\n\n",-1);
-	for(x=0;x<Servermem->info.nycklar;x++) {
-		if(puttekn(Servermem->Nyckelnamn[x],-1)) return;
+	for(x=0;x<Servermem->cfg->noOfFileKeys;x++) {
+		if(puttekn(Servermem->cfg->fileKeys[x],-1)) return;
 		eka('\r');
 	}
 	puttekn("\r\n",-1);
@@ -368,7 +368,7 @@ void listfiler(void) {
 	puttekn(outbuffer,-1);
 	for(sokpek=(struct Fil *)Servermem->areor[area2].ar_list.mlh_TailPred;sokpek->f_node.mln_Pred;sokpek=(struct Fil *)sokpek->f_node.mln_Pred) {
 		if(notvalid && !(sokpek->flaggor & FILE_NOTVALID)) continue;
-		if((sokpek->flaggor & FILE_NOTVALID) && Servermem->inne[nodnr].status < Servermem->cfg.st.filer && sokpek->uppladdare != inloggad) continue;
+		if((sokpek->flaggor & FILE_NOTVALID) && Servermem->inne[nodnr].status < Servermem->cfg->st.filer && sokpek->uppladdare != inloggad) continue;
 		if(nyckel!=-1 && !BAMTEST(sokpek->nycklar,nyckel)) continue;
 		ts=localtime(&sokpek->tid);
 		if(puttekn("\r\n",-1)) return;
@@ -478,7 +478,7 @@ int andraarea(void) {
 		puttekn("\r\n\nSkriv: Ändra Area <areanamn>\r\n\n",-1);
 		return(0);
 	}
-	if(inloggad!=Servermem->areor[arnr].skapad_av && Servermem->inne[nodnr].status<Servermem->cfg.st.radarea) {
+	if(inloggad!=Servermem->areor[arnr].skapad_av && Servermem->inne[nodnr].status<Servermem->cfg->st.radarea) {
 		puttekn("\r\n\nDu har ingen rätt att ändra på den arean!\r\n\n",-1);
 		return(0);
 	}
@@ -652,7 +652,7 @@ int skapafil(void) {
 	puttekn("\r\nVilken statusnivå ska filen ha? ",-1);
 	if(getstring(EKO,3,NULL)) { FreeMem(allokpek,sizeof(struct Fil)); return(1); }
 	allokpek->status=atoi(inmat);
-	if(Servermem->inne[nodnr].status >= Servermem->cfg.st.filer) {
+	if(Servermem->inne[nodnr].status >= Servermem->cfg->st.filer) {
           if(GetYesOrNo("\n\r", "Ska filen valideras?", NULL, NULL, "Ja", "Nej", NULL,
                         TRUE, &isCorrect)) {
               return 1;
@@ -731,7 +731,7 @@ void radfil(void) {
 		puttekn("\r\n\nFinns ingen sådan fil!\r\n",-1);
 		return;
 	}
-	if(letpek->uppladdare!=inloggad && Servermem->inne[nodnr].status<Servermem->cfg.st.filer) {
+	if(letpek->uppladdare!=inloggad && Servermem->inne[nodnr].status<Servermem->cfg->st.filer) {
 		puttekn("\r\n\nDu kan bara radera filer som du själv har laddat upp!\r\n",-1);
 		return;
 	}
@@ -754,7 +754,7 @@ void radfil(void) {
 	if(remove(filnamn)) puttekn("\r\nKunde inte radera filen fysiskt!",-1);
 	sprintf(filnamn,"%slongdesc/%s.long",Servermem->areor[area2].dir[letpek->dir],letpek->namn);
 	if((letpek->flaggor & FILE_LONGDESC) && remove(filnamn)) puttekn("\r\nKunde inte radera långa beskrivningen!",-1);
-	if(Servermem->inne[nodnr].status>=Servermem->cfg.st.filer && userexists(letpek->uppladdare)) {
+	if(Servermem->inne[nodnr].status>=Servermem->cfg->st.filer && userexists(letpek->uppladdare)) {
           SendString("\r\nSka %s diskrediteras?", getusername(letpek->uppladdare));
           if(GetYesOrNo(NULL, NULL, NULL, NULL, "Ja", "Nej", "\r\n", FALSE, &isCorrect)) {
             return;
@@ -794,7 +794,7 @@ int andrafil(void) {
 		puttekn("\r\n\nFinns ingen sådan fil!\r\n",-1);
 		return(0);
 	}
-	if(filpek->uppladdare!=inloggad && Servermem->inne[nodnr].status<Servermem->cfg.st.filer) {
+	if(filpek->uppladdare!=inloggad && Servermem->inne[nodnr].status<Servermem->cfg->st.filer) {
 		puttekn("\r\nDu har ingen rätt att ändra på den filen!\r\n",-1);
 		return(0);
 	}
@@ -810,8 +810,8 @@ int andrafil(void) {
 	else newname[0]=0;
 	memcpy(tmpnycklar,filpek->nycklar,MAXNYCKLAR/8);
 	puttekn("\r\nFöljande nycklar är satta:\r\n",-1);
-	for(x=0;x<Servermem->info.nycklar;x++) if(BAMTEST(tmpnycklar,x)) {
-		puttekn(Servermem->Nyckelnamn[x],-1);
+	for(x=0;x<Servermem->cfg->noOfFileKeys;x++) if(BAMTEST(tmpnycklar,x)) {
+		puttekn(Servermem->cfg->fileKeys[x],-1);
 		eka('\r');
 	}
 	if(editkey(tmpnycklar)) return(1);
@@ -825,7 +825,7 @@ int andrafil(void) {
 	if(getstring(EKO,3,NULL)) return(1);
 	if(inmat[0]) tmpstatus=atoi(inmat);
 	else tmpstatus=filpek->status;
-	if(Servermem->inne[nodnr].status>=Servermem->cfg.st.filer) {
+	if(Servermem->inne[nodnr].status>=Servermem->cfg->st.filer) {
 		sprintf(outbuffer,"\r\nAntal downloads: (%d) ",filpek->downloads);
 		puttekn(outbuffer,-1);
 		if(getstring(EKO,7,NULL)) return(1);
@@ -971,7 +971,7 @@ int sokfil(void) {
 
 		for(filpek=(struct Fil *)Servermem->areor[areatmp].ar_list.mlh_TailPred;
 			filpek->f_node.mln_Pred;filpek=(struct Fil *)filpek->f_node.mln_Pred) {
-			if((filpek->flaggor & FILE_NOTVALID) && Servermem->inne[nodnr].status < Servermem->cfg.st.filer && filpek->uppladdare != inloggad) continue;
+			if((filpek->flaggor & FILE_NOTVALID) && Servermem->inne[nodnr].status < Servermem->cfg->st.filer && filpek->uppladdare != inloggad) continue;
 			if(sokstring[0]) {
 				if(pat) {
 					if(searchOnFilename) {
@@ -994,7 +994,7 @@ int sokfil(void) {
 			}
 			if(keys) {
 				foo=TRUE;
-				for(x=0;x<Servermem->info.nycklar;x++) {
+				for(x=0;x<Servermem->cfg->noOfFileKeys;x++) {
 					if(BAMTEST(soknyckel,x) && (!BAMTEST(filpek->nycklar,x))) {
 						foo=FALSE;
 							break;
@@ -1073,7 +1073,7 @@ int area;
 	letpek=(struct Fil *)Servermem->areor[area].ar_list.mlh_TailPred;
 	while(letpek->f_node.mln_Pred) {
 		if((letpek->flaggor & FILE_NOTVALID) &&
-		Servermem->inne[nodnr].status < Servermem->cfg.st.filer &&
+		Servermem->inne[nodnr].status < Servermem->cfg->st.filer &&
 		letpek->uppladdare != inloggad) {
 			letpek=(struct Fil *)letpek->f_node.mln_Pred;
 			continue;
@@ -1129,9 +1129,9 @@ void filstatus(void) {
 	if(vispek->flaggor & FILE_NOTVALID) puttekn("\n\rFilen är inte validerad.",-1);
 	if(vispek->flaggor & FILE_FREEDL) puttekn("\n\rFilen har fri download.",-1);
 	puttekn("\r\n\nNycklar:\r\n",-1);
-	for(x=0;x<Servermem->info.nycklar;x++) {
+	for(x=0;x<Servermem->cfg->noOfFileKeys;x++) {
 		if(BAMTEST(vispek->nycklar,x)) {
-			sprintf(outbuffer,"%s\r",Servermem->Nyckelnamn[x]);
+			sprintf(outbuffer,"%s\r",Servermem->cfg->fileKeys[x]);
 			puttekn(outbuffer,-1);
 		}
 	}
@@ -1166,7 +1166,7 @@ void typefil(void) {
 		puttekn("\r\n\nFinns ingen sådan fil!\r\n",-1);
 		return;
 	}
-	if(filpek->status>Servermem->inne[nodnr].status && Servermem->inne[nodnr].status<Servermem->cfg.st.laddaner) {
+	if(filpek->status>Servermem->inne[nodnr].status && Servermem->inne[nodnr].status<Servermem->cfg->st.laddaner) {
 		puttekn("\r\n\nDu har ingen rätt att se den filen!\r\n",-1);
 		return;
 	}
@@ -1186,7 +1186,7 @@ void nyafiler(void) {
 		for(sokpek=(struct Fil *)Servermem->areor[areacnt].ar_list.mlh_TailPred;sokpek->f_node.mln_Pred;sokpek=(struct Fil *)sokpek->f_node.mln_Pred)
 		{
 			if(notvalid && !(sokpek->flaggor & FILE_NOTVALID)) continue;
-			if((sokpek->flaggor & FILE_NOTVALID) && Servermem->inne[nodnr].status < Servermem->cfg.st.filer && sokpek->uppladdare != inloggad) continue;
+			if((sokpek->flaggor & FILE_NOTVALID) && Servermem->inne[nodnr].status < Servermem->cfg->st.filer && sokpek->uppladdare != inloggad) continue;
 			if(sokpek->validtime < Servermem->inne[nodnr].senast_in) continue;
 			if(!headerprinted) {
 				sprintf(outbuffer,"\r\n\nArean %s\r\n",Servermem->areor[areacnt].namn);
@@ -1226,14 +1226,14 @@ int editkey(char *bitmap) {
 			puttekn("'!' för att se vilka nycklar du har satt.\r\n",-1);
 		} else if(inmat[0]=='!') {
 			puttekn("\r\nFöljande nycklar är satta:\r\n",-1);
-			for(x=0;x<Servermem->info.nycklar;x++) if(BAMTEST(bitmap,x)) {
-				puttekn(Servermem->Nyckelnamn[x],-1);
+			for(x=0;x<Servermem->cfg->noOfFileKeys;x++) if(BAMTEST(bitmap,x)) {
+				puttekn(Servermem->cfg->fileKeys[x],-1);
 				eka('\r');
 			}
 		} else if(inmat[0]!=0) {
 			if((nyckel=parsenyckel(inmat))==-1) puttekn("\r\nFinns ingen sådan nyckel\r\n",-1);
 			else if(nyckel>=0) {
-				sprintf(outbuffer,"\r%s\r",Servermem->Nyckelnamn[nyckel]);
+				sprintf(outbuffer,"\r%s\r",Servermem->cfg->fileKeys[nyckel]);
 				puttekn(outbuffer,-1);
 				if(BAMTEST(bitmap,nyckel)) BAMCLEAR(bitmap,nyckel);
 				else BAMSET(bitmap,nyckel);

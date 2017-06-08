@@ -153,18 +153,18 @@ struct FidoDomain *getfidodomain(int nr,int zone) {
   char *zonestr;
 
   for(i = 0; i < 10; i++) {
-    if(!Servermem->fidodata.fd[i].domain[0]) {
+    if(!Servermem->cfg->fidoConfig.fd[i].domain[0]) {
       return NULL;
     }
     if(nr > 0) {
-      if(nr == Servermem->fidodata.fd[i].nummer) {
-        return &Servermem->fidodata.fd[i];
+      if(nr == Servermem->cfg->fidoConfig.fd[i].nummer) {
+        return &Servermem->cfg->fidoConfig.fd[i];
       }
     } else {
-      zonestr = Servermem->fidodata.fd[i].zones;
+      zonestr = Servermem->cfg->fidoConfig.fd[i].zones;
       while(zonestr[0]) {
         if(atoi(zonestr) == zone) {
-          return &Servermem->fidodata.fd[i];
+          return &Servermem->cfg->fidoConfig.fd[i];
         } else {
           zonestr = hittaefter(zonestr);
         }
@@ -293,7 +293,7 @@ int fido_skriv(int komm,int komtill) {
     motpek->texter = nummer;
   }
   SendStringCat("%s\r\n\n", CATSTR(MSG_WRITE_TEXT_GOT_NUMBER), nummer);
-  if(Servermem->cfg.logmask & LOG_BREV) {
+  if(Servermem->cfg->logmask & LOG_BREV) {
     LogEvent(USAGE_LOG, INFO, "%s skriver text %d i %s",
              getusername(inloggad), nummer, motpek->namn);
   }

@@ -24,7 +24,7 @@ int __saveds AASM LIBMaySeeConf(register __d0 int mote AREG(d0), register __d1 i
 	motpek = LIBGetConfPoint(mote,NiKomBase);
 	if(!motpek) return(FALSE);
 
-	if(usr->status >= NiKomBase->Servermem->cfg.st.medmoten) return(TRUE);
+	if(usr->status >= NiKomBase->Servermem->cfg->st.medmoten) return(TRUE);
 	if(motpek->status & SUPERHEMLIGT) return(FALSE);
 	if(motpek->status & AUTOMEDLEM) return(TRUE);
 	if((motpek->status & HEMLIGT) && !LIBMayBeMemberConf(mote,usrnr,usr,NiKomBase)) return(FALSE);
@@ -39,7 +39,7 @@ int __saveds AASM LIBMayBeMemberConf(register __d0 int mote AREG(d0), register _
 	motpek = LIBGetConfPoint(mote,NiKomBase);
 	if(!motpek) return(FALSE);
 
-	if(usr->status >= NiKomBase->Servermem->cfg.st.medmoten) return(TRUE);
+	if(usr->status >= NiKomBase->Servermem->cfg->st.medmoten) return(TRUE);
 	if(motpek->status & SUPERHEMLIGT) return(TRUE);
 	if(motpek->status & AUTOMEDLEM) return(TRUE);
 	if(motpek->status & SKRIVSTYRT) return(TRUE);
@@ -63,7 +63,7 @@ int __saveds AASM LIBMayWriteConf(register __d0 int mote AREG(d0), register __d1
 
 	if(!LIBMayBeMemberConf(mote,usrnr,usr,NiKomBase)) return(FALSE);
 	if(LIBMayAdminConf(mote,usrnr,usr,NiKomBase)) return(TRUE);
-	if(usr->status >= NiKomBase->Servermem->cfg.st.skriv) return(TRUE);
+	if(usr->status >= NiKomBase->Servermem->cfg->st.skriv) return(TRUE);
 	if(motpek->status & SKRIVSKYDD) return(FALSE);
 	if(motpek->status & SKRIVSTYRT) return(BAMTEST(usr->motratt,mote) || (motpek->grupper & usr->grupper));
 	return(TRUE);
@@ -79,7 +79,7 @@ int __saveds AASM LIBMayReplyConf(register __d0 int mote AREG(d0), register __d1
 
 	if(!LIBMayBeMemberConf(mote,usrnr,usr,NiKomBase)) return(FALSE);
 	if(LIBMayAdminConf(mote,usrnr,usr,NiKomBase)) return(TRUE);
-	if(usr->status >= NiKomBase->Servermem->cfg.st.skriv) return(TRUE);
+	if(usr->status >= NiKomBase->Servermem->cfg->st.skriv) return(TRUE);
 	if(motpek->status & KOMSKYDD) return(FALSE);
 	if(motpek->status & SKRIVSTYRT) return(BAMTEST(usr->motratt,mote) || (motpek->grupper & usr->grupper));
 	return(TRUE);
@@ -94,7 +94,7 @@ int __saveds AASM LIBMayAdminConf(register __d0 int mote AREG(d0), register __d1
 	if(!motpek) return(FALSE);
 
 	if(!LIBMayBeMemberConf(mote,usrnr,usr,NiKomBase)) return(FALSE);
-	if(usr->status >= NiKomBase->Servermem->cfg.st.texter) return(TRUE);
+	if(usr->status >= NiKomBase->Servermem->cfg->st.texter) return(TRUE);
 	if(motpek->skapat_av ==  usrnr) return(TRUE);
 	if(motpek->mad == usrnr) return(TRUE);
 	return(FALSE);

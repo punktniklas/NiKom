@@ -139,13 +139,13 @@ int main(int argc, char **argv) {
     memset(commandhistory,0,1024);
     Servermem->inne[nodnr].rader=0;
     sendfile("NiKom:Texter/Login.txt");
-    if(Servermem->cfg.ar.preinlogg) sendautorexx(Servermem->cfg.ar.preinlogg);
+    if(Servermem->cfg->ar.preinlogg) sendautorexx(Servermem->cfg->ar.preinlogg);
     going=TRUE;
     while(going) {
       Servermem->idletime[nodnr] = time(NULL);
       SendStringNoBrk("\r\nName: ");
       getstring(EKO,40,NULL);
-      if(!stricmp(inmat,Servermem->cfg.ny)) {
+      if(!stricmp(inmat,Servermem->cfg->ny)) {
         tmp = RegisterNewUser();
         if(tmp == 2) {
           goto panik;
@@ -190,12 +190,12 @@ int main(int argc, char **argv) {
 
     connection();
 
-    if(Servermem->cfg.logmask & LOG_UTLOGG) {
+    if(Servermem->cfg->logmask & LOG_UTLOGG) {
       LogEvent(USAGE_LOG, INFO, "%s loggar ut från nod %d",
                getusername(inloggad), nodnr);
     }
     if(Servermem->say[nodnr]) displaysay();
-    if(Servermem->cfg.ar.utlogg) sendautorexx(Servermem->cfg.ar.utlogg);
+    if(Servermem->cfg->ar.utlogg) sendautorexx(Servermem->cfg->ar.utlogg);
     SendInfoFile("Logout.txt", 0);
     sprintf(titel,"Nod #%d CON: <Ingen inloggad>",nodnr);
     SetWindowTitles(NiKwind,titel,(UBYTE *)-1L);

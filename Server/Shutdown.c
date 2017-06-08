@@ -69,7 +69,7 @@ void cleanup(int exitCode,char *errorMsg) {
     }
     freegroupmem();
     freefilemem();
-    FreeCommandMem();
+    FreeAllConfigs(Servermem->cfg);
     freemotmem();
     freeshortusermem();
     if(Servermem->confTexts.texts != NULL) {
