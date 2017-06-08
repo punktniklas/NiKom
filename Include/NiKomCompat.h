@@ -11,7 +11,7 @@ typedef struct Library NiKomLocaleType;
 #endif
 
 /* SAS/C specific functions. */
-#ifndef __SASC__
+#ifndef __SASC
 int dfind(struct FileInfoBlock *info, const char *name, int attr);
 long getft(char *name);
 int stcgfn(char *node, const char *name);
@@ -39,7 +39,7 @@ int stcgfn(char *node, const char *name);
 #endif
 
 /* Header files. */
-#ifndef __SASC__
+#ifndef __SASC
 # define HAVE_PROTO_ALIB_H	1
 #endif
 
