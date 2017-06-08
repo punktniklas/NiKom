@@ -956,6 +956,10 @@ ReadConfig()
 
 Läser in NiKoms konfigurationsfiler. Samma sak som kommandot ReadConfig.
 
+Returvärden:
+0  - Inläsningen misslyckades. Den gamla konfigurationen används fortfarande.
+1  - Konfigurationen inläst.
+
 @endnode
 @node NodeInfo "Referens : NodeInfo()"
 

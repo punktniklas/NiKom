@@ -716,6 +716,11 @@ Du har nu ingen förinställd nodtyp.
 MSG_CHANGE_NODETYPE_SELECTED
 Din förinställda nodtyp är nu
 ;
+MSG_READCFG_SUCCESS
+Konfigurationen har lästs om.
+MSG_READCFG_FAIL
+Konfigurationen kunde inte läsas om. Behåller den gamla konfigurationen.
+;
 ; ******** Dealing with flags **********
 MSG_FLAG_ON
 På

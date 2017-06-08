@@ -791,7 +791,10 @@ void gamlatexter(void) { }
 void gamlabrev(void) { }
 
 void getconfig(void) {
-  sendservermess(READCFG, 0);
+  long success;
+  success = sendservermess(READCFG, 0);
+  SendString("\r\n\n%s\r\n",
+             success ? CATSTR(MSG_READCFG_SUCCESS) : CATSTR(MSG_READCFG_FAIL));
 }
 
 void writeinfo(void) {

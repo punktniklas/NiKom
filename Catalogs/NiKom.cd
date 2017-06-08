@@ -712,6 +712,11 @@ You now have no selected node type.
 MSG_CHANGE_NODETYPE_SELECTED (1145//)
 Your selected node type is now
 ;
+MSG_READCFG_SUCCESS (1150//)
+The config was read successfully.
+MSG_READCFG_FAIL (1151//)
+There was an error reading the config. Keeping the old config.
+;
 ; ******** Dealing with flags **********
 MSG_FLAG_ON (9000//)
 On
