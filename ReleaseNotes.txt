@@ -66,6 +66,16 @@ A number of things must be perfomed in an existing installation.
   command "Återse" is now a synonym to the "Läsa" command (in Swedish
   only since there is no such legacy in English). You need to edit
   your Command.cfg accordingly.
+
+- The command "ReadConfig" will now handle errors in any of the config
+  files. If there is an error the old config will remain active.
+  Previously an error in a config would result in NiKServer exiting
+  (just as it would do on startup) even though there were active
+  nodes running. (And bad things would happen if you continued to use
+  the system..)
+  The command ReadConfig will tell whether reading the config was
+  successful or not and the ARexx function ReadConfig() now returns
+  a value indicating the result.
 ---------------------------------------------------------------------------
                          NiKom v2.2.0, 2016-10-04
 ---------------------------------------------------------------------------
