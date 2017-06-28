@@ -445,6 +445,7 @@ Möjliga returvärden är:
 1 - Kommandot kunde inte tolkas.
 2 - Det angivna kommandot är tomt.
 3 - Användaren har inte rättigheter att utföra kommandot.
+4 - Kommandot är flertydigt
 
 Ex:
 'nikcommand ra te 4335'

@@ -26,6 +26,7 @@
 #include "BasicIO.h"
 #include "KOM.h"
 #include "Fifo.h"
+#include "CommandParser.h"
 
 #define EKO             1
 #define EJEKO   0
@@ -318,56 +319,77 @@ void senastread(struct RexxMsg *mess) {
 }
 
 void kommando(struct RexxMsg *mess) {
-  int parseret;
-  char *nikcmd;
-  struct Kommando *cmd;
+  int parseRes, cmdId = 0;
+  char *cmdStr;
+  struct Kommando *parseResult[10], *cmd = NULL;
 
-  nikcmd = hittaefter(mess->rm_Args[0]);
-  if((parseret = parse(nikcmd)) == -1) {
-    LogEvent(SYSTEM_LOG, WARN,
-             "Invalid NiKom command in ARexx 'NikCommand': '%s'", nikcmd);
-    SetRexxResultString(mess, "1");
-  } else if(parseret == -3) {
+  static char argbuf[1081];
+
+  cmdStr = hittaefter(mess->rm_Args[0]);
+
+  parseRes = ParseCommand(cmdStr, Servermem->inne[nodnr].language, &Servermem->inne[nodnr], parseResult, argbuf);
+  switch(parseRes) {
+  case -2:
+    cmdId = 212;
+    argument = cmdStr;
+    break;
+
+  case -1:
     LogEvent(SYSTEM_LOG, WARN, "Empty command sent to ARexx 'NikCommand'");   
     SetRexxResultString(mess, "2");
-  } else if(parseret == -4) {
+    return;
+
+  case 0:
     LogEvent(SYSTEM_LOG, WARN,
-             "User %d has no permission executing NiKom command in ARexx 'NikCommand': '%s'",
-             inloggad, nikcmd);   
-    SetRexxResultString(mess, "3");
-  } else {
-    if((cmd = getkmdpek(parseret)) == NULL) {
+             "Invalid NiKom command in ARexx 'NikCommand': '%s'", cmdStr);
+    SetRexxResultString(mess, "1");
+    return;
+
+  case 1:
+    if(!HasUserCmdPermission(parseResult[0], &Servermem->inne[nodnr])
+       || parseResult[0]->losen[0]) {
+      LogEvent(SYSTEM_LOG, WARN,
+               "User %d has no permission executing NiKom command in ARexx 'NikCommand': '%s'",
+               inloggad, cmdStr);   
+      SetRexxResultString(mess, "3");
+      return;
+    }
+    cmd = parseResult[0];
+    argument = argbuf;
+    break;
+
+  default:
+    LogEvent(SYSTEM_LOG, WARN,
+             "Ambigous NiKom command in ARexx 'NikCommand': '%s'", cmdStr);
+    SetRexxResultString(mess, "4");
+    return;
+  }
+
+  if(cmd == NULL) {
+    if((cmd = getkmdpek(cmdId)) == NULL) {
       LogEvent(SYSTEM_LOG, ERROR,
                "Can't find command definition for command %d when trying to "
-               "execute %s from ARexx.", parseret, nikcmd);
+               "execute %s from ARexx.", cmdId, cmdStr);
       SetRexxErrorResult(mess, 20);
       return;
     }
-    DoExecuteCommand(cmd);
-    if(ImmediateLogout()) {
-      SetRexxErrorResult(mess, 100);
-    } else {
-      SetRexxResultString(mess, "0");
-    }
+  }
+  ExecuteCommand(cmd);
+  if(ImmediateLogout()) {
+    SetRexxErrorResult(mess, 100);
+  } else {
+    SetRexxResultString(mess, "0");
   }
 }
 
 void niknrcommand(struct RexxMsg *mess) {
   int cmdId;
   char *commandstr = hittaefter(mess->rm_Args[0]);
-  struct Kommando *cmd;
 
   cmdId = atoi(commandstr);
   argument=hittaefter(commandstr);
 
-  if((cmd = getkmdpek(cmdId)) == NULL) {
-    LogEvent(SYSTEM_LOG, ERROR,
-             "Can't find command definition for command %d when trying to "
-             "execute numeric comand from ARexx.", cmdId);
-    SetRexxErrorResult(mess, 10);
-    return;
-  }
-  DoExecuteCommand(cmd);
+  ExecuteCommandById(cmdId);
   if(ImmediateLogout()) {
     SetRexxErrorResult(mess, 100);
   } else {

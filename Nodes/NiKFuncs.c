@@ -57,7 +57,7 @@ char *monthNames[2][12] =
 char *weekdayNames[2][7] =
   {{ "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" },
    { "Söndag", "Måndag", "Tisdag", "Onsdag", "Torsdag", "Fredag", "Lördag" }};
-char *argument,usernamebuf[50],argbuf[1081],vilkabuf[50];
+char *argument,usernamebuf[50],vilkabuf[50];
 struct Header sparhead,readhead;
 struct Inloggning Statstr;
 struct MinList aliaslist;
@@ -499,104 +499,6 @@ void listmot(char *pattern) {
   } else {
     SendString("\r\n\n%s\r\n\n", CATSTR(MSG_FORUM_LIST_NOTEXTS));
   }
-}
-
-struct LangCommand *chooseLangCommand(struct Kommando *cmd) {
-  return cmd->langCmd[Servermem->inne[nodnr].language].name[0]
-    ? &cmd->langCmd[Servermem->inne[nodnr].language] : &cmd->langCmd[0];
-}
-
-int parse(char *str) {
-  int argType, timeSinceFirstLogin;
-  char *arg2 = NULL, *word2;
-  struct Kommando *cmd, *foundCmd = NULL;
-  struct LangCommand *langCmd;
-
-  timeSinceFirstLogin = time(NULL) - Servermem->inne[nodnr].forst_in;
-  if(str[0] == 0) {
-    return -3;
-  }
-  if(str[0] >= '0' && str[0] <= '9') {
-    argument = str;
-    return 212;
-  }
-
-  arg2 = FindNextWord(str);
-  if(IzDigit(arg2[0])) {
-    argType = KOMARGNUM;
-  } else if(!arg2[0]) {
-    argType = KOMARGINGET;
-  } else {
-    argType = KOMARGCHAR;
-  }
-
-  ITER_EL(cmd, Servermem->cfg->kom_list, kom_node, struct Kommando *) {
-    if(cmd->secret) {
-      if(cmd->status > Servermem->inne[nodnr].status) continue;
-      if(cmd->minlogg > Servermem->inne[nodnr].loggin) continue;
-      if(cmd->mindays * 86400 > timeSinceFirstLogin) continue;
-      if(cmd->grupper && !(cmd->grupper & Servermem->inne[nodnr].grupper)) continue;
-    }
-    langCmd = chooseLangCommand(cmd);
-    if(langCmd->name[0] && matchar(str, langCmd->name)) {
-      word2 = FindNextWord(langCmd->name);
-      if((langCmd->words == 2 && matchar(arg2, word2) && arg2[0]) || langCmd->words == 1) {
-        if(langCmd->words == 1) {
-          if(cmd->argument == KOMARGNUM && argType == KOMARGCHAR) continue;
-          if(cmd->argument == KOMARGINGET && argType != KOMARGINGET) continue;
-        }
-        if(foundCmd == NULL) {
-          foundCmd = cmd;
-        }
-        else if(foundCmd == (struct Kommando *)1L) {
-          SendString("%s\n\r", chooseLangCommand(cmd)->name);
-        } else {
-          SendString("\r\n\n%s\r\n\n", CATSTR(MSG_KOM_AMBIGOUS_COMMAND));
-          SendString("%s\n\r", chooseLangCommand(foundCmd)->name);
-          SendString("%s\n\r", chooseLangCommand(cmd)->name);
-          foundCmd = (struct Kommando *)1L;
-        }
-      }
-    }
-  }
-  if(foundCmd != NULL && foundCmd != (struct Kommando *)1L) {
-    argument = FindNextWord(str);
-    if(chooseLangCommand(foundCmd)->words == 2) {
-      argument = FindNextWord(argument);
-    }
-    memset(argbuf, 0, 1080);
-    strncpy(argbuf, argument, 1080);
-    argbuf[strlen(argument)] = 0;
-    argument = argbuf;
-  }
-  if(foundCmd == NULL) {
-    return -1;
-  }
-  else if(foundCmd == (struct Kommando *)1L) {
-    return -2;
-  } else {
-    if(foundCmd->status > Servermem->inne[nodnr].status || foundCmd->minlogg > Servermem->inne[nodnr].loggin) {
-      return -4;
-    }
-    if(foundCmd->mindays * 86400 > timeSinceFirstLogin) {
-      return -4;
-    }
-    if(foundCmd->grupper && !(foundCmd->grupper & Servermem->inne[nodnr].grupper)) {
-      return -4;
-    }
-  }
-  if(foundCmd->losen[0]) {
-    SendString("\r\n\n%s: ", CATSTR(MSG_KOM_COMMAND_PASSWORD));
-    if(Servermem->inne[nodnr].flaggor & STAREKOFLAG) {
-      getstring(STAREKO,20,NULL);
-    } else {
-      getstring(EJEKO,20,NULL);
-    }
-    if(strcmp(foundCmd->losen, inmat)) {
-      return -5;
-    }
-  }
-  return foundCmd->nummer;
 }
 
 int parsemot(char *skri) {

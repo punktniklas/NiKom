@@ -29,7 +29,6 @@ int visatext(int text);
 void tiden(void);
 int skapmot(void);
 void listmot(char *);
-int parse(char *skri);
 int parsemot(char *skri);
 void medlem(char *args);
 void uttrad(char *args);

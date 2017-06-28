@@ -19,6 +19,7 @@
 #include "NiKVersion.h"
 #include "BasicIO.h"
 #include "Languages.h"
+#include "CommandParser.h"
 #include "NiKomFuncs.h"
 
 #include "KOM.h"
@@ -28,6 +29,7 @@
 #define CMD_NEXTCONF  221
 #define CMD_SEETIME   306
 #define CMD_GOMAIL    222
+#define CMD_READTEXT  212
 #define MAILBOX_CONFID -1
 
 struct Stack *g_unreadRepliesStack;
@@ -124,10 +126,13 @@ int isUserOutOfTime(void) {
 }
 
 struct Kommando *getCommandToExecute(int defaultCmd) {
-  int parseRes, cmdId;
+  int parseRes, cmdId, i;
   struct Alias *alias;
   static unsigned badCommandCnt = 0;
   static char aliasbuf[1081];
+  struct Kommando *parseResult[10];
+
+  static char argbuf[1081];
 
   if(GetString(999, NULL)) {
     return NULL;
@@ -142,46 +147,63 @@ struct Kommando *getCommandToExecute(int defaultCmd) {
     strcpy(inmat,aliasbuf);
   }
   
-  parseRes = parse(inmat);
+  parseRes = ParseCommand(inmat, Servermem->inne[nodnr].language, &Servermem->inne[nodnr], parseResult, argbuf);
   switch(parseRes) {
+  case -2:
+    cmdId = CMD_READTEXT;
+    argument = inmat;
+    break;
+
   case -1:
+    cmdId = defaultCmd;
+    break;
+
+  case 0:
     SendString("\r\n\n%s\r\n", CATSTR(MSG_KOM_INVALID_COMMAND));
     if(++badCommandCnt >= 2 && !(Servermem->inne[nodnr].flaggor & INGENHELP)) {
       SendInfoFile("2Errors.txt", 0);
     }
     return NULL;
 
-  case -2:
-    return NULL; // Ambigous command
-
-  case -3:
-    cmdId = defaultCmd;
-    break;
-
-  case -4:
-    SendString("\r\n\n%s\r\n", CATSTR(MSG_KOM_NO_PERMISSION));
-    if(Servermem->cfg->ar.noright) {
-      sendautorexx(Servermem->cfg->ar.noright);
+  case 1:
+    cmdId = parseResult[0]->nummer;
+    argument = argbuf;
+    badCommandCnt = 0;
+    if(!HasUserCmdPermission(parseResult[0], &Servermem->inne[nodnr])) {
+      SendString("\r\n\n%s\r\n", CATSTR(MSG_KOM_NO_PERMISSION));
+      if(Servermem->cfg->ar.noright) {
+        sendautorexx(Servermem->cfg->ar.noright);
+      }
+      return NULL;
     }
-    return NULL;
 
-  case -5:
-    SendString("\r\n\n%s\r\n", CATSTR(MSG_KOM_INVALID_PASSWORD));
-    return NULL;
+    if(parseResult[0]->losen[0]) {
+      SendString("\r\n\n%s: ", CATSTR(MSG_KOM_COMMAND_PASSWORD));
+      getstring(Servermem->inne[nodnr].flaggor & STAREKOFLAG ? STAREKO : EJEKO, 20, NULL);
+
+      if(strcmp(parseResult[0]->losen, inmat)) {
+        SendString("\r\n\n%s\r\n", CATSTR(MSG_KOM_INVALID_PASSWORD));
+        return NULL;
+      }
+    }
+    break;
 
   default:
-    cmdId = parseRes;
-    badCommandCnt = 0;
-    break;
+    SendString("\r\n\n%s\r\n\n", CATSTR(MSG_KOM_AMBIGOUS_COMMAND));
+    for(i = 0; i < parseRes; i++) {
+      SendString("%s\n\r", ChooseLangCommand(parseResult[i], Servermem->inne[nodnr].language)->name);
+    }
+    return NULL;
   }
+
   if(cmdId == CMD_GOMAIL) {
     return &internalGoMailCommand;
   }
-  return getkmdpek(cmdId);
+  return parseRes == 1 ? parseResult[0] : getkmdpek(cmdId);
 }
 
-void DoExecuteCommand(struct Kommando *cmd) {
-  switch(cmd->nummer) {
+void ExecuteCommandById(int cmdId) {
+  switch(cmdId) {
   case 201: Cmd_GoConf(); break; // ga(argument);
   case 210: Cmd_NextText(); break;
   case 211: Cmd_NextReply(); break;
@@ -280,17 +302,17 @@ void DoExecuteCommand(struct Kommando *cmd) {
   case 416: nyafiler(); break;
   case 417: validerafil(); break;
   default:
-    if(cmd->nummer >= 500) {
-      sendrexx(cmd->nummer);
+    if(cmdId >= 500) {
+      sendrexx(cmdId);
     } else {
       LogEvent(SYSTEM_LOG, ERROR,
-               "Trying to execute undefined command %d", cmd->nummer);
+               "Trying to execute undefined command %d", cmdId);
       DisplayInternalError();
     }
   }
 }
 
-void executeCommand(struct Kommando *cmd) {
+void ExecuteCommand(struct Kommando *cmd) {
   int afterRexxScript;
   if(cmd->before) {
     sendautorexx(cmd->before);
@@ -303,9 +325,9 @@ void executeCommand(struct Kommando *cmd) {
     Servermem->vilkastr[nodnr] = cmd->vilkainfo;
   }
   // Save 'after' in case the command to execute is to reload the config and
-  // cmd is not a valid pointer anymore when DoExecuteCommand() returns.
+  // cmd is not a valid pointer anymore when ExecuteCommandById() returns.
   afterRexxScript = cmd->after; 
-  DoExecuteCommand(cmd);
+  ExecuteCommandById(cmd->nummer);
   if(afterRexxScript) {
     sendautorexx(afterRexxScript);
   }
@@ -377,7 +399,7 @@ void displayPrompt(int defaultCmd) {
   if((cmd = getCommandToExecute(defaultCmd)) == NULL) {
     return;
   }
-  executeCommand(cmd);
+  ExecuteCommand(cmd);
 }
 
 int shouldLogout(void) {
