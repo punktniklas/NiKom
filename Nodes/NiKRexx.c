@@ -321,7 +321,7 @@ void senastread(struct RexxMsg *mess) {
 void kommando(struct RexxMsg *mess) {
   int parseRes, cmdId = 0;
   char *cmdStr;
-  struct Kommando *parseResult[10], *cmd = NULL;
+  struct Kommando *parseResult[50], *cmd = NULL;
 
   static char argbuf[1081];
 

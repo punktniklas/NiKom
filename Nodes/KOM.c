@@ -130,7 +130,7 @@ struct Kommando *getCommandToExecute(int defaultCmd) {
   struct Alias *alias;
   static unsigned badCommandCnt = 0;
   static char aliasbuf[1081];
-  struct Kommando *parseResult[10];
+  struct Kommando *parseResult[50];
 
   static char argbuf[1081];
 
