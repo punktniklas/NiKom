@@ -21,6 +21,7 @@
 #include "Config.h"
 #include "RexxUtils.h"
 #include "StringUtils.h"
+#include "CommandParser.h"
 
 extern struct System *Servermem;
 
@@ -182,184 +183,122 @@ int writeuser(int nummer, struct User *user) {
 }
 
 void userinfo(struct RexxMsg *mess) {
-	int nummer, nodnr, usrloggedin = 1;
-	char str[100];
-	struct tm *ts;
-	struct User userinfouser;
-
-	if((!mess->rm_Args[1]) || (!mess->rm_Args[2])) {
-		mess->rm_Result1=1;
-		mess->rm_Result2=0;
-		return;
-	}
-	if(!userexists(nummer=atoi(mess->rm_Args[1]))) {
-		if(!(mess->rm_Result2=(long)CreateArgstring("-1",strlen("-1"))))
-		printf("Kunde inte allokera en ArgString\n");
-		mess->rm_Result1=0;
-		return;
-	}
-
-	nodnr = 0; // Fix false warning about uninitialized variable.
-	if(mess->rm_Args[2][0]!='n' && mess->rm_Args[2][0]!='N' && mess->rm_Args[2][0]!='r'  && mess->rm_Args[2][0]!='R') {
-		for(nodnr=0;nodnr<MAXNOD;nodnr++) if(Servermem->inloggad[nodnr]==nummer) break;
-
-		if(nodnr>=MAXNOD)
-		{
-			if(readuser(nummer,&userinfouser))
-			{
-				mess->rm_Result1=3;
-				mess->rm_Result2=0;
-				return;
-			}
-			usrloggedin = 0;
-		}
-	}
-	switch(mess->rm_Args[2][0]) {
-		case 'a' : case 'A' :
-			if(usrloggedin)
-				strcpy(str,Servermem->inne[nodnr].annan_info);
-			else
-				strcpy(str,userinfouser.annan_info);
-			break;
-		case 'b' : case 'B' :
-			if(usrloggedin)
-				ts = localtime(&Servermem->inne[nodnr].forst_in);
-			else
-				ts=localtime(&userinfouser.forst_in);
-			sprintf(str,"%4d%02d%02d %02d:%02d",
-                                ts->tm_year + 1900, ts->tm_mon + 1, ts->tm_mday,
-                                ts->tm_hour, ts->tm_min);
-			break;
-		case 'c' : case 'C' :
-			if(usrloggedin)
-				strcpy(str,Servermem->inne[nodnr].land);
-			else
-				strcpy(str,userinfouser.land);
-			break;
-		case 'd' : case 'D' :
-			if(usrloggedin)
-				sprintf(str,"%ld",Servermem->inne[nodnr].download);
-			else
-				sprintf(str,"%ld",userinfouser.download);
-			break;
-		case 'e' : case 'E' :
-			if(usrloggedin)
-				ts=localtime(&Servermem->inne[nodnr].senast_in);
-			else
-				ts=localtime(&userinfouser.senast_in);
-			sprintf(str,"%4d%02d%02d %02d:%02d",
-                                ts->tm_year + 1900, ts->tm_mon + 1, ts->tm_mday,
-                                ts->tm_hour, ts->tm_min);
-			break;
-		case 'f' : case 'F' :
-			if(usrloggedin)
-				strcpy(str,Servermem->inne[nodnr].telefon);
-			else
-				strcpy(str,userinfouser.telefon);
-			break;
-		case 'g' : case 'G' :
-			if(usrloggedin)
-				strcpy(str,Servermem->inne[nodnr].gata);
-			else
-				strcpy(str,userinfouser.gata);
-			break;
-		case 'h' : case 'H' :
-			if(usrloggedin)
-				sprintf(str,"%ld",Servermem->inne[nodnr].downloadbytes);
-			else
-				sprintf(str,"%ld",userinfouser.downloadbytes);
-			break;
-		case 'j' : case 'J' :
-			if(usrloggedin)
-				sprintf(str,"%ld",Servermem->inne[nodnr].uploadbytes);
-			else
-				sprintf(str,"%ld",userinfouser.uploadbytes);
-			break;
-		case 'i' : case 'I' :
-			if(usrloggedin)
-				sprintf(str,"%ld",Servermem->inne[nodnr].loggin);
-			else
-				sprintf(str,"%ld",userinfouser.loggin);
-			break;
-		case 'l' : case 'L' :
-			if(usrloggedin)
-				sprintf(str,"%ld",Servermem->inne[nodnr].read);
-			else
-				sprintf(str,"%ld",userinfouser.read);
-			break;
-		case 'm' : case 'M' :
-			if(usrloggedin)
-				strcpy(str,Servermem->inne[nodnr].prompt);
-			else
-				strcpy(str,userinfouser.prompt);
-			break;
-		case 'n' : case 'N' :
-			strcpy(str,getusername(nummer));
-			break;
-		case 'o' : case 'O' :
-			if(usrloggedin)
-				sprintf(str,"%ld",Servermem->inne[nodnr].flaggor);
-			else
-				sprintf(str,"%ld",userinfouser.flaggor);
-			break;
-		case 'p' : case 'P' :
-			if(usrloggedin)
-				strcpy(str,Servermem->inne[nodnr].postadress);
-			else
-				strcpy(str,userinfouser.postadress);
-			break;
-		case 'q' : case 'Q' :
-			if(usrloggedin)
-				sprintf(str,"%d",Servermem->inne[nodnr].rader);
-			else
-				sprintf(str,"%d",userinfouser.rader);
-			break;
-		case 'r' : case 'R' :
-			sprintf(str,"%d",getuserstatus(nummer));
-			break;
-		case 's' : case 'S' :
-			if(usrloggedin)
-				sprintf(str,"%ld",Servermem->inne[nodnr].skrivit);
-			else
-				sprintf(str,"%ld",userinfouser.skrivit);
-			break;
-		case 't' : case 'T' :
-			if(usrloggedin)
-				sprintf(str,"%ld",Servermem->inne[nodnr].tot_tid);
-			else
-				sprintf(str,"%ld",userinfouser.tot_tid);
-			break;
-		case 'u' : case 'U' :
-			if(usrloggedin)
-				sprintf(str,"%ld",Servermem->inne[nodnr].upload);
-			else
-				sprintf(str,"%ld",userinfouser.upload);
-			break;
-		case 'x' : case 'X' :
-			if(usrloggedin)
-				strcpy(str,Servermem->inne[nodnr].losen);
-			else
-				strcpy(str,userinfouser.losen);
-			break;
-		case 'y' : case 'Y' :
-			if(usrloggedin)
-				sprintf(str,"%d,%d",(unsigned int)Servermem->inne[nodnr].grupper/65536,(unsigned int)Servermem->inne[nodnr].grupper%65536);
-			else
-				sprintf(str,"%d,%d",(unsigned int)userinfouser.grupper/65536,(unsigned int)userinfouser.grupper%65536);
-			break;
-		case 'z' : case 'Z' :
-			if(usrloggedin)
-				sprintf(str,"%ld",Servermem->inne[nodnr].brevpek);
-			else
-				sprintf(str,"%ld",userinfouser.brevpek);
-			break;
-		default :
-			str[0]=0;
-			break;
-	}
-	if(!(mess->rm_Result2=(long)CreateArgstring(str,strlen(str))))
-		printf("Kunde inte allokera en ArgString\n");
-	mess->rm_Result1=0;
+  int nummer, nodnr;
+  char str[100];
+  struct tm *ts;
+  struct User userdata, *user;
+  
+  if((!mess->rm_Args[1]) || (!mess->rm_Args[2])) {
+    SetRexxErrorResult(mess, 1);
+    return;
+  }
+  if(!userexists(nummer = atoi(mess->rm_Args[1]))) {
+    SetRexxResultString(mess, "-1");
+    return;
+  }
+  
+  nodnr = 0; // Fix false warning about uninitialized variable.
+  if(mess->rm_Args[2][0] != 'n'
+     && mess->rm_Args[2][0] != 'N'
+     && mess->rm_Args[2][0] != 'r'
+     && mess->rm_Args[2][0] != 'R') {
+    for(nodnr = 0; nodnr < MAXNOD; nodnr++) {
+      if(Servermem->inloggad[nodnr] == nummer) {
+        user = &Servermem->inne[nodnr];
+        break;
+      }
+    }
+    if(nodnr >= MAXNOD) {
+      if(readuser(nummer, &userdata)) {
+        SetRexxErrorResult(mess, 3);
+        return;
+      }
+      user = &userdata;
+    }
+  }
+  switch(mess->rm_Args[2][0]) {
+  case 'a' : case 'A' :
+    strcpy(str, user->annan_info);
+  case 'b' : case 'B' :
+    ts = localtime(&user->forst_in);
+    sprintf(str, "%4d%02d%02d %02d:%02d",
+            ts->tm_year + 1900, ts->tm_mon + 1, ts->tm_mday,
+            ts->tm_hour, ts->tm_min);
+    break;
+  case 'c' : case 'C' :
+    strcpy(str, user->land);
+    break;
+  case 'd' : case 'D' :
+    sprintf(str, "%ld", user->download);
+    break;
+  case 'e' : case 'E' :
+    ts = localtime(&user->senast_in);
+    sprintf(str, "%4d%02d%02d %02d:%02d",
+            ts->tm_year + 1900, ts->tm_mon + 1, ts->tm_mday,
+            ts->tm_hour, ts->tm_min);
+    break;
+  case 'f' : case 'F' :
+    strcpy(str, user->telefon);
+    break;
+  case 'g' : case 'G' :
+    strcpy(str, user->gata);
+    break;
+  case 'h' : case 'H' :
+    sprintf(str, "%ld", user->downloadbytes);
+    break;
+  case 'i' : case 'I' :
+    sprintf(str, "%ld", user->loggin);
+    break;
+  case 'j' : case 'J' :
+    sprintf(str, "%ld", user->uploadbytes);
+    break;
+  case 'k' : case 'K' :
+    strcpy(str, Servermem->languages[user->language]);
+    break;
+  case 'l' : case 'L' :
+    sprintf(str, "%ld", user->read);
+    break;
+  case 'm' : case 'M' :
+    strcpy(str, user->prompt);
+    break;
+  case 'n' : case 'N' :
+    strcpy(str, getusername(nummer));
+    break;
+  case 'o' : case 'O' :
+    sprintf(str, "%ld", user->flaggor);
+    break;
+  case 'p' : case 'P' :
+    strcpy(str, user->postadress);
+    break;
+  case 'q' : case 'Q' :
+    sprintf(str, "%d", user->rader);
+    break;
+  case 'r' : case 'R' :
+    sprintf(str, "%d", getuserstatus(nummer));
+    break;
+  case 's' : case 'S' :
+    sprintf(str, "%ld", user->skrivit);
+    break;
+  case 't' : case 'T' :
+    sprintf(str, "%ld", user->tot_tid);
+    break;
+  case 'u' : case 'U' :
+    sprintf(str, "%ld", user->upload);
+    break;
+  case 'x' : case 'X' :
+    strcpy(str, user->losen);
+    break;
+  case 'y' : case 'Y' :
+    sprintf(str, "%d,%d", (unsigned int)user->grupper / 65536, (unsigned int)user->grupper % 65536);
+    break;
+  case 'z' : case 'Z' :
+    sprintf(str, "%ld", user->brevpek);
+    break;
+  default :
+    str[0]=0;
+    break;
+  }
+  SetRexxResultString(mess, str);
 }
 
 
@@ -541,35 +480,61 @@ void writemeet(struct Mote *motpek)
 }
 
 void nikparse(struct RexxMsg *mess) {
-	char str[10];
-	if((!mess->rm_Args[1]) || (!mess->rm_Args[2])) {
-		mess->rm_Result1=1;
-		mess->rm_Result2=0;
-		return;
-	}
-	switch(mess->rm_Args[2][0]) {
-		case 'k' : case 'K' :
-			sprintf(str,"%d",parse(mess->rm_Args[1]));
-			break;
-		case 'm' : case 'M' :
-			sprintf(str,"%d",parsemot(mess->rm_Args[1]));
-			break;
-		case 'n' : case 'N' :
-			sprintf(str,"%d",parsenamn(mess->rm_Args[1]));
-			break;
-		case 'a' : case 'A' :
-			sprintf(str,"%d",parsearea(mess->rm_Args[1]));
-			break;
-		case 'y' : case 'Y' :
-			sprintf(str,"%d",parsenyckel(mess->rm_Args[1]));
-			break;
-		default :
-			str[0]=0;
-			break;
-	}
-	if(!(mess->rm_Result2=(long)CreateArgstring(str,strlen(str))))
-		printf("Kunde inte allokera en ArgString\n");
-	mess->rm_Result1=0;
+  char str[10];
+  int lang = 0, parseRes, i, nikparseRes;
+  struct Kommando *cmds[50];
+
+  if((!mess->rm_Args[1]) || (!mess->rm_Args[2])) {
+    SetRexxErrorResult(mess, 1);
+    return;
+  }
+  switch(mess->rm_Args[2][0]) {
+  case 'k' : case 'K' :
+    if(mess->rm_Args[3]) {
+      for(i = 0; i < NUM_LANGUAGES; i++) {
+        if(stricmp(Servermem->languages[i], mess->rm_Args[3]) == 0) {
+          lang = i;
+          break;
+        }
+      }
+    }
+    parseRes = ParseCommand(mess->rm_Args[1], lang, NULL, cmds, NULL);
+    switch(parseRes) {
+    case -2:
+      nikparseRes = 212;
+      break;
+    case -1:
+      nikparseRes = -3;
+      break;
+    case 0:
+      nikparseRes = -1;
+      break;
+    case 1:
+      nikparseRes = cmds[0]->nummer;
+      break;
+    default:
+      nikparseRes = -2;
+      break;
+    }
+    sprintf(str, "%d", nikparseRes);
+    break;
+  case 'm' : case 'M' :
+    sprintf(str, "%d", parsemot(mess->rm_Args[1]));
+    break;
+  case 'n' : case 'N' :
+    sprintf(str, "%d", parsenamn(mess->rm_Args[1]));
+    break;
+  case 'a' : case 'A' :
+    sprintf(str, "%d", parsearea(mess->rm_Args[1]));
+    break;
+  case 'y' : case 'Y' :
+    sprintf(str, "%d", parsenyckel(mess->rm_Args[1]));
+    break;
+  default :
+    str[0] = '\0';
+    break;
+  }
+  SetRexxResultString(mess, str);
 }
 
 void senaste(struct RexxMsg *mess) {
@@ -792,43 +757,6 @@ char *skrivet,*facit;
 		}
 	}
 	return(mat);
-}
-
-int parse(char *skri) {
-	int nummer=0,argtyp;
-	char *arg2,*ord2;
-	struct Kommando *kompek,*forst=NULL;
-	if(skri[0]==0) return(-3);
-	if(IzDigit(skri[0])) {
-		/* argument=skri; */
-		return(212);
-	}
-	arg2=FindNextWord(skri);
-	if(IzDigit(arg2[0])) argtyp=KOMARGNUM;
-	else if(!arg2[0]) argtyp=KOMARGINGET;
-	else argtyp=KOMARGCHAR;
-	for(kompek=(struct Kommando *)Servermem->cfg->kom_list.mlh_Head;kompek->kom_node.mln_Succ;kompek=(struct Kommando *)kompek->kom_node.mln_Succ) {
-		if(matchar(skri,kompek->langCmd[0].name)) {
-			ord2=FindNextWord(kompek->langCmd[0].name);
-			if((kompek->langCmd[0].words == 2 && matchar(arg2,ord2) && arg2[0]) || kompek->langCmd[0].words == 1) {
-				if(kompek->langCmd[0].words == 1) {
-					if(kompek->argument==KOMARGNUM && argtyp==KOMARGCHAR) continue;
-					if(kompek->argument==KOMARGINGET && argtyp!=KOMARGINGET) continue;
-				}
-				if(forst==NULL) {
-					forst=kompek;
-					nummer=kompek->nummer;
-				}
-				else if(forst==(struct Kommando *)1L) {
-				} else {
-					forst=(struct Kommando *)1L;
-				}
-			}
-		}
-	}
-	if(forst==NULL) return(-1);
-	else if(forst==(struct Kommando *)1L) return(-2);
-	return(nummer);
 }
 
 int parsemot(char *skri) {

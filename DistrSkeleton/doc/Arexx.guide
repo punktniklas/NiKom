@@ -748,6 +748,10 @@ n - användarnamn
 a - area
 y - nyckel
 
+När subjektet är 'k' så kan man ange ett tredje argument som anger vilket
+språk som ska användas. Giltiga värden är 'english' och 'svenska'. Om detta
+inte anges så används engelska.
+
 Felvärden:
 1 - Inte tillräckligt med argument.
 
@@ -759,8 +763,9 @@ Annars ett nummer (användarnummer, mötesnummer, kommandonummer etc)
 
 Ex:
 say NiKParse('ni li','n') ==> 0
-variabel='li mö'
+variabel='li fo'
 say NiKParse(variabel,'k') ==> 101
+say NiKParse('li mö', 'k', 'svenska')
 
 @endnode
 @node LastLogin "Referens : LastLogin()"

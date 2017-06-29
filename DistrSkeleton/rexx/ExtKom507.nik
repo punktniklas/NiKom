@@ -14,7 +14,7 @@ if argument="" then do
 end
 
 argument=strip(argument)
-kom=nikparse(argument,'k')
+kom=nikparse(argument,'k', UserInfo(person, 'k'))
 if kom='-1' then do
   'sendstring' '0d0a0a'x'Finns inget kommando som matchar' argument '0d0a'x
   exit

@@ -11,9 +11,22 @@ struct LangCommand *ChooseLangCommand(struct Kommando *cmd, int lang) {
 }
 
 /*
- * -1 - No input
- * -2 - Command is a text number
- * x  - Number of commands matched
+ * Parses the given str as a command line command for the given language. The
+ * result array is populated with pointers to struct Kommando instances of the matching
+ * commands. Up to 50 pointers may be populated so the array must be large enough to
+ * hold this. The actual number of matched commands (and hence pointers populated in the
+ * result array) is returned from the function.
+ *
+ * If a pointer to a user is provided commands that are secret will not be included if
+ * the user doesn't have permission to execute them.
+ *
+ * If a argbuf pointer is provided and the number of matched commands is 1 the arguments
+ * to the given command is copied from the commandline into the argbuf array and the global
+ * "argument" variable is set to point to argbuf.
+ *
+ * Apart from the number of matched commands the following values can also be returned.
+ * -1 - The input string is empty.
+ * -2 - The input string is a number (which usually is interpreted as a text number)
  */
 int ParseCommand(char *str, int lang, struct User *user, struct Kommando *result[], char *argbuf) {
   int argType, timeSinceFirstLogin, matchedCommands = 0;
@@ -56,7 +69,7 @@ int ParseCommand(char *str, int lang, struct User *user, struct Kommando *result
           if(cmd->argument == KOMARGINGET && argType != KOMARGINGET) continue;
         }
         result[matchedCommands++] = cmd;
-        if(matchedCommands == 10) {
+        if(matchedCommands == 50) {
           break;
         }
       }

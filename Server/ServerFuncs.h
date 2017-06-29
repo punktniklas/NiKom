@@ -15,7 +15,6 @@ void handlerexx(struct RexxMsg *mess);
 int parsenamn(char *skri);
 int matchar(char *skrivet,char *facit);
 char *hittaefter(char *strang);
-int parse(char *skri);
 int parsemot(char *skri);
 int parsearea(char *skri);
 int parsenyckel(char *skri);
