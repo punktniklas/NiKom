@@ -671,6 +671,7 @@ g - gata
 h - antal nerladdade byte
 j - antal uppladdade byte
 i - antal inloggningar
+k - använaderns valda språk ('english' eller 'svenska')
 l - antal lästa texter
 m - prompten
 n - namn
