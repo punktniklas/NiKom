@@ -1,5 +1,5 @@
 #define NIKLIBNAME "nikom.library"
-#define NIKRELEASE "v2.3.1dev"
+#define NIKRELEASE "v2.3.1"
 #define NIKLIBVERSION 24
 #define NIKLIBREVISION 2
 #define NIKLIBVERSIONSTR "24"

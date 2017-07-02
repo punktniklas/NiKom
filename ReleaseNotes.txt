@@ -1,4 +1,17 @@
 ---------------------------------------------------------------------------
+                         NiKom v2.3.1, 2017-07-01
+---------------------------------------------------------------------------
+Language fixes for 2.3.0.
+- New subject in UserInfo() to get a user's selected language.
+- A third paremter to NiKParse() subject 'k' to be able to specify the
+  language that should be used when parsing.
+- A third parameter to CommandoInfo() sobject 'n' and 'o' to be able
+  to specify the language.
+
+Some updates to ARexx scripts to use these new features. Most notably the
+"Manual" command.
+
+---------------------------------------------------------------------------
                          NiKom v2.3.0, 2017-06-11
 ---------------------------------------------------------------------------
 NiKom now supports UTF-8 terminals. Users can select UTF-8 as their
