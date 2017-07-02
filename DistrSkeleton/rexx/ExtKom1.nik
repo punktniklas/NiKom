@@ -16,7 +16,7 @@ if ~open('prfil',profile) then exit
 do until eof('prfil')
 	foo=readln('prfil')
 	if trim(foo) = '' then iterate
-	if NiKParse(foo,'k')=506 then do
+	if NiKParse(foo,'k', UserInfo(person, 'k')) = 506 then do
 		'sendstring' '0d0a0a'x || 'Du kan inte ha 'Exekvera Profile' i din profile.' '0a0d'x
 		iterate
 	end

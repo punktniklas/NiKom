@@ -16,7 +16,7 @@ end
 do until eof('fil')
    line = readln('fil')
    if trim(line) = '' then iterate
-   cmdnr=NikParse(line,'k')
+   cmdnr=NikParse(line,'k', UserInfo(person, 'k'))
    if cmdnr ~= 506 then do
      'nikcommand' line
    end
