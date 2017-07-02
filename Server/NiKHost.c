@@ -479,9 +479,22 @@ void writemeet(struct Mote *motpek)
 	Close(fh);
 }
 
+static int findLangId(char *langStr) {
+  int i;
+  if(langStr == NULL) {
+    return 0;
+  }
+  for(i = 0; i < NUM_LANGUAGES; i++) {
+    if(stricmp(Servermem->languages[i], langStr) == 0) {
+      return i;
+    }
+  }
+  return 0;
+}
+
 void nikparse(struct RexxMsg *mess) {
   char str[10];
-  int lang = 0, parseRes, i, nikparseRes;
+  int parseRes, nikparseRes;
   struct Kommando *cmds[50];
 
   if((!mess->rm_Args[1]) || (!mess->rm_Args[2])) {
@@ -490,15 +503,7 @@ void nikparse(struct RexxMsg *mess) {
   }
   switch(mess->rm_Args[2][0]) {
   case 'k' : case 'K' :
-    if(mess->rm_Args[3]) {
-      for(i = 0; i < NUM_LANGUAGES; i++) {
-        if(stricmp(Servermem->languages[i], mess->rm_Args[3]) == 0) {
-          lang = i;
-          break;
-        }
-      }
-    }
-    parseRes = ParseCommand(mess->rm_Args[1], lang, NULL, cmds, NULL);
+    parseRes = ParseCommand(mess->rm_Args[1], findLangId(mess->rm_Args[3]), NULL, cmds, NULL);
     switch(parseRes) {
     case -2:
       nikparseRes = 212;
@@ -918,56 +923,54 @@ int getuserstatus(int nummer) {
 }
 
 void kominfo(struct RexxMsg *mess) {
-	int nummer,found=FALSE;
-	char str[100];
-	struct Kommando *kompek;
-	if((!mess->rm_Args[1]) || (!mess->rm_Args[2])) {
-		mess->rm_Result1=1;
-		mess->rm_Result2=0;
-		return;
-	}
-	nummer=atoi(mess->rm_Args[1]);
-	for(kompek=(struct Kommando *)Servermem->cfg->kom_list.mlh_Head;kompek->kom_node.mln_Succ;kompek=(struct Kommando *)kompek->kom_node.mln_Succ)
-		if(kompek->nummer==nummer) {
-			found=TRUE;
-			break;
-		}
-	if(!found) {
-		if(!(mess->rm_Result2=(long)CreateArgstring("-1",strlen("-1"))))
-		printf("Kunde inte allokera en ArgString\n");
-		mess->rm_Result1=0;
-		return;
-	}
-	switch(mess->rm_Args[2][0]) {
-		case 'a' : case 'A' :
-			sprintf(str,"%d",kompek->argument);
-			break;
-		case 'd' : case 'D' :
-			sprintf(str,"%ld",kompek->mindays);
-			break;
-		case 'l' : case 'L' :
-			sprintf(str,"%ld",kompek->minlogg);
-			break;
-		case 'n' : case 'N' :
-			strcpy(str,kompek->langCmd[0].name);
-			if(str[strlen(str)-1]=='\n') str[strlen(str)-1]=0;
-			break;
-		case 'o' : case 'O' :
-			sprintf(str,"%d",kompek->langCmd[0].words);
-			break;
-		case 's' : case 'S' :
-			sprintf(str,"%d",kompek->status);
-			break;
-		case 'x' : case 'X' :
-			strcpy(str,kompek->losen);
-			break;
-		defualt :
-			str[0]=0;
-			break;
-	}
-	if(!(mess->rm_Result2=(long)CreateArgstring(str,strlen(str))))
-		printf("Kunde inte allokera en ArgString\n");
-	mess->rm_Result1=0;
+  int cmdId, found = FALSE;
+  char str[100];
+  struct Kommando *cmd;
+  if((!mess->rm_Args[1]) || (!mess->rm_Args[2])) {
+    SetRexxErrorResult(mess, 1);
+    return;
+  }
+  cmdId = atoi(mess->rm_Args[1]);
+  ITER_EL(cmd, Servermem->cfg->kom_list, kom_node, struct Kommando *) {
+    if(cmd->nummer == cmdId) {
+      found = TRUE;
+      break;
+    }
+  }
+  if(!found) {
+    SetRexxResultString(mess, "-1");
+    return;
+  }
+  switch(mess->rm_Args[2][0]) {
+  case 'a' : case 'A' :
+    sprintf(str, "%d", cmd->argument);
+    break;
+  case 'd' : case 'D' :
+    sprintf(str, "%ld", cmd->mindays);
+    break;
+  case 'l' : case 'L' :
+    sprintf(str, "%ld", cmd->minlogg);
+    break;
+  case 'n' : case 'N' :
+    strcpy(str, cmd->langCmd[findLangId(mess->rm_Args[3])].name);
+    if(str[strlen(str) - 1] == '\n') {
+      str[strlen(str) - 1] = '\0';
+    }
+    break;
+  case 'o' : case 'O' :
+    sprintf(str, "%d", cmd->langCmd[findLangId(mess->rm_Args[3])].words);
+    break;
+  case 's' : case 'S' :
+    sprintf(str, "%d", cmd->status);
+    break;
+  case 'x' : case 'X' :
+    strcpy(str, cmd->losen);
+    break;
+  defualt :
+    str[0] = '\0';
+    break;
+  }
+  SetRexxResultString(mess, str);
 }
 
 void filinfo(struct RexxMsg *mess) {

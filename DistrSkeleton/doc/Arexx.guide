@@ -840,6 +840,10 @@ o - Antal ord, 1 eller 2.
 s - Status man måste ha för att använda kommandot.
 x - Lösenord som behövs för att använda komamndot.
 
+För 'n' och 'o' kan ett tredje argument anges för vilket språk som avses
+('english', 'svenska' etc). Om inget språk anges (eller språket är
+felaktigt) så används engelska.
+
 Felvärde:
 1 - Inte tillräckligt med argument.
 
@@ -848,7 +852,8 @@ Returvärden:
 Annars den begärda informationen.
 
 Ex:
-say CommandInfo(102,'n') --> LISTA ANVÄNDARE
+say CommandInfo(102,'n') --> LISTA USERS
+say CommandInfo(102,'n', 'svenska') --> LISTA ANVÄNDARE
 
 @endnode
 @node AreaInfo "Referens : AreInfo()"
