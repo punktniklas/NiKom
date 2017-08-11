@@ -29,7 +29,7 @@ for c in sys.stdin.readline():
             state = "Normal"
     elif "SubOption" == state:
         # Bytes following a sub-option til next command are part of it
-        if 0xff == c:
+        if "\xff" == c:
             state = "Command"
     elif "OptionCode" == state:
         state = "Normal"
