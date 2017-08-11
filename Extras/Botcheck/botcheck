@@ -4,7 +4,8 @@
 # attempting to connect.
 #
 # Requirements:
-# - The readline.py script must be found on the system path.
+# - The readline.py and striptelnetcmds.py scripts must be found on the system
+#   path.
 #
 # It's intended to be launched by inetd. Example configuration file
 # additions are shown below.
@@ -30,9 +31,10 @@ bbsPort="$3"
 
 # All echos are explicitly ended with CRLF to be compatible with various telnet
 # clients.
+
 echo -e -n "Welcome to botcheck!\r\n\r\n"
 echo -e -n "Prove you're not a bot by entering \"$expectedAnswer\": "
-answer="$(readline.py --timeout 30 --numChars $[${#expectedAnswer} * 2])"
+answer="$(readline.py --timeout 30 --numChars $[64 + ${#expectedAnswer} * 2] | striptelnetcmds.py)"
 echo -e -n "\r\n"
 if [[ "$answer" == "$expectedAnswer" ]]; then
     nc "$bbsHost" "$bbsPort"
