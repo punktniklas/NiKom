@@ -511,7 +511,6 @@ int fido_brev(char *tillpers,char *adr,struct Mote *motpek) {
   SendString("\r\n%s\r\n", CATSTR(MSG_MAIL_MAILBOX));
   SendStringCat("%s\n\r", CATSTR(MSG_MAIL_FIDO_MAIL), ft.date);
   SendString(CATSTR(MSG_MAIL_FROM), ft.fromuser);
-  SendString(CATSTR(MSG_MAIL_FROM), ft.fromuser);
   SendString(" (%d:%d/%d.%d)\r\n", ft.fromzone, ft.fromnet, ft.fromnode, ft.frompoint);
   SendString(CATSTR(MSG_MAIL_TO), ft.touser);
   SendString(" (%d:%d/%d.%d)\n\r", ft.tozone, ft.tonet, ft.tonode, ft.topoint);
