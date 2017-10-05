@@ -42,6 +42,7 @@ int plussa,autoanswer,highbaud,hst,hangupdelay;
 
 static void sendat(char *atstring);
 static void sendplus(void);
+static char wc_gettkn(int seropen);
 
 static void modemcmd(char *pekare,int size) {
 	serwritereq->IOSer.io_Command=CMD_WRITE;
@@ -66,7 +67,7 @@ void disconnect() {
 
 static void sendat(char *atstring) {
 	int count=2,going=TRUE, i=0;
-	char tkn;
+	char tkn, junk[201];
 	long signals,timersig=1L << timerport->mp_SigBit,sersig=1L << serreadport->mp_SigBit;
 	serchangereq->IOSer.io_Command = SDCMD_QUERY;
 	DoSerIOErr(serchangereq);
@@ -91,15 +92,24 @@ static void sendat(char *atstring) {
 	while(going) {
 		i = 0;
 		while(tknwaiting()) {
-                  gettekn();
-                  i++;
-                  if(i >= 100) {
+                  tkn = wc_gettkn(TRUE);
+                  if(i >= 199) {
                     cleanup(EXIT_ERROR,"Serial device is returning an endless stream of junk data.");
                   }
+                  junk[i++] = tkn;
 		}
-		sprintf(outbuffer, "\nRemoved %d junk bytes from serial device", i);
+                count = i;
+		sprintf(outbuffer, "\nRemoved %d junk bytes from serial device:\n", count);
 		conputtekn(outbuffer,-1);
-		conputtekn("\nInitiating modem\n",-1);
+                for(i = 0; i < count; i++) {
+                  if(junk[i] < 32) {
+                    sprintf(outbuffer, "0x%02x", junk[i]);
+                  } else {
+                    sprintf(outbuffer, "%c", junk[i]);
+                  }
+                  conputtekn(outbuffer,-1);
+                }
+		conputtekn("\n\nInitiating modem\n",-1);
 		putstring(atstring,-1,0);
 		eka('\r');
 		timerreq->tr_node.io_Command=TR_ADDREQUEST;
