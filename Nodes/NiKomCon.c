@@ -34,6 +34,7 @@ extern int area2, nodnr, nodestate;
 extern struct MinList aliaslist,edit_list;
 extern char outbuffer[], nodid[], inmat[];
 extern struct System *Servermem;
+extern struct Inloggning Statstr;
 
 struct IntuitionBase *IntuitionBase=NULL;
 struct RsxLib *RexxSysBase=NULL;
@@ -191,8 +192,8 @@ int main(int argc, char **argv) {
     connection();
 
     if(Servermem->cfg->logmask & LOG_UTLOGG) {
-      LogEvent(USAGE_LOG, INFO, "%s loggar ut från nod %d",
-               getusername(inloggad), nodnr);
+      LogEvent(USAGE_LOG, INFO, "%s loggar ut från nod %d (%d skrivna, %d lästa)",
+               getusername(inloggad), nodnr, Statstr.write, Statstr.read);
     }
     if(Servermem->say[nodnr]) displaysay();
     if(Servermem->cfg->ar.utlogg) sendautorexx(Servermem->cfg->ar.utlogg);
