@@ -3,8 +3,8 @@
 Läsa (Återse)
 -------------
 
-Synopsis: [Läsa] <textnummer> [-v]
-          [Återse] <textnummer> [-v]
+Synopsis: [Läsa] <textnummer> [<användare>] [-v]
+          [Återse] <textnummer> [<användare>] [-v]
 
 Beskrivning:
 Visar den angivna texten. Observera att man inte behöver skriva 'Läsa' utan
@@ -22,6 +22,9 @@ som har hyllat eller dissat den.
 För texter i de lokala mötena så räcker det att vara i något lokalt möte
 (inte nödvändigtvis det texten finns i) när man ger kommandot. För Fido-
 möten måste man dock vara i rätt möte. Samma sak gäller brevlådan; för att
-läsa ett brev måste man befinna sig i brevlådan.
+läsa ett brev måste man befinna sig i brevlådan. I brevlådan kan man även
+läsa brev i andra användares brevlådor som man själv skrivit genom att ange
+en användare efter textnumret. (Använd kommandot Lista Brev för att hitta
+textnummer.)
 
-Se Även: Lista Ärende
+Se Även: Lista Ärende, Lista Brev
