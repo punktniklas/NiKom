@@ -410,7 +410,7 @@ int sethwm(char *dir, int nummer, char littleEndian) {
 int __saveds AASM LIBWriteFidoText(register __a0 struct FidoText *fidotext AREG(a0), register __a1 struct TagItem *taglist AREG(a1),register __a6 struct NiKomBase *NiKomBase AREG(a6)) {
 	BPTR lock,fh;
 	struct FidoLine *fl,*next;
-	int nummer, going=TRUE, charset, bytes;
+	int nummer, going=TRUE, charset, bytes, hwmToLog = 0;
 	UBYTE *dir,filename[20],fullpath[100],ftshead[190],*domain,*reply,flowchar,datebuf[14],timebuf[10];
 	struct DateTime dt;
 
@@ -439,7 +439,11 @@ int __saveds AASM LIBWriteFidoText(register __a0 struct FidoText *fidotext AREG(
         writeTwoByteField(fidotext->topoint, &ftshead[180], NIK_LITTLE_ENDIAN);
         writeTwoByteField(fidotext->frompoint, &ftshead[182], NIK_LITTLE_ENDIAN);
         writeTwoByteField(fidotext->attribut, &ftshead[186], NIK_LITTLE_ENDIAN);
-	if(!(nummer = gethwm(dir, NIK_LITTLE_ENDIAN))) nummer = 2;
+	if(nummer = gethwm(dir, NIK_LITTLE_ENDIAN)) {
+          hwmToLog = nummer;
+        } else {
+          nummer = 2;
+        }
 	while(going) {
 		sprintf(filename,"%d.msg",nummer);
 		strcpy(fullpath,dir);
@@ -450,7 +454,16 @@ int __saveds AASM LIBWriteFidoText(register __a0 struct FidoText *fidotext AREG(
 			nummer++;
 		} else going=FALSE;
 	}
-	if(!(fh=Open(fullpath,MODE_NEWFILE))) return(FALSE);
+        LogEvent(NiKomBase->Servermem, FIDO_LOG, INFO,
+                 "Saving new message %s, first available number counting up from %d (%s)",
+                 fullpath,
+                 hwmToLog != 0 ? hwmToLog : 2,
+                 hwmToLog != 0 ? "which is HWM in 1.msg" : "which is default HWM since no 1.msg was found");
+	if(!(fh=Open(fullpath,MODE_NEWFILE))) {
+          LogEvent(NiKomBase->Servermem, FIDO_LOG, ERROR,
+                   "Error creating %s.", fullpath);
+          return FALSE;
+        }
 	if(Write(fh,ftshead,190)==-1) {
 		Close(fh);
 		return(FALSE);
