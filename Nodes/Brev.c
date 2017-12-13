@@ -601,7 +601,7 @@ int fido_brev(char *tillpers,char *adr,struct Mote *motpek) {
                                WFT_CharSet,chrs,
                                TAG_DONE);
   }
-  SendString("%s\r\n\n", CATSTR(MSG_MAIL_GOT_NUMBER), textId);
+  SendStringCat("%s\r\n\n", CATSTR(MSG_MAIL_GOT_NUMBER), textId);
   if(Servermem->cfg->logmask & LOG_BREV) {
     LogEvent(USAGE_LOG, INFO, "%s skickar brev %d till %s (%d:%d/%d.%d)",
              getusername(inloggad), textId,
