@@ -18,7 +18,6 @@ extern struct System *Servermem;
 extern int nodnr,inloggad,radcnt;
 extern char outbuffer[];
 extern struct Inloggning Statstr;
-extern struct timerequest *inactivereq;
 extern struct MinList edit_list;
 
 struct Header grabhead;
@@ -210,10 +209,7 @@ void grab(void) {
     puttekn("\r\n\nKunde inte öppna grabfilen!\r\n",-1);
     return;
   }
-  if(!CheckIO((struct IORequest *)inactivereq)) {
-    AbortIO((struct IORequest *)inactivereq);
-    WaitIO((struct IORequest *)inactivereq);
-  }
+  // Turn off inactivity checking somehow
   radcnt=-9999;
   sprintf(outbuffer,"\r\nRensar brevlådan..");
   puttekn(outbuffer,-1);

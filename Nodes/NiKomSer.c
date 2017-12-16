@@ -24,6 +24,8 @@
 #include "BasicIO.h"
 #include "Languages.h"
 
+#include "HeartBeat.h"
+
 #define EXIT_ERROR	128
 
 int CXBRK(void) { return(0); }
@@ -144,7 +146,7 @@ int main(int argc,char *argv[]) {
   inloggad=Servermem->inloggad[nodnr];
   conreqtkn();
   serreqtkn();
-  UpdateInactive();
+  StartHeartBeat(TRUE);
   sprintf(titel,"Nod #%d SER: %s #%d",nodnr,Servermem->inne[nodnr].namn,inloggad);
   SetWindowTitles(NiKwind,titel,(char *)-1L);
   if(!ReadUnreadTexts(&Servermem->unreadTexts[nodnr], inloggad)) {
@@ -190,7 +192,7 @@ int main(int argc,char *argv[]) {
   writeuser(inloggad,&Servermem->inne[nodnr]);
   WriteUnreadTexts(&Servermem->unreadTexts[nodnr], inloggad);
   writesenaste();
-  AbortInactive();
+  StopHeartBeat();
   freealiasmem();
   sprintf(tellstr,"loggade just ut från nod %d",nodnr);
   tellallnodes(tellstr);
@@ -201,4 +203,8 @@ int main(int argc,char *argv[]) {
   nodestate &= (NIKSTATE_RELOGIN | NIKSTATE_CLOSESER | NIKSTATE_NOANSWER);
   cleanup(nodestate,"");
   return 0;
+}
+
+void HandleHeartBeat(void) {
+  CheckInactivity();
 }

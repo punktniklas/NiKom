@@ -19,6 +19,8 @@
 #include "BasicIO.h"
 #include "Languages.h"
 
+#include "HeartBeat.h"
+
 #define EXIT_ERROR	10
 #define EXIT_OK	0
 #define EKO	1
@@ -216,7 +218,7 @@ int main(int argc,char *argv[]) {
   serreqtkn();
   Delay(50);
   for(;;) {
-    AbortInactive();
+    StopHeartBeat();
     inloggad=-1;
     Servermem->idletime[nodnr] = time(NULL);
     Servermem->inloggad[nodnr]=-1;
@@ -225,7 +227,7 @@ int main(int argc,char *argv[]) {
     Servermem->idletime[nodnr] = time(NULL);
     Servermem->inloggad[nodnr]=-2; /* Sätt till <Uppringd> för att även hantera -getty-fallet */
   reloginspec:
-    UpdateInactive();
+    StartHeartBeat(TRUE);
     Servermem->inne[nodnr].flaggor = Servermem->cfg->defaultflags;
     if(!getty) Delay(100);
     Servermem->inne[nodnr].rader=0;
@@ -292,7 +294,7 @@ int main(int argc,char *argv[]) {
     if((nt = selectNodeType()) == NULL) {
       goto panik;
     }
-    AbortInactive();
+    StopHeartBeat();
     abortserial();
     
     sprintf(commandstring,"%s -N%d -B%d %s",nt->path,nodnr,dtespeed,configname);
@@ -344,4 +346,8 @@ int main(int argc,char *argv[]) {
     disconnect();
   }
   return 0;
+}
+
+void HandleHeartBeat(void) {
+  CheckInactivity();
 }

@@ -96,7 +96,7 @@ void ExecFifo(char *command,int cooked) {
     return;
   }
   SendString("\n\n\r");
-  AbortInactive();
+  StopHeartBeat();
   RequestFifo(fiforead, &fiforeadmess, FREQ_RPEND);
   while(going) {
     event = getfifoevent(fifoport, &userchar);
@@ -182,6 +182,6 @@ void ExecFifo(char *command,int cooked) {
   CloseFifo(fiforead, FALSE);
   DeleteMsgPort(fifoport);
   CloseLibrary(FifoBase);
-  UpdateInactive();
+  StartHeartBeat(TRUE);
   return;
 }

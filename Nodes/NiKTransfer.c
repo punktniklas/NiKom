@@ -656,7 +656,7 @@ int recbinfile(char *dir) {
   puttekn("\r\nTryck Ctrl-X några gånger för att avbryta.\r\n",-1);
   AbortIO((struct IORequest *)serreadreq);
   WaitIO((struct IORequest *)serreadreq);
-  AbortInactive();
+  StopHeartBeat();
   xpr_setup(xio);
   xio->xpr_filename = zmodeminit;
   XProtocolSetup(xio);
@@ -681,7 +681,7 @@ int recbinfile(char *dir) {
   serchangereq->IOSer.io_Command=CMD_FLUSH;
   DoIO((struct IORequest *)serchangereq);
   serreqtkn();
-  UpdateInactive();
+  StartHeartBeat(TRUE);
   if(Servermem->cfg->ar.postup2) {
     sendautorexx(Servermem->cfg->ar.postup2);
   }
@@ -713,7 +713,7 @@ int sendbinfile(void) {
 	puttekn("Tryck Ctrl-X några gånger för att avbryta.\r\n",-1);
 	AbortIO((struct IORequest *)serreadreq);
 	WaitIO((struct IORequest *)serreadreq);
-        AbortInactive();
+        StopHeartBeat();
 
 	xpr_setup(xio);
 	xio->xpr_filename=zinitstring;
@@ -740,7 +740,7 @@ int sendbinfile(void) {
 	serchangereq->IOSer.io_Command=CMD_FLUSH;
 	DoIO((struct IORequest *)serchangereq);
 	serreqtkn();
-	UpdateInactive();
+	StartHeartBeat(TRUE);
 	if(Servermem->cfg->logmask & LOG_SENDFILE) {
 		for(tf=(struct TransferFiles *)tf_list.mlh_Head;tf->node.mln_Succ;tf=(struct TransferFiles *)tf->node.mln_Succ)
 			if(tf->sucess) {

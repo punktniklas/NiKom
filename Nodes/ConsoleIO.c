@@ -411,9 +411,9 @@ void getnodeconfig(char *configname) {
 	fclose(fp);
 }
 
-void AbortInactive(void) { }
+void StartHeartBeat(int recordActivity) { }
 
-void UpdateInactive(void) { }
+void StopHeartBeat(void) { }
 
 #define FIFOEVENT_FROMUSER  1
 #define FIFOEVENT_FROMFIFO  2

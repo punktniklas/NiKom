@@ -1,5 +1,7 @@
 int ImmediateLogout(void);
 int ConnectionLost(void);
 void QueryCarrierDropped(void);
-void UpdateInactive(void);
-void AbortInactive(void);
+void StartHeartBeat(int recordActivity);
+void StopHeartBeat(void);
+void RecordActivity(void);
+void CheckInactivity(void);

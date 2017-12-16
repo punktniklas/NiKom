@@ -17,6 +17,8 @@
 #include "NiKomStr.h"
 #include "NiKomFuncs.h"
 #include "NiKomLib.h"
+#include "HeartBeat.h"
+
 #include "BasicIO.h"
 
 #define EXIT_ERROR	128
@@ -33,8 +35,8 @@ struct IOExtSer *serreadreq=NULL;
 struct MsgPort *serreadport=NULL;
 struct IOExtSer *serchangereq=NULL;
 struct MsgPort *serchangeport=NULL;
-struct timerequest *timerreq=NULL,*inactivereq=NULL;
-struct MsgPort *timerport=NULL,*inactiveport=NULL;
+struct timerequest *timerreq=NULL,*heartbeatreq=NULL;
+struct MsgPort *timerport=NULL,*heartbeatport=NULL;
 
 
 extern int nodnr, ypos, xpos, ysize, xsize, inloggad, nodestate;
@@ -58,15 +60,16 @@ static char coninput, serinput; /* Behövs för SendIO()-anropet */
 char typeaheadbuf[51];   /* För att buffra inkommande tecken under utskrift */
 static char device[31];         /* Devicenamnet, från SerNode.cfg */
 static BOOL consoleyes, serialyes, timeryes;
+static long latestActivityTime;
 
 int OpenIO(struct Window *iowin) {
 	if(!(timerport=(struct MsgPort *)CreateMsgPort()))
 		return(FALSE);
 	if(!(timerreq=(struct timerequest *)CreateExtIO(timerport,(LONG)sizeof(struct timerequest))))
 		return(FALSE);
-	if(!(inactiveport=(struct MsgPort *)CreateMsgPort()))
+	if(!(heartbeatport=(struct MsgPort *)CreateMsgPort()))
 		return(FALSE);
-	if(!(inactivereq=(struct timerequest *)CreateExtIO(inactiveport,(LONG)sizeof(struct timerequest))))
+	if(!(heartbeatreq=(struct timerequest *)CreateExtIO(heartbeatport,(LONG)sizeof(struct timerequest))))
 		return(FALSE);
 	if(OpenTimer(timerreq)) return(FALSE);
 	else timeryes=TRUE;
@@ -117,8 +120,8 @@ void CloseIO(void) {
 	if(conwriteport) DeleteMsgPort(conwriteport);
 
 	if(timeryes) CloseTimer(timerreq);
-	if(inactivereq) DeleteExtIO((struct IORequest *)inactivereq);
-	if(inactiveport) DeleteMsgPort(inactiveport);
+	if(heartbeatreq) DeleteExtIO((struct IORequest *)heartbeatreq);
+	if(heartbeatport) DeleteMsgPort(heartbeatport);
 	if(timerreq) DeleteExtIO((struct IORequest *)timerreq);
 	if(timerport) DeleteMsgPort(timerport);
 }
@@ -179,23 +182,29 @@ struct IOExtSer *writereq,*readreq,*changereq;
 }
 
 BYTE OpenTimer(struct timerequest *treq) {
-	BYTE error;
-	error=OpenDevice(TIMERNAME,UNIT_VBLANK,(struct IORequest *)treq,0);
-	if(!error) {
-		inactivereq->tr_node.io_Device=treq->tr_node.io_Device;
-		inactivereq->tr_node.io_Unit=treq->tr_node.io_Unit;
-		treq->tr_node.io_Command=TR_ADDREQUEST;
-		treq->tr_node.io_Message.mn_ReplyPort=timerport;
-		treq->tr_time.tv_secs=0;
-		treq->tr_time.tv_micro=10;
-		if(DoIO((struct IORequest *)timerreq)) printf("Fel DoIO i OpenTimer()\n");
-		inactivereq->tr_node.io_Command=TR_ADDREQUEST;
-		inactivereq->tr_node.io_Message.mn_ReplyPort=inactiveport;
-		inactivereq->tr_time.tv_secs=0;
-		inactivereq->tr_time.tv_micro=10;
-		if(DoIO((struct IORequest *)inactivereq)) printf("Fel DoIO i OpenTimer()\n");
-	}
-	return(error);
+  BYTE error;
+  error = OpenDevice(TIMERNAME, UNIT_VBLANK, (struct IORequest *)treq, 0);
+  if(!error) {
+    heartbeatreq->tr_node.io_Device = treq->tr_node.io_Device;
+    heartbeatreq->tr_node.io_Unit = treq->tr_node.io_Unit;
+
+    treq->tr_node.io_Command = TR_ADDREQUEST;
+    treq->tr_node.io_Message.mn_ReplyPort = timerport;
+    treq->tr_time.tv_secs = 0;
+    treq->tr_time.tv_micro = 10;
+    if(DoIO((struct IORequest *)timerreq)) {
+      printf("Fel DoIO i OpenTimer()\n");
+    }
+
+    heartbeatreq->tr_node.io_Command = TR_ADDREQUEST;
+    heartbeatreq->tr_node.io_Message.mn_ReplyPort = heartbeatport;
+    heartbeatreq->tr_time.tv_secs = 0;
+    heartbeatreq->tr_time.tv_micro = 10;
+    if(DoIO((struct IORequest *)heartbeatreq)) {
+      printf("Fel DoIO i OpenTimer()\n");
+    }
+  }
+  return(error);
 }
 
 void CloseConsole(void)
@@ -228,9 +237,9 @@ void CloseTimer(struct timerequest *treq) {
 		AbortIO((struct IORequest *)timerreq);
 		WaitIO((struct IORequest *)timerreq);
 	}
-	if(!(CheckIO((struct IORequest *)inactivereq))) {
-		AbortIO((struct IORequest *)inactivereq);
-		WaitIO((struct IORequest *)inactivereq);
+	if(!(CheckIO((struct IORequest *)heartbeatreq))) {
+		AbortIO((struct IORequest *)heartbeatreq);
+		WaitIO((struct IORequest *)heartbeatreq);
 	}
 	CloseDevice((struct IORequest *)treq);
 }
@@ -308,7 +317,7 @@ char gettekn(void) {
     conreadsig = 1L << conreadport->mp_SigBit,
     windsig = 1L << NiKwind->UserPort->mp_SigBit,
     serreadsig = 1L << serreadport->mp_SigBit,
-    inactivesig=1L << inactiveport->mp_SigBit,
+    heartbeatsig=1L << heartbeatport->mp_SigBit,
     nikomnodesig = 1L << nikomnodeport->mp_SigBit;
   char serbuf[8];
   int seridx;
@@ -328,11 +337,11 @@ char gettekn(void) {
 
   seridx = 0;
   while(!ch) {
-    signals = Wait(conreadsig | windsig | serreadsig | inactivesig | nikomnodesig
+    signals = Wait(conreadsig | windsig | serreadsig | heartbeatsig | nikomnodesig
                    | SIGBREAKF_CTRL_C);
     if((signals & conreadsig) && CheckIO((struct IORequest *)conreadreq)) {
       ch = congettkn();
-      UpdateInactive();
+      RecordActivity();
     }
     if((signals & serreadsig) && CheckIO((struct IORequest *)serreadreq)) {
       int conv;
@@ -343,7 +352,7 @@ char gettekn(void) {
         /* Need more bytes, continue reading. */
         ++seridx;
       }
-      UpdateInactive();
+      RecordActivity();
       QueryCarrierDropped();
     }
     if(signals & windsig) {
@@ -353,8 +362,8 @@ char gettekn(void) {
       WaitIO((struct IORequest *)conreadreq);
       AbortIO((struct IORequest *)serreadreq);
       WaitIO((struct IORequest *)serreadreq);
-      AbortIO((struct IORequest *)inactivereq);
-      WaitIO((struct IORequest *)inactivereq);
+      AbortIO((struct IORequest *)heartbeatreq);
+      WaitIO((struct IORequest *)heartbeatreq);
       cleanup(EXIT_OK,"");
     }
     if(signals & SIGBREAKF_CTRL_C) {
@@ -362,13 +371,14 @@ char gettekn(void) {
       WaitIO((struct IORequest *)conreadreq);
       AbortIO((struct IORequest *)serreadreq);
       WaitIO((struct IORequest *)serreadreq);
-      AbortIO((struct IORequest *)inactivereq);
-      WaitIO((struct IORequest *)inactivereq);
+      AbortIO((struct IORequest *)heartbeatreq);
+      WaitIO((struct IORequest *)heartbeatreq);
       cleanup(EXIT_OK,"");
     }
-    if((signals & inactivesig) && CheckIO((struct IORequest *)inactivereq)) {
-      WaitIO((struct IORequest *)inactivereq);
-      nodestate |= NIKSTATE_INACTIVITY;
+    if((signals & heartbeatsig) && CheckIO((struct IORequest *)heartbeatreq)) {
+      WaitIO((struct IORequest *)heartbeatreq);
+      HandleHeartBeat();
+      StartHeartBeat(FALSE);
     }
     if(signals & nikomnodesig) {
       while((nikmess = (struct NiKMess *) GetMsg(nikomnodeport))) {
@@ -568,21 +578,32 @@ void getnodeconfig(char *configname) {
 	if(getty) highbaud=gettybps;
 }
 
-void UpdateInactive(void) {
-  nodestate &= ~NIKSTATE_INACTIVITY;
-  AbortInactive();
-
-  inactivereq->tr_node.io_Command = TR_ADDREQUEST;
-  inactivereq->tr_node.io_Message.mn_ReplyPort = inactiveport;
-  inactivereq->tr_time.tv_secs = Servermem->maxinactivetime[nodnr] * 60;
-  inactivereq->tr_time.tv_micro = 0;
-  SendIO((struct IORequest *)inactivereq);
+void StartHeartBeat(int recordActivity) {
+  heartbeatreq->tr_node.io_Command = TR_ADDREQUEST;
+  heartbeatreq->tr_node.io_Message.mn_ReplyPort = heartbeatport;
+  heartbeatreq->tr_time.tv_secs = 61;
+  heartbeatreq->tr_time.tv_micro = 0;
+  SendIO((struct IORequest *)heartbeatreq);
+  if(recordActivity) {
+    RecordActivity();
+  }
 }
 
-void AbortInactive(void) {
-  if(!CheckIO((struct IORequest *)inactivereq)) {
-    AbortIO((struct IORequest *)inactivereq);
-    WaitIO((struct IORequest *)inactivereq);
+void StopHeartBeat(void) {
+  if(!CheckIO((struct IORequest *)heartbeatreq)) {
+    AbortIO((struct IORequest *)heartbeatreq);
+    WaitIO((struct IORequest *)heartbeatreq);
+  }
+}
+
+void RecordActivity(void) {
+  nodestate &= ~NIKSTATE_INACTIVITY;
+  latestActivityTime = time(NULL);
+}
+
+void CheckInactivity(void) {
+  if(time(NULL) > latestActivityTime + Servermem->maxinactivetime[nodnr] * 60) {
+    nodestate |= NIKSTATE_INACTIVITY;
   }
 }
 
@@ -921,7 +942,7 @@ int sendtosercon(char *conpek, char *serpek, int consize, int sersize) {
         typeaheadbuf[typeaheadbuftkn++]=tecken;
         typeaheadbuf[typeaheadbuftkn]=0;
       }
-      UpdateInactive();
+      RecordActivity();
     }
     if((signals & serreadsig) && CheckIO((struct IORequest *)serreadreq)) {
       if((tecken = sergettkn()) == 3) {
@@ -943,7 +964,7 @@ int sendtosercon(char *conpek, char *serpek, int consize, int sersize) {
         typeaheadbuf[typeaheadbuftkn++]=tecken;
         typeaheadbuf[typeaheadbuftkn]=0;
       }
-      UpdateInactive();
+      RecordActivity();
       QueryCarrierDropped();
     }
     if(signals & windsig) {
@@ -953,8 +974,8 @@ int sendtosercon(char *conpek, char *serpek, int consize, int sersize) {
       WaitIO((struct IORequest *)conreadreq);
       AbortIO((struct IORequest *)serreadreq);
       WaitIO((struct IORequest *)serreadreq);
-      AbortIO((struct IORequest *)inactivereq);
-      WaitIO((struct IORequest *)inactivereq);
+      AbortIO((struct IORequest *)heartbeatreq);
+      WaitIO((struct IORequest *)heartbeatreq);
       if(!CheckIO((struct IORequest *)conwritereq)) {
         AbortIO((struct IORequest *)conwritereq);
         WaitIO((struct IORequest *)conwritereq);
@@ -1139,7 +1160,7 @@ int sendtoser(char *pekare, int size) {
         typeaheadbuf[typeaheadbuftkn++] = tecken;
         typeaheadbuf[typeaheadbuftkn] = 0;
       }
-      UpdateInactive();
+      RecordActivity();
       QueryCarrierDropped();
     }
     if(signals & windsig) {
