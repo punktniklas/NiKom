@@ -492,19 +492,28 @@ void radbrev(void) {
 }
 
 void vilka(void) {
-  int i, verbose=FALSE;
+  int i, verbose = FALSE, allNodes = FALSE;
   long timenow;
   int idle;
   struct Mote *conf;
-  char name[50], bps[15], actionbuf[100];
+  char name[50], actionbuf[100];
 
-  if(argument[0]) {
-    if(argument[0] == '-' && (argument[1] == 'v' || argument[1] == 'V')) verbose = TRUE;
+  if(argument[0] == '-') {
+    for(i = 1; argument[i] != '\0' && argument[i] != ' '; i++) {
+      switch(argument[i]) {
+      case 'a': case 'A':
+        allNodes = TRUE;
+        break;
+      case 'v': case 'V':
+        verbose = TRUE;
+        break;
+      }
+    }
   }
-  puttekn("\r\n\n",-1);
+  SendString("\r\n\n");
   timenow = time(NULL);
   for(i = 0; i < MAXNOD; i++) {
-    if(!Servermem->nodtyp[i]) {
+    if(!Servermem->nodtyp[i] || (!allNodes && Servermem->inloggad[i] == -1)) {
       continue;
     }
     if(Servermem->inloggad[i] == -1) {
@@ -515,36 +524,27 @@ void vilka(void) {
       strcpy(name, getusername(Servermem->inloggad[i]));
     }
 
-    SendString("%s #%-2d %s %-20s %s\n\r", CATSTR(MSG_WHO_NODE), i,
-               Servermem->nodtyp[i] == NODCON ? "CON" : "SER", 
-               Servermem->nodid[i], name);
+    idle = timenow - Servermem->idletime[i];
+    SendString("%s #%-2d %-40s %c %3d:%02d\n\r",
+               CATSTR(MSG_WHO_NODE), i,
+               name,
+               Servermem->say[i] ? '*' : ' ',
+               idle / 3600, (idle % 3600) / 60);
 
     if(!verbose) {
       continue;
     }
-    idle = timenow - Servermem->idletime[i];
     if(Servermem->inloggad[i] == -1 || Servermem->inloggad[i] == -2) {
-      if(Servermem->inloggad[i] == -2) {
-        SendString("Bps: %-7ld%15d:%02d %c\r\n\n",
-                   Servermem->connectbps[i], idle / 3600, (idle % 3600) / 60,
-                   Servermem->say[i] ? '*' : ' ');
-      } else {
-        SendString("Bps: -      %15d:%02d %c\r\n\n",
-                   idle / 3600, (idle % 3600) / 60, Servermem->say[i] ? '*' : ' ');
-      }
+      SendString("\n");
       continue;
     }
-    if(Servermem->nodtyp[i] == NODCON) {
-      sprintf(bps, "Bps: -      %15d:%02d %c",
-              idle / 3600, (idle % 3600) / 60, Servermem->say[i] ? '*' : ' ');
-    } else {
-      sprintf(bps, "Bps: %-7ld%15d:%02d %c",
-              Servermem->connectbps[i], idle / 3600, (idle % 3600) / 60,
-              Servermem->say[i] ? '*' : ' ');
-    }
+
+    SendString("  %s %-20s ",
+               Servermem->nodtyp[i] == NODCON ? "CON" : "SER",
+               Servermem->nodid[i]);
     switch(Servermem->action[i]) {
     case INGET :
-      sprintf(actionbuf, "%-32s %s\r\n\n", bps, CATSTR(MSG_WHO_NO_UNREAD));
+      strcpy(actionbuf, CATSTR(MSG_WHO_NO_UNREAD));
       break;
     case SKRIVER :
       if(Servermem->varmote[i] !=- 1) {
@@ -553,12 +553,12 @@ void vilka(void) {
           continue;
         }
         if(!MaySeeConf(conf->nummer, inloggad, &Servermem->inne[nodnr])) {
-          sprintf(actionbuf, "%-32s %s\r\n\n", bps, CATSTR(MSG_WHO_WRITES_TEXT));
+          strcpy(actionbuf, CATSTR(MSG_WHO_WRITES_TEXT));
         } else {
-          sprintf(actionbuf, "%-32s %s %s\r\n\n", bps, CATSTR(MSG_WHO_WRITES_IN), conf->namn);
+          sprintf(actionbuf, "%s %s", CATSTR(MSG_WHO_WRITES_IN), conf->namn);
         }
       } else {
-        sprintf(actionbuf, "%-32s %s\r\n\n", bps, CATSTR(MSG_WHO_WRITES_MAIL));
+        strcpy(actionbuf, CATSTR(MSG_WHO_WRITES_MAIL));
       }
       break;
     case LASER :
@@ -568,50 +568,46 @@ void vilka(void) {
           continue;
         }
         if(!MaySeeConf(conf->nummer, inloggad, &Servermem->inne[nodnr])) {
-          sprintf(actionbuf, "%-32s %s\r\n", bps, CATSTR(MSG_WHO_READS_TEXTS));
+          strcpy(actionbuf,CATSTR(MSG_WHO_READS_TEXTS));
         } else {
-          sprintf(actionbuf, "%-32s %s %s\r\n", bps, CATSTR(MSG_WHO_READS_IN), conf->namn);
+          sprintf(actionbuf, "%s %s", CATSTR(MSG_WHO_READS_IN), conf->namn);
         }
       } else {
-        sprintf(actionbuf, "%-32s %s\r\n", bps, CATSTR(MSG_WHO_READS_MAIL));
+        strcpy(actionbuf, CATSTR(MSG_WHO_READS_MAIL));
       }
       break;
     case GORNGTANNAT :
-      sprintf(actionbuf, "%-32s %s\r\n", bps, Servermem->vilkastr[i]);
+      strcpy(actionbuf, Servermem->vilkastr[i]);
       break;
     case UPLOAD :
       if(!Servermem->areor[Servermem->varmote[i]].namn[0]
          || !arearatt(Servermem->varmote[i], inloggad, &Servermem->inne[nodnr])) {
-        sprintf(actionbuf, "%-32s %s\r\n", bps, CATSTR(MSG_WHO_UPLOADING));
+        strcpy(actionbuf, CATSTR(MSG_WHO_UPLOADING));
       } else {
         if(Servermem->vilkastr[i]) {
-          sprintf(actionbuf, "%-32s %s %s\r\n", bps, CATSTR(MSG_WHO_UPLOADING), Servermem->vilkastr[i]);
+          sprintf(actionbuf, "%s %s", CATSTR(MSG_WHO_UPLOADING), Servermem->vilkastr[i]);
         } else {
-          sprintf(actionbuf, "%-32s %s\r\n", bps, CATSTR(MSG_WHO_SOON_UPLOAD));
+          strcpy(actionbuf, CATSTR(MSG_WHO_SOON_UPLOAD));
         }
       }
       break;
     case DOWNLOAD :
       if(!Servermem->areor[Servermem->varmote[i]].namn[0]
          || !arearatt(Servermem->varmote[i], inloggad, &Servermem->inne[nodnr])) {
-        sprintf(actionbuf, "%-32s %s\r\n", bps, CATSTR(MSG_WHO_DOWNLOADING));
+        strcpy(actionbuf, CATSTR(MSG_WHO_DOWNLOADING));
       } else {
         if(Servermem->vilkastr[i]) {
-          sprintf(actionbuf, "%-32s %s %s\r\n", bps, CATSTR(MSG_WHO_DOWNLOADING), Servermem->vilkastr[i]);
+          sprintf(actionbuf, "%s %s", CATSTR(MSG_WHO_DOWNLOADING), Servermem->vilkastr[i]);
         } else {
-          sprintf(actionbuf, "%-32s %s\r\n", bps, CATSTR(MSG_WHO_SOON_DOWNLOAD));
+          strcpy(actionbuf, CATSTR(MSG_WHO_SOON_DOWNLOAD));
         }
       }
       break;
     default :
-      sprintf(actionbuf, "%-32s <%s>\r\n", bps, CATSTR(MSG_WHO_UNDEFINED));
+      strcpy(actionbuf, CATSTR(MSG_WHO_UNDEFINED));
       break;
     }
-    if(Servermem->CallerID[i]) {
-      strcat(actionbuf, Servermem->CallerID[i]);
-      strcat(actionbuf, "\r\n");
-    }
-    SendString("%s\n", actionbuf);
+    SendString("%s\r\n\n", actionbuf);
   }
 }
 

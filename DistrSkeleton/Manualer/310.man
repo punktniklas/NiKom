@@ -3,10 +3,13 @@
 Vilka
 -----
 
-Synopsis: Vilka
+Synopsis: Vilka [-av]
 
 Beskrivning:
-Visar vilka som är inloggade på de olika noderna samt om dessa skriver en
-text, läser en text, chattar eller inte gör något speciellt.
+Visar vilka som är inloggade på de olika noderna. Som standard visas
+endast de noder där någon är inloggad. Med flaggan -a så visas samtliga
+noder.
+
+Flaggan -v kan användas för att ge lite mer information om varje nod.
 
 Se Även: Status
