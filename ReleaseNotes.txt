@@ -1,4 +1,12 @@
 ---------------------------------------------------------------------------
+                         NiKom v2.4.0, 2018-xx-yy
+---------------------------------------------------------------------------
+- A user's data is now saved automatically every minute while being logged
+  in. This means that if a user is logged in but idle and the node is
+  closed/crashes they will not need to e.g. re-read texts that were read
+  during the terminated login.
+
+---------------------------------------------------------------------------
                          NiKom v2.3.1, 2017-07-01
 ---------------------------------------------------------------------------
 Language fixes for 2.3.0.

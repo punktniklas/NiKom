@@ -79,6 +79,11 @@ void cleanup(int kod,char *text) {
 	exit(kod);
 }
 
+void saveUserData(void) {
+  writeuser(inloggad,&Servermem->inne[nodnr]);
+  WriteUnreadTexts(&Servermem->unreadTexts[nodnr], inloggad);
+}
+
 int main(int argc,char *argv[]) {
   int x;
   long tid;
@@ -189,10 +194,9 @@ int main(int argc,char *argv[]) {
   Servermem->inne[nodnr].loggin++;
   Servermem->info.inloggningar++;
   Servermem->inne[nodnr].defarea=area2;
-  writeuser(inloggad,&Servermem->inne[nodnr]);
-  WriteUnreadTexts(&Servermem->unreadTexts[nodnr], inloggad);
   writesenaste();
   StopHeartBeat();
+  saveUserData();
   freealiasmem();
   sprintf(tellstr,"loggade just ut från nod %d",nodnr);
   tellallnodes(tellstr);
@@ -207,4 +211,5 @@ int main(int argc,char *argv[]) {
 
 void HandleHeartBeat(void) {
   CheckInactivity();
+  saveUserData();
 }
