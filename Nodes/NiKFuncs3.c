@@ -492,11 +492,11 @@ void radbrev(void) {
 }
 
 void vilka(void) {
-  int i, verbose = FALSE, allNodes = FALSE;
+  int i, verbose = FALSE, allNodes = FALSE, userLoggedIn;
   long timenow;
   int idle;
   struct Mote *conf;
-  char name[50], actionbuf[100];
+  char name[50], actionbuf[100], idlebuf[20];
 
   if(argument[0] == '-') {
     for(i = 1; argument[i] != '\0' && argument[i] != ' '; i++) {
@@ -516,6 +516,7 @@ void vilka(void) {
     if(!Servermem->nodtyp[i] || (!allNodes && Servermem->inloggad[i] == -1)) {
       continue;
     }
+    userLoggedIn = Servermem->inloggad[i] >= 0;
     if(Servermem->inloggad[i] == -1) {
       sprintf(name, "<%s>", CATSTR(MSG_WHO_NOONE));
     } else if(Servermem->inloggad[i] == -2) {
@@ -525,16 +526,21 @@ void vilka(void) {
     }
 
     idle = timenow - Servermem->idletime[i];
-    SendString("%s #%-2d %-40s %c %3d:%02d\n\r",
+    if(idle < 60 && userLoggedIn) {
+      strcpy(idlebuf, CATSTR(MSG_WHO_ACTIVE));
+    } else {
+      sprintf(idlebuf, "%3d:%02d", idle / 3600, (idle % 3600) / 60);
+    }
+    SendString("%s #%-2d %-40s %c %7s\n\r",
                CATSTR(MSG_WHO_NODE), i,
                name,
                Servermem->say[i] ? '*' : ' ',
-               idle / 3600, (idle % 3600) / 60);
+               idlebuf);
 
     if(!verbose) {
       continue;
     }
-    if(Servermem->inloggad[i] == -1 || Servermem->inloggad[i] == -2) {
+    if(!userLoggedIn) {
       SendString("\n");
       continue;
     }

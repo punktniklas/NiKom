@@ -547,6 +547,8 @@ MSG_WHO_SOON_DOWNLOAD
 Ska strax ladda ner en fil
 MSG_WHO_UNDEFINED
 Gör något odefinierat
+MSG_WHO_ACTIVE
+aktiv
 ;
 MSG_PURGE_TEXTS_SYNTAX
 Skriv : Rensa texter <antal texter>

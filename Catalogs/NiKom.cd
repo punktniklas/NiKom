@@ -543,6 +543,8 @@ MSG_WHO_SOON_DOWNLOAD (953//)
 Is about to download a file
 MSG_WHO_UNDEFINED (954//)
 Does something undefined
+MSG_WHO_ACTIVE (955//)
+active
 ;
 MSG_PURGE_TEXTS_SYNTAX (960//)
 Syntax: Purge Texts <number of texts>
