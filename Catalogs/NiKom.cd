@@ -567,7 +567,7 @@ MSG_SAY_SENT (976//)
 Message to %s has been sent.
 ;
 MSG_LIST_LOGINS_HEADER (980//)
-     Name                            Logged out   Time  Read Wri  Ul  Dl
+     Name                            Logged out    Time  Read Wri  Ul  Dl
 ;
 MSG_DUMP_TEXT_SYNTAX (990//)
 Syntax: Dump Text <text number> [<filename>]

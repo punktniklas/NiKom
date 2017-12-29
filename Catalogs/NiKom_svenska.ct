@@ -571,7 +571,7 @@ MSG_SAY_SENT
 %s meddelad.
 ;
 MSG_LIST_LOGINS_HEADER
-     Namn                            Utloggad     Tid   Läst Skr  Ul  Dl
+     Namn                            Utloggad       Tid  Läst Skr  Ul  Dl
 ;
 MSG_DUMP_TEXT_SYNTAX
 Skriv: Dumpa Text <textnr> [<filename>]

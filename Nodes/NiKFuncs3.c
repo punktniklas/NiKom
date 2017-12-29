@@ -18,6 +18,7 @@
 #include "StringUtils.h"
 #include "Stack.h"
 #include "Languages.h"
+#include "DateUtils.h"
 
 #define EKO		1
 #define EJEKO	0
@@ -526,16 +527,11 @@ void vilka(void) {
     }
 
     idle = timenow - Servermem->idletime[i];
-    if(idle < 60 && userLoggedIn) {
-      strcpy(idlebuf, CATSTR(MSG_WHO_ACTIVE));
-    } else {
-      sprintf(idlebuf, "%3d:%02d", idle / 3600, (idle % 3600) / 60);
-    }
     SendString("%s #%-2d %-40s %c %7s\n\r",
                CATSTR(MSG_WHO_NODE), i,
                name,
                Servermem->say[i] ? '*' : ' ',
-               idlebuf);
+               (idle < 60 && userLoggedIn) ? (const char *)CATSTR(MSG_WHO_ACTIVE) : FormatDuration(idle, idlebuf));
 
     if(!verbose) {
       continue;
@@ -933,6 +929,7 @@ void writesenaste(void) {
 void listasenaste(void) {
   int i, userId, allUsers = TRUE, cnt = 0, antal = MAXSENASTE;
   struct tm *ts;
+  char durationBuf[10];
 
   if(argument[0] == '-') {
     antal = atoi(&argument[1]);
@@ -956,11 +953,11 @@ void listasenaste(void) {
     }
     cnt++;
     ts = localtime(&Servermem->senaste[i].utloggtid);
-    if(SendString("%-35s %02d/%02d %02d:%02d %3dmin  %4d %3d  %2d  %2d\r\n",
+    if(SendString("%-35s %02d/%02d %02d:%02d %7s  %4d %3d  %2d  %2d\r\n",
                   getusername(Servermem->senaste[i].anv), ts->tm_mday, ts->tm_mon + 1, ts->tm_hour, ts->tm_min,
-                  Servermem->senaste[i].tid_inloggad, Servermem->senaste[i].read,
-                  Servermem->senaste[i].write, Servermem->senaste[i].ul,
-                  Servermem->senaste[i].dl)) {
+                  FormatDuration(Servermem->senaste[i].tid_inloggad * 60, durationBuf),
+                  Servermem->senaste[i].read, Servermem->senaste[i].write,
+                  Servermem->senaste[i].ul, Servermem->senaste[i].dl)) {
       return;
     }
     if(cnt >= antal) {
