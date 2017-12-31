@@ -18,6 +18,7 @@
 #include "NiKomLib.h"
 #include "NiKomStr.h"
 #include "NiKomFuncs.h"
+#include "UserData.h"
 
 #include "Cmd_Users.h"
 
@@ -27,7 +28,7 @@ extern char outbuffer[],inmat[], *argument;
 
 
 void Cmd_Status(void) {
-  struct User readuserstr;
+  struct User *user;
   struct Mote *conf;
   int userId, nod, cnt = 0, sumUnread = 0, showAllConf = FALSE, kb;
   struct tm *ts;
@@ -40,7 +41,7 @@ void Cmd_Status(void) {
     argument = hittaefter(argument);
   }
   if(argument[0] == 0) {
-    memcpy(&readuserstr, &Servermem->inne[nodnr], sizeof(struct User));
+    user = &Servermem->inne[nodnr];
     unreadTexts = &Servermem->unreadTexts[nodnr];
     userId = inloggad;
   } else {
@@ -54,10 +55,10 @@ void Cmd_Status(void) {
       }
     }
     if(nod < MAXNOD) {
-      memcpy(&readuserstr, &Servermem->inne[nod], sizeof(struct User));
+      user =  &Servermem->inne[nod];
       unreadTexts = &Servermem->unreadTexts[nod];
     } else {
-      if(readuser(userId,&readuserstr)) {
+      if(!(user = GetUserData(userId))) {
         return;
       }
       if(!ReadUnreadTexts(&unreadTextsBuf, userId)) {
@@ -66,49 +67,49 @@ void Cmd_Status(void) {
       unreadTexts = &unreadTextsBuf;
     }
   }
-  if(SendStringCat("\r\n\n%s\r\n\n", CATSTR(MSG_USER_STATUS_HEADER), readuserstr.namn,userId)) { return; }
-  if(SendString("%-21s: %d\r\n", CATSTR(MSG_USER_LEVEL), readuserstr.status)) { return; }
-  if(!((readuserstr.flaggor & SKYDDAD)
+  if(SendStringCat("\r\n\n%s\r\n\n", CATSTR(MSG_USER_STATUS_HEADER), user->namn,userId)) { return; }
+  if(SendString("%-21s: %d\r\n", CATSTR(MSG_USER_LEVEL), user->status)) { return; }
+  if(!((user->flaggor & SKYDDAD)
        && Servermem->inne[nodnr].status < Servermem->cfg->st.sestatus
        && inloggad != userId)) {
-    if(SendString("%-21s: %s\r\n", CATSTR(MSG_USER_STREET), readuserstr.gata)) { return; }
-    if(SendString("%-21s: %s\r\n", CATSTR(MSG_USER_CITY), readuserstr.postadress)) { return; }
-    if(SendString("%-21s: %s\r\n", CATSTR(MSG_USER_COUNTRY), readuserstr.land)) { return; }
-    if(SendString("%-21s: %s\r\n", CATSTR(MSG_USER_PHONE), readuserstr.telefon)) { return; }
+    if(SendString("%-21s: %s\r\n", CATSTR(MSG_USER_STREET), user->gata)) { return; }
+    if(SendString("%-21s: %s\r\n", CATSTR(MSG_USER_CITY), user->postadress)) { return; }
+    if(SendString("%-21s: %s\r\n", CATSTR(MSG_USER_COUNTRY), user->land)) { return; }
+    if(SendString("%-21s: %s\r\n", CATSTR(MSG_USER_PHONE), user->telefon)) { return; }
   }
-  if(SendString("%-21s: %s\r\n", CATSTR(MSG_USER_MISCINFO), readuserstr.annan_info)) { return; }
-  if(SendString("%-21s: %d\r\n", CATSTR(MSG_USER_LINES), readuserstr.rader)) { return; }
-  ts = localtime(&readuserstr.forst_in);
+  if(SendString("%-21s: %s\r\n", CATSTR(MSG_USER_MISCINFO), user->annan_info)) { return; }
+  if(SendString("%-21s: %d\r\n", CATSTR(MSG_USER_LINES), user->rader)) { return; }
+  ts = localtime(&user->forst_in);
   if(SendString("%-21s: %4d%02d%02d  %02d:%02d\r\n", CATSTR(MSG_USER_FIRST_LOGIN),
           ts->tm_year + 1900, ts->tm_mon + 1, ts->tm_mday, ts->tm_hour,
           ts->tm_min)) { return; }
-  ts = localtime(&readuserstr.senast_in);
+  ts = localtime(&user->senast_in);
   if(SendString("%-21s: %4d%02d%02d  %02d:%02d\r\n", CATSTR(MSG_USER_LAST_LOGIN),
           ts->tm_year + 1900, ts->tm_mon + 1, ts->tm_mday, ts->tm_hour,
           ts->tm_min)) { return; }
-  if(SendString("%-21s: %d:%02d\r\n", CATSTR(MSG_USER_TOTAL_TIME), readuserstr.tot_tid / 3600,
-          (readuserstr.tot_tid % 3600) / 60)) { return; }
-  if(SendString("%-21s: %d\r\n", CATSTR(MSG_USER_LOGINS), readuserstr.loggin)) { return; }
-  if(SendString("%-21s: %d\r\n", CATSTR(MSG_USER_READ), readuserstr.read)) { return; }
-  if(SendString("%-21s: %d\r\n", CATSTR(MSG_USER_WRITTEN), readuserstr.skrivit)) { return; }
-  if(SendString("%-21s: %d\r\n", CATSTR(MSG_USER_DL_FILES), readuserstr.download)) { return; }
-  if(SendString("%-21s: %d\r\n", CATSTR(MSG_USER_UL_FILES), readuserstr.upload)) { return; }
+  if(SendString("%-21s: %d:%02d\r\n", CATSTR(MSG_USER_TOTAL_TIME), user->tot_tid / 3600,
+          (user->tot_tid % 3600) / 60)) { return; }
+  if(SendString("%-21s: %d\r\n", CATSTR(MSG_USER_LOGINS), user->loggin)) { return; }
+  if(SendString("%-21s: %d\r\n", CATSTR(MSG_USER_READ), user->read)) { return; }
+  if(SendString("%-21s: %d\r\n", CATSTR(MSG_USER_WRITTEN), user->skrivit)) { return; }
+  if(SendString("%-21s: %d\r\n", CATSTR(MSG_USER_DL_FILES), user->download)) { return; }
+  if(SendString("%-21s: %d\r\n", CATSTR(MSG_USER_UL_FILES), user->upload)) { return; }
 
-  kb = readuserstr.downloadbytes > 90000;
+  kb = user->downloadbytes > 90000;
   if(SendString("%-21s: %d %s\r\n", CATSTR(MSG_USER_DL_BYTES),
-                kb ? readuserstr.downloadbytes / 1024 : readuserstr.downloadbytes,
+                kb ? user->downloadbytes / 1024 : user->downloadbytes,
                 kb ? "KB" : "B"))
     { return; }
-  kb = readuserstr.uploadbytes > 90000;
+  kb = user->uploadbytes > 90000;
   if(SendString("%-21s: %d %s\r\n\n", CATSTR(MSG_USER_UL_BYTES),
-                kb ? readuserstr.uploadbytes / 1024 : readuserstr.uploadbytes,
+                kb ? user->uploadbytes / 1024 : user->uploadbytes,
                 kb ? "KB" : "B"))
     { return; }
 
-  if(readuserstr.grupper) {
+  if(user->grupper) {
     SendString("%s:\r\n", CATSTR(MSG_USER_USER_GROUPS));
     ITER_EL(listpek, Servermem->grupp_list, grupp_node, struct UserGroup *) {
-      if(!BAMTEST((char *)&readuserstr.grupper, listpek->nummer)) {
+      if(!BAMTEST((char *)&user->grupper, listpek->nummer)) {
         continue;
       }
       if((listpek->flaggor & HEMLIGT)
@@ -120,13 +121,13 @@ void Cmd_Status(void) {
     }
     SendString("\n");
   }
-  if((cnt = countmail(userId, readuserstr.brevpek))) {
+  if((cnt = countmail(userId, user->brevpek))) {
     if(SendString("%4d %s\r\n", cnt, CATSTR(MSG_MAIL_MAILBOX))) { return; }
     sumUnread += cnt;
   }
   ITER_EL(conf, Servermem->mot_list, mot_node, struct Mote *) {
     if(!MaySeeConf(conf->nummer, inloggad, &Servermem->inne[nodnr])
-       || !IsMemberConf(conf->nummer, userId, &readuserstr)) {
+       || !IsMemberConf(conf->nummer, userId, user)) {
       continue;
     }
     cnt = 0;
@@ -180,8 +181,7 @@ int Cmd_ChangeUser(void) {
       memcpy(&user,&Servermem->inne[i],sizeof(struct User));
     }
     else {
-      if(readuser(userId,&user)) {
-        DisplayInternalError();
+      if(!NodeReadUser(userId, &user)) {
         return 0;
       }
       SendStringCat("\r\n\n%s\r\n", CATSTR(MSG_USER_CHANGING_USER), getusername(userId));
@@ -269,8 +269,8 @@ int Cmd_ChangeUser(void) {
       break;
     }
   }
-  writeuser(userId, &user);
-  return(0);
+  NodeWriteUser(userId, &user);
+  return 0;
 }
 
 void Cmd_DeleteUser(void) {

@@ -28,6 +28,7 @@
 #include "DiskUtils.h"
 #include "Terminal.h"
 #include "Logging.h"
+#include "UserData.h"
 
 #define EKO		1
 
@@ -764,9 +765,13 @@ void radfil(void) {
             if(x<MAXNOD) {
               Servermem->inne[x].upload--;
             } else {
-              if(readuser(letpek->uppladdare,&tempuser)) return;
+              if(!NodeReadUser(letpek->uppladdare, &tempuser)) {
+                return;
+              }
               tempuser.upload--;
-              if(writeuser(letpek->uppladdare,&tempuser)) return;
+              if(!NodeWriteUser(letpek->uppladdare, &tempuser)) {
+                return;
+              }
             }
           }
 	} else {

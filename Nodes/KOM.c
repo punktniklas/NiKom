@@ -282,7 +282,6 @@ void ExecuteCommandById(int cmdId) {
   case 325: Cmd_ReLogin(); break;
   case 326: bytnodtyp(); break;
   case 327: bytteckenset(); break;
-  case 328: SaveCurrentUser(inloggad, nodnr); break;
   case 329: Cmd_ChangeLanguage(); break;
   case 401: bytarea(); break;
   case 402: filinfo(); break;

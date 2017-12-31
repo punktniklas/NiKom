@@ -22,6 +22,8 @@
 #include "RexxUtils.h"
 #include "StringUtils.h"
 #include "CommandParser.h"
+#include "UserData.h"
+#include "UserDataUtils.h"
 
 extern struct System *Servermem;
 
@@ -142,57 +144,17 @@ int updatefile(int area,struct Fil *fil)
 	return 0;
 }
 
-int readuser(int nummer, struct User *user) {
-	BPTR fh;
-	int x;
-	char filnamn[40];
-	for(x=0;x<MAXNOD;x++) if(Servermem->inloggad[x]==nummer) break;
-	if(x!=MAXNOD) {
-		memcpy(user,&Servermem->inne[x],sizeof(struct User));
-		return(0);
-	}
-	sprintf(filnamn,"NiKom:Users/%d/%d/Data",nummer/100,nummer);
-	if(!(fh=Open(filnamn,MODE_OLDFILE))) {
-		printf("Kunde inte öppna Users.dat!\n");
-		return(1);
-	}
-	if(!Read(fh,(void *)user,sizeof(struct User))) {
-		printf("Kunde inte läsa Users.dat!\n");
-		Close(fh);
-		return(1);
-	}
-	Close(fh);
-	return(0);
-}
-
-int writeuser(int nummer, struct User *user) {
-	BPTR fh;
-	char filnamn[40];
-	sprintf(filnamn,"NiKom:Users/%d/%d/Data",nummer/100,nummer);
-	if(!(fh=Open(filnamn,MODE_OLDFILE))) {
-		printf("Kunde inte öppna Users.dat!\n");
-		return(1);
-	}
-	if(!Write(fh,(void *)user,sizeof(struct User))) {
-		printf("Kunde inte skriva Users.dat!\n");
-		Close(fh);
-		return(1);
-	}
-	Close(fh);
-	return(0);
-}
-
 void userinfo(struct RexxMsg *mess) {
-  int nummer, nodnr;
+  int userId, nodnr;
   char str[100];
   struct tm *ts;
-  struct User userdata, *user;
+  struct User *user;
   
   if((!mess->rm_Args[1]) || (!mess->rm_Args[2])) {
     SetRexxErrorResult(mess, 1);
     return;
   }
-  if(!userexists(nummer = atoi(mess->rm_Args[1]))) {
+  if(!userexists(userId = atoi(mess->rm_Args[1]))) {
     SetRexxResultString(mess, "-1");
     return;
   }
@@ -202,18 +164,9 @@ void userinfo(struct RexxMsg *mess) {
      && mess->rm_Args[2][0] != 'N'
      && mess->rm_Args[2][0] != 'r'
      && mess->rm_Args[2][0] != 'R') {
-    for(nodnr = 0; nodnr < MAXNOD; nodnr++) {
-      if(Servermem->inloggad[nodnr] == nummer) {
-        user = &Servermem->inne[nodnr];
-        break;
-      }
-    }
-    if(nodnr >= MAXNOD) {
-      if(readuser(nummer, &userdata)) {
+    if(!(user = GetUserData(userId))) {
         SetRexxErrorResult(mess, 3);
-        return;
-      }
-      user = &userdata;
+        return;      
     }
   }
   switch(mess->rm_Args[2][0]) {
@@ -262,7 +215,7 @@ void userinfo(struct RexxMsg *mess) {
     strcpy(str, user->prompt);
     break;
   case 'n' : case 'N' :
-    strcpy(str, getusername(nummer));
+    strcpy(str, getusername(userId));
     break;
   case 'o' : case 'O' :
     sprintf(str, "%ld", user->flaggor);
@@ -274,7 +227,7 @@ void userinfo(struct RexxMsg *mess) {
     sprintf(str, "%d", user->rader);
     break;
   case 'r' : case 'R' :
-    sprintf(str, "%d", getuserstatus(nummer));
+    sprintf(str, "%d", getuserstatus(userId));
     break;
   case 's' : case 'S' :
     sprintf(str, "%ld", user->skrivit);
@@ -1114,130 +1067,136 @@ void areainfo(struct RexxMsg *mess) {
 }
 
 void chguser(struct RexxMsg *mess) {
-	int user,x,foo;
-	struct ShortUser *letpek;
-	struct User chguseruser;
-	char temp[20];
+  int userId, i, otherUserId;
+  struct ShortUser *shortUser;
+  struct User chguseruser;
+  char temp[20];
 
-	if(!mess->rm_Args[1] || !mess->rm_Args[2] || !mess->rm_Args[3]) {
-		mess->rm_Result1=1;
-		mess->rm_Result2=0;
-		return;
-	}
-	if(!userexists(user=atoi(mess->rm_Args[1]))) {
-		if(!(mess->rm_Result2=(long)CreateArgstring("-1",strlen("-1"))))
-		printf("Kunde inte allokera en ArgString\n");
-		mess->rm_Result1=0;
-		return;
-	}
-	for(x=0;x<MAXNOD;x++) if(Servermem->inloggad[x]==user) break;
+  if(!mess->rm_Args[1] || !mess->rm_Args[2] || !mess->rm_Args[3]) {
+    SetRexxErrorResult(mess, 1);
+    return;
+  }
+  if(!userexists(userId = atoi(mess->rm_Args[1]))) {
+    SetRexxResultString(mess, "-1");
+    return;
+  }
+  for(i = 0; i < MAXNOD; i++) {
+    if(Servermem->inloggad[i] == userId) {
+      break;
+    }
+  }
 
-	if(x==MAXNOD)
-	{
-		if(readuser(user,&chguseruser))
-		{
-			mess->rm_Result1=3;
-			mess->rm_Result2=0;
-			return;
-		}
-	}
+  if(i == MAXNOD) {
+    if(!ReadUser(userId, &chguseruser)) {
+      SetRexxErrorResult(mess, 3);
+      return;
+    }
+  }
 
-	switch(mess->rm_Args[3][0]) {
-		case 'a' : case 'A' :
-			if(x==MAXNOD) strncpy(chguseruser.annan_info,mess->rm_Args[2],60);
-			else strncpy(Servermem->inne[x].annan_info,mess->rm_Args[2],60);
-			break;
-		case 'c' : case 'C' :
-			if(x==MAXNOD) strncpy(chguseruser.land,mess->rm_Args[2],40);
-			else strncpy(Servermem->inne[x].land,mess->rm_Args[2],40);
-			break;
-		case 'd' : case 'D' :
-			if(x==MAXNOD) chguseruser.download=atoi(mess->rm_Args[2]);
-			else Servermem->inne[x].download=atoi(mess->rm_Args[2]);
-			break;
-		case 'f' : case 'F' :
-			if(x==MAXNOD) strncpy(chguseruser.telefon,mess->rm_Args[2],20);
-			else strncpy(Servermem->inne[x].telefon,mess->rm_Args[2],20);
-			break;
-		case 'g' : case 'G' :
-			if(x==MAXNOD) strncpy(chguseruser.gata,mess->rm_Args[2],40);
-			else strncpy(Servermem->inne[x].gata,mess->rm_Args[2],40);
-			break;
-		case 'h' : case 'H' :
-			if(x==MAXNOD) chguseruser.downloadbytes = atoi(mess->rm_Args[2]);
-			else Servermem->inne[x].downloadbytes = atoi(mess->rm_Args[2]);
-			break;
-		case 'j' : case 'J' :
-			if(x==MAXNOD) chguseruser.uploadbytes = atoi(mess->rm_Args[2]);
-			else Servermem->inne[x].uploadbytes = atoi(mess->rm_Args[2]);
-			break;
-		case 'i' : case 'I' :
-			if(x==MAXNOD) chguseruser.loggin=atoi(mess->rm_Args[2]);
-			else Servermem->inne[x].loggin=atoi(mess->rm_Args[2]);
-			break;
-		case 'l' : case 'L' :
-			if(x==MAXNOD) chguseruser.read=atoi(mess->rm_Args[2]);
-			else Servermem->inne[x].read=atoi(mess->rm_Args[2]);
-			break;
-		case 'm' : case 'M' :
-			if(x==MAXNOD) strncpy(chguseruser.prompt,mess->rm_Args[2],5);
-			else strncpy(Servermem->inne[x].prompt,mess->rm_Args[2],5);
-			break;
-		case 'n' : case 'N' :
-			if((foo=parsenamn(mess->rm_Args[2]))==-1 || foo==user) {
-				if(x==MAXNOD) strncpy(chguseruser.namn,mess->rm_Args[2],40);
-				else strncpy(Servermem->inne[x].namn,mess->rm_Args[2],40);
-				for(letpek=(struct ShortUser *)Servermem->user_list.mlh_Head;letpek->user_node.mln_Succ;letpek=(struct ShortUser *)letpek->user_node.mln_Succ)
-					if(letpek->nummer==user) break;
-				if(letpek->user_node.mln_Succ) strncpy(letpek->namn,mess->rm_Args[2],40);
-			}
-			break;
-		case 'o' : case 'O' :
-			if(x==MAXNOD) chguseruser.flaggor=atoi(mess->rm_Args[2]);
-			else Servermem->inne[x].flaggor=atoi(mess->rm_Args[2]);
-			break;
-		case 'p' : case 'P' :
-			if(x==MAXNOD) strncpy(chguseruser.postadress,mess->rm_Args[2],40);
-			else strncpy(Servermem->inne[x].postadress,mess->rm_Args[2],40);
-			break;
-		case 'q' : case 'Q' :
-			if(x==MAXNOD) chguseruser.rader=atoi(mess->rm_Args[2]);
-			else Servermem->inne[x].rader=atoi(mess->rm_Args[2]);
-			break;
-		case 'r' : case 'R' :
-			if(x==MAXNOD) chguseruser.status=atoi(mess->rm_Args[2]);
-			else Servermem->inne[x].status=atoi(mess->rm_Args[2]);
-			for(letpek=(struct ShortUser *)Servermem->user_list.mlh_Head;letpek->user_node.mln_Succ;letpek=(struct ShortUser *)letpek->user_node.mln_Succ)
-				if(letpek->nummer==user) break;
-			if(letpek->user_node.mln_Succ) letpek->status=atoi(mess->rm_Args[2]);
-			break;
-		case 's' : case 'S' :
-			if(x==MAXNOD) chguseruser.skrivit=atoi(mess->rm_Args[2]);
-			else Servermem->inne[x].skrivit=atoi(mess->rm_Args[2]);
-			break;
-		case 't' : case 'T' :
-			if(x==MAXNOD) chguseruser.tot_tid=atoi(mess->rm_Args[2]);
-			else Servermem->inne[x].tot_tid=atoi(mess->rm_Args[2]);
-			break;
-		case 'u' : case 'U' :
-			if(x==MAXNOD) chguseruser.upload=atoi(mess->rm_Args[2]);
-			else Servermem->inne[x].upload=atoi(mess->rm_Args[2]);
-			break;
-		case 'x' : case 'X' :
-                  if(Servermem->cfg->cfgflags & NICFG_CRYPTEDPASSWORDS) {
-                    CryptPassword(mess->rm_Args[2], temp);
-                  } else {
-                    strncpy(temp, mess->rm_Args[2], 15);
-                  }
-                  if(x==MAXNOD) strncpy(chguseruser.losen,temp,15);
-                  else strncpy(Servermem->inne[x].losen,temp,15);
-                  break;
-		default : break;
-	}
-	if(x==MAXNOD && writeuser(user,&chguseruser)) mess->rm_Result1=3;
-	else mess->rm_Result1=0;
-	if(!(mess->rm_Result2=(long)CreateArgstring("0",strlen("0"))))
-		printf("Kunde inte allokera en ArgString\n");
+  switch(mess->rm_Args[3][0]) {
+  case 'a' : case 'A' :
+    if(i == MAXNOD) strncpy(chguseruser.annan_info, mess->rm_Args[2], 60);
+    else strncpy(Servermem->inne[i].annan_info, mess->rm_Args[2], 60);
+    break;
+  case 'c' : case 'C' :
+    if(i == MAXNOD) strncpy(chguseruser.land, mess->rm_Args[2], 40);
+    else strncpy(Servermem->inne[i].land, mess->rm_Args[2], 40);
+    break;
+  case 'd' : case 'D' :
+    if(i == MAXNOD) chguseruser.download = atoi(mess->rm_Args[2]);
+    else Servermem->inne[i].download = atoi(mess->rm_Args[2]);
+    break;
+  case 'f' : case 'F' :
+    if(i == MAXNOD) strncpy(chguseruser.telefon, mess->rm_Args[2], 20);
+    else strncpy(Servermem->inne[i].telefon, mess->rm_Args[2], 20);
+    break;
+  case 'g' : case 'G' :
+    if(i == MAXNOD) strncpy(chguseruser.gata, mess->rm_Args[2], 40);
+    else strncpy(Servermem->inne[i].gata, mess->rm_Args[2], 40);
+    break;
+  case 'h' : case 'H' :
+    if(i == MAXNOD) chguseruser.downloadbytes = atoi(mess->rm_Args[2]);
+    else Servermem->inne[i].downloadbytes = atoi(mess->rm_Args[2]);
+    break;
+  case 'j' : case 'J' :
+    if(i == MAXNOD) chguseruser.uploadbytes = atoi(mess->rm_Args[2]);
+    else Servermem->inne[i].uploadbytes = atoi(mess->rm_Args[2]);
+    break;
+  case 'i' : case 'I' :
+    if(i == MAXNOD) chguseruser.loggin = atoi(mess->rm_Args[2]);
+    else Servermem->inne[i].loggin = atoi(mess->rm_Args[2]);
+    break;
+  case 'l' : case 'L' :
+    if(i == MAXNOD) chguseruser.read = atoi(mess->rm_Args[2]);
+    else Servermem->inne[i].read = atoi(mess->rm_Args[2]);
+    break;
+  case 'm' : case 'M' :
+    if(i == MAXNOD) strncpy(chguseruser.prompt, mess->rm_Args[2], 5);
+    else strncpy(Servermem->inne[i].prompt, mess->rm_Args[2], 5);
+    break;
+  case 'n' : case 'N' :
+    if((otherUserId = parsenamn(mess->rm_Args[2])) == -1 || otherUserId == userId) {
+      if(i == MAXNOD) strncpy(chguseruser.namn, mess->rm_Args[2], 40);
+      else strncpy(Servermem->inne[i].namn, mess->rm_Args[2], 40);
+      ITER_EL(shortUser, Servermem->user_list, user_node, struct ShortUser *) {
+        if(shortUser->nummer == userId) {
+          strncpy(shortUser->namn, mess->rm_Args[2], 40);
+          break;
+        }
+      }
+    }
+    break;
+  case 'o' : case 'O' :
+    if(i == MAXNOD) chguseruser.flaggor = atoi(mess->rm_Args[2]);
+    else Servermem->inne[i].flaggor = atoi(mess->rm_Args[2]);
+    break;
+  case 'p' : case 'P' :
+    if(i == MAXNOD) strncpy(chguseruser.postadress, mess->rm_Args[2], 40);
+    else strncpy(Servermem->inne[i].postadress, mess->rm_Args[2], 40);
+    break;
+  case 'q' : case 'Q' :
+    if(i == MAXNOD) chguseruser.rader = atoi(mess->rm_Args[2]);
+    else Servermem->inne[i].rader = atoi(mess->rm_Args[2]);
+    break;
+  case 'r' : case 'R' :
+    if(i == MAXNOD) chguseruser.status = atoi(mess->rm_Args[2]);
+    else Servermem->inne[i].status = atoi(mess->rm_Args[2]);
+    ITER_EL(shortUser, Servermem->user_list, user_node, struct ShortUser *) {
+      if(shortUser->nummer == userId) {
+        shortUser->status = atoi(mess->rm_Args[2]);
+        break;
+      }
+    }
+    break;
+  case 's' : case 'S' :
+    if(i == MAXNOD) chguseruser.skrivit = atoi(mess->rm_Args[2]);
+    else Servermem->inne[i].skrivit = atoi(mess->rm_Args[2]);
+    break;
+  case 't' : case 'T' :
+    if(i == MAXNOD) chguseruser.tot_tid = atoi(mess->rm_Args[2]);
+    else Servermem->inne[i].tot_tid = atoi(mess->rm_Args[2]);
+    break;
+  case 'u' : case 'U' :
+    if(i == MAXNOD) chguseruser.upload = atoi(mess->rm_Args[2]);
+    else Servermem->inne[i].upload = atoi(mess->rm_Args[2]);
+    break;
+  case 'x' : case 'X' :
+    if(Servermem->cfg->cfgflags & NICFG_CRYPTEDPASSWORDS) {
+      CryptPassword(mess->rm_Args[2], temp);
+    } else {
+      strncpy(temp, mess->rm_Args[2], 15);
+    }
+    if(i == MAXNOD) strncpy(chguseruser.losen, temp, 15);
+    else strncpy(Servermem->inne[i].losen, temp, 15);
+    break;
+  default :
+    break;
+  }
+  if(i == MAXNOD && !WriteUser(userId,&chguseruser)) {
+    SetRexxErrorResult(mess, 3);
+  } else {
+    SetRexxResultString(mess, "0");
+  }
 }
 
 void skapafil(struct RexxMsg *mess) {

@@ -80,8 +80,6 @@ int writetexthead(int nummer,struct Header *head);
 int readletterheader(BPTR fh,struct ReadLetter *rl);
 int getnextletter(int user);
 int getfirstletter(int user);
-int readuser(int nummer,struct User *user);
-int writeuser(int nummer,struct User *user);
 void rensatexter(void);
 void gamlatexter(void);
 void gamlabrev(void);
@@ -138,7 +136,6 @@ struct Kommando *getkmdpek(int);
 int bytnodtyp(void);
 void dellostsay(void);
 void bytteckenset(void);
-void SaveCurrentUser(int, int);   /* Kommandot SPARA */
 
 /* Prototypes for functions defined in NiKEditor.c */
 int edittext(char *filnamn);

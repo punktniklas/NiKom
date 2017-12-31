@@ -27,6 +27,7 @@
 #include "StringUtils.h"
 #include "BasicIO.h"
 #include "Languages.h"
+#include "UserData.h"
 
 #define EKO		1
 
@@ -311,7 +312,7 @@ static void changeGroupMembership(int isAdd) {
     if(Servermem->inloggad[i] == userId) { break; }
   }
   if(i == MAXNOD) {
-    if(readuser(userId, &anv)) {
+    if(!NodeReadUser(userId, &anv)) {
       return;
     }
     if(isAdd) {
@@ -319,7 +320,7 @@ static void changeGroupMembership(int isAdd) {
     } else {
       BAMCLEAR((char *)&anv.grupper, groupId);
     }
-    if(writeuser(userId,&anv)) {
+    if(!NodeWriteUser(userId, &anv)) {
       return;
     }
   } else {

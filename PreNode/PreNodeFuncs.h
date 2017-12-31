@@ -31,7 +31,6 @@ void rxsendrawfile(struct RexxMsg *mess);
 char *hittaefter(char *);
 int parsenamn(char *);
 int matchar(char *, char *);
-int readuser(int,struct User *);
 char *getusername(int);
 void NiKForbid(void);
 void NiKPermit(void);

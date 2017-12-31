@@ -88,27 +88,6 @@ char *skrivet,*facit;
 	return(mat);
 }
 
-int readuser(int nummer,struct User *user) {
-	BPTR fh;
-	char filnamn[40];
-	sprintf(filnamn,"NiKom:Users/%d/%d/Data",nummer/100,nummer);
-	NiKForbid();
-	if(!(fh=Open(filnamn,MODE_OLDFILE))) {
-		puttekn("\r\n\nKunde inte öppna Users.dat!\r\n\n",-1);
-		NiKPermit();
-		return(1);
-	}
-	if(Read(fh,(void *)user,sizeof(struct User))==-1) {
-		puttekn("\r\n\nKunde inte läsa Users.dat!\r\n\n",-1);
-		Close(fh);
-		NiKPermit();
-		return(1);
-	}
-	Close(fh);
-	NiKPermit();
-	return(0);
-}
-
 char *getusername(int nummer) {
 	struct ShortUser *letpek;
 	int found=FALSE;

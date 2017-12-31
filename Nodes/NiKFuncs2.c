@@ -16,6 +16,7 @@
 #include "NiKomLib.h"
 #include "Terminal.h"
 #include "Languages.h"
+#include "UserData.h"
 
 extern struct System *Servermem;
 extern int nodnr,inloggad,senast_text_typ,rad,mote2,buftkn,senast_brev_nr,senast_brev_anv;
@@ -100,7 +101,7 @@ void listmed(void) {
   int listMembers;
   struct ShortUser *shortUser;
   struct Mote *conf;
-  struct User listuser;
+  struct User *user;
 
   if(argument[0] == '-' && (argument[1] == 'g' || argument[1] == 'G')) {
     argument = hittaefter(argument);
@@ -123,12 +124,12 @@ void listmed(void) {
              listMembers ? CATSTR(MSG_FORUM_LISTMEM_MEM) : CATSTR(MSG_FORUM_LISTMEM_NONMEM),
              conf->namn);
   ITER_EL(shortUser, Servermem->user_list, user_node, struct ShortUser *) {
-    if(readuser(shortUser->nummer, &listuser)) {
+    if(!(user = GetUserData(shortUser->nummer))) {
       return;
     }
-    if((listMembers && IsMemberConf(mote2, shortUser->nummer, &listuser))
-       || (!listMembers && !IsMemberConf(mote2, shortUser->nummer, &listuser))) {
-      if(SendString("%s #%d\r\n", listuser.namn, shortUser->nummer)) {
+    if((listMembers && IsMemberConf(mote2, shortUser->nummer, user))
+       || (!listMembers && !IsMemberConf(mote2, shortUser->nummer, user))) {
+      if(SendString("%s #%d\r\n", user->namn, shortUser->nummer)) {
         return;
       }
     }
@@ -139,7 +140,7 @@ void listratt(void) {
   int listPerm;
   struct ShortUser *shortUser;
   struct Mote *conf;
-  struct User listuser;
+  struct User *user;
 
   if(mote2 == -1) {
     SendString("\r\n\n%s\r\n\n", CATSTR(MSG_FORUM_LISTAUTH_MAIL));
@@ -165,12 +166,12 @@ void listratt(void) {
              listPerm ? CATSTR(MSG_FORUM_LISTAUTH_AUTH) : CATSTR(MSG_FORUM_LISTAUTH_NONAUTH),
              conf->namn);
   ITER_EL(shortUser, Servermem->user_list, user_node, struct ShortUser *) {
-    if(readuser(shortUser->nummer, &listuser)) {
+    if(!(user = GetUserData(shortUser->nummer))) {
       return;
     }
-    if((listPerm && BAMTEST(listuser.motratt, mote2))
-       || (!listPerm && !BAMTEST(listuser.motratt, mote2))) {
-      if(SendString("%s #%d\r\n",listuser.namn, shortUser->nummer)) {
+    if((listPerm && BAMTEST(user->motratt, mote2))
+       || (!listPerm && !BAMTEST(user->motratt, mote2))) {
+      if(SendString("%s #%d\r\n",user->namn, shortUser->nummer)) {
         return;
       }
     }
@@ -390,10 +391,14 @@ void addratt(void) {
 		BAMSET(Servermem->inne[x].motratt,motpek->nummer);
 		sprintf(outbuffer,"\n\n\rRättigheter i %s adderade för %s\n\r",motpek->namn,getusername(anv));
 	} else {
-		if(readuser(anv,&adduser)) return;
-		BAMSET(adduser.motratt,motpek->nummer);
-		if(writeuser(anv,&adduser)) return;
-		sprintf(outbuffer,"\n\n\rRättigheter i %s adderade för %s #%d\n\r",motpek->namn,adduser.namn,anv);
+          if(!NodeReadUser(anv, &adduser)) {
+            return;
+          }
+          BAMSET(adduser.motratt,motpek->nummer);
+          if(!NodeWriteUser(anv, &adduser)) {
+            return;
+          }
+          sprintf(outbuffer,"\n\n\rRättigheter i %s adderade för %s #%d\n\r",motpek->namn,adduser.namn,anv);
 	}
 	puttekn(outbuffer,-1);
 }
@@ -424,11 +429,15 @@ void subratt(void) {
 		BAMCLEAR(Servermem->inne[x].motmed,motpek->nummer);
 		sprintf(outbuffer,"\n\n\rRättigheter i %s subtraherade för %s\n\r",motpek->namn,getusername(anv));
 	} else {
-		if(readuser(anv,&subuser)) return;
-		BAMCLEAR(subuser.motratt,motpek->nummer);
-		BAMCLEAR(subuser.motmed,motpek->nummer);
-		if(writeuser(anv,&subuser)) return;
-		sprintf(outbuffer,"\n\n\rRättigheter i %s subtraherade för %s #%d\n\r",motpek->namn,subuser.namn,anv);
+          if(!NodeReadUser(anv, &subuser)) {
+            return;
+          }
+          BAMCLEAR(subuser.motratt,motpek->nummer);
+          BAMCLEAR(subuser.motmed,motpek->nummer);
+          if(!NodeWriteUser(anv, &subuser)) {
+            return;
+          }
+          sprintf(outbuffer,"\n\n\rRättigheter i %s subtraherade för %s #%d\n\r",motpek->namn,subuser.namn,anv);
 	}
 	puttekn(outbuffer,-1);
 }

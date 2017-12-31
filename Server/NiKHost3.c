@@ -14,6 +14,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include "UserData.h"
 
 #include "RexxUtils.h"
 
@@ -161,75 +162,39 @@ Returnerar:
 -3	Arean finns inte.
 */
 
-void rexxarearight(struct RexxMsg *mess)
-{
-	int anvnr, areanr, i;
-	struct User user;
+void rexxarearight(struct RexxMsg *mess) {
+  int userId, areanr;
+  struct User *user;
+  
+  if(!mess->rm_Args[1] || !mess->rm_Args[2]) {
+    SetRexxErrorResult(mess, 1);
+    return;
+  }
+  
+  userId = atoi(mess->rm_Args[1]);
+  areanr = atoi(mess->rm_Args[2]);
+  
+  if(areanr < 0 || areanr >= Servermem->info.areor) {
+    SetRexxResultString(mess, "-3");
+    return;
+  }
+  
+  if(!Servermem->areor[areanr].namn[0]) {
+    SetRexxResultString(mess, "-2");
+    return;
+  }
+  
+  if(!userexists(userId)) {
+    SetRexxResultString(mess, "-1");
+    return;
+  }
 
-	if(!mess->rm_Args[1] || !mess->rm_Args[2]) {
-		mess->rm_Result1=1;
-		mess->rm_Result2=0;
-		return;
-	}
-
-	anvnr = atoi(mess->rm_Args[1]);
-	areanr = atoi(mess->rm_Args[2]);
-
-	if(areanr < 0 || areanr >= Servermem->info.areor)
-	{
-		if(!(mess->rm_Result2=(long)CreateArgstring("-3",strlen("-3"))))
-			printf("Kunde inte allokera en ArgString\n");
-		mess->rm_Result1=0;
-		return;
-	}
-
-	if(!Servermem->areor[areanr].namn[0])
-	{
-		if(!(mess->rm_Result2=(long)CreateArgstring("-2",strlen("-2"))))
-			printf("Kunde inte allokera en ArgString\n");
-		mess->rm_Result1=0;
-		return;
-	}
-
-	if(!userexists(anvnr)) {
-		if(!(mess->rm_Result2=(long)CreateArgstring("-1",strlen("-1"))))
-			printf("Kunde inte allokera en ArgString\n");
-		mess->rm_Result1=0;
-		return;
-	}
-
-	for(i=0;i<MAXNOD;i++)
-		if(anvnr==Servermem->inloggad[i]) break;
-
-	if(i<MAXNOD)
-	{
-		memcpy(&user,&Servermem->inne[i],sizeof(struct User));
-	}
-	else
-	{
-		if(readuser(anvnr,&user))
-		{
-			if(!(mess->rm_Result2=(long)CreateArgstring("-1",strlen("-1"))))
-				printf("Kunde inte allokera en ArgString\n");
-			mess->rm_Result1=0;
-			return;
-		}
-	}
-
-	if(arearatt(areanr, anvnr, &user))
-	{
-		if(!(mess->rm_Result2=(long)CreateArgstring("1",1)))
-			printf("Kunde inte allokera en ArgString\n");
-		mess->rm_Result1=0;
-		return;
-	}
-	else
-	{
-		if(!(mess->rm_Result2=(long)CreateArgstring("0",1)))
-			printf("Kunde inte allokera en ArgString\n");
-		mess->rm_Result1=0;
-		return;
-	}
+  if(!(user = GetUserData(userId))) {
+    SetRexxResultString(mess, "-1");
+    return;
+  }
+  
+  SetRexxResultString(mess, arearatt(areanr, userId, user) ? "1" : "0");
 }
 
 int arearatt(int area, int usrnr, struct User *usr) {
@@ -328,7 +293,7 @@ void rexxconsoletext(struct RexxMsg *mess)
 
 void rexxcheckuserpassword(struct RexxMsg *mess) {
   int userId;
-  struct User user;
+  struct User *user;
 
   if(!mess->rm_Args[1] || !mess->rm_Args[2]) {
     SetRexxErrorResult(mess, 1);
@@ -336,10 +301,10 @@ void rexxcheckuserpassword(struct RexxMsg *mess) {
   }
 
   userId = atoi(mess->rm_Args[1]);
-  if(readuser(userId, &user)) {
+  if(!(user = GetUserData(userId))) {
     SetRexxResultString(mess, "-1");
     return;
   }
 
-  SetRexxResultString(mess, CheckPassword(mess->rm_Args[2], user.losen) ? "1" : "0");
+  SetRexxResultString(mess, CheckPassword(mess->rm_Args[2], user->losen) ? "1" : "0");
 }

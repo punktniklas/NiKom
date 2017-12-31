@@ -28,6 +28,8 @@
 #include "FileAreaUtils.h"
 #include "RexxUtils.h"
 #include "StringUtils.h"
+#include "UserData.h"
+#include "UserDataUtils.h"
 
 // TODO: Get rid of these prototypes
 struct Fil *parsefil(char *,int);
@@ -713,127 +715,91 @@ int motesmed(int mote,struct User *usr) {
 }
 
 void meetright(struct RexxMsg *mess) {
-        struct Mote *motpek;
-        int motnr,anvnr;
-        char str[2];
-        struct User meetrightuser;
-        if((!mess->rm_Args[1]) || (!mess->rm_Args[2])) {
-                mess->rm_Result1=1;
-                mess->rm_Result2=0;
-                return;
-        }
-        anvnr=atoi(mess->rm_Args[1]);
-        motnr=atoi(mess->rm_Args[2]);
-        if(!userexists(anvnr)) {
-                if(!(mess->rm_Result2=(long)CreateArgstring("-1",strlen("-1"))))
-                        printf("Kunde inte allokera en ArgString\n");
-                mess->rm_Result1=0;
-                return;
-        }
-        if(readuser(anvnr,&meetrightuser)) {
-                if(!(mess->rm_Result2=(long)CreateArgstring("-2",strlen("-1"))))
-                        printf("Kunde inte allokera en ArgString\n");
-                mess->rm_Result1=0;
-                return;
-        }
-        if(!(motpek=getmotpek(motnr))) {
-                if(!(mess->rm_Result2=(long)CreateArgstring("-3",strlen("-1"))))
-                        printf("Kunde inte allokera en ArgString\n");
-                mess->rm_Result1=0;
-                return;
-        }
-        if(motesratt(motnr,&meetrightuser)) str[0]='1';
-        else str[0]='0';
-        str[1]=0;
-        if(!(mess->rm_Result2=(long)CreateArgstring(str,strlen(str))))
-                printf("Kunde inte allokera en ArgString\n");
-        mess->rm_Result1=0;
+  struct Mote *motpek;
+  int confId, userId;
+  struct User *user;
+  if((!mess->rm_Args[1]) || (!mess->rm_Args[2])) {
+    SetRexxErrorResult(mess, 1);
+    return;
+  }
+  userId = atoi(mess->rm_Args[1]);
+  confId = atoi(mess->rm_Args[2]);
+  if(!userexists(userId)) {
+    SetRexxResultString(mess, "-1");
+    return;
+  }
+  if(!(user = GetUserData(userId))) {
+    SetRexxResultString(mess, "-2");
+    return;
+  }
+  if(!(motpek = getmotpek(confId))) {
+    SetRexxResultString(mess, "-3");
+    return;
+  }
+  SetRexxResultString(mess, motesratt(confId, user) ? "1" : "0");
 }
 
 void meetmember(struct RexxMsg *mess) {
-	struct Mote *motpek;
-	int motnr,anvnr;
-	char str[2];
-	struct User meetmemberuser;
-	if((!mess->rm_Args[1]) || (!mess->rm_Args[2])) {
-		mess->rm_Result1=1;
-		mess->rm_Result2=0;
-		return;
-	}
-	anvnr=atoi(mess->rm_Args[1]);
-	motnr=atoi(mess->rm_Args[2]);
-	if(!userexists(anvnr)) {
-		if(!(mess->rm_Result2=(long)CreateArgstring("-1",strlen("-1"))))
-			printf("Kunde inte allokera en ArgString\n");
-		mess->rm_Result1=0;
-		return;
-	}
-	if(readuser(anvnr,&meetmemberuser)) {
-		if(!(mess->rm_Result2=(long)CreateArgstring("-2",strlen("-1"))))
-			printf("Kunde inte allokera en ArgString\n");
-		mess->rm_Result1=0;
-		return;
-	}
-	if(!(motpek=getmotpek(motnr))) {
-		if(!(mess->rm_Result2=(long)CreateArgstring("-3",strlen("-1"))))
-			printf("Kunde inte allokera en ArgString\n");
-		mess->rm_Result1=0;
-		return;
-	}
-	if(motesmed(motnr,&meetmemberuser)) str[0]='1';
-	else str[0]='0';
-	str[1]=0;
-	if(!(mess->rm_Result2=(long)CreateArgstring(str,strlen(str))))
-		printf("Kunde inte allokera en ArgString\n");
-	mess->rm_Result1=0;
+  struct Mote *motpek;
+  int confId, userId;
+  struct User *user;
+  if((!mess->rm_Args[1]) || (!mess->rm_Args[2])) {
+    SetRexxErrorResult(mess, 1);
+    return;
+  }
+  userId = atoi(mess->rm_Args[1]);
+  confId = atoi(mess->rm_Args[2]);
+  if(!userexists(userId)) {
+    SetRexxResultString(mess, "-1");
+    return;
+  }
+  if(!(user = GetUserData(userId))) {
+    SetRexxResultString(mess, "-3");
+    return;
+  }
+  if(!(motpek = getmotpek(confId))) {
+    SetRexxResultString(mess, "-3");
+    return;
+  }
+  SetRexxResultString(mess, motesmed(confId, user) ? "1" : "0");
 }
 
 void chgmeetright(struct RexxMsg *mess) {
-        struct Mote *motpek;
-        int motnr,anvnr;
-        struct User chguser;
-        if((!mess->rm_Args[1]) || (!mess->rm_Args[2]) || (!mess->rm_Args[3])) {
-                mess->rm_Result1=1;
-                mess->rm_Result2=0;
-                return;
-        }
-        anvnr=atoi(mess->rm_Args[1]);
-        motnr=atoi(mess->rm_Args[2]);
-        if(mess->rm_Args[3][0] != '-' && mess->rm_Args[3][0] != '+') {
-                if(!(mess->rm_Result2=(long)CreateArgstring("-1",strlen("-1"))))
-                        printf("Kunde inte allokera en ArgString\n");
-                mess->rm_Result1=0;
-                return;
-        }
-        if(!userexists(anvnr)) {
-                if(!(mess->rm_Result2=(long)CreateArgstring("-2",strlen("-1"))))
-                        printf("Kunde inte allokera en ArgString\n");
-                mess->rm_Result1=0;
-                return;
-        }
-        if(readuser(anvnr,&chguser)) {
-                if(!(mess->rm_Result2=(long)CreateArgstring("-3",strlen("-1"))))
-                        printf("Kunde inte allokera en ArgString\n");
-                mess->rm_Result1=0;
-                return;
-        }
-        if(!(motpek=getmotpek(motnr))) {
-                if(!(mess->rm_Result2=(long)CreateArgstring("-4",strlen("-1"))))
-                        printf("Kunde inte allokera en ArgString\n");
-                mess->rm_Result1=0;
-                return;
-        }
-        if(mess->rm_Args[3][0] == '-') BAMCLEAR(chguser.motratt,motnr);
-        else BAMSET(chguser.motratt,motnr);
-        if(writeuser(anvnr,&chguser)) {
-                if(!(mess->rm_Result2=(long)CreateArgstring("-5",strlen("-1"))))
-                        printf("Kunde inte allokera en ArgString\n");
-                mess->rm_Result1=0;
-                return;
-        }
-        if(!(mess->rm_Result2=(long)CreateArgstring("0",strlen("0"))))
-                printf("Kunde inte allokera en ArgString\n");
-        mess->rm_Result1=0;
+  struct Mote *motpek;
+  int confId, userId;
+  struct User *user;
+  if((!mess->rm_Args[1]) || (!mess->rm_Args[2]) || (!mess->rm_Args[3])) {
+    SetRexxErrorResult(mess, 1);
+    return;
+  }
+  userId = atoi(mess->rm_Args[1]);
+  confId = atoi(mess->rm_Args[2]);
+  if(mess->rm_Args[3][0] != '-' && mess->rm_Args[3][0] != '+') {
+    SetRexxResultString(mess, "-1");
+    return;
+  }
+  if(!userexists(userId)) {
+    SetRexxResultString(mess, "-2");
+    return;
+  }
+  if(!(user = GetUserData(userId))) {
+    SetRexxResultString(mess, "-3");
+    return;
+  }
+  if(!(motpek = getmotpek(confId))) {
+    SetRexxResultString(mess, "-4");
+    return;
+  }
+  if(mess->rm_Args[3][0] == '-') {
+    BAMCLEAR(user->motratt,confId);
+  } else {
+    BAMSET(user->motratt,confId);
+  }
+  if(!WriteUser(userId, user)) {
+    SetRexxResultString(mess, "-5");
+    return;
+  }
+  SetRexxResultString(mess, "0");
 }
 
 /*

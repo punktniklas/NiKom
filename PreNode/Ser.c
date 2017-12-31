@@ -18,6 +18,7 @@
 #include "NewUser.h"
 #include "BasicIO.h"
 #include "Languages.h"
+#include "UserData.h"
 
 #include "HeartBeat.h"
 
@@ -250,7 +251,7 @@ int main(int argc,char *argv[]) {
         car = tmp ? 0 : 1;
         going=FALSE;
       } else if((inloggad=parsenamn(inmat))>=0) {
-        if(readuser(inloggad,&Servermem->inne[nodnr])) {
+        if(!NodeReadUser(inloggad,&Servermem->inne[nodnr])) {
           goto panik;
         }
         // TODO: Extract password loop. Should be identical to in NiKomCon.c

@@ -19,6 +19,7 @@
 #include "Stack.h"
 #include "Languages.h"
 #include "DateUtils.h"
+#include "UserData.h"
 
 #define EKO		1
 #define EJEKO	0
@@ -450,9 +451,7 @@ int andmot(void) {
     if(!(shortUser->nummer % 10)) {
       SendString("\r%d", shortUser->nummer);
     }
-    if(readuser(shortUser->nummer,&skuser)) {
-      LogEvent(SYSTEM_LOG, ERROR, "Can't read user %d", shortUser->nummer);
-      DisplayInternalError();
+    if(!NodeReadUser(shortUser->nummer, &skuser)) {
       return 0;
     }
     userChanged = FALSE;
@@ -468,9 +467,7 @@ int andmot(void) {
       BAMCLEAR(skuser.motmed, tmpConf.nummer);
       userChanged = TRUE;
     }
-    if(userChanged && writeuser(shortUser->nummer,&skuser)) {
-      LogEvent(SYSTEM_LOG, ERROR, "Can't write user %d", shortUser->nummer);
-      DisplayInternalError();      
+    if(userChanged && !NodeWriteUser(shortUser->nummer, &skuser)) {
       return 0;
     }
     
@@ -723,52 +720,6 @@ int getfirstletter(int user) {
   }
   Close(fh);
   return atoi(nrstr);
-}
-
-int readuser(int userId,struct User *user) {
-  BPTR fh;
-  char filename[40];
-  sprintf(filename, "NiKom:Users/%d/%d/Data", userId / 100, userId);
-  NiKForbid();
-  if(!(fh = Open(filename, MODE_OLDFILE))) {
-    LogEvent(SYSTEM_LOG, ERROR, "Can't open %s", filename);
-    DisplayInternalError();
-    NiKPermit();
-    return 1;
-  }
-  if(Read(fh, (void *)user,sizeof(struct User)) == -1) {
-    LogEvent(SYSTEM_LOG, ERROR, "Can't read %s", filename);
-    DisplayInternalError();
-    Close(fh);
-    NiKPermit();
-    return 1;
-  }
-  Close(fh);
-  NiKPermit();
-  return 0;
-}
-
-int writeuser(int userId,struct User *user) {
-  BPTR fh;
-  char filename[40];
-  sprintf(filename, "NiKom:Users/%d/%d/Data", userId / 100, userId);
-  NiKForbid();
-  if(!(fh = Open(filename, MODE_OLDFILE))) {
-    LogEvent(SYSTEM_LOG, ERROR, "Can't open %s", filename);
-    DisplayInternalError();
-    NiKPermit();
-    return 1;
-  }
-  if(Write(fh, (void *)user, sizeof(struct User)) == -1) {
-    LogEvent(SYSTEM_LOG, ERROR, "Can't write %s", filename);
-    DisplayInternalError();
-    Close(fh);
-    NiKPermit();
-    return 1;
-  }
-  Close(fh);
-  NiKPermit();
-  return 0;
 }
 
 void rensatexter(void) {

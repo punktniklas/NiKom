@@ -24,6 +24,7 @@
 #include "Terminal.h"
 #include "StringUtils.h"
 #include "Languages.h"
+#include "UserData.h"
 
 #include "Brev.h"
 
@@ -333,7 +334,7 @@ int initbrevheader(int tillpers) {
   int length=0,i=0,lappnr;
   long tid,tempmott;
   struct tm *ts;
-  struct User usr;
+  struct User *toUser;
   char filnamn[40],*mottagare,tempbuf[100],*vemskrev;
 
   Servermem->action[nodnr] = SKRIVER;
@@ -357,8 +358,10 @@ int initbrevheader(int tillpers) {
     sprintf(brevspar.to, "%d", tillpers);
   }
   sprintf(brevspar.from, "%d", inloggad);
-  readuser(atoi(brevspar.to), &usr);
-  if(usr.flaggor & LAPPBREV) {
+  if((toUser = GetUserData(atoi(brevspar.to))) == NULL) {
+    return 1;
+  }
+  if(toUser->flaggor & LAPPBREV) {
     SendString("\r\n\n");
     lappnr = atoi(brevspar.to);
     sprintf(filnamn, "NiKom:Users/%d/%d/Lapp", lappnr / 100, lappnr);
@@ -828,7 +831,7 @@ int skickabrev(void) {
 void initpersheader(void) {
   long tid, lappnr, length, i;
   struct tm *ts;
-  struct User usr;
+  struct User *toUser;
   char filnamn[40], buf[100];
 
   Servermem->action[nodnr] = SKRIVER;
@@ -836,8 +839,10 @@ void initpersheader(void) {
   memset(&brevspar,0,sizeof(struct ReadLetter));
   sprintf(brevspar.to, "%ld", readhead.person);
   sprintf(brevspar.from, "%d", inloggad);
-  readuser(readhead.person, &usr);
-  if(usr.flaggor & LAPPBREV) {
+  if((toUser = GetUserData(atoi(brevspar.to))) == NULL) {
+    return;
+  }
+  if(toUser->flaggor & LAPPBREV) {
     SendString("\r\n\n");
     lappnr = atoi(brevspar.to);
     sprintf(filnamn, "NiKom:Users/%ld/%ld/Lapp", lappnr/100, lappnr);

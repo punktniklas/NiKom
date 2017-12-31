@@ -26,6 +26,7 @@
 #include "BasicIO.h"
 #include "KOM.h"
 #include "Languages.h"
+#include "UserData.h"
 
 #if defined(__GNUC__) && !defined(max)
 #define max(a, b) \
@@ -397,10 +398,7 @@ int skapmot(void) {
     if(!(shortUser->nummer % 10)) {
       SendString("\r%d", shortUser->nummer);
     }
-    if(readuser(shortUser->nummer, &user)) {
-      LogEvent(SYSTEM_LOG, ERROR, "Could not read user %d to set "
-               "membership/permissions for new conference.", shortUser->nummer);
-      DisplayInternalError();
+    if(!NodeReadUser(shortUser->nummer, &user)) {
       return 0;
     }
     changed = FALSE;
@@ -416,10 +414,7 @@ int skapmot(void) {
       BAMCLEAR(user.motmed, newConf->nummer);
       changed = TRUE;
     }
-    if(changed && writeuser(shortUser->nummer, &user)) {
-      LogEvent(SYSTEM_LOG, ERROR, "Could not write user %d to set "
-               "membership/permissions for new conference.", shortUser->nummer);
-      DisplayInternalError();
+    if(changed && !NodeWriteUser(shortUser->nummer, &user)) {
       return 0;
     }
     

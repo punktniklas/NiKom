@@ -141,9 +141,3 @@ void bytteckenset(void) {
   }
   AskUserForCharacterSet(FALSE, showExample);
 }
-
-void SaveCurrentUser(int userId, int nodeId) {
-  Servermem->inne[nodeId].senast_in = time(NULL);
-  writeuser(userId, &Servermem->inne[nodeId]);
-  WriteUnreadTexts(&Servermem->unreadTexts[nodeId], userId);
-}
