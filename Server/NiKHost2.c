@@ -28,7 +28,6 @@
 #include "FileAreaUtils.h"
 #include "RexxUtils.h"
 #include "StringUtils.h"
-#include "UserData.h"
 #include "UserDataUtils.h"
 
 // TODO: Get rid of these prototypes
@@ -795,7 +794,7 @@ void chgmeetright(struct RexxMsg *mess) {
   } else {
     BAMSET(user->motratt,confId);
   }
-  if(!WriteUser(userId, user)) {
+  if(!WriteUser(userId, user, FALSE)) {
     SetRexxResultString(mess, "-5");
     return;
   }

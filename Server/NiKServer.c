@@ -17,12 +17,16 @@
 #include "Shutdown.h"
 #include "Config.h"
 
+#include "UserNotificationHooks.h"
+
 #define EXIT_OK	     0
 
 void sparatext(struct NiKMess *);
 int CXBRK(void) { return(0); }
 
 extern char windowTitle[];
+
+void DisplayInternalError(void) {}
 
 void sparatext(struct NiKMess *message) {
 	BPTR fh;

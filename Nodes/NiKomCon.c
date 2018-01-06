@@ -21,9 +21,10 @@
 #include "InfoFiles.h"
 #include "Logging.h"
 #include "Terminal.h"
+#include "UserNotificationHooks.h"
 #include "NewUser.h"
 #include "Languages.h"
-#include "UserData.h"
+#include "UserDataUtils.h"
 
 #define EXIT_ERROR	10
 #define EXIT_OK	0
@@ -156,7 +157,7 @@ int main(int argc, char **argv) {
         going=FALSE;
       }
       else if((inloggad=parsenamn(inmat))>=0) {
-        if(!NodeReadUser(inloggad, &Servermem->inne[nodnr])) {
+        if(!ReadUser(inloggad, &Servermem->inne[nodnr])) {
           goto panik;
         }
         // TODO: Extract password loop. Should be identical to in PreNode/Ser.c
@@ -210,7 +211,7 @@ int main(int argc, char **argv) {
     Servermem->inne[nodnr].loggin++;
     Servermem->info.inloggningar++;
     Servermem->inne[nodnr].defarea=area2;
-    NodeWriteUser(inloggad, &Servermem->inne[nodnr]);
+    WriteUser(inloggad, &Servermem->inne[nodnr], FALSE);
     WriteUnreadTexts(&Servermem->unreadTexts[nodnr], inloggad);
     writesenaste();
     freealiasmem();

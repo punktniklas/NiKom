@@ -10,6 +10,7 @@
 
 #include "NiKomFuncs.h"
 #include "Terminal.h"
+#include "UserNotificationHooks.h"
 #include "Logging.h"
 #include "BasicIO.h"
 

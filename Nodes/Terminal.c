@@ -10,8 +10,10 @@
 #include "NiKomFuncs.h"
 #include "NiKomLib.h"
 #include "Logging.h"
-#include "Terminal.h"
 #include "BasicIO.h"
+
+#include "Terminal.h"
+#include "UserNotificationHooks.h"
 
 #define CASE_BIT      0x20
 #define LOWERCASE(ch) (ch | CASE_BIT)

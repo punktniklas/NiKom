@@ -16,7 +16,7 @@
 #include "NiKomLib.h"
 #include "Terminal.h"
 #include "Languages.h"
-#include "UserData.h"
+#include "UserDataUtils.h"
 
 extern struct System *Servermem;
 extern int nodnr,inloggad,senast_text_typ,rad,mote2,buftkn,senast_brev_nr,senast_brev_anv;
@@ -391,11 +391,11 @@ void addratt(void) {
 		BAMSET(Servermem->inne[x].motratt,motpek->nummer);
 		sprintf(outbuffer,"\n\n\rRättigheter i %s adderade för %s\n\r",motpek->namn,getusername(anv));
 	} else {
-          if(!NodeReadUser(anv, &adduser)) {
+          if(!ReadUser(anv, &adduser)) {
             return;
           }
           BAMSET(adduser.motratt,motpek->nummer);
-          if(!NodeWriteUser(anv, &adduser)) {
+          if(!WriteUser(anv, &adduser, FALSE)) {
             return;
           }
           sprintf(outbuffer,"\n\n\rRättigheter i %s adderade för %s #%d\n\r",motpek->namn,adduser.namn,anv);
@@ -429,12 +429,12 @@ void subratt(void) {
 		BAMCLEAR(Servermem->inne[x].motmed,motpek->nummer);
 		sprintf(outbuffer,"\n\n\rRättigheter i %s subtraherade för %s\n\r",motpek->namn,getusername(anv));
 	} else {
-          if(!NodeReadUser(anv, &subuser)) {
+          if(!ReadUser(anv, &subuser)) {
             return;
           }
           BAMCLEAR(subuser.motratt,motpek->nummer);
           BAMCLEAR(subuser.motmed,motpek->nummer);
-          if(!NodeWriteUser(anv, &subuser)) {
+          if(!WriteUser(anv, &subuser, FALSE)) {
             return;
           }
           sprintf(outbuffer,"\n\n\rRättigheter i %s subtraherade för %s #%d\n\r",motpek->namn,subuser.namn,anv);

@@ -10,10 +10,12 @@
 #include "NiKomLib.h"
 #include "NiKomFuncs.h"
 #include "Terminal.h"
+#include "UserNotificationHooks.h"
 #include "Logging.h"
 #include "CharacterSets.h"
 #include "InfoFiles.h"
 #include "Languages.h"
+#include "UserDataUtils.h"
 
 void initConfPermissions(void);
 int createUserDirectory(int newUserId);
@@ -200,19 +202,9 @@ int createUserDirectory(int newUserId) {
     }
   }
   UnLock(lock);
-  sprintf(filename,"NiKom:Users/%d/%d/Data",newUserId/100,newUserId);
-  if(!(fh=Open(filename,MODE_NEWFILE))) {
-    LogEvent(SYSTEM_LOG, ERROR, "Could not create file %s", filename);
-    DisplayInternalError();
+  if(!WriteUser(newUserId, &Servermem->inne[nodnr], TRUE)) {
     return 0;
   }
-  if(Write(fh,(void *)&Servermem->inne[nodnr],sizeof(struct User))==-1) {
-    LogEvent(SYSTEM_LOG, ERROR, "Error writing to file %s", filename);
-    DisplayInternalError();
-    Close(fh);
-    return 0;
-  }
-  Close(fh);
   
   if(!WriteUnreadTexts(&Servermem->unreadTexts[nodnr], newUserId)) {
     LogEvent(SYSTEM_LOG, ERROR, "Could not create UnreadTexts for user %d",

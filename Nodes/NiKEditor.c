@@ -17,6 +17,7 @@
 #include "NiKomLib.h"
 #include "InfoFiles.h"
 #include "Terminal.h"
+#include "UserNotificationHooks.h"
 #include "Logging.h"
 #include "Languages.h"
 

@@ -4,6 +4,7 @@
 #include <exec/memory.h>
 #include "NiKomStr.h"
 #include "Terminal.h"
+#include "UserNotificationHooks.h"
 #include "Logging.h"
 #include "Languages.h"
 #include "InfoFiles.h"

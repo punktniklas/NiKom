@@ -6,6 +6,7 @@
 #include "NiKomLib.h"
 #include "NiKomFuncs.h"
 #include "Terminal.h"
+#include "UserNotificationHooks.h"
 #include "Logging.h"
 #include "ConfCommon.h"
 #include "StringUtils.h"

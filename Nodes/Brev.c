@@ -22,9 +22,10 @@
 #include "NiKomFuncs.h"
 #include "Logging.h"
 #include "Terminal.h"
+#include "UserNotificationHooks.h"
 #include "StringUtils.h"
 #include "Languages.h"
-#include "UserData.h"
+#include "UserDataUtils.h"
 
 #include "Brev.h"
 

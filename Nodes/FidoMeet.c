@@ -19,6 +19,7 @@
 #include "VersionStrings.h"
 #include "Logging.h"
 #include "Terminal.h"
+#include "UserNotificationHooks.h"
 #include "Languages.h"
 
 #include "FidoMeet.h"

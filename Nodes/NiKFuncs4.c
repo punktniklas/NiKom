@@ -22,12 +22,13 @@
 #include "NiKomFuncs.h"
 #include "NiKomLib.h"
 #include "Terminal.h"
+#include "UserNotificationHooks.h"
 #include "Logging.h"
 #include "ServerMemUtils.h"
 #include "StringUtils.h"
 #include "BasicIO.h"
 #include "Languages.h"
-#include "UserData.h"
+#include "UserDataUtils.h"
 
 #define EKO		1
 
@@ -312,7 +313,7 @@ static void changeGroupMembership(int isAdd) {
     if(Servermem->inloggad[i] == userId) { break; }
   }
   if(i == MAXNOD) {
-    if(!NodeReadUser(userId, &anv)) {
+    if(!ReadUser(userId, &anv)) {
       return;
     }
     if(isAdd) {
@@ -320,7 +321,7 @@ static void changeGroupMembership(int isAdd) {
     } else {
       BAMCLEAR((char *)&anv.grupper, groupId);
     }
-    if(!NodeWriteUser(userId, &anv)) {
+    if(!WriteUser(userId, &anv, FALSE)) {
       return;
     }
   } else {

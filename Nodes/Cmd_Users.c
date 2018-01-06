@@ -10,6 +10,7 @@
 #include <proto/exec.h>
 
 #include "Terminal.h"
+#include "UserNotificationHooks.h"
 #include "ServerMemUtils.h"
 #include "Logging.h"
 #include "BasicIO.h"
@@ -18,7 +19,7 @@
 #include "NiKomLib.h"
 #include "NiKomStr.h"
 #include "NiKomFuncs.h"
-#include "UserData.h"
+#include "UserDataUtils.h"
 
 #include "Cmd_Users.h"
 
@@ -181,7 +182,7 @@ int Cmd_ChangeUser(void) {
       memcpy(&user,&Servermem->inne[i],sizeof(struct User));
     }
     else {
-      if(!NodeReadUser(userId, &user)) {
+      if(!ReadUser(userId, &user)) {
         return 0;
       }
       SendStringCat("\r\n\n%s\r\n", CATSTR(MSG_USER_CHANGING_USER), getusername(userId));
@@ -269,7 +270,7 @@ int Cmd_ChangeUser(void) {
       break;
     }
   }
-  NodeWriteUser(userId, &user);
+  WriteUser(userId, &user, FALSE);
   return 0;
 }
 

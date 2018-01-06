@@ -21,9 +21,10 @@
 #include "InfoFiles.h"
 #include "Logging.h"
 #include "Terminal.h"
+#include "UserNotificationHooks.h"
 #include "BasicIO.h"
 #include "Languages.h"
-#include "UserData.h"
+#include "UserDataUtils.h"
 
 #include "HeartBeat.h"
 
@@ -81,7 +82,7 @@ void cleanup(int kod,char *text) {
 }
 
 void saveUserData(void) {
-  NodeWriteUser(inloggad, &Servermem->inne[nodnr]);
+  WriteUser(inloggad, &Servermem->inne[nodnr], FALSE);
   WriteUnreadTexts(&Servermem->unreadTexts[nodnr], inloggad);
 }
 

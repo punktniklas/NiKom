@@ -5,6 +5,7 @@
 #include "NiKomStr.h"
 #include "NiKomFuncs.h"
 #include "Terminal.h"
+#include "UserNotificationHooks.h"
 #include "OrgMeet.h"
 #include "FidoMeet.h"
 #include "Brev.h"

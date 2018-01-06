@@ -22,7 +22,6 @@
 #include "RexxUtils.h"
 #include "StringUtils.h"
 #include "CommandParser.h"
-#include "UserData.h"
 #include "UserDataUtils.h"
 
 extern struct System *Servermem;
@@ -1192,7 +1191,7 @@ void chguser(struct RexxMsg *mess) {
   default :
     break;
   }
-  if(i == MAXNOD && !WriteUser(userId,&chguseruser)) {
+  if(i == MAXNOD && !WriteUser(userId,&chguseruser, FALSE)) {
     SetRexxErrorResult(mess, 3);
   } else {
     SetRexxResultString(mess, "0");

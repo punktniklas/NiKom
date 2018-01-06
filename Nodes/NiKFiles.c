@@ -27,8 +27,9 @@
 #include "NiKomFuncs.h"
 #include "DiskUtils.h"
 #include "Terminal.h"
+#include "UserNotificationHooks.h"
 #include "Logging.h"
-#include "UserData.h"
+#include "UserDataUtils.h"
 
 #define EKO		1
 
@@ -765,11 +766,11 @@ void radfil(void) {
             if(x<MAXNOD) {
               Servermem->inne[x].upload--;
             } else {
-              if(!NodeReadUser(letpek->uppladdare, &tempuser)) {
+              if(!ReadUser(letpek->uppladdare, &tempuser)) {
                 return;
               }
               tempuser.upload--;
-              if(!NodeWriteUser(letpek->uppladdare, &tempuser)) {
+              if(!WriteUser(letpek->uppladdare, &tempuser, FALSE)) {
                 return;
               }
             }

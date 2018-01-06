@@ -13,13 +13,14 @@
 #include "NiKomFuncs.h"
 #include "NiKomLib.h"
 #include "Terminal.h"
+#include "UserNotificationHooks.h"
 #include "KOM.h"
 #include "Logging.h"
 #include "StringUtils.h"
 #include "Stack.h"
 #include "Languages.h"
 #include "DateUtils.h"
-#include "UserData.h"
+#include "UserDataUtils.h"
 
 #define EKO		1
 #define EJEKO	0
@@ -451,7 +452,7 @@ int andmot(void) {
     if(!(shortUser->nummer % 10)) {
       SendString("\r%d", shortUser->nummer);
     }
-    if(!NodeReadUser(shortUser->nummer, &skuser)) {
+    if(!ReadUser(shortUser->nummer, &skuser)) {
       return 0;
     }
     userChanged = FALSE;
@@ -467,7 +468,7 @@ int andmot(void) {
       BAMCLEAR(skuser.motmed, tmpConf.nummer);
       userChanged = TRUE;
     }
-    if(userChanged && !NodeWriteUser(shortUser->nummer, &skuser)) {
+    if(userChanged && !WriteUser(shortUser->nummer, &skuser, FALSE)) {
       return 0;
     }
     

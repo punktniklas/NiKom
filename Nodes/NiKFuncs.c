@@ -21,12 +21,13 @@
 #include "Logging.h"
 #include "StringUtils.h"
 #include "Terminal.h"
+#include "UserNotificationHooks.h"
 #include "Cmd_Users.h"
 #include "NiKVersion.h"
 #include "BasicIO.h"
 #include "KOM.h"
 #include "Languages.h"
-#include "UserData.h"
+#include "UserDataUtils.h"
 
 #if defined(__GNUC__) && !defined(max)
 #define max(a, b) \
@@ -398,7 +399,7 @@ int skapmot(void) {
     if(!(shortUser->nummer % 10)) {
       SendString("\r%d", shortUser->nummer);
     }
-    if(!NodeReadUser(shortUser->nummer, &user)) {
+    if(!ReadUser(shortUser->nummer, &user)) {
       return 0;
     }
     changed = FALSE;
@@ -414,7 +415,7 @@ int skapmot(void) {
       BAMCLEAR(user.motmed, newConf->nummer);
       changed = TRUE;
     }
-    if(changed && !NodeWriteUser(shortUser->nummer, &user)) {
+    if(changed && !WriteUser(shortUser->nummer, &user, FALSE)) {
       return 0;
     }
     

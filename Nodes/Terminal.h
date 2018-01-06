@@ -14,7 +14,6 @@ int SendStringCat(char *fmt, char *catStr, ...);
 int SendStringNoBrk(char *fmt, ...);
 int SendRepeatedChr(char c, int count);
 int conputtekn(char *pekare,int size);
-void DisplayInternalError(void);
 int GetYesOrNo(char *preStr, char *label,
                char *yesChar, char *noChar, char *yesStr, char *noStr,
                char *postStr, int yesIsDefault, int *res);

@@ -10,6 +10,7 @@
 #include "FidoMeet.h"
 #include "Brev.h"
 #include "Terminal.h"
+#include "UserNotificationHooks.h"
 #include "Cmd_KOM.h"
 #include "Cmd_Users.h"
 #include "Cmd_Conf.h"

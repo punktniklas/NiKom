@@ -13,6 +13,7 @@
 #include "Logging.h"
 #include "Stack.h"
 #include "Terminal.h"
+#include "UserNotificationHooks.h"
 #include "KOM.h"
 #include "ConfCommon.h"
 #include "ConfHeaderExtensions.h"
