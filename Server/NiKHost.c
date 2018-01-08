@@ -23,6 +23,7 @@
 #include "StringUtils.h"
 #include "CommandParser.h"
 #include "UserDataUtils.h"
+#include "ServermemUtils.h"
 
 extern struct System *Servermem;
 
@@ -1066,9 +1067,9 @@ void areainfo(struct RexxMsg *mess) {
 }
 
 void chguser(struct RexxMsg *mess) {
-  int userId, i, otherUserId;
+  int userId, otherUserId, needsWrite;
   struct ShortUser *shortUser;
-  struct User chguseruser;
+  struct User *user;
   char temp[20];
 
   if(!mess->rm_Args[1] || !mess->rm_Args[2] || !mess->rm_Args[3]) {
@@ -1079,105 +1080,73 @@ void chguser(struct RexxMsg *mess) {
     SetRexxResultString(mess, "-1");
     return;
   }
-  for(i = 0; i < MAXNOD; i++) {
-    if(Servermem->inloggad[i] == userId) {
-      break;
-    }
-  }
-
-  if(i == MAXNOD) {
-    if(!ReadUser(userId, &chguseruser)) {
-      SetRexxErrorResult(mess, 3);
-      return;
-    }
+  if(!(user = GetUserDataForUpdate(userId, &needsWrite))) {
+    SetRexxErrorResult(mess, 3);
+    return;
   }
 
   switch(mess->rm_Args[3][0]) {
   case 'a' : case 'A' :
-    if(i == MAXNOD) strncpy(chguseruser.annan_info, mess->rm_Args[2], 60);
-    else strncpy(Servermem->inne[i].annan_info, mess->rm_Args[2], 60);
+    strncpy(user->annan_info, mess->rm_Args[2], 60);
     break;
   case 'c' : case 'C' :
-    if(i == MAXNOD) strncpy(chguseruser.land, mess->rm_Args[2], 40);
-    else strncpy(Servermem->inne[i].land, mess->rm_Args[2], 40);
+    strncpy(user->land, mess->rm_Args[2], 40);
     break;
   case 'd' : case 'D' :
-    if(i == MAXNOD) chguseruser.download = atoi(mess->rm_Args[2]);
-    else Servermem->inne[i].download = atoi(mess->rm_Args[2]);
+    user->download = atoi(mess->rm_Args[2]);
     break;
   case 'f' : case 'F' :
-    if(i == MAXNOD) strncpy(chguseruser.telefon, mess->rm_Args[2], 20);
-    else strncpy(Servermem->inne[i].telefon, mess->rm_Args[2], 20);
+    strncpy(user->telefon, mess->rm_Args[2], 20);
     break;
   case 'g' : case 'G' :
-    if(i == MAXNOD) strncpy(chguseruser.gata, mess->rm_Args[2], 40);
-    else strncpy(Servermem->inne[i].gata, mess->rm_Args[2], 40);
+    strncpy(user->gata, mess->rm_Args[2], 40);
     break;
   case 'h' : case 'H' :
-    if(i == MAXNOD) chguseruser.downloadbytes = atoi(mess->rm_Args[2]);
-    else Servermem->inne[i].downloadbytes = atoi(mess->rm_Args[2]);
+    user->downloadbytes = atoi(mess->rm_Args[2]);
     break;
   case 'j' : case 'J' :
-    if(i == MAXNOD) chguseruser.uploadbytes = atoi(mess->rm_Args[2]);
-    else Servermem->inne[i].uploadbytes = atoi(mess->rm_Args[2]);
+    user->uploadbytes = atoi(mess->rm_Args[2]);
     break;
   case 'i' : case 'I' :
-    if(i == MAXNOD) chguseruser.loggin = atoi(mess->rm_Args[2]);
-    else Servermem->inne[i].loggin = atoi(mess->rm_Args[2]);
+    user->loggin = atoi(mess->rm_Args[2]);
     break;
   case 'l' : case 'L' :
-    if(i == MAXNOD) chguseruser.read = atoi(mess->rm_Args[2]);
-    else Servermem->inne[i].read = atoi(mess->rm_Args[2]);
+    user->read = atoi(mess->rm_Args[2]);
     break;
   case 'm' : case 'M' :
-    if(i == MAXNOD) strncpy(chguseruser.prompt, mess->rm_Args[2], 5);
-    else strncpy(Servermem->inne[i].prompt, mess->rm_Args[2], 5);
+    strncpy(user->prompt, mess->rm_Args[2], 5);
     break;
   case 'n' : case 'N' :
     if((otherUserId = parsenamn(mess->rm_Args[2])) == -1 || otherUserId == userId) {
-      if(i == MAXNOD) strncpy(chguseruser.namn, mess->rm_Args[2], 40);
-      else strncpy(Servermem->inne[i].namn, mess->rm_Args[2], 40);
-      ITER_EL(shortUser, Servermem->user_list, user_node, struct ShortUser *) {
-        if(shortUser->nummer == userId) {
-          strncpy(shortUser->namn, mess->rm_Args[2], 40);
-          break;
-        }
+      strncpy(user->namn, mess->rm_Args[2], 40);
+      if(shortUser = FindShortUser(userId)) {
+        strncpy(shortUser->namn, mess->rm_Args[2], 40);
       }
     }
     break;
   case 'o' : case 'O' :
-    if(i == MAXNOD) chguseruser.flaggor = atoi(mess->rm_Args[2]);
-    else Servermem->inne[i].flaggor = atoi(mess->rm_Args[2]);
+    user->flaggor = atoi(mess->rm_Args[2]);
     break;
   case 'p' : case 'P' :
-    if(i == MAXNOD) strncpy(chguseruser.postadress, mess->rm_Args[2], 40);
-    else strncpy(Servermem->inne[i].postadress, mess->rm_Args[2], 40);
+    strncpy(user->postadress, mess->rm_Args[2], 40);
     break;
   case 'q' : case 'Q' :
-    if(i == MAXNOD) chguseruser.rader = atoi(mess->rm_Args[2]);
-    else Servermem->inne[i].rader = atoi(mess->rm_Args[2]);
+    user->rader = atoi(mess->rm_Args[2]);
     break;
   case 'r' : case 'R' :
-    if(i == MAXNOD) chguseruser.status = atoi(mess->rm_Args[2]);
-    else Servermem->inne[i].status = atoi(mess->rm_Args[2]);
-    ITER_EL(shortUser, Servermem->user_list, user_node, struct ShortUser *) {
-      if(shortUser->nummer == userId) {
-        shortUser->status = atoi(mess->rm_Args[2]);
-        break;
-      }
+    user->status = atoi(mess->rm_Args[2]);
+    if(shortUser = FindShortUser(userId)) {
+      shortUser->status = atoi(mess->rm_Args[2]);
     }
     break;
   case 's' : case 'S' :
-    if(i == MAXNOD) chguseruser.skrivit = atoi(mess->rm_Args[2]);
-    else Servermem->inne[i].skrivit = atoi(mess->rm_Args[2]);
+    user->skrivit = atoi(mess->rm_Args[2]);
     break;
   case 't' : case 'T' :
-    if(i == MAXNOD) chguseruser.tot_tid = atoi(mess->rm_Args[2]);
-    else Servermem->inne[i].tot_tid = atoi(mess->rm_Args[2]);
+    user->tot_tid = atoi(mess->rm_Args[2]);
     break;
   case 'u' : case 'U' :
-    if(i == MAXNOD) chguseruser.upload = atoi(mess->rm_Args[2]);
-    else Servermem->inne[i].upload = atoi(mess->rm_Args[2]);
+    user->upload = atoi(mess->rm_Args[2]);
     break;
   case 'x' : case 'X' :
     if(Servermem->cfg->cfgflags & NICFG_CRYPTEDPASSWORDS) {
@@ -1185,13 +1154,12 @@ void chguser(struct RexxMsg *mess) {
     } else {
       strncpy(temp, mess->rm_Args[2], 15);
     }
-    if(i == MAXNOD) strncpy(chguseruser.losen, temp, 15);
-    else strncpy(Servermem->inne[i].losen, temp, 15);
+    strncpy(user->losen, temp, 15);
     break;
   default :
     break;
   }
-  if(i == MAXNOD && !WriteUser(userId,&chguseruser, FALSE)) {
+  if(needsWrite && !WriteUser(userId, user, FALSE)) {
     SetRexxErrorResult(mess, 3);
   } else {
     SetRexxResultString(mess, "0");

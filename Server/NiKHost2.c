@@ -765,7 +765,7 @@ void meetmember(struct RexxMsg *mess) {
 
 void chgmeetright(struct RexxMsg *mess) {
   struct Mote *motpek;
-  int confId, userId;
+  int confId, userId, needsWrite;
   struct User *user;
   if((!mess->rm_Args[1]) || (!mess->rm_Args[2]) || (!mess->rm_Args[3])) {
     SetRexxErrorResult(mess, 1);
@@ -781,7 +781,7 @@ void chgmeetright(struct RexxMsg *mess) {
     SetRexxResultString(mess, "-2");
     return;
   }
-  if(!(user = GetUserData(userId))) {
+  if(!(user = GetUserDataForUpdate(userId, &needsWrite))) {
     SetRexxResultString(mess, "-3");
     return;
   }
@@ -794,9 +794,11 @@ void chgmeetright(struct RexxMsg *mess) {
   } else {
     BAMSET(user->motratt,confId);
   }
-  if(!WriteUser(userId, user, FALSE)) {
-    SetRexxResultString(mess, "-5");
-    return;
+  if(needsWrite) {
+    if(!WriteUser(userId, user, FALSE)) {
+      SetRexxResultString(mess, "-5");
+      return;
+    }
   }
   SetRexxResultString(mess, "0");
 }

@@ -152,10 +152,10 @@ void tiden(void) {
 
 int skapmot(void) {
   struct ShortUser *shortUser;
-  int mad, setPermission, changed, ch, i, fidoDomainId, highestId;
+  int mad, setPermission, changed, ch, i, fidoDomainId, highestId, needsWrite;
   struct FidoDomain *fidoDomain;
   BPTR lock;
-  struct User user;
+  struct User *user;
   struct Mote tmpConf,*searchConf,*newConf;
 
   memset(&tmpConf, 0, sizeof(struct Mote));
@@ -385,50 +385,35 @@ int skapmot(void) {
   }
 
   setPermission = (newConf->status & (SLUTET | SKRIVSTYRT)) ? FALSE : TRUE;
-  for(i = 0; i < MAXNOD; i++) {
-    BAMCLEAR(Servermem->inne[i].motmed, newConf->nummer);
-    if(setPermission) {
-      BAMSET(Servermem->inne[i].motratt, newConf->nummer);
-    } else {
-      BAMCLEAR(Servermem->inne[i].motratt, newConf->nummer);
-    }
-  }
 
   SendString("\r\n%s\r\n", CATSTR(MSG_FORUM_CREATE_CHANGING));
   ITER_EL(shortUser, Servermem->user_list, user_node, struct ShortUser *) {
     if(!(shortUser->nummer % 10)) {
       SendString("\r%d", shortUser->nummer);
     }
-    if(!ReadUser(shortUser->nummer, &user)) {
+    if(!(user = GetUserDataForUpdate(shortUser->nummer, &needsWrite))) {
       return 0;
     }
     changed = FALSE;
-    if(setPermission != BAMTEST(user.motratt, newConf->nummer)) {
+    if(setPermission != BAMTEST(user->motratt, newConf->nummer)) {
       if(setPermission) {
-        BAMSET(user.motratt, newConf->nummer);
+        BAMSET(user->motratt, newConf->nummer);
       } else {
-        BAMCLEAR(user.motratt, newConf->nummer);
+        BAMCLEAR(user->motratt, newConf->nummer);
       }
       changed = TRUE;
     }
-    if(!(newConf->status & AUTOMEDLEM) && BAMTEST(user.motmed, newConf->nummer)) {
-      BAMCLEAR(user.motmed, newConf->nummer);
+    if(!(newConf->status & AUTOMEDLEM) && BAMTEST(user->motmed, newConf->nummer)) {
+      BAMCLEAR(user->motmed, newConf->nummer);
       changed = TRUE;
     }
-    if(changed && !WriteUser(shortUser->nummer, &user, FALSE)) {
+    if(changed && needsWrite && !WriteUser(shortUser->nummer, user, FALSE)) {
       return 0;
     }
     
   }
-  for(i = 0; i < MAXNOD; i++) {
-    BAMCLEAR(Servermem->inne[i].motmed, newConf->nummer);
-    if(setPermission) {
-      BAMSET(Servermem->inne[i].motratt, newConf->nummer);
-    } else {
-      BAMCLEAR(Servermem->inne[i].motratt, newConf->nummer);
-    }
-  }
-  BAMSET(Servermem->inne[nodnr].motratt, newConf->nummer);
+
+    BAMSET(Servermem->inne[nodnr].motratt, newConf->nummer);
   BAMSET(Servermem->inne[nodnr].motmed, newConf->nummer);
   if(newConf->type == MOTE_FIDO) {
     ReScanFidoConf(newConf, 0);

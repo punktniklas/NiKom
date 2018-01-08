@@ -154,49 +154,38 @@ void Cmd_Status(void) {
   }
 }
 
-int Cmd_ChangeUser(void) {
-  int userId, tmp, i, isCorrect;
-  struct User user;
+void Cmd_ChangeUser(void) {
+  int userId, tmp, isCorrect, needsWrite;
+  struct User *user, *userWrite;
   struct ShortUser *shortUser;
   if(argument[0]) {
     if(Servermem->inne[nodnr].status < Servermem->cfg->st.anv) {
       SendString("\r\n\n%s\r\n\n", CATSTR(MSG_USER_CHANGE_NO_OTHER));
-      return 0;
+      return;
     }
     if((userId = parsenamn(argument)) == -1) {
       SendString("\r\n\n%s\r\n\n", CATSTR(MSG_COMMON_NO_SUCH_USER));
-      return 0;
+      return;
     } else if(userId == -3) {
       LogEvent(SYSTEM_LOG, ERROR,
                "-3 returned from parsenamn() in Cmd_ChangeUser(). Argument = '%s'",
                argument);
       DisplayInternalError();
-      return 0;
+      return;
     }
-    for(i = 0; i < MAXNOD; i++) {
-      if(userId==Servermem->inloggad[i]) {
-        break;
-      }
-    }
-    if( i < MAXNOD) {
-      memcpy(&user,&Servermem->inne[i],sizeof(struct User));
-    }
-    else {
-      if(!ReadUser(userId, &user)) {
-        return 0;
-      }
-      SendStringCat("\r\n\n%s\r\n", CATSTR(MSG_USER_CHANGING_USER), getusername(userId));
-    }
+    SendStringCat("\r\n\n%s\r\n", CATSTR(MSG_USER_CHANGING_USER), getusername(userId));
   } else {
-    memcpy(&user, &Servermem->inne[nodnr], sizeof(struct User));
     userId = inloggad;
     SendString("\r\n\n%s\r\n", CATSTR(MSG_USER_CHANGING_SELF));
   }
+  if(!(user = GetUserData(userId))) {
+    return;
+  }
 
   for(;;) {
-    SendString("\r\n%s : (%s) ", CATSTR(MSG_USER_NAME), user.namn);
+    SendString("\r\n%s : (%s) ", CATSTR(MSG_USER_NAME), user->namn);
     if(GetString(40,NULL)) {
-      return 1;
+      return;
     }
     if(inmat[0] == '\0') {
       break;
@@ -204,74 +193,75 @@ int Cmd_ChangeUser(void) {
     if((tmp = parsenamn(inmat)) != -1 && tmp != userId) {
       SendString("\r\n\n%s\r\n", CATSTR(MSG_USER_ALREADY_EXISTS));
     } else {
-      strncpy(user.namn, inmat, 41);
+      strncpy(user->namn, inmat, 41);
       break;
     }
   }
 
   if(Servermem->inne[nodnr].status >= Servermem->cfg->st.chgstatus) {
-    if(MaybeEditNumberChar(CATSTR(MSG_USER_LEVEL), &user.status, 3, 0, 100)) { return 1; }
+    if(MaybeEditNumberChar(CATSTR(MSG_USER_LEVEL), &user->status, 3, 0, 100)) { return; }
   }
-  if(MaybeEditString(CATSTR(MSG_USER_STREET), user.gata, 40)) { return 1; }
-  if(MaybeEditString(CATSTR(MSG_USER_CITY), user.postadress, 40)) { return 1; }
-  if(MaybeEditString(CATSTR(MSG_USER_COUNTRY), user.land, 40)) { return 1; }
-  if(MaybeEditString(CATSTR(MSG_USER_PHONE), user.telefon, 20)) { return 1; }
-  if(MaybeEditString(CATSTR(MSG_USER_MISCINFO), user.annan_info, 60)) { return 1; }
-  if(MaybeEditPassword(CATSTR(MSG_USER_PASSWORD), CATSTR(MSG_USER_PASSWORD_CONFIRM), user.losen, 15)) { return 1; }
-  if(MaybeEditString(CATSTR(MSG_USER_PROMPT), user.prompt, 5)) { return 1; }
-  if(MaybeEditNumberChar(CATSTR(MSG_USER_LINES), &user.rader, 5, 0, 127)) { return 1; }
+  if(MaybeEditString(CATSTR(MSG_USER_STREET), user->gata, 40)) { return; }
+  if(MaybeEditString(CATSTR(MSG_USER_CITY), user->postadress, 40)) { return; }
+  if(MaybeEditString(CATSTR(MSG_USER_COUNTRY), user->land, 40)) { return; }
+  if(MaybeEditString(CATSTR(MSG_USER_PHONE), user->telefon, 20)) { return; }
+  if(MaybeEditString(CATSTR(MSG_USER_MISCINFO), user->annan_info, 60)) { return; }
+  if(MaybeEditPassword(CATSTR(MSG_USER_PASSWORD), CATSTR(MSG_USER_PASSWORD_CONFIRM), user->losen, 15)) { return; }
+  if(MaybeEditString(CATSTR(MSG_USER_PROMPT), user->prompt, 5)) { return; }
+  if(MaybeEditNumberChar(CATSTR(MSG_USER_LINES), &user->rader, 5, 0, 127)) { return; }
 
   if(Servermem->inne[nodnr].status>=Servermem->cfg->st.anv) {
-    if(MaybeEditNumber(CATSTR(MSG_USER_READ), (int *)&user.read, 8, 0, INT_MAX)) { return 1; }
-    if(MaybeEditNumber(CATSTR(MSG_USER_WRITTEN), (int *)&user.skrivit, 8, 0, INT_MAX)) { return 1; }
-    if(MaybeEditNumber(CATSTR(MSG_USER_DL_FILES), (int *)&user.download, 8, 0, INT_MAX)) { return 1; }
-    if(MaybeEditNumber(CATSTR(MSG_USER_UL_FILES), (int *)&user.upload, 8, 0, INT_MAX)) { return 1; }
-    if(MaybeEditNumber(CATSTR(MSG_USER_DL_BYTES), (int *)&user.downloadbytes, 8, 0, INT_MAX)) { return 1; }
-    if(MaybeEditNumber(CATSTR(MSG_USER_UL_BYTES), (int *)&user.uploadbytes, 8, 0, INT_MAX)) { return 1; }
-    if(MaybeEditNumber(CATSTR(MSG_USER_LOGINS), (int *)&user.loggin, 8, 0, INT_MAX)) { return 1; }
+    if(MaybeEditNumber(CATSTR(MSG_USER_READ), (int *)&user->read, 8, 0, INT_MAX)) { return; }
+    if(MaybeEditNumber(CATSTR(MSG_USER_WRITTEN), (int *)&user->skrivit, 8, 0, INT_MAX)) { return; }
+    if(MaybeEditNumber(CATSTR(MSG_USER_DL_FILES), (int *)&user->download, 8, 0, INT_MAX)) { return; }
+    if(MaybeEditNumber(CATSTR(MSG_USER_UL_FILES), (int *)&user->upload, 8, 0, INT_MAX)) { return; }
+    if(MaybeEditNumber(CATSTR(MSG_USER_DL_BYTES), (int *)&user->downloadbytes, 8, 0, INT_MAX)) { return; }
+    if(MaybeEditNumber(CATSTR(MSG_USER_UL_BYTES), (int *)&user->uploadbytes, 8, 0, INT_MAX)) { return; }
+    if(MaybeEditNumber(CATSTR(MSG_USER_LOGINS), (int *)&user->loggin, 8, 0, INT_MAX)) { return; }
   }
   if(GetYesOrNo("\r\n\n", CATSTR(MSG_COMMON_IS_CORRECT), NULL, NULL,
                 CATSTR(MSG_COMMON_YES), CATSTR(MSG_COMMON_NO), "\r\n\n",
                 TRUE, &isCorrect)) {
-    return 1;
+    return;
   }
   if(!isCorrect) {
-    return 0;
+    return;
   }
 
   if((shortUser = FindShortUser(userId)) == NULL) {
     LogEvent(SYSTEM_LOG, ERROR,
              "While changing user %d, can't find ShortUser entry.", userId);
     DisplayInternalError();
-    return 0;
+    return;
   }
-  strncpy(shortUser->namn, user.namn, 41);
-  shortUser->status = user.status;
+  strncpy(shortUser->namn, user->namn, 41);
+  shortUser->status = user->status;
 
-  for(i=0; i < MAXNOD; i++) {
-    if(userId == Servermem->inloggad[i]) {
-      strncpy(Servermem->inne[i].namn, user.namn, 41);
-      Servermem->inne[i].status = user.status;
-      strncpy(Servermem->inne[i].gata, user.gata, 41);
-      strncpy(Servermem->inne[i].postadress, user.postadress, 41);
-      strncpy(Servermem->inne[i].land, user.land, 41);
-      strncpy(Servermem->inne[i].telefon, user.telefon, 21);
-      strncpy(Servermem->inne[i].annan_info, user.annan_info, 61);
-      strncpy(Servermem->inne[i].losen, user.losen, 16);
-      strncpy(Servermem->inne[i].prompt, user.prompt, 6);
-      Servermem->inne[i].rader = user.rader;
-      Servermem->inne[i].read = user.read;
-      Servermem->inne[i].skrivit = user.skrivit;
-      Servermem->inne[i].download = user.download;
-      Servermem->inne[i].upload = user.upload;
-      Servermem->inne[i].uploadbytes = user.uploadbytes;
-      Servermem->inne[i].downloadbytes = user.downloadbytes;
-      Servermem->inne[i].loggin = user.loggin;
-      break;
-    }
+  if(!(userWrite = GetUserDataForUpdate(userId, &needsWrite))) {
+    return;
   }
-  WriteUser(userId, &user, FALSE);
-  return 0;
+  
+  strncpy(userWrite->namn, user->namn, 41);
+  userWrite->status = user->status;
+  strncpy(userWrite->gata, user->gata, 41);
+  strncpy(userWrite->postadress, user->postadress, 41);
+  strncpy(userWrite->land, user->land, 41);
+  strncpy(userWrite->telefon, user->telefon, 21);
+  strncpy(userWrite->annan_info, user->annan_info, 61);
+  strncpy(userWrite->losen, user->losen, 16);
+  strncpy(userWrite->prompt, user->prompt, 6);
+  userWrite->rader = user->rader;
+  userWrite->read = user->read;
+  userWrite->skrivit = user->skrivit;
+  userWrite->download = user->download;
+  userWrite->upload = user->upload;
+  userWrite->uploadbytes = user->uploadbytes;
+  userWrite->downloadbytes = user->downloadbytes;
+  userWrite->loggin = user->loggin;
+
+  if(needsWrite) {
+    WriteUser(userId, userWrite, FALSE);
+  }
 }
 
 void Cmd_DeleteUser(void) {

@@ -78,12 +78,26 @@ struct User *GetLoggedInUser(int userId) {
 }
 
 struct User *GetUserData(int userId) {
-  static struct User user, *loggedInUser;
+  static struct User user;
+  struct User *loggedInUser;
 
   loggedInUser = GetLoggedInUser(userId);
   if(loggedInUser != NULL) {
     memcpy(&user, loggedInUser, sizeof(struct User));
     return &user;
   }
+  return ReadUser(userId, &user);
+}
+
+struct User *GetUserDataForUpdate(int userId, int *needsWrite) {
+  static struct User user;
+  struct User *loggedInUser;
+
+  loggedInUser = GetLoggedInUser(userId);
+  if(loggedInUser != NULL) {
+    *needsWrite = FALSE;
+    return loggedInUser;
+  }
+  *needsWrite = TRUE;
   return ReadUser(userId, &user);
 }

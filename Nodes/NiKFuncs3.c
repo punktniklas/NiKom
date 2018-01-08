@@ -225,10 +225,10 @@ int radmot(void) {
 
 int andmot(void) {
   int confId, tmpConfId, permissionsNarrowed = FALSE, mad,
-    clearMembership, setPermission, userChanged, ch, i, isCorrect;
+    clearMembership, setPermission, userChanged, ch, i, isCorrect, needsWrite;
   struct ShortUser *shortUser;
   struct FidoDomain *domain;
-  struct User skuser;
+  struct User *user;
   struct Mote tmpConf, *conf;
 
   if((confId = parsemot(argument)) == -1) {
@@ -439,48 +439,33 @@ int andmot(void) {
   } else {
     setPermission=TRUE;
   }
-  for(i = 0; i < MAXNOD; i++) {
-    BAMCLEAR(Servermem->inne[i].motmed, tmpConf.nummer);
-    if(setPermission) {
-      BAMSET(Servermem->inne[i].motratt,tmpConf.nummer);
-    } else {
-      BAMCLEAR(Servermem->inne[i].motratt,tmpConf.nummer);
-    }
-  }
+
   SendString("\r\n%s\r\n", CATSTR(MSG_FORUM_CHANGE_RESETTING));
   ITER_EL(shortUser, Servermem->user_list, user_node, struct ShortUser *) {
     if(!(shortUser->nummer % 10)) {
       SendString("\r%d", shortUser->nummer);
     }
-    if(!ReadUser(shortUser->nummer, &skuser)) {
+    if(!(user = GetUserDataForUpdate(shortUser->nummer, &needsWrite))) {
       return 0;
     }
     userChanged = FALSE;
-    if(setPermission != BAMTEST(skuser.motratt, tmpConf.nummer)) {
+    if(setPermission != BAMTEST(user->motratt, tmpConf.nummer)) {
       if(setPermission) {
-        BAMSET(skuser.motratt, tmpConf.nummer);
+        BAMSET(user->motratt, tmpConf.nummer);
       } else {
-        BAMCLEAR(skuser.motratt, tmpConf.nummer);
+        BAMCLEAR(user->motratt, tmpConf.nummer);
       }
       userChanged = TRUE;
     }
-    if(clearMembership && BAMTEST(skuser.motmed, tmpConf.nummer)) {
-      BAMCLEAR(skuser.motmed, tmpConf.nummer);
+    if(clearMembership && BAMTEST(user->motmed, tmpConf.nummer)) {
+      BAMCLEAR(user->motmed, tmpConf.nummer);
       userChanged = TRUE;
     }
-    if(userChanged && !WriteUser(shortUser->nummer, &skuser, FALSE)) {
+    if(userChanged && needsWrite && !WriteUser(shortUser->nummer, user, FALSE)) {
       return 0;
     }
-    
   }
-  for(i = 0; i < MAXNOD; i++) {
-    BAMCLEAR(Servermem->inne[i].motmed, tmpConf.nummer);
-    if(setPermission) {
-      BAMSET(Servermem->inne[i].motratt,tmpConf.nummer);
-    } else {
-      BAMCLEAR(Servermem->inne[i].motratt,tmpConf.nummer);
-    }
-  }
+
   BAMSET(Servermem->inne[nodnr].motratt,tmpConf.nummer);
   BAMSET(Servermem->inne[nodnr].motmed,tmpConf.nummer);
   return 0;

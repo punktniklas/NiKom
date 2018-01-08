@@ -367,77 +367,71 @@ void writemeet(struct Mote *motpek) {
 }
 
 void addratt(void) {
-	int anv,x;
-	struct Mote *motpek;
-	struct User adduser;
-	if(mote2==-1) {
-		puttekn("\r\n\nDu kan inte addera rättigheter i brevlådan!\r\n",-1);
-		return;
-	}
-	motpek=getmotpek(mote2);
-	if(!MayAdminConf(mote2, inloggad, &Servermem->inne[nodnr])) {
-		puttekn("\r\n\nDu har inte rätt att addera rättigheter i det här mötet!\r\n\n",-1);
-		return;
-	}
-	if((anv=parsenamn(argument))==-1) {
-		puttekn("\r\n\nFinns ingen som heter så eller har det numret!\r\n\n",-1);
-		return;
-	} else if(anv==-3) {
-		puttekn("\r\n\nSkriv: Addera rättigheter <användare>\r\n(Se till så att du befinner dig i rätt möte)\r\n\n",-1);
-		return;
-	}
-	for(x=0;x<MAXNOD;x++) if(Servermem->inloggad[x]==anv) break;
-	if(x<MAXNOD) {
-		BAMSET(Servermem->inne[x].motratt,motpek->nummer);
-		sprintf(outbuffer,"\n\n\rRättigheter i %s adderade för %s\n\r",motpek->namn,getusername(anv));
-	} else {
-          if(!ReadUser(anv, &adduser)) {
-            return;
-          }
-          BAMSET(adduser.motratt,motpek->nummer);
-          if(!WriteUser(anv, &adduser, FALSE)) {
-            return;
-          }
-          sprintf(outbuffer,"\n\n\rRättigheter i %s adderade för %s #%d\n\r",motpek->namn,adduser.namn,anv);
-	}
-	puttekn(outbuffer,-1);
+  int userId, needsWrite;
+  struct Mote *motpek;
+  struct User *user;
+  if(mote2==-1) {
+    puttekn("\r\n\nDu kan inte addera rättigheter i brevlådan!\r\n",-1);
+    return;
+  }
+  motpek=getmotpek(mote2);
+  if(!MayAdminConf(mote2, inloggad, &Servermem->inne[nodnr])) {
+    puttekn("\r\n\nDu har inte rätt att addera rättigheter i det här mötet!\r\n\n",-1);
+    return;
+  }
+  if((userId=parsenamn(argument))==-1) {
+    puttekn("\r\n\nFinns ingen som heter så eller har det numret!\r\n\n",-1);
+    return;
+  } else if(userId==-3) {
+    puttekn("\r\n\nSkriv: Addera rättigheter <användare>\r\n(Se till så att du befinner dig i rätt möte)\r\n\n",-1);
+    return;
+  }
+
+  if(!(user = GetUserDataForUpdate(userId, &needsWrite))) {
+    return;
+  }
+  BAMSET(user->motratt, motpek->nummer);
+  if(needsWrite) {
+    if(!WriteUser(userId, user, FALSE)) {
+      return;
+    }
+  }
+  sprintf(outbuffer,"\n\n\rRättigheter i %s adderade för %s #%d\n\r", motpek->namn, user->namn, userId);
+  puttekn(outbuffer,-1);
 }
 
 void subratt(void) {
-	int anv,x;
-	struct Mote *motpek;
-	struct User subuser;
-	if(mote2==-1) {
-		puttekn("\r\n\nDu kan inte subtrahera rättigheter i brevlådan!\r\n",-1);
-		return;
-	}
-	motpek=getmotpek(mote2);
-	if(!MayAdminConf(mote2, inloggad, &Servermem->inne[nodnr])) {
-		puttekn("\r\n\nDu har inte rätt att subtrahera rättigheter i det här mötet!\r\n\n",-1);
-		return;
-	}
-	if((anv=parsenamn(argument))==-1) {
-		puttekn("\r\n\nFinns ingen som heter så eller har det numret!\r\n\n",-1);
-		return;
-	} else if(anv==-3) {
-		puttekn("\r\n\nSkriv: Subtrahera rättigheter <användare>\r\n(Se till så att du befinner dig i rätt möte)\r\n\n",-1);
-		return;
-	}
-	for(x=0;x<MAXNOD;x++) if(Servermem->inloggad[x]==anv) break;
-	if(x<MAXNOD) {
-		BAMCLEAR(Servermem->inne[x].motratt,motpek->nummer);
-		BAMCLEAR(Servermem->inne[x].motmed,motpek->nummer);
-		sprintf(outbuffer,"\n\n\rRättigheter i %s subtraherade för %s\n\r",motpek->namn,getusername(anv));
-	} else {
-          if(!ReadUser(anv, &subuser)) {
-            return;
-          }
-          BAMCLEAR(subuser.motratt,motpek->nummer);
-          BAMCLEAR(subuser.motmed,motpek->nummer);
-          if(!WriteUser(anv, &subuser, FALSE)) {
-            return;
-          }
-          sprintf(outbuffer,"\n\n\rRättigheter i %s subtraherade för %s #%d\n\r",motpek->namn,subuser.namn,anv);
-	}
-	puttekn(outbuffer,-1);
+  int userId, needsWrite;
+  struct Mote *motpek;
+  struct User *user;
+  if(mote2==-1) {
+    puttekn("\r\n\nDu kan inte subtrahera rättigheter i brevlådan!\r\n",-1);
+    return;
+  }
+  motpek=getmotpek(mote2);
+  if(!MayAdminConf(mote2, inloggad, &Servermem->inne[nodnr])) {
+    puttekn("\r\n\nDu har inte rätt att subtrahera rättigheter i det här mötet!\r\n\n",-1);
+    return;
+  }
+  if((userId=parsenamn(argument))==-1) {
+    puttekn("\r\n\nFinns ingen som heter så eller har det numret!\r\n\n",-1);
+    return;
+  } else if(userId==-3) {
+    puttekn("\r\n\nSkriv: Subtrahera rättigheter <användare>\r\n(Se till så att du befinner dig i rätt möte)\r\n\n",-1);
+    return;
+  }
+
+  if(!(user = GetUserDataForUpdate(userId, &needsWrite))) {
+    return;
+  }
+  BAMCLEAR(user->motratt, motpek->nummer);
+  BAMCLEAR(user->motmed, motpek->nummer);
+  if(needsWrite) {
+    if(!WriteUser(userId, user, FALSE)) {
+      return;
+    }
+  }
+
+  sprintf(outbuffer,"\n\n\rRättigheter i %s subtraherade för %s #%d\n\r", motpek->namn, user->namn, userId);
+  puttekn(outbuffer,-1);
 }

@@ -274,9 +274,9 @@ void listagrupper(void) {
 }
 
 static void changeGroupMembership(int isAdd) {
-  int i, userId, groupId;
-  struct User anv;
-  struct ShortUser *user;
+  int userId, groupId, needsWrite;
+  struct User *user;
+  struct ShortUser *shortUser;
   struct UserGroup *group;
   
   if(!argument[0]) {
@@ -309,40 +309,29 @@ static void changeGroupMembership(int isAdd) {
     SendString("\r\n\n%s\r\n", CATSTR(MSG_CHANGE_GROUPMEM_NOPERM));
     return;
   }
-  for(i = 0; i < MAXNOD; i++) {
-    if(Servermem->inloggad[i] == userId) { break; }
+  if(!(user = GetUserDataForUpdate(userId, &needsWrite))) {
+    return;
   }
-  if(i == MAXNOD) {
-    if(!ReadUser(userId, &anv)) {
-      return;
-    }
-    if(isAdd) {
-      BAMSET((char *)&anv.grupper, groupId);
-    } else {
-      BAMCLEAR((char *)&anv.grupper, groupId);
-    }
-    if(!WriteUser(userId, &anv, FALSE)) {
-      return;
-    }
+  if(isAdd) {
+    BAMSET((char *)&user->grupper, groupId);
   } else {
-    if(isAdd) {
-      BAMSET((char *)&Servermem->inne[i].grupper, groupId);
-    } else {
-      BAMCLEAR((char *)&Servermem->inne[i].grupper, groupId);
+    BAMCLEAR((char *)&user->grupper, groupId);
+  }
+  if(needsWrite) {
+    if(!WriteUser(userId, user, FALSE)) {
+      return;
     }
   }
 
   SendStringCat("\r\n\n%s\r\n",
                 isAdd ? CATSTR(MSG_CHANGE_GROUPMEM_ADDED) : CATSTR(MSG_CHANGE_GROUPMEM_REMOVED),
                 getusername(userId), getgruppname(groupId));
-  ITER_EL(user, Servermem->user_list, user_node, struct ShortUser *) {
-    if(user->nummer == userId) { break; }
-  }
-  if(user->user_node.mln_Succ) {
+
+  if(shortUser = FindShortUser(userId)) {
     if(isAdd) {
-      BAMSET((char *)&user->grupper, groupId);
+      BAMSET((char *)&shortUser->grupper, groupId);
     } else {
-      BAMCLEAR((char *)&user->grupper, groupId);
+      BAMCLEAR((char *)&shortUser->grupper, groupId);
     }
   } else {
     LogEvent(SYSTEM_LOG, ERROR, "Could not find ShortUser entry for user %d", userId);

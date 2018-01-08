@@ -717,9 +717,9 @@ int skapafil(void) {
 
 void radfil(void) {
 	struct Fil *letpek;
-	char filnamn[100],x;
-	struct User tempuser;
-        int isCorrect;
+	char filnamn[100];
+	struct User *user;
+        int isCorrect, needsWrite;
 
 	if(area2==-1) {
 		puttekn("\r\n\nDu befinner dig inte i någon area!\r\n",-1);
@@ -756,22 +756,21 @@ void radfil(void) {
 	if(remove(filnamn)) puttekn("\r\nKunde inte radera filen fysiskt!",-1);
 	sprintf(filnamn,"%slongdesc/%s.long",Servermem->areor[area2].dir[letpek->dir],letpek->namn);
 	if((letpek->flaggor & FILE_LONGDESC) && remove(filnamn)) puttekn("\r\nKunde inte radera långa beskrivningen!",-1);
-	if(Servermem->inne[nodnr].status>=Servermem->cfg->st.filer && userexists(letpek->uppladdare)) {
-          SendString("\r\nSka %s diskrediteras?", getusername(letpek->uppladdare));
-          if(GetYesOrNo(NULL, NULL, NULL, NULL, "Ja", "Nej", "\r\n", FALSE, &isCorrect)) {
-            return;
-          }
-          if(isCorrect) {
-            for(x=0;x<MAXNOD;x++) if(letpek->uppladdare==Servermem->inloggad[x]) break;
-            if(x<MAXNOD) {
-              Servermem->inne[x].upload--;
-            } else {
-              if(!ReadUser(letpek->uppladdare, &tempuser)) {
+	if(Servermem->inne[nodnr].status >= Servermem->cfg->st.filer) {
+          if(userexists(letpek->uppladdare)) {
+            SendString("\r\nSka %s diskrediteras?", getusername(letpek->uppladdare));
+            if(GetYesOrNo(NULL, NULL, NULL, NULL, "Ja", "Nej", "\r\n", FALSE, &isCorrect)) {
+              return;
+            }
+            if(isCorrect) {
+              if(!(user = GetUserDataForUpdate(letpek->uppladdare, &needsWrite))) {
                 return;
               }
-              tempuser.upload--;
-              if(!WriteUser(letpek->uppladdare, &tempuser, FALSE)) {
-                return;
+              user->upload--;
+              if(needsWrite) {
+                if(!WriteUser(letpek->uppladdare, user, FALSE)) {
+                  return;
+                }
               }
             }
           }

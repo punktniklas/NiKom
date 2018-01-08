@@ -27,3 +27,15 @@ struct User *GetLoggedInUser(int userId);
  * valid until the next time this function is called.
  */
 struct User *GetUserData(int userId);
+
+/*
+ * Returns a pointer to a User structure for the given user, or NULL
+ * if the user is not found (or some other error). If the user is
+ * currently logged in the pointer is to the active data structure
+ * in Servermem. In this case needsWrite will be set to FALSE as
+ * any update will take effect immediately and written to disk by
+ * the node where the user is logged in. If not the pointer is to
+ * static memory in this function and needsWrite will be set to TRUE.
+ * For any change to be permanent WriteUser() must be called.
+ */
+struct User *GetUserDataForUpdate(int userId, int *needsWrite);
