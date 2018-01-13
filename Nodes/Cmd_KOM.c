@@ -3,6 +3,7 @@
 #include "KOM.h"
 #include "NiKomLib.h"
 #include "NiKomStr.h"
+#include "Nodes.h"
 #include "NiKomFuncs.h"
 #include "Terminal.h"
 #include "UserNotificationHooks.h"
@@ -36,9 +37,9 @@ void Cmd_GoConf(void) {
     }
     newConfId = parsedConfId;
 
-    if(!IsMemberConf(newConfId, inloggad, &Servermem->inne[nodnr])) {
+    if(!IsMemberConf(newConfId, inloggad, CURRENT_USER)) {
       conf = getmotpek(newConfId);
-      if(MayBeMemberConf(conf->nummer, inloggad, &Servermem->inne[nodnr])) {
+      if(MayBeMemberConf(conf->nummer, inloggad, CURRENT_USER)) {
 
         sprintf(buffer, CATSTR(MSG_GO_NOT_MEMBER_WANT_TO), conf->namn);
         if(GetYesOrNo("\r\n\n", buffer, NULL, NULL, "Ja", "Nej", "\r\n",
@@ -48,7 +49,7 @@ void Cmd_GoConf(void) {
         if(!becomeMember) {
           return;
         }
-        BAMSET(Servermem->inne[nodnr].motmed, parsedConfId);
+        BAMSET(CURRENT_USER->motmed, parsedConfId);
         if(conf->type == MOTE_ORGINAL) {
           unreadTexts->lowestPossibleUnreadText[parsedConfId] = 0;
         }

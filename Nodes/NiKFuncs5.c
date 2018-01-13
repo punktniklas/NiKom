@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <time.h>
 #include "NiKomStr.h"
+#include "Nodes.h"
 #include "NiKomLib.h"
 #include "NiKomFuncs.h"
 #include "Terminal.h"
@@ -81,10 +82,10 @@ int bytnodtyp(void) {
     }
   }
   if(!nt) {
-    Servermem->inne[nodnr].shell = 0;
+    CURRENT_USER->shell = 0;
     SendString("\n\n\r%s\n\r", CATSTR(MSG_CHANGE_NODETYPE_NOSELECT));
   } else {
-    Servermem->inne[nodnr].shell = nt->nummer;
+    CURRENT_USER->shell = nt->nummer;
     SendString("\n\n\r%s:\n\r%s\n\n\r", CATSTR(MSG_CHANGE_NODETYPE_SELECTED), nt->desc);
   }
   return 0;
@@ -107,23 +108,23 @@ void bytteckenset(void) {
   if(argument[0]) {
     switch(argument[0]) {
     case '1' :
-      Servermem->inne[nodnr].chrset = CHRS_LATIN1;
+      CURRENT_USER->chrset = CHRS_LATIN1;
       SendString("\n\n\r%s: %s\n\r", CATSTR(MSG_CHRS_NEW), CATSTR(MSG_CHRS_ISO88591));
       return;
     case '2' :
-      Servermem->inne[nodnr].chrset = CHRS_CP437;
+      CURRENT_USER->chrset = CHRS_CP437;
       SendString("\n\n\r%s: %s\n\r", CATSTR(MSG_CHRS_NEW), CATSTR(MSG_CHRS_CP437));
       return;
     case '3' :
-      Servermem->inne[nodnr].chrset = CHRS_MAC;
+      CURRENT_USER->chrset = CHRS_MAC;
       SendString("\n\n\r%s: %s\n\r", CATSTR(MSG_CHRS_NEW), CATSTR(MSG_CHRS_MAC));
       return;
     case '4' :
-      Servermem->inne[nodnr].chrset = CHRS_SIS7;
+      CURRENT_USER->chrset = CHRS_SIS7;
       SendString("\n\n\r%s: %s\n\r", CATSTR(MSG_CHRS_NEW), CATSTR(MSG_CHRS_SIS7));
       return;
     case '5' :
-      Servermem->inne[nodnr].chrset = CHRS_UTF8;
+      CURRENT_USER->chrset = CHRS_UTF8;
       SendString("\n\n\r%s: %s\n\r", CATSTR(MSG_CHRS_NEW), CATSTR(MSG_CHRS_UTF8));
       return;
     case '-':

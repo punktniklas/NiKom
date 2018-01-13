@@ -18,6 +18,7 @@
 #endif
 #include <time.h>
 #include "NiKomStr.h"
+#include "Nodes.h"
 #include "NiKomLib.h"
 #include "NiKomFuncs.h"
 #include "Logging.h"
@@ -109,7 +110,7 @@ int brev_kommentera(void) {
       }
     } else {
       if(anv != inloggad && inloggad != atoi(brevread.from)
-         && Servermem->inne[nodnr].status < Servermem->cfg->st.brev) {
+         && CURRENT_USER->status < Servermem->cfg->st.brev) {
         SendString("\r\n\n%s\r\n\n", CATSTR(MSG_MAIL_NOT_WRITTEN));
         return 0;
       }
@@ -163,7 +164,7 @@ int HasUnreadMail(void) {
   BPTR lock;
   char filename[40];
   sprintf(filename, "NiKom:Users/%d/%d/%ld.letter", inloggad/100, inloggad,
-          Servermem->inne[nodnr].brevpek);
+          CURRENT_USER->brevpek);
   if((lock = Lock(filename, ACCESS_READ))) {
     UnLock(lock);
     return TRUE;
@@ -177,9 +178,9 @@ void NextMail(void) {
     return;
   }
   g_lastKomTextType = BREV;
-  g_lastKomTextNr = Servermem->inne[nodnr].brevpek;
+  g_lastKomTextNr = CURRENT_USER->brevpek;
   g_lastKomTextConf = -1;
-  visabrev(Servermem->inne[nodnr].brevpek++, inloggad);
+  visabrev(CURRENT_USER->brevpek++, inloggad);
 }
 
 int countmail(int user,int brevpek) {
@@ -188,7 +189,7 @@ int countmail(int user,int brevpek) {
 
 void varmail(void) {
   int antal;
-  antal = countmail(inloggad,Servermem->inne[nodnr].brevpek);
+  antal = countmail(inloggad,CURRENT_USER->brevpek);
   SendString("\r\n\n%s\r\n", CATSTR(MSG_MAIL_YOU_ARE));
   if(antal == 0) {
     SendString("%s\r\n\n", CATSTR(MSG_MAIL_NO_UNREAD));
@@ -225,11 +226,11 @@ void visabrev(int brev,int anv) {
     mottagare = hittaefter(mottagare);
   }
   if(!tillmig && inloggad != atoi(brevread.from)
-     && Servermem->inne[nodnr].status < Servermem->cfg->st.brev) {
+     && CURRENT_USER->status < Servermem->cfg->st.brev) {
     SendString("\n\n\r%s\n\r", CATSTR(MSG_MAIL_NO_READ_PERM));
     return;
   }
-  Servermem->inne[nodnr].read++;
+  CURRENT_USER->read++;
   Servermem->info.lasta++;
   Statstr.read++;
 
@@ -250,7 +251,7 @@ void visabrev(int brev,int anv) {
     mottagare = hittaefter(mottagare);
   }
   SendStringCat("%s\r\n", CATSTR(MSG_ORG_TEXT_SUBJECT), brevread.subject);
-  if(Servermem->inne[nodnr].flaggor & STRECKRAD) {
+  if(CURRENT_USER->flaggor & STRECKRAD) {
     length = strlen(outbuffer);
     for(i = 0; i < length - 2; i++) {
       textbuf[i]='-';
@@ -276,11 +277,11 @@ void visabrev(int brev,int anv) {
 void visafidobrev(struct ReadLetter *brevread, BPTR fh, int brev, int anv) {
   int length, i;
   char textbuf[100];
-  if(anv != inloggad && Servermem->inne[nodnr].status < Servermem->cfg->st.brev) {
+  if(anv != inloggad && CURRENT_USER->status < Servermem->cfg->st.brev) {
     SendString("\n\n\rDu har inte rätt att läsa det brevet!\n\r");
     return;
   }
-  Servermem->inne[nodnr].read++;
+  CURRENT_USER->read++;
   Servermem->info.lasta++;
   Statstr.read++;
   SendStringCat("\r\n\n%s\r\n", CATSTR(MSG_MAIL_LINE1), brev, getusername(anv));
@@ -288,7 +289,7 @@ void visafidobrev(struct ReadLetter *brevread, BPTR fh, int brev, int anv) {
   SendStringCat("%s\r\n", CATSTR(MSG_MAIL_FROM), brevread->from);
   SendStringCat("%s\n\r", CATSTR(MSG_MAIL_TO), brevread->to);
   SendStringCat("%s\r\n", CATSTR(MSG_ORG_TEXT_SUBJECT), brevread->subject);
-  if(Servermem->inne[nodnr].flaggor & STRECKRAD) {
+  if(CURRENT_USER->flaggor & STRECKRAD) {
     length = strlen(outbuffer);
     for(i = 0; i < length - 2; i++) {
       textbuf[i] = '-';
@@ -301,7 +302,7 @@ void visafidobrev(struct ReadLetter *brevread, BPTR fh, int brev, int anv) {
   
   while(FGets(fh, textbuf, 99)) {
     if(textbuf[0] == 1) {
-      if(!(Servermem->inne[nodnr].flaggor & SHOWKLUDGE)) {
+      if(!(CURRENT_USER->flaggor & SHOWKLUDGE)) {
         continue;
       }
       if(SendString("^A%s\r", textbuf)) {
@@ -403,7 +404,7 @@ int initbrevheader(int tillpers) {
     strcpy(brevspar.subject,inmat);
   }
   SendString("\r\n");
-  if(Servermem->inne[nodnr].flaggor & STRECKRAD) {
+  if(CURRENT_USER->flaggor & STRECKRAD) {
     length = strlen(brevspar.subject);
     for(i = 0; i < length + 8; i++) {
       tempbuf[i]='-';
@@ -437,8 +438,8 @@ int fido_brev(char *tillpers,char *adr,struct Mote *motpek) {
   struct MinNode *first, *last;
   char *foo, tmpfrom[100], fullpath[100], filnamn[20], subject[80], msgid[50];
 
-  if(!(Servermem->inne[nodnr].grupper & Servermem->cfg->fidoConfig.mailgroups)
-     && Servermem->inne[nodnr].status < Servermem->cfg->fidoConfig.mailstatus) {
+  if(!(CURRENT_USER->grupper & Servermem->cfg->fidoConfig.mailgroups)
+     && CURRENT_USER->status < Servermem->cfg->fidoConfig.mailstatus) {
     SendString("\n\n\rDu har ingen rätt att skicka FidoNet NetMail.\n\r");
     return 0;
   }
@@ -537,7 +538,7 @@ int fido_brev(char *tillpers,char *adr,struct Mote *motpek) {
     strcpy(ft.subject, inmat);
   }
   SendString("\r\n");
-  if(Servermem->inne[nodnr].flaggor & STRECKRAD) {
+  if(CURRENT_USER->flaggor & STRECKRAD) {
     length = strlen(ft.subject);
     for(i = 0; i < length + 8; i++) {
       tmpfrom[i] = '-';
@@ -558,7 +559,7 @@ int fido_brev(char *tillpers,char *adr,struct Mote *motpek) {
   if(crashmail) {
     ft.attribut |= FIDOT_CRASH;
   }
-  Servermem->inne[nodnr].skrivit++;
+  CURRENT_USER->skrivit++;
   Servermem->info.skrivna++;
   Statstr.write++;
   SendString("\n\n\r%s\r\n\n", CATSTR(MSG_MAIL_FIDO_WHAT_CHARSET));
@@ -669,7 +670,7 @@ void sparabrev(void) {
   char buf[100], orgfilename[50], *motstr;
   int userId, nr, mot;
 
-  Servermem->inne[nodnr].skrivit++;
+  CURRENT_USER->skrivit++;
   Servermem->info.skrivna++;
   Statstr.write++;
   userId = atoi(brevspar.to);
@@ -863,7 +864,7 @@ void initpersheader(void) {
   SendStringCat("%s\n\r", CATSTR(MSG_MAIL_TO), getusername(readhead.person));
   strcpy(brevspar.subject, readhead.arende);
   SendStringCat("%s\n\r", CATSTR(MSG_ORG_TEXT_SUBJECT), brevspar.subject);
-  if(Servermem->inne[nodnr].flaggor & STRECKRAD) {
+  if(CURRENT_USER->flaggor & STRECKRAD) {
     length = strlen(brevspar.subject);
     for(i = 0; i < length + 8; i++) buf[i] = '-';
     buf[i] = '\0';
@@ -973,8 +974,8 @@ void rensabrev(void) {
   }
   Close(fh);
   SendStringCat("\n\r%s\n\r", CATSTR(MSG_MAIL_PURGE_RESULT), antal);
-  if((first + antal) > Servermem->inne[nodnr].brevpek) {
-    Servermem->inne[nodnr].brevpek = first + antal;
+  if((first + antal) > CURRENT_USER->brevpek) {
+    CURRENT_USER->brevpek = first + antal;
   }
 }
 

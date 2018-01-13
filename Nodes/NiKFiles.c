@@ -24,6 +24,7 @@
 #include <string.h>
 #include <time.h>
 #include "NiKomStr.h"
+#include "Nodes.h"
 #include "NiKomFuncs.h"
 #include "DiskUtils.h"
 #include "Terminal.h"
@@ -269,7 +270,7 @@ char *skri;
 		faci=Servermem->areor[count].namn;
 		skri2=skri;
 		going2=TRUE;
-		if(!arearatt(count, inloggad, &Servermem->inne[nodnr])) going2=FALSE;
+		if(!arearatt(count, inloggad, CURRENT_USER)) going2=FALSE;
 		if(matchar(skri2,faci)) {
 			while(going2) {
 				skri2=hittaefter(skri2);
@@ -295,7 +296,7 @@ void listarea(void)
 	int x;
 	puttekn("\r\n\n",-1);
 	for(x=0;x<Servermem->info.areor;x++) {
-		if(!Servermem->areor[x].namn[0] || !arearatt(x, inloggad, &Servermem->inne[nodnr])) continue;
+		if(!Servermem->areor[x].namn[0] || !arearatt(x, inloggad, CURRENT_USER)) continue;
 		sprintf(outbuffer,"%s",Servermem->areor[x].namn);
 		puttekn(outbuffer,-1);
 		if(Servermem->areor[x].flaggor & AREA_NOUPLOAD) puttekn(" (Ingen upload)",-1);
@@ -370,7 +371,7 @@ void listfiler(void) {
 	puttekn(outbuffer,-1);
 	for(sokpek=(struct Fil *)Servermem->areor[area2].ar_list.mlh_TailPred;sokpek->f_node.mln_Pred;sokpek=(struct Fil *)sokpek->f_node.mln_Pred) {
 		if(notvalid && !(sokpek->flaggor & FILE_NOTVALID)) continue;
-		if((sokpek->flaggor & FILE_NOTVALID) && Servermem->inne[nodnr].status < Servermem->cfg->st.filer && sokpek->uppladdare != inloggad) continue;
+		if((sokpek->flaggor & FILE_NOTVALID) && CURRENT_USER->status < Servermem->cfg->st.filer && sokpek->uppladdare != inloggad) continue;
 		if(nyckel!=-1 && !BAMTEST(sokpek->nycklar,nyckel)) continue;
 		ts=localtime(&sokpek->tid);
 		if(puttekn("\r\n",-1)) return;
@@ -405,7 +406,7 @@ void bytarea(void) {
 		puttekn("\r\n\nFinns ingen sådan area!\r\n",-1);
 		return;
 	}
-/*	if(!arearatt(area, inloggad, &Servermem->inne[nodnr])) {
+/*	if(!arearatt(area, inloggad, CURRENT_USER)) {
 		puttekn("\r\n\nFinns ingen sådan area!\r\n",-1);
 		return;
 	} */
@@ -480,7 +481,7 @@ int andraarea(void) {
 		puttekn("\r\n\nSkriv: Ändra Area <areanamn>\r\n\n",-1);
 		return(0);
 	}
-	if(inloggad!=Servermem->areor[arnr].skapad_av && Servermem->inne[nodnr].status<Servermem->cfg->st.radarea) {
+	if(inloggad!=Servermem->areor[arnr].skapad_av && CURRENT_USER->status<Servermem->cfg->st.radarea) {
 		puttekn("\r\n\nDu har ingen rätt att ändra på den arean!\r\n\n",-1);
 		return(0);
 	}
@@ -654,7 +655,7 @@ int skapafil(void) {
 	puttekn("\r\nVilken statusnivå ska filen ha? ",-1);
 	if(getstring(EKO,3,NULL)) { FreeMem(allokpek,sizeof(struct Fil)); return(1); }
 	allokpek->status=atoi(inmat);
-	if(Servermem->inne[nodnr].status >= Servermem->cfg->st.filer) {
+	if(CURRENT_USER->status >= Servermem->cfg->st.filer) {
           if(GetYesOrNo("\n\r", "Ska filen valideras?", NULL, NULL, "Ja", "Nej", NULL,
                         TRUE, &isCorrect)) {
               return 1;
@@ -680,7 +681,7 @@ int skapafil(void) {
 		puttekn("\r\n\nKunde inte skriva till datafilen\r\n",-1);
 		return(0);
 	}
-	Servermem->inne[nodnr].upload++;
+	CURRENT_USER->upload++;
 	Statstr.ul++;
 
         if(GetYesOrNo("\r\n\n", "Vill du skriva en längre beskrivning?",
@@ -733,7 +734,7 @@ void radfil(void) {
 		puttekn("\r\n\nFinns ingen sådan fil!\r\n",-1);
 		return;
 	}
-	if(letpek->uppladdare!=inloggad && Servermem->inne[nodnr].status<Servermem->cfg->st.filer) {
+	if(letpek->uppladdare!=inloggad && CURRENT_USER->status<Servermem->cfg->st.filer) {
 		puttekn("\r\n\nDu kan bara radera filer som du själv har laddat upp!\r\n",-1);
 		return;
 	}
@@ -756,7 +757,7 @@ void radfil(void) {
 	if(remove(filnamn)) puttekn("\r\nKunde inte radera filen fysiskt!",-1);
 	sprintf(filnamn,"%slongdesc/%s.long",Servermem->areor[area2].dir[letpek->dir],letpek->namn);
 	if((letpek->flaggor & FILE_LONGDESC) && remove(filnamn)) puttekn("\r\nKunde inte radera långa beskrivningen!",-1);
-	if(Servermem->inne[nodnr].status >= Servermem->cfg->st.filer) {
+	if(CURRENT_USER->status >= Servermem->cfg->st.filer) {
           if(userexists(letpek->uppladdare)) {
             SendString("\r\nSka %s diskrediteras?", getusername(letpek->uppladdare));
             if(GetYesOrNo(NULL, NULL, NULL, NULL, "Ja", "Nej", "\r\n", FALSE, &isCorrect)) {
@@ -775,7 +776,7 @@ void radfil(void) {
             }
           }
 	} else {
-          Servermem->inne[nodnr].upload--;
+          CURRENT_USER->upload--;
         }
 	FreeMem(letpek,sizeof(struct Fil));
 }
@@ -799,7 +800,7 @@ int andrafil(void) {
 		puttekn("\r\n\nFinns ingen sådan fil!\r\n",-1);
 		return(0);
 	}
-	if(filpek->uppladdare!=inloggad && Servermem->inne[nodnr].status<Servermem->cfg->st.filer) {
+	if(filpek->uppladdare!=inloggad && CURRENT_USER->status<Servermem->cfg->st.filer) {
 		puttekn("\r\nDu har ingen rätt att ändra på den filen!\r\n",-1);
 		return(0);
 	}
@@ -830,7 +831,7 @@ int andrafil(void) {
 	if(getstring(EKO,3,NULL)) return(1);
 	if(inmat[0]) tmpstatus=atoi(inmat);
 	else tmpstatus=filpek->status;
-	if(Servermem->inne[nodnr].status>=Servermem->cfg->st.filer) {
+	if(CURRENT_USER->status>=Servermem->cfg->st.filer) {
 		sprintf(outbuffer,"\r\nAntal downloads: (%d) ",filpek->downloads);
 		puttekn(outbuffer,-1);
 		if(getstring(EKO,7,NULL)) return(1);
@@ -971,12 +972,12 @@ int sokfil(void) {
 		else
 			areatmp = area2;
 
-		if(!Servermem->areor[areatmp].namn[0] || !arearatt(areatmp, inloggad, &Servermem->inne[nodnr])) continue;
+		if(!Servermem->areor[areatmp].namn[0] || !arearatt(areatmp, inloggad, CURRENT_USER)) continue;
 		foundfiles = 0;
 
 		for(filpek=(struct Fil *)Servermem->areor[areatmp].ar_list.mlh_TailPred;
 			filpek->f_node.mln_Pred;filpek=(struct Fil *)filpek->f_node.mln_Pred) {
-			if((filpek->flaggor & FILE_NOTVALID) && Servermem->inne[nodnr].status < Servermem->cfg->st.filer && filpek->uppladdare != inloggad) continue;
+			if((filpek->flaggor & FILE_NOTVALID) && CURRENT_USER->status < Servermem->cfg->st.filer && filpek->uppladdare != inloggad) continue;
 			if(sokstring[0]) {
 				if(pat) {
 					if(searchOnFilename) {
@@ -1048,7 +1049,7 @@ struct Fil *parsefilallareas(char *skri)
 
 	for(x=0;x<Servermem->info.areor;x++)
 	{
-		if(!Servermem->areor[x].namn[0] || !arearatt(x, inloggad, &Servermem->inne[nodnr])) continue;
+		if(!Servermem->areor[x].namn[0] || !arearatt(x, inloggad, CURRENT_USER)) continue;
 		if(Servermem->areor[x].flaggor & AREA_NODOWNLOAD) continue;
 
 		fil = parsefil(skri, x);
@@ -1078,7 +1079,7 @@ int area;
 	letpek=(struct Fil *)Servermem->areor[area].ar_list.mlh_TailPred;
 	while(letpek->f_node.mln_Pred) {
 		if((letpek->flaggor & FILE_NOTVALID) &&
-		Servermem->inne[nodnr].status < Servermem->cfg->st.filer &&
+		CURRENT_USER->status < Servermem->cfg->st.filer &&
 		letpek->uppladdare != inloggad) {
 			letpek=(struct Fil *)letpek->f_node.mln_Pred;
 			continue;
@@ -1171,7 +1172,7 @@ void typefil(void) {
 		puttekn("\r\n\nFinns ingen sådan fil!\r\n",-1);
 		return;
 	}
-	if(filpek->status>Servermem->inne[nodnr].status && Servermem->inne[nodnr].status<Servermem->cfg->st.laddaner) {
+	if(filpek->status>CURRENT_USER->status && CURRENT_USER->status<Servermem->cfg->st.laddaner) {
 		puttekn("\r\n\nDu har ingen rätt att se den filen!\r\n",-1);
 		return;
 	}
@@ -1186,13 +1187,13 @@ void nyafiler(void) {
 	struct Fil *sokpek;
 	if(argument[0]=='-') notvalid=TRUE;
 	for(areacnt=0;areacnt<Servermem->info.areor;areacnt++) {
-		if(!arearatt(areacnt, inloggad, &Servermem->inne[nodnr]) || !Servermem->areor[areacnt].namn[0]) continue;
+		if(!arearatt(areacnt, inloggad, CURRENT_USER) || !Servermem->areor[areacnt].namn[0]) continue;
 		headerprinted=FALSE;
 		for(sokpek=(struct Fil *)Servermem->areor[areacnt].ar_list.mlh_TailPred;sokpek->f_node.mln_Pred;sokpek=(struct Fil *)sokpek->f_node.mln_Pred)
 		{
 			if(notvalid && !(sokpek->flaggor & FILE_NOTVALID)) continue;
-			if((sokpek->flaggor & FILE_NOTVALID) && Servermem->inne[nodnr].status < Servermem->cfg->st.filer && sokpek->uppladdare != inloggad) continue;
-			if(sokpek->validtime < Servermem->inne[nodnr].senast_in) continue;
+			if((sokpek->flaggor & FILE_NOTVALID) && CURRENT_USER->status < Servermem->cfg->st.filer && sokpek->uppladdare != inloggad) continue;
+			if(sokpek->validtime < CURRENT_USER->senast_in) continue;
 			if(!headerprinted) {
 				sprintf(outbuffer,"\r\n\nArean %s\r\n",Servermem->areor[areacnt].namn);
 				puttekn(outbuffer,-1);

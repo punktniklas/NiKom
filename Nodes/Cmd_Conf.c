@@ -3,6 +3,7 @@
 #include <limits.h>
 #include <proto/dos.h>
 #include "NiKomStr.h"
+#include "Nodes.h"
 #include "NiKomLib.h"
 #include "NiKomFuncs.h"
 #include "Terminal.h"
@@ -39,7 +40,7 @@ void Cmd_Reply(void) {
       return;
     }
     if(conf->type == MOTE_FIDO) {
-      if(!MayReplyConf(mote2, inloggad, &Servermem->inne[nodnr])) {
+      if(!MayReplyConf(mote2, inloggad, CURRENT_USER)) {
         SendString("\r\n\n%s\r\n\n", CATSTR(MSG_COMMENT_NO_COMMENT_IN_FORUM));
         return;
       }
@@ -74,7 +75,7 @@ void Cmd_Reply(void) {
     DisplayInternalError();
     return;
   }
-  if(!MayReplyConf(senast_text_mote, inloggad, &Servermem->inne[nodnr])) {
+  if(!MayReplyConf(senast_text_mote, inloggad, CURRENT_USER)) {
     SendString("\r\n\n%s\r\n\n", CATSTR(MSG_COMMENT_NO_COMMENT_IN_FORUM));
     return;
   }
@@ -150,7 +151,7 @@ void Cmd_FootNote(void) {
     return;
   }
   if(textHeader.person != inloggad
-     && !MayAdminConf(confId, inloggad, &Servermem->inne[nodnr])) {
+     && !MayAdminConf(confId, inloggad, CURRENT_USER)) {
     SendString("\r\n\n%s\r\n\n", CATSTR(MSG_FOOTNOTE_ONLY_OWN_TEXTS));
     return;
   }
@@ -259,7 +260,7 @@ void Cmd_Search(void) {
         if((confId = GetConferenceForText(i)) == -1) {
           continue;
         }
-        if(!MayReadConf(confId, inloggad, &Servermem->inne[nodnr])) {
+        if(!MayReadConf(confId, inloggad, CURRENT_USER)) {
           continue;
         }
         break;
@@ -392,7 +393,7 @@ void cmd_Reaction(long reaction) {
       SendString("\r\n\n%s\r\n", CATSTR(MSG_FORUMS_NO_SUCH_TEXT));
       return;
     }
-    if(!MayReadConf(confId, inloggad, &Servermem->inne[nodnr])) {
+    if(!MayReadConf(confId, inloggad, CURRENT_USER)) {
       SendString("\r\n\n%s\r\n", CATSTR(MSG_REACTION_NO_PERMISSION));
       return;
     }

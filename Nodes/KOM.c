@@ -3,6 +3,7 @@
 #include <string.h>
 #include "NiKomLib.h"
 #include "NiKomStr.h"
+#include "Nodes.h"
 #include "Stack.h"
 #include "Logging.h"
 #include "StringUtils.h"
@@ -52,7 +53,7 @@ int hasUnreadInConf(int confId) {
   if(confId == MAILBOX_CONFID) {
     return HasUnreadMail();
   }
-  if(!IsMemberConf(confId, inloggad, &Servermem->inne[nodnr])) {
+  if(!IsMemberConf(confId, inloggad, CURRENT_USER)) {
     return 0;
   }
   if((conf = getmotpek(confId)) == NULL) {
@@ -112,9 +113,9 @@ int FindNextUnreadConf(int currentConfId) {
 
 int isUserOutOfTime(void) {
   int limitSeconds, secondsLoggedIn;
-  limitSeconds = 60 * Servermem->cfg->maxtid[Servermem->inne[nodnr].status]
+  limitSeconds = 60 * Servermem->cfg->maxtid[CURRENT_USER->status]
     + extratime;
-  if(Servermem->cfg->maxtid[Servermem->inne[nodnr].status] != 0) {
+  if(Servermem->cfg->maxtid[CURRENT_USER->status] != 0) {
     secondsLoggedIn = time(NULL) - logintime;
     if(secondsLoggedIn > limitSeconds) {
       SendInfoFile("OutOfTime.txt", 0);
@@ -148,7 +149,7 @@ struct Kommando *getCommandToExecute(int defaultCmd) {
     strcpy(inmat,aliasbuf);
   }
   
-  parseRes = ParseCommand(inmat, Servermem->inne[nodnr].language, &Servermem->inne[nodnr], parseResult, argbuf);
+  parseRes = ParseCommand(inmat, CURRENT_USER->language, CURRENT_USER, parseResult, argbuf);
   switch(parseRes) {
   case -2:
     cmdId = CMD_READTEXT;
@@ -161,7 +162,7 @@ struct Kommando *getCommandToExecute(int defaultCmd) {
 
   case 0:
     SendString("\r\n\n%s\r\n", CATSTR(MSG_KOM_INVALID_COMMAND));
-    if(++badCommandCnt >= 2 && !(Servermem->inne[nodnr].flaggor & INGENHELP)) {
+    if(++badCommandCnt >= 2 && !(CURRENT_USER->flaggor & INGENHELP)) {
       SendInfoFile("2Errors.txt", 0);
     }
     return NULL;
@@ -170,7 +171,7 @@ struct Kommando *getCommandToExecute(int defaultCmd) {
     cmdId = parseResult[0]->nummer;
     argument = argbuf;
     badCommandCnt = 0;
-    if(!HasUserCmdPermission(parseResult[0], &Servermem->inne[nodnr])) {
+    if(!HasUserCmdPermission(parseResult[0], CURRENT_USER)) {
       SendString("\r\n\n%s\r\n", CATSTR(MSG_KOM_NO_PERMISSION));
       if(Servermem->cfg->ar.noright) {
         sendautorexx(Servermem->cfg->ar.noright);
@@ -180,7 +181,7 @@ struct Kommando *getCommandToExecute(int defaultCmd) {
 
     if(parseResult[0]->losen[0]) {
       SendString("\r\n\n%s: ", CATSTR(MSG_KOM_COMMAND_PASSWORD));
-      getstring(Servermem->inne[nodnr].flaggor & STAREKOFLAG ? STAREKO : EJEKO, 20, NULL);
+      getstring(CURRENT_USER->flaggor & STAREKOFLAG ? STAREKO : EJEKO, 20, NULL);
 
       if(strcmp(parseResult[0]->losen, inmat)) {
         SendString("\r\n\n%s\r\n", CATSTR(MSG_KOM_INVALID_PASSWORD));
@@ -192,7 +193,7 @@ struct Kommando *getCommandToExecute(int defaultCmd) {
   default:
     SendString("\r\n\n%s\r\n\n", CATSTR(MSG_KOM_AMBIGOUS_COMMAND));
     for(i = 0; i < parseRes; i++) {
-      SendString("%s\n\r", ChooseLangCommand(parseResult[i], Servermem->inne[nodnr].language)->name);
+      SendString("%s\n\r", ChooseLangCommand(parseResult[i], CURRENT_USER->language)->name);
     }
     return NULL;
   }
@@ -391,9 +392,9 @@ void displayPrompt(int defaultCmd) {
     cmdStr = "*** Undefined default command ***";
   }
   if(minutesLeft > 4) {
-    SendString("\r\n%s %s ", cmdStr, Servermem->inne[nodnr].prompt);
+    SendString("\r\n%s %s ", cmdStr, CURRENT_USER->prompt);
   } else {
-    SendString("\r\n%s (%d) %s ", cmdStr, minutesLeft, Servermem->inne[nodnr].prompt);
+    SendString("\r\n%s (%d) %s ", cmdStr, minutesLeft, CURRENT_USER->prompt);
   }
 
   if((cmd = getCommandToExecute(defaultCmd)) == NULL) {

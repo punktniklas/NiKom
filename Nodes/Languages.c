@@ -2,6 +2,7 @@
 #include <proto/dos.h>
 
 #include "NiKomStr.h"
+#include "Nodes.h"
 #include "Logging.h"
 #include "Terminal.h"
 #include "BasicIO.h"
@@ -53,7 +54,7 @@ void initFlagNames(void) {
 }
 
 void LoadCatalogForUser(void) {
-  int lang = Servermem->inne[nodnr].language;
+  int lang = CURRENT_USER->language;
 
   loadNewCatalog(lang);
   initFlagNames();

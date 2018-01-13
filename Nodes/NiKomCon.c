@@ -16,6 +16,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include "NiKomStr.h"
+#include "Nodes.h"
 #include "NiKomFuncs.h"
 #include "NiKomLib.h"
 #include "InfoFiles.h"
@@ -140,7 +141,7 @@ int main(int argc, char **argv) {
   do {
     Servermem->idletime[nodnr] = time(NULL);
     memset(commandhistory,0,1024);
-    Servermem->inne[nodnr].rader=0;
+    CURRENT_USER->rader=0;
     sendfile("NiKom:Texter/Login.txt");
     if(Servermem->cfg->ar.preinlogg) sendautorexx(Servermem->cfg->ar.preinlogg);
     going=TRUE;
@@ -157,18 +158,18 @@ int main(int argc, char **argv) {
         going=FALSE;
       }
       else if((inloggad=parsenamn(inmat))>=0) {
-        if(!ReadUser(inloggad, &Servermem->inne[nodnr])) {
+        if(!ReadUser(inloggad, CURRENT_USER)) {
           goto panik;
         }
         // TODO: Extract password loop. Should be identical to in PreNode/Ser.c
         forsok=2;
         while(forsok) {
           SendStringNoBrk("\r\nPassword: ");
-          if(Servermem->inne[nodnr].flaggor & STAREKOFLAG)
+          if(CURRENT_USER->flaggor & STAREKOFLAG)
             getstring(STAREKO,15,NULL);
           else
             getstring(EJEKO,15,NULL);
-          if(CheckPassword(inmat, Servermem->inne[nodnr].losen)) {
+          if(CheckPassword(inmat, CURRENT_USER->losen)) {
             forsok=FALSE;
             going=FALSE;
           } else {
@@ -179,7 +180,7 @@ int main(int argc, char **argv) {
         SendStringNoBrk("\r\nNo such user\r\n");
       }
     }
-    sprintf(titel,"Nod #%d CON: %s #%d",nodnr,Servermem->inne[nodnr].namn,inloggad);
+    sprintf(titel,"Nod #%d CON: %s #%d",nodnr,CURRENT_USER->namn,inloggad);
     SetWindowTitles(NiKwind,titel,(UBYTE *)-1L);
     if(!ReadUnreadTexts(&Servermem->unreadTexts[nodnr], inloggad)) {
       LogEvent(SYSTEM_LOG, ERROR,
@@ -189,7 +190,7 @@ int main(int argc, char **argv) {
     }
     Servermem->inloggad[nodnr]=inloggad;
     Servermem->idletime[nodnr] = time(NULL);
-    SendInfoFile("Bulletin.txt", Servermem->inne[nodnr].senast_in);
+    SendInfoFile("Bulletin.txt", CURRENT_USER->senast_in);
 
     connection();
 
@@ -206,12 +207,12 @@ int main(int argc, char **argv) {
     
     Servermem->action[nodnr]=0;
     time(&tid);
-    Servermem->inne[nodnr].senast_in=tid;
-    Servermem->inne[nodnr].tot_tid+=(tid-logintime);
-    Servermem->inne[nodnr].loggin++;
+    CURRENT_USER->senast_in=tid;
+    CURRENT_USER->tot_tid+=(tid-logintime);
+    CURRENT_USER->loggin++;
     Servermem->info.inloggningar++;
-    Servermem->inne[nodnr].defarea=area2;
-    WriteUser(inloggad, &Servermem->inne[nodnr], FALSE);
+    CURRENT_USER->defarea=area2;
+    WriteUser(inloggad, CURRENT_USER, FALSE);
     WriteUnreadTexts(&Servermem->unreadTexts[nodnr], inloggad);
     writesenaste();
     freealiasmem();

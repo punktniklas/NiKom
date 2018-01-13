@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <time.h>
 #include "NiKomStr.h"
+#include "Nodes.h"
 #include "NiKomFuncs.h"
 #include "NiKomLib.h"
 #include "Logging.h"
@@ -53,7 +54,7 @@ void org_kommentera(void) {
       return;
     }
     confId = GetConferenceForText(textId);
-    if(!MayBeMemberConf(confId, inloggad, &Servermem->inne[nodnr])) {
+    if(!MayBeMemberConf(confId, inloggad, CURRENT_USER)) {
       SendString("\r\n\n%s\r\n", CATSTR(MSG_COMMENT_NO_PERMISSIONS));
       return;
     }
@@ -65,7 +66,7 @@ void org_kommentera(void) {
       return;
     }
     if(conf->status & KOMSKYDD) {
-      if(!MayReplyConf(conf->nummer, inloggad, &Servermem->inne[nodnr])) {
+      if(!MayReplyConf(conf->nummer, inloggad, CURRENT_USER)) {
         SendString("\r\n\n%s\r\n", CATSTR(MSG_COMMENT_NO_COMMENT_IN_FORUM));
         return;
       } else {
@@ -138,7 +139,7 @@ void pushTextRepliesToStack(struct Header *textHeader) {
     confId = GetConferenceForText(textId);
     if(confId == -1
        || !IsTextUnread(textId, &Servermem->unreadTexts[nodnr])
-       || !IsMemberConf(confId, inloggad, &Servermem->inne[nodnr])) {
+       || !IsMemberConf(confId, inloggad, CURRENT_USER)) {
       continue;
     }
     StackPush(g_unreadRepliesStack, textId);
@@ -232,20 +233,20 @@ int org_visatext(int textId, char verbose) {
   struct tm *ts;
   struct EditLine *el;
 
-  Servermem->inne[nodnr].read++;
+  CURRENT_USER->read++;
   Servermem->info.lasta++;
   Statstr.read++;
 
   if(GetConferenceForText(textId) == -1) {
     SendStringCat("\n\n\r%s\n\n\r", CATSTR(MSG_TEXT_DELETED), textId);
-    if(Servermem->inne[nodnr].status < Servermem->cfg->st.medmoten) {
+    if(CURRENT_USER->status < Servermem->cfg->st.medmoten) {
       return 0;
     }
   }
   if(readtexthead(textId, &readhead)) {
     return 0;
   }
-  if(!MayReadConf(readhead.mote, inloggad, &Servermem->inne[nodnr])) {
+  if(!MayReadConf(readhead.mote, inloggad, CURRENT_USER)) {
     SendString("\r\n\n%s\r\n\n", CATSTR(MSG_TEXT_NO_PERM));
     return 0;
   }
@@ -261,7 +262,7 @@ int org_visatext(int textId, char verbose) {
                getusername(readhead.kom_till_per));
   }
   SendStringCat("%s\r\n", CATSTR(MSG_ORG_TEXT_SUBJECT), readhead.arende);
-  if(Servermem->inne[nodnr].flaggor & STRECKRAD) {
+  if(CURRENT_USER->flaggor & STRECKRAD) {
     length = strlen(readhead.arende) + 8;
     for(i = 0; i < length; i++) {
       outbuffer[i] = '-';
@@ -286,7 +287,7 @@ int org_visatext(int textId, char verbose) {
 
   for(i = 0; readhead.kom_i[i] != -1; i++) {
     confId = GetConferenceForText(readhead.kom_i[i]);
-    if(confId != -1 && IsMemberConf(confId, inloggad, &Servermem->inne[nodnr])) {
+    if(confId != -1 && IsMemberConf(confId, inloggad, CURRENT_USER)) {
       SendStringCat("  %s\r\n", CATSTR(MSG_ORG_TEXT_COMMENT_IN), readhead.kom_i[i],
                  getusername(readhead.kom_av[i]));
     }
@@ -321,7 +322,7 @@ int org_visatext(int textId, char verbose) {
 
 void org_sparatext(void) {
   int i, nummer;
-  Servermem->inne[nodnr].skrivit++;
+  CURRENT_USER->skrivit++;
   Servermem->info.skrivna++;
   Statstr.write++;
   sparhead.rader=rad;
@@ -399,7 +400,7 @@ int org_initheader(int komm) {
     strcpy(sparhead.arende,inmat);
   }
   SendString("\r\n");
-  if(Servermem->inne[nodnr].flaggor & STRECKRAD) {
+  if(CURRENT_USER->flaggor & STRECKRAD) {
     length = strlen(sparhead.arende);
     for(i = 0; i < length + 8; i++) {
       outbuffer[i] = '-';

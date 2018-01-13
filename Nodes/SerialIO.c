@@ -15,6 +15,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "NiKomStr.h"
+#include "Nodes.h"
 #include "NiKomFuncs.h"
 #include "NiKomLib.h"
 #include "HeartBeat.h"
@@ -347,7 +348,7 @@ char gettekn(void) {
       int conv;
       serbuf[seridx] = sergettkn();
       conv = ConvMBChrsToAmiga(&ch,serbuf,seridx+1,
-                               Servermem->inne[nodnr].chrset);
+                               CURRENT_USER->chrset);
       if (conv < 0) {
         /* Need more bytes, continue reading. */
         ++seridx;
@@ -417,7 +418,7 @@ void eka(char tecken) {
 	conwritereq->io_Data=(APTR)&tecken;
 	conwritereq->io_Length=1;
 	if(DoIO((struct IORequest *)conwritereq)) printf("DoIO i eka() (1)\n");
-	bytes = ConvMBChrsFromAmiga(sertkn,&tecken,1,Servermem->inne[nodnr].chrset,0);
+	bytes = ConvMBChrsFromAmiga(sertkn,&tecken,1,CURRENT_USER->chrset,0);
 	serwritereq->IOSer.io_Command=CMD_WRITE;
 	serwritereq->IOSer.io_Data=(APTR)sertkn;
 	serwritereq->IOSer.io_Length=bytes;
@@ -431,7 +432,7 @@ void sereka(char tecken)
 {
 	char sertkn[2];
 	int bytes;
-	bytes = ConvMBChrsFromAmiga(sertkn,&tecken,1,Servermem->inne[nodnr].chrset,0);
+	bytes = ConvMBChrsFromAmiga(sertkn,&tecken,1,CURRENT_USER->chrset,0);
 	serwritereq->IOSer.io_Command=CMD_WRITE;
 	serwritereq->IOSer.io_Data=(APTR)sertkn;
 	serwritereq->IOSer.io_Length=bytes;
@@ -468,7 +469,7 @@ void putstring(char *pekare,int size, long flags) {
 	int bytes;
 
 	bytes = ConvMBChrsFromAmiga(serpekare, pekare, 199,
-				    Servermem->inne[nodnr].chrset, 0);
+				    CURRENT_USER->chrset, 0);
 	serwritereq->IOSer.io_Command=CMD_WRITE;
 	serwritereq->IOSer.io_Data=serpekare;
 	serwritereq->IOSer.io_Length=bytes;
@@ -487,7 +488,7 @@ static void serputstring(char *pekare, int size, long flags)
 	int bytes;
 
 	bytes = ConvMBChrsFromAmiga(serpekare, pekare, 199,
-				    Servermem->inne[nodnr].chrset, 0);
+				    CURRENT_USER->chrset, 0);
 	serwritereq->IOSer.io_Command=CMD_WRITE;
 	serwritereq->IOSer.io_Data=serpekare;
 	serwritereq->IOSer.io_Length=bytes;
@@ -733,16 +734,16 @@ int puttekn(char *pekare,int size)
 	strncpy(localconstring,pekare,1199);
 	localconstring[1199]=0;
 	if(Servermem->cfg->cfgflags & NICFG_LOCALCOLOURS) {
-		bytes=ConvMBChrsFromAmiga(serpekare,pekare,1199,Servermem->inne[nodnr].chrset,0);
+		bytes=ConvMBChrsFromAmiga(serpekare,pekare,1199,CURRENT_USER->chrset,0);
 		serpekare[bytes] = '\0';
-		if(!(Servermem->inne[nodnr].flaggor & ANSICOLOURS)) StripAnsiSequences(serpekare);
+		if(!(CURRENT_USER->flaggor & ANSICOLOURS)) StripAnsiSequences(serpekare);
 	} else {
 		StripAnsiSequences(localconstring);
-		if(Servermem->inne[nodnr].flaggor & ANSICOLOURS) {
-			bytes=ConvMBChrsFromAmiga(serpekare,pekare,1199,Servermem->inne[nodnr].chrset,0);
+		if(CURRENT_USER->flaggor & ANSICOLOURS) {
+			bytes=ConvMBChrsFromAmiga(serpekare,pekare,1199,CURRENT_USER->chrset,0);
 			serpekare[bytes] = '\0';
 		} else  {
-			bytes=ConvMBChrsFromAmiga(serpekare,localconstring,1199,Servermem->inne[nodnr].chrset,0);
+			bytes=ConvMBChrsFromAmiga(serpekare,localconstring,1199,CURRENT_USER->chrset,0);
 			serpekare[bytes] = '\0';
 		}
 	}
@@ -935,7 +936,7 @@ int sendtosercon(char *conpek, char *serpek, int consize, int sersize) {
         aborted = TRUE;
         console = serial = 0;
         putstring("^C\n\r",-1,0);
-      } else if((tecken==' ' && (Servermem->inne[nodnr].flaggor & MELLANSLAG))
+      } else if((tecken==' ' && (CURRENT_USER->flaggor & MELLANSLAG))
                 || tecken==19) {
         paused=TRUE;
       } else if(tecken && typeaheadbuftkn < 50) {
@@ -957,7 +958,7 @@ int sendtosercon(char *conpek, char *serpek, int consize, int sersize) {
         aborted = TRUE;
         console = serial = 0;
         putstring("^C\n\r",-1,0);
-      } else if((tecken==' ' && (Servermem->inne[nodnr].flaggor & MELLANSLAG))
+      } else if((tecken==' ' && (CURRENT_USER->flaggor & MELLANSLAG))
                 || tecken==19) {
         paused=TRUE;
       } else if(tecken && typeaheadbuftkn<50) {
@@ -1032,7 +1033,7 @@ int sendtocon(char *pekare, int size)
 				aborted=TRUE;
 				console=0;
 				putstring("^C\n\r",-1,0);
-			} else if((tecken==' ' && (Servermem->inne[nodnr].flaggor & MELLANSLAG)) || tecken==19) paused=TRUE;
+			} else if((tecken==' ' && (CURRENT_USER->flaggor & MELLANSLAG)) || tecken==19) paused=TRUE;
 			else if(tecken && typeaheadbuftkn<50) {
 				typeaheadbuf[typeaheadbuftkn++]=tecken;
 				typeaheadbuf[typeaheadbuftkn]=0;
@@ -1068,7 +1069,7 @@ int serputtekn(char *pekare,int size)
 	serstring[1199]=0;
 	pekare = &serstring[0];
 
-	if(!(Servermem->inne[nodnr].flaggor & ANSICOLOURS)) StripAnsiSequences(pekare);
+	if(!(CURRENT_USER->flaggor & ANSICOLOURS)) StripAnsiSequences(pekare);
 
 	if(size == -1 && !pekare[0]) return(aborted);
 
@@ -1153,7 +1154,7 @@ int sendtoser(char *pekare, int size) {
         aborted = TRUE;
         serial = 0;
         serputstring("^C\n\r",-1,0);
-      } else if((tecken == ' ' && (Servermem->inne[nodnr].flaggor & MELLANSLAG))
+      } else if((tecken == ' ' && (CURRENT_USER->flaggor & MELLANSLAG))
                 || tecken == 19) {
         paused = TRUE;
       } else if(tecken && typeaheadbuftkn<50) {

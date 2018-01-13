@@ -13,6 +13,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "NiKomStr.h"
+#include "Nodes.h"
 #include "NiKomFuncs.h"
 #include "NiKomLib.h"
 #include "InfoFiles.h"
@@ -83,7 +84,7 @@ void fullcrash(void);
 int edittext(char *filename) {
   int ret;
   freeeditlist();
-  if(Servermem->inne[nodnr].flaggor & FULLSCREEN) {
+  if(CURRENT_USER->flaggor & FULLSCREEN) {
     ret = fulledit(filename);
   } else {
     ret = lineedit(filename);
@@ -153,7 +154,7 @@ int lineedit(char *filename) {
   char letmp[81], wrap[81];
 
   NewList((struct List *)&edit_list);
-  if(!(Servermem->inne[nodnr].flaggor & INGENHELP)) {
+  if(!(CURRENT_USER->flaggor & INGENHELP)) {
     SendStringNoBrk("%s\n\r", CATSTR(MSG_EDIT_LINE_HELP1));
     SendStringNoBrk("%s\n\n\r", CATSTR(MSG_EDIT_LINE_HELP2));
   }
@@ -385,8 +386,8 @@ void lineflyttatext(char *vart) {
     SendStringNoBrk("\r\nSkriv : !flytta <mötesnamn>\r\n");
     return;
   }
-  if(!MayWriteConf(confId, inloggad, &Servermem->inne[nodnr])
-     || !MayReplyConf(confId, inloggad, &Servermem->inne[nodnr])) {
+  if(!MayWriteConf(confId, inloggad, CURRENT_USER)
+     || !MayReplyConf(confId, inloggad, CURRENT_USER)) {
     SendStringNoBrk("\n\rDu har ingen rätt att flytta texten till det mötet.\n\r");
     return;
   }
@@ -550,7 +551,7 @@ void linecrash(void) {
     SendStringNoBrk("\n\rEndast Fido-brev kan skickas som crashmail.\n\r");
     return;
   }
-  if(Servermem->inne[nodnr].status < Servermem->cfg->fidoConfig.crashstatus) {
+  if(CURRENT_USER->status < Servermem->cfg->fidoConfig.crashstatus) {
     SendStringNoBrk("\n\rDu har inte rätt att skicka crashmail.\n\r");
     return;
   }
@@ -564,7 +565,7 @@ int fulledit(char *filename) {
   int ch;
   NewList((struct List *)&edit_list);
   yankbuffer[0] = 0;
-  if(!(Servermem->inne[nodnr].flaggor & INGENHELP)) {
+  if(!(CURRENT_USER->flaggor & INGENHELP)) {
     SendStringNoBrk("\r\n%s\n\r", CATSTR(MSG_EDIT_FULL_HELP1));
     SendStringNoBrk("%s\n\n\r", CATSTR(MSG_EDIT_FULL_HELP2));
   }
@@ -971,8 +972,8 @@ void fullflyttatext(char *confName) {
     GetChar();
     return;
   }
-  if(!MayWriteConf(confId, inloggad, &Servermem->inne[nodnr])
-     || !MayReplyConf(confId, inloggad, &Servermem->inne[nodnr])) {
+  if(!MayWriteConf(confId, inloggad, CURRENT_USER)
+     || !MayReplyConf(confId, inloggad, CURRENT_USER)) {
     SendStringNoBrk("\rDu har ingen rätt att flytta texten till det mötet. <RETURN>");
     return;
   }
@@ -1085,7 +1086,7 @@ void fullcrash(void) {
     GetChar();
     return;
   }
-  if(Servermem->inne[nodnr].status < Servermem->cfg->fidoConfig.crashstatus) {
+  if(CURRENT_USER->status < Servermem->cfg->fidoConfig.crashstatus) {
     SendStringNoBrk("\rDu har inte rätt att skicka crashmail. <RETURN>");
     GetChar();
     return;

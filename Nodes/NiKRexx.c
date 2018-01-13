@@ -17,6 +17,7 @@
 #include <time.h>
 #include <limits.h>
 #include "NiKomStr.h"
+#include "Nodes.h"
 #include "NiKomLib.h"
 #include "NiKomFuncs.h"
 #include "Terminal.h"
@@ -327,7 +328,7 @@ void kommando(struct RexxMsg *mess) {
 
   cmdStr = hittaefter(mess->rm_Args[0]);
 
-  parseRes = ParseCommand(cmdStr, Servermem->inne[nodnr].language, &Servermem->inne[nodnr], parseResult, argbuf);
+  parseRes = ParseCommand(cmdStr, CURRENT_USER->language, CURRENT_USER, parseResult, argbuf);
   switch(parseRes) {
   case -2:
     cmdId = 212;
@@ -346,7 +347,7 @@ void kommando(struct RexxMsg *mess) {
     return;
 
   case 1:
-    if(!HasUserCmdPermission(parseResult[0], &Servermem->inne[nodnr])
+    if(!HasUserCmdPermission(parseResult[0], CURRENT_USER)
        || parseResult[0]->losen[0]) {
       LogEvent(SYSTEM_LOG, WARN,
                "User %d has no permission executing NiKom command in ARexx 'NikCommand': '%s'",
@@ -720,9 +721,9 @@ void rxextratime(struct RexxMsg *mess) {
 void rxgettime(struct RexxMsg *mess) {
   long limit, timeLeft, now;
   char buf[10];
-  if(Servermem->cfg->maxtid[Servermem->inne[nodnr].status] > 0) {
+  if(Servermem->cfg->maxtid[CURRENT_USER->status] > 0) {
     time(&now);
-    limit = 60 * Servermem->cfg->maxtid[Servermem->inne[nodnr].status] + extratime;
+    limit = 60 * Servermem->cfg->maxtid[CURRENT_USER->status] + extratime;
     timeLeft = limit - (now - logintime);
   } else {
     timeLeft=0;

@@ -18,6 +18,7 @@
 
 #include "NiKomLib.h"
 #include "NiKomStr.h"
+#include "Nodes.h"
 #include "NiKomFuncs.h"
 #include "UserDataUtils.h"
 
@@ -42,7 +43,7 @@ void Cmd_Status(void) {
     argument = hittaefter(argument);
   }
   if(argument[0] == 0) {
-    user = &Servermem->inne[nodnr];
+    user = CURRENT_USER;
     unreadTexts = &Servermem->unreadTexts[nodnr];
     userId = inloggad;
   } else {
@@ -71,7 +72,7 @@ void Cmd_Status(void) {
   if(SendStringCat("\r\n\n%s\r\n\n", CATSTR(MSG_USER_STATUS_HEADER), user->namn,userId)) { return; }
   if(SendString("%-21s: %d\r\n", CATSTR(MSG_USER_LEVEL), user->status)) { return; }
   if(!((user->flaggor & SKYDDAD)
-       && Servermem->inne[nodnr].status < Servermem->cfg->st.sestatus
+       && CURRENT_USER->status < Servermem->cfg->st.sestatus
        && inloggad != userId)) {
     if(SendString("%-21s: %s\r\n", CATSTR(MSG_USER_STREET), user->gata)) { return; }
     if(SendString("%-21s: %s\r\n", CATSTR(MSG_USER_CITY), user->postadress)) { return; }
@@ -114,8 +115,8 @@ void Cmd_Status(void) {
         continue;
       }
       if((listpek->flaggor & HEMLIGT)
-         && !BAMTEST((char *)&Servermem->inne[nodnr].grupper, listpek->nummer)
-         && Servermem->inne[nodnr].status < Servermem->cfg->st.medmoten) {
+         && !BAMTEST((char *)&CURRENT_USER->grupper, listpek->nummer)
+         && CURRENT_USER->status < Servermem->cfg->st.medmoten) {
         continue;
       }
       if(SendString(" %s\r\n", listpek->namn)) { return; }
@@ -127,7 +128,7 @@ void Cmd_Status(void) {
     sumUnread += cnt;
   }
   ITER_EL(conf, Servermem->mot_list, mot_node, struct Mote *) {
-    if(!MaySeeConf(conf->nummer, inloggad, &Servermem->inne[nodnr])
+    if(!MaySeeConf(conf->nummer, inloggad, CURRENT_USER)
        || !IsMemberConf(conf->nummer, userId, user)) {
       continue;
     }
@@ -159,7 +160,7 @@ void Cmd_ChangeUser(void) {
   struct User *user, *userWrite;
   struct ShortUser *shortUser;
   if(argument[0]) {
-    if(Servermem->inne[nodnr].status < Servermem->cfg->st.anv) {
+    if(CURRENT_USER->status < Servermem->cfg->st.anv) {
       SendString("\r\n\n%s\r\n\n", CATSTR(MSG_USER_CHANGE_NO_OTHER));
       return;
     }
@@ -198,7 +199,7 @@ void Cmd_ChangeUser(void) {
     }
   }
 
-  if(Servermem->inne[nodnr].status >= Servermem->cfg->st.chgstatus) {
+  if(CURRENT_USER->status >= Servermem->cfg->st.chgstatus) {
     if(MaybeEditNumberChar(CATSTR(MSG_USER_LEVEL), &user->status, 3, 0, 100)) { return; }
   }
   if(MaybeEditString(CATSTR(MSG_USER_STREET), user->gata, 40)) { return; }
@@ -210,7 +211,7 @@ void Cmd_ChangeUser(void) {
   if(MaybeEditString(CATSTR(MSG_USER_PROMPT), user->prompt, 5)) { return; }
   if(MaybeEditNumberChar(CATSTR(MSG_USER_LINES), &user->rader, 5, 0, 127)) { return; }
 
-  if(Servermem->inne[nodnr].status>=Servermem->cfg->st.anv) {
+  if(CURRENT_USER->status>=Servermem->cfg->st.anv) {
     if(MaybeEditNumber(CATSTR(MSG_USER_READ), (int *)&user->read, 8, 0, INT_MAX)) { return; }
     if(MaybeEditNumber(CATSTR(MSG_USER_WRITTEN), (int *)&user->skrivit, 8, 0, INT_MAX)) { return; }
     if(MaybeEditNumber(CATSTR(MSG_USER_DL_FILES), (int *)&user->download, 8, 0, INT_MAX)) { return; }
@@ -343,5 +344,5 @@ int Cmd_ListUsers(void) {
 }
 
 void Cmd_ChangeLanguage(void) {
-  AskUserForLanguage(&Servermem->inne[nodnr]);
+  AskUserForLanguage(CURRENT_USER);
 }

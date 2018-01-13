@@ -7,6 +7,7 @@
 #include <string.h>
 #include <stdarg.h>
 #include "NiKomStr.h"
+#include "Nodes.h"
 #include "NiKomFuncs.h"
 #include "NiKomLib.h"
 #include "Logging.h"
@@ -77,7 +78,7 @@ int GetChar(void) {
     case 4: // Ctrl-D
       return GETCHAR_DELETE;
     case 127: // Delete
-      return Servermem->inne[nodnr].flaggor & ASCII_7E_IS_DELETE
+      return CURRENT_USER->flaggor & ASCII_7E_IS_DELETE
           || Servermem->nodtyp[nodnr] == NODCON
         ? GETCHAR_DELETE : GETCHAR_BACKSPACE;
     case 24: // Ctrl-X
@@ -233,7 +234,7 @@ int GetNumber(int minvalue, int maxvalue, char *defaultStr) {
 }
 
 int GetSecretString(int maxchrs, char *defaultStr) {
-  return GetStringX(Servermem->inne[nodnr].flaggor & STAREKOFLAG ? STAREKO : EJEKO,
+  return GetStringX(CURRENT_USER->flaggor & STAREKOFLAG ? STAREKO : EJEKO,
                     maxchrs, defaultStr, NULL, NULL, NULL);
 }
 
@@ -290,7 +291,7 @@ int GetStringX(int echo, int maxchrs, char *defaultStr,
         continue;
       }
       if(echo) {
-        if(Servermem->inne[nodnr].flaggor & SEKVENSANSI) {
+        if(CURRENT_USER->flaggor & SEKVENSANSI) {
           SendStringNoBrk("\x1b\x5b\x44\x1b\x5b\x50",-1,0);
         }
         else {
@@ -393,7 +394,7 @@ int GetStringX(int echo, int maxchrs, char *defaultStr,
         continue;
       }
       if(echo) {
-        if(Servermem->inne[nodnr].flaggor & SEKVENSANSI) {
+        if(CURRENT_USER->flaggor & SEKVENSANSI) {
           SendStringNoBrk("\x1b\x5b\x31\x40");
         }
         if(echo != STAREKO) {
@@ -418,7 +419,7 @@ int GetStringX(int echo, int maxchrs, char *defaultStr,
     }
 
     for(i = 0; i < size; i++) {
-      if(Servermem->inne[nodnr].flaggor & SEKVENSANSI) {
+      if(CURRENT_USER->flaggor & SEKVENSANSI) {
         SendStringNoBrk("\x1b\x5b\x44\x1b\x5b\x50");
       } else {
         SendStringNoBrk("\b \b");
@@ -445,8 +446,8 @@ int incantrader(void) {
   int ch;
   
   radcnt++;
-  if(Servermem->inne[nodnr].rader
-     && radcnt >= Servermem->inne[nodnr].rader
+  if(CURRENT_USER->rader
+     && radcnt >= CURRENT_USER->rader
      && rxlinecount) {
     SendStringNoBrk("\r<RETURN>");
     for(;;) {
@@ -474,7 +475,7 @@ int conputtekn(char *pekare,int size)
 	constring[1199]=0;
 	pekare = &constring[0];
 
-	if(!(Servermem->inne[nodnr].flaggor & ANSICOLOURS)) StripAnsiSequences(pekare);
+	if(!(CURRENT_USER->flaggor & ANSICOLOURS)) StripAnsiSequences(pekare);
 
 	if(size == -1 && !pekare[0]) return(aborted);
 

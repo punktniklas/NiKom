@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "NiKomStr.h"
+#include "Nodes.h"
 #include "Terminal.h"
 
 #include "InfoFiles.h"
@@ -8,7 +9,7 @@ extern struct System *Servermem;
 extern int nodnr;
 
 char *CreateLocalizedInfoFilePath(char *fileName, char *buf) {
-  sprintf(buf, "NiKom:Texter/%s/%s", Servermem->languages[Servermem->inne[nodnr].language], fileName);
+  sprintf(buf, "NiKom:Texter/%s/%s", Servermem->languages[CURRENT_USER->language], fileName);
   return buf;
 }
 

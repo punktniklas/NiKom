@@ -9,6 +9,7 @@
 #include <string.h>
 #include <time.h>
 #include "NiKomStr.h"
+#include "Nodes.h"
 #include "NiKomFuncs.h"
 #include "NiKomLib.h"
 
@@ -27,13 +28,13 @@ int grabfidotext(int text,struct Mote *motpek,FILE *fpgrab) {
 	struct FidoText *ft;
 	struct FidoLine *fl;
 	char filnamn[20],fullpath[100];
-	Servermem->inne[nodnr].read++;
+	CURRENT_USER->read++;
 	Servermem->info.lasta++;
 	Statstr.read++;
 	sprintf(filnamn,"%ld.msg",text - motpek->renumber_offset);
 	strcpy(fullpath,motpek->dir);
 	AddPart(fullpath,filnamn,99);
-	if(Servermem->inne[nodnr].flaggor & SHOWKLUDGE) ft=ReadFidoTextTags(fullpath,TAG_DONE);
+	if(CURRENT_USER->flaggor & SHOWKLUDGE) ft=ReadFidoTextTags(fullpath,TAG_DONE);
 	else ft=ReadFidoTextTags(fullpath,RFT_NoKludges,TRUE,RFT_NoSeenBy,TRUE,TAG_DONE);
 	if(!ft) {
 		puttekn("\n\n\rKunde inte läsa texten\n\r",-1);
@@ -57,15 +58,15 @@ int grabtext(int text,FILE *fpgrab) {
   int x, confId;
 	struct EditLine *el;
 	struct tm *ts;
-	Servermem->inne[nodnr].read++;
+	CURRENT_USER->read++;
 	Servermem->info.lasta++;
 	Statstr.read++;
 	if(GetConferenceForText(text) == -1) {
 		puttekn("\r\n\nTexten är raderad!\r\n\n",-1);
-		if(Servermem->inne[nodnr].status<Servermem->cfg->st.medmoten) return(0);
+		if(CURRENT_USER->status<Servermem->cfg->st.medmoten) return(0);
 	}
 	if(readtexthead(text,&grabhead)) return(2);
-	if(!MayReadConf(grabhead.mote, inloggad, &Servermem->inne[nodnr])) {
+	if(!MayReadConf(grabhead.mote, inloggad, CURRENT_USER)) {
 		puttekn("\r\n\nDu har inte rätt att läsa den texten!\r\n\n",-1);
 		return(0);
 	}
@@ -93,7 +94,7 @@ int grabtext(int text,FILE *fpgrab) {
 	while(grabhead.kom_i[x] != -1) {
           confId = GetConferenceForText(grabhead.kom_i[x]);
           if(confId != -1
-             && IsMemberConf(confId, inloggad, &Servermem->inne[nodnr])) {
+             && IsMemberConf(confId, inloggad, CURRENT_USER)) {
             fprintf(fpgrab,"  (Kommentar i text %ld av %s)\n",
                     grabhead.kom_i[x],getusername(grabhead.kom_av[x]));
           }
@@ -107,7 +108,7 @@ int grabtext(int text,FILE *fpgrab) {
 void grabfidobrev(struct ReadLetter *brevread, BPTR fh, int brev, FILE *fpgrab) {
 	int length,x;
 	char textbuf[100];
-	Servermem->inne[nodnr].read++;
+	CURRENT_USER->read++;
 	Servermem->info.lasta++;
 	Statstr.read++;
 	fprintf(fpgrab,"\n\nText %d  i brevlådan hos %s\n",brev,getusername(inloggad));
@@ -115,7 +116,7 @@ void grabfidobrev(struct ReadLetter *brevread, BPTR fh, int brev, FILE *fpgrab) 
 	fprintf(fpgrab,"Avsändare: %s\n",brevread->from);
 	fprintf(fpgrab,"Mottagare: %s\n",brevread->to);
 	fprintf(fpgrab,"Ärende: %s\n",brevread->subject);
-	if(Servermem->inne[nodnr].flaggor & STRECKRAD) {
+	if(CURRENT_USER->flaggor & STRECKRAD) {
 		length=strlen(outbuffer);
 		for(x=0;x<length-2;x++) outbuffer[x]='-';
 		outbuffer[x]=0;
@@ -124,7 +125,7 @@ void grabfidobrev(struct ReadLetter *brevread, BPTR fh, int brev, FILE *fpgrab) 
 	} else fputs("\n",fpgrab);
 	while(FGets(fh,textbuf,99)) {
 		if(textbuf[0]==1) {
-			if(!(Servermem->inne[nodnr].flaggor & SHOWKLUDGE)) continue;
+			if(!(CURRENT_USER->flaggor & SHOWKLUDGE)) continue;
 			fputs("^A",fpgrab);
 			fputs(&textbuf[1],fpgrab);
 		} else {
@@ -140,7 +141,7 @@ int grabbrev(int text, FILE *fpgrab) {
 	BPTR fh;
 	int x,length=0;
 	char filnamn[40],*mottagare,textbuf[100];
-	Servermem->inne[nodnr].read++;
+	CURRENT_USER->read++;
 	Servermem->info.lasta++;
 	Statstr.read++;
 	sprintf(filnamn,"NiKom:Users/%d/%d/%d.letter",inloggad/100,inloggad,text);
@@ -165,7 +166,7 @@ int grabbrev(int text, FILE *fpgrab) {
 		mottagare=hittaefter(mottagare);
 	}
 	fprintf(fpgrab,"Ärende: %s\n",brevgrab.subject);
-	if(Servermem->inne[nodnr].flaggor & STRECKRAD) {
+	if(CURRENT_USER->flaggor & STRECKRAD) {
 		length=strlen(outbuffer);
 		for(x=0;x<length-2;x++) outbuffer[x]='-';
 		outbuffer[x]=0;
@@ -188,7 +189,7 @@ int grabkom(FILE *fp) {
     confId = GetConferenceForText(kom[x]);
     if(confId != -1
        && IsTextUnread(kom[x], &Servermem->unreadTexts[nodnr])
-       && IsMemberConf(confId, inloggad, &Servermem->inne[nodnr])) {
+       && IsMemberConf(confId, inloggad, CURRENT_USER)) {
       if((grabret=grabtext(kom[x],fp))==1) {
         if(grabkom(fp)) return(1);
       }
@@ -214,7 +215,7 @@ void grab(void) {
   sprintf(outbuffer,"\r\nRensar brevlådan..");
   puttekn(outbuffer,-1);
   y=getnextletter(inloggad);
-  for(x=Servermem->inne[nodnr].brevpek;x<y;x++) {
+  for(x=CURRENT_USER->brevpek;x<y;x++) {
     if(grabbrev(x,fp)==2) {
       sprintf(outbuffer,"\r\nFel under vid läsandet/skrivandet av brev %d!\r\n",x);
       puttekn(outbuffer,-1);
@@ -222,10 +223,10 @@ void grab(void) {
       return;
     }
   }
-  Servermem->inne[nodnr].brevpek=y;
+  CURRENT_USER->brevpek=y;
   for(motpek=(struct Mote *)Servermem->mot_list.mlh_Head;motpek->mot_node.mln_Succ;motpek=(struct Mote *)motpek->mot_node.mln_Succ) {
     if(motpek->status & SUPERHEMLIGT) continue;
-    if(!IsMemberConf(motpek->nummer, inloggad, &Servermem->inne[nodnr])) continue;
+    if(!IsMemberConf(motpek->nummer, inloggad, CURRENT_USER)) continue;
     sprintf(outbuffer,"\r\nRensar mötet %s...",motpek->namn);
     puttekn(outbuffer,-1);
 

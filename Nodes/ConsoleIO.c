@@ -15,6 +15,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "NiKomStr.h"
+#include "Nodes.h"
 #include "NiKomFuncs.h"
 #include "NiKomLib.h"
 #include "BasicIO.h"
@@ -245,7 +246,7 @@ int puttekn(char *pekare,int size) {
 	constring[1199]=0;
 	pekare = &constring[0];
 
-	if(!(Servermem->inne[nodnr].flaggor & ANSICOLOURS)) StripAnsiSequences(pekare);
+	if(!(CURRENT_USER->flaggor & ANSICOLOURS)) StripAnsiSequences(pekare);
 
 	if(size == -1 && !pekare[0]) return(aborted);
 
@@ -349,7 +350,7 @@ int sendtocon(char *pekare, int size)
 				aborted=TRUE;
 				console=0;
 				putstring("^C\n\r",-1,0);
-			} else if((tecken==' ' && (Servermem->inne[nodnr].flaggor & MELLANSLAG)) || tecken==19) paused=TRUE;
+			} else if((tecken==' ' && (CURRENT_USER->flaggor & MELLANSLAG)) || tecken==19) paused=TRUE;
 			else if(tecken && typeaheadbuftkn<50) {
 				typeaheadbuf[typeaheadbuftkn++]=tecken;
 				typeaheadbuf[typeaheadbuftkn]=0;

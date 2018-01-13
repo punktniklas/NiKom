@@ -12,6 +12,7 @@
 #include <devices/timer.h>
 #include "StringUtils.h"
 #include "NiKomStr.h"
+#include "Nodes.h"
 #include "NiKomFuncs.h"
 #include "NiKomLib.h"
 #include "Terminal.h"
@@ -183,7 +184,7 @@ void listnyheter(void) {
 	struct Mote *motpek=(struct Mote *)Servermem->mot_list.mlh_Head;
 	struct Fil *sokpek;
 	puttekn("\r\n\n",-1);
-	if((cnt=countmail(inloggad,Servermem->inne[nodnr].brevpek))) {
+	if((cnt=countmail(inloggad,CURRENT_USER->brevpek))) {
 		sprintf(outbuffer,"%4d Brevlådan\r\n", cnt);
 		puttekn(outbuffer,-1);
 		olasta=TRUE;
@@ -191,7 +192,7 @@ void listnyheter(void) {
 	}
 	for(;motpek->mot_node.mln_Succ;motpek=(struct Mote *)motpek->mot_node.mln_Succ) {
 		if(motpek->status & SUPERHEMLIGT) continue;
-		if(IsMemberConf(motpek->nummer, inloggad, &Servermem->inne[nodnr]))
+		if(IsMemberConf(motpek->nummer, inloggad, CURRENT_USER))
 		{
 			cnt=countunread(motpek->nummer);
 			if(cnt) {
@@ -208,14 +209,14 @@ void listnyheter(void) {
 		puttekn(outbuffer,-1);
 	}
 	puttekn("\r\n\n",-1);
-	if(Servermem->inne[nodnr].flaggor & FILLISTA) nyafiler();
+	if(CURRENT_USER->flaggor & FILLISTA) nyafiler();
 	else {
 		for(x=0;x<Servermem->info.areor;x++) {
-			if(!arearatt(x, inloggad, &Servermem->inne[nodnr])) continue;
+			if(!arearatt(x, inloggad, CURRENT_USER)) continue;
 			olasta=0;
 			for(sokpek=(struct Fil *)Servermem->areor[x].ar_list.mlh_TailPred;sokpek->f_node.mln_Pred;sokpek=(struct Fil *)sokpek->f_node.mln_Pred) {
-				if((sokpek->flaggor & FILE_NOTVALID) && Servermem->inne[nodnr].status < Servermem->cfg->st.filer && sokpek->uppladdare != inloggad) continue;
-				if(sokpek->validtime < Servermem->inne[nodnr].senast_in) continue;
+				if((sokpek->flaggor & FILE_NOTVALID) && CURRENT_USER->status < Servermem->cfg->st.filer && sokpek->uppladdare != inloggad) continue;
+				if(sokpek->validtime < CURRENT_USER->senast_in) continue;
 				else olasta++;
 			}
 			if(olasta) {
@@ -231,7 +232,7 @@ void listflagg(void) {
   SendString("\r\n\n");
   for(i = 31; i > (31 - ANTFLAGG); i--) {
     SendString("%-4s %s\r\n",
-               BAMTEST((char *)&Servermem->inne[nodnr].flaggor, i)
+               BAMTEST((char *)&CURRENT_USER->flaggor, i)
                  ? CATSTR(MSG_FLAG_ON) : CATSTR(MSG_FLAG_OFF),
                g_FlagNames[31 - i]);
   }
@@ -261,9 +262,9 @@ void slaav(void) {
 	}
 	sprintf(outbuffer,"\r\n\nSlår av flaggan %s\r\n", g_FlagNames[flagga]);
 	puttekn(outbuffer,-1);
-	if(BAMTEST((char *)&Servermem->inne[nodnr].flaggor,31-flagga)) puttekn("Den var påslagen.\r\n\n",-1);
+	if(BAMTEST((char *)&CURRENT_USER->flaggor,31-flagga)) puttekn("Den var påslagen.\r\n\n",-1);
 	else puttekn("Den var redan avslagen.\r\n\n",-1);
-	BAMCLEAR((char *)&Servermem->inne[nodnr].flaggor,31-flagga);
+	BAMCLEAR((char *)&CURRENT_USER->flaggor,31-flagga);
 }
 
 void slapa(void) {
@@ -277,9 +278,9 @@ void slapa(void) {
 	}
 	sprintf(outbuffer,"\r\n\nSlår på flaggan %s\r\n", g_FlagNames[flagga]);
 	puttekn(outbuffer,-1);
-	if(!BAMTEST((char *)&Servermem->inne[nodnr].flaggor,31-flagga)) puttekn("Den var avslagen.\r\n\n",-1);
+	if(!BAMTEST((char *)&CURRENT_USER->flaggor,31-flagga)) puttekn("Den var avslagen.\r\n\n",-1);
 	else puttekn("Den var redan påslagen.\r\n\n",-1);
-	BAMSET((char *)&Servermem->inne[nodnr].flaggor,31-flagga);
+	BAMSET((char *)&CURRENT_USER->flaggor,31-flagga);
 }
 
 int ropa(void) {
@@ -289,7 +290,7 @@ int ropa(void) {
   SendString("\r\n\n");
   for(i = 0; i < 10; i++) {
     SendStringNoBrk("\rSYSOP!! %s vill dig något!! (%d)",
-                    Servermem->inne[nodnr].namn, i);
+                    CURRENT_USER->namn, i);
     DisplayBeep(NULL);
     timerreq->tr_node.io_Command = TR_ADDREQUEST;
     timerreq->tr_node.io_Message.mn_ReplyPort = timerport;
@@ -375,7 +376,7 @@ void addratt(void) {
     return;
   }
   motpek=getmotpek(mote2);
-  if(!MayAdminConf(mote2, inloggad, &Servermem->inne[nodnr])) {
+  if(!MayAdminConf(mote2, inloggad, CURRENT_USER)) {
     puttekn("\r\n\nDu har inte rätt att addera rättigheter i det här mötet!\r\n\n",-1);
     return;
   }
@@ -409,7 +410,7 @@ void subratt(void) {
     return;
   }
   motpek=getmotpek(mote2);
-  if(!MayAdminConf(mote2, inloggad, &Servermem->inne[nodnr])) {
+  if(!MayAdminConf(mote2, inloggad, CURRENT_USER)) {
     puttekn("\r\n\nDu har inte rätt att subtrahera rättigheter i det här mötet!\r\n\n",-1);
     return;
   }

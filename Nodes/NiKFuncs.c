@@ -16,6 +16,7 @@
 #include <limits.h>
 #include <math.h>
 #include "NiKomStr.h"
+#include "Nodes.h"
 #include "NiKomFuncs.h"
 #include "NiKomLib.h"
 #include "Logging.h"
@@ -93,7 +94,7 @@ int skriv(void) {
     DisplayInternalError();
     return 0;
   }
-  if(!MayWriteConf(conf->nummer, inloggad, &Servermem->inne[nodnr])) {
+  if(!MayWriteConf(conf->nummer, inloggad, CURRENT_USER)) {
     SendString("\r\n\n%s\r\n\n", CATSTR(MSG_WRITE_NO_PERM_IN_FORUM));
     return 0;
   }
@@ -141,11 +142,11 @@ void tiden(void) {
   time(&now);
   ts=localtime(&now);
   SendStringCat("\r\n\n%s\r\n", CATSTR(MSG_KOM_TIME_NOW),
-          weekdayNames[Servermem->inne[nodnr].language][ts->tm_wday], ts->tm_mday,
-          monthNames[Servermem->inne[nodnr].language][ts->tm_mon],
+          weekdayNames[CURRENT_USER->language][ts->tm_wday], ts->tm_mday,
+          monthNames[CURRENT_USER->language][ts->tm_mon],
           1900 + ts->tm_year, ts->tm_hour, ts->tm_min);
-  if(Servermem->cfg->maxtid[Servermem->inne[nodnr].status]) {
-    timeLimitSeconds = 60 * (Servermem->cfg->maxtid[Servermem->inne[nodnr].status]) + extratime;
+  if(Servermem->cfg->maxtid[CURRENT_USER->status]) {
+    timeLimitSeconds = 60 * (Servermem->cfg->maxtid[CURRENT_USER->status]) + extratime;
     SendStringCat("\n%s\r\n", CATSTR(MSG_KOM_TIME_LEFT), (timeLimitSeconds - (now - logintime)) / 60);
   }
 }
@@ -413,8 +414,8 @@ int skapmot(void) {
     
   }
 
-    BAMSET(Servermem->inne[nodnr].motratt, newConf->nummer);
-  BAMSET(Servermem->inne[nodnr].motmed, newConf->nummer);
+    BAMSET(CURRENT_USER->motratt, newConf->nummer);
+  BAMSET(CURRENT_USER->motmed, newConf->nummer);
   if(newConf->type == MOTE_FIDO) {
     ReScanFidoConf(newConf, 0);
   }
@@ -438,14 +439,14 @@ void listmot(char *pattern) {
   }
 
   ITER_EL(conf, Servermem->mot_list, mot_node, struct Mote *) {
-    if(!MaySeeConf(conf->nummer,inloggad,&Servermem->inne[nodnr])) {
+    if(!MaySeeConf(conf->nummer,inloggad,CURRENT_USER)) {
       continue;
     }
     if(usingPattern && !MatchPatternNoCase(parsedPattern, conf->namn)) {
       continue;
     }
     cnt = 0;
-    if(IsMemberConf(conf->nummer, inloggad, &Servermem->inne[nodnr])) {
+    if(IsMemberConf(conf->nummer, inloggad, CURRENT_USER)) {
       if(SendString("%3d %s ", countunread(conf->nummer), conf->namn)) { return; }
     } else {
       if(SendString("   *%s ",conf->namn)) { return; }
@@ -468,7 +469,7 @@ void listmot(char *pattern) {
     if(conf->status & SKRIVSTYRT) {
       if(SendString(" (%s)", CATSTR(MSG_FORUM_LIST_WRITECTRL))) { return; }
     }
-    if((conf->status & SUPERHEMLIGT) && Servermem->inne[nodnr].status >= Servermem->cfg->st.medmoten) {
+    if((conf->status & SUPERHEMLIGT) && CURRENT_USER->status >= Servermem->cfg->st.medmoten) {
       if(SendString(" (%s)", CATSTR(MSG_FORUM_LIST_AREXX))) { return; }
     }
     if(SendString("\r\n")) { return; }
@@ -488,7 +489,7 @@ int parsemot(char *skri) {
         char *faci,*skri2;
         if(skri[0]==0 || skri[0]==' ') return(-3);
         for(;motpek->mot_node.mln_Succ;motpek=(struct Mote *)motpek->mot_node.mln_Succ) {
-                if(!MaySeeConf(motpek->nummer, inloggad, &Servermem->inne[nodnr])) continue;
+                if(!MaySeeConf(motpek->nummer, inloggad, CURRENT_USER)) continue;
                 faci=motpek->namn;
                 skri2=skri;
                 going2=TRUE;
@@ -517,9 +518,9 @@ void medlem(char *args) {
 
   if(args[0] == '-' && (args[1] == 'a' || args[1] == 'A')) {
     ITER_EL(conf, Servermem->mot_list, mot_node, struct Mote *) {
-      if(MayBeMemberConf(conf->nummer, inloggad, &Servermem->inne[nodnr])
-         && !IsMemberConf(conf->nummer, inloggad, &Servermem->inne[nodnr])) {
-        BAMSET(Servermem->inne[nodnr].motmed, conf->nummer);
+      if(MayBeMemberConf(conf->nummer, inloggad, CURRENT_USER)
+         && !IsMemberConf(conf->nummer, inloggad, CURRENT_USER)) {
+        BAMSET(CURRENT_USER->motmed, conf->nummer);
         if(conf->type == MOTE_ORGINAL) {
           unreadTexts->lowestPossibleUnreadText[conf->nummer] = 0;
         }
@@ -540,11 +541,11 @@ void medlem(char *args) {
     SendString("\r\n\n%s\r\n\n", CATSTR(MSG_GO_NO_SUCH_FORUM));
     return;
   }
-  if(!MayBeMemberConf(confId, inloggad, &Servermem->inne[nodnr])) {
+  if(!MayBeMemberConf(confId, inloggad, CURRENT_USER)) {
     SendString("\r\n\n%s\r\n\n", CATSTR(MSG_MEMBER_NO_PERM));
     return;
   }
-  BAMSET(Servermem->inne[nodnr].motmed, confId);
+  BAMSET(CURRENT_USER->motmed, confId);
   SendStringCat("\r\n\n%s\r\n\n", CATSTR(MSG_MEMBER_NOW_MEMBER), getmotnamn(confId));
   conf = getmotpek(confId);
   if(conf->type == MOTE_ORGINAL) {
@@ -566,8 +567,8 @@ void uttrad(char *args) {
   
   if(args[0] == '-' && (args[1] == 'a' || args[1] == 'A')) {
     ITER_EL(conf, Servermem->mot_list, mot_node, struct Mote *) {
-      if(IsMemberConf(conf->nummer, inloggad, &Servermem->inne[nodnr]))
-        BAMCLEAR(Servermem->inne[nodnr].motmed, conf->nummer);
+      if(IsMemberConf(conf->nummer, inloggad, CURRENT_USER))
+        BAMCLEAR(CURRENT_USER->motmed, conf->nummer);
     }
     return;
   }
@@ -586,21 +587,21 @@ void uttrad(char *args) {
     SendString("\n\n\r%s\n\r", CATSTR(MSG_LEAVE_CAN_NOT));
     return;
   }
-  if(!IsMemberConf(confId, inloggad, &Servermem->inne[nodnr])) {
+  if(!IsMemberConf(confId, inloggad, CURRENT_USER)) {
     SendString("\r\n\n%s\r\n\n", CATSTR(MSG_LEAVE_NOT_MEMBER));
     return;
   }
   if(confId == mote2) {
     mote2 = -1;
   }
-  BAMCLEAR(Servermem->inne[nodnr].motmed, confId);
+  BAMCLEAR(CURRENT_USER->motmed, confId);
   SendStringCat("\r\n\n%s\r\n\n", CATSTR(MSG_LEAVE_HAVE_LEFT), getmotnamn(confId));
 }
 
 int countunread(int conf) {
   struct Mote *motpek;
   if(conf == -1) {
-    return(countmail(inloggad,Servermem->inne[nodnr].brevpek));
+    return(countmail(inloggad,CURRENT_USER->brevpek));
   }
   motpek=getmotpek(conf);
   if(motpek->type==MOTE_ORGINAL) {
@@ -645,8 +646,8 @@ void connection(void) {
   }
   sprintf(tellstr,"loggade just in på nod %d",nodnr);
   tellallnodes(tellstr);
-  area2=Servermem->inne[nodnr].defarea;
-  if(area2<0 || area2>Servermem->info.areor || !Servermem->areor[area2].namn || !arearatt(area2, inloggad, &Servermem->inne[nodnr])) area2=-1;
+  area2=CURRENT_USER->defarea;
+  if(area2<0 || area2>Servermem->info.areor || !Servermem->areor[area2].namn || !arearatt(area2, inloggad, CURRENT_USER)) area2=-1;
   initgrupp();
   rxlinecount = TRUE;
   radcnt=0;

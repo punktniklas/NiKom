@@ -23,6 +23,7 @@
 #include <xproto.h>
 #include <xpr_lib.h>
 #include "NiKomStr.h"
+#include "Nodes.h"
 #include "NiKomFuncs.h"
 #include "DiskUtils.h"
 #include "FileAreaUtils.h"
@@ -319,12 +320,12 @@ int download(void) {
 	char *nextfile,*nextnext;
 	struct Fil *filpek;
 	struct TransferFiles *tf;
-	if(Servermem->inne[nodnr].upload+1==0) {
+	if(CURRENT_USER->upload+1==0) {
 		puttekn("\r\n\nVARNING!! Uploads = -1",-1);
 		return(0);
 	}
-	if(Servermem->cfg->uldlratio[Servermem->inne[nodnr].status] && Servermem->cfg->uldlratio[Servermem->inne[nodnr].status] < (Servermem->inne[nodnr].download+1)/(Servermem->inne[nodnr].upload+1)) {
-		sprintf(outbuffer,"\r\n\nDu måste ladda upp en fil per %d filer du laddar ner.\r\n",Servermem->cfg->uldlratio[Servermem->inne[nodnr].status]);
+	if(Servermem->cfg->uldlratio[CURRENT_USER->status] && Servermem->cfg->uldlratio[CURRENT_USER->status] < (CURRENT_USER->download+1)/(CURRENT_USER->upload+1)) {
+		sprintf(outbuffer,"\r\n\nDu måste ladda upp en fil per %d filer du laddar ner.\r\n",Servermem->cfg->uldlratio[CURRENT_USER->status]);
 		puttekn(outbuffer,-1);
 		puttekn("Endast filer med fri download tillåts.\n\r",-1);
 		freedlonly=TRUE;
@@ -333,7 +334,7 @@ int download(void) {
 		puttekn("\r\n\nDu befinner dig inte i någon area!\r\n",-1);
 		return(0);
 	}
-	if((!global && Servermem->areor[area2].flaggor & AREA_NODOWNLOAD) && (Servermem->inne[nodnr].status < Servermem->cfg->st.laddaner)) {
+	if((!global && Servermem->areor[area2].flaggor & AREA_NODOWNLOAD) && (CURRENT_USER->status < Servermem->cfg->st.laddaner)) {
 		puttekn("\n\n\rDu har ingen rätt att ladda ner från den här arean!\n\r",-1);
 		return(0);
 	}
@@ -380,7 +381,7 @@ int download(void) {
 			continue;
 		}
 
-		if(filpek->status>Servermem->inne[nodnr].status && Servermem->inne[nodnr].status<Servermem->cfg->st.laddaner)
+		if(filpek->status>CURRENT_USER->status && CURRENT_USER->status<Servermem->cfg->st.laddaner)
 		{
 			sprintf(outbuffer,"Du har ingen rätt att ladda ner %s!\n\r",filpek->namn);
 			puttekn(outbuffer,-1);
@@ -425,7 +426,7 @@ int download(void) {
 	}
 	for(tf=(struct TransferFiles *)tf_list.mlh_Head;tf->node.mln_Succ;tf=(struct TransferFiles *)tf->node.mln_Succ) {
 		if(tf->sucess) {
-			if(!(tf->filpek->flaggor & FILE_FREEDL)) Servermem->inne[nodnr].download++;
+			if(!(tf->filpek->flaggor & FILE_FREEDL)) CURRENT_USER->download++;
 			Statstr.dl++;
 			raisefiledl(tf->filpek);
 			sprintf(outbuffer,"%s, %ld cps\n\r",tf->filpek->namn,tf->cps);
@@ -470,11 +471,11 @@ int upload(void) {
     if(area2==-1) return(0);
     area=area2;
   }
-  if(!arearatt(area, inloggad, &Servermem->inne[nodnr])) {
+  if(!arearatt(area, inloggad, CURRENT_USER)) {
     puttekn("\n\rFinns ingen sådan area!\n\r",-1);
     return(0);
   }
-  if((Servermem->areor[area].flaggor & AREA_NOUPLOAD) && (Servermem->inne[nodnr].status < Servermem->cfg->st.laddaner)) {
+  if((Servermem->areor[area].flaggor & AREA_NOUPLOAD) && (CURRENT_USER->status < Servermem->cfg->st.laddaner)) {
     puttekn("\n\n\rDu har ingen rätt att ladda upp till den arean!\n\r",-1);
     return(0);
   }
@@ -534,7 +535,7 @@ int upload(void) {
     puttekn("\r\nVilken status ska behövas för att ladda ner filen? (0)",-1);
     if(getstring(EKO,3,NULL)) { FreeMem(allokpek,sizeof(struct Fil)); return(1); }
     allokpek->status=atoi(inmat);
-    if(Servermem->inne[nodnr].status >= Servermem->cfg->st.filer) {
+    if(CURRENT_USER->status >= Servermem->cfg->st.filer) {
       if(GetYesOrNo("\n\r", "Ska filen valideras?", NULL, NULL, "Ja", "Nej", NULL,
                     TRUE, &isCorrect)) {
         return 1;
@@ -575,7 +576,7 @@ int upload(void) {
       
     }
     
-    Servermem->inne[nodnr].upload++;
+    CURRENT_USER->upload++;
     Statstr.ul++;
     if(Servermem->cfg->logmask & LOG_UPLOAD) {
       LogEvent(USAGE_LOG, INFO, "%s laddar upp %s",

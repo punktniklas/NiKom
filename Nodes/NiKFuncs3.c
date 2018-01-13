@@ -10,6 +10,7 @@
 #include <math.h>
 #include <limits.h>
 #include "NiKomStr.h"
+#include "Nodes.h"
 #include "NiKomFuncs.h"
 #include "NiKomLib.h"
 #include "Terminal.h"
@@ -66,10 +67,10 @@ void endast(void) {
   }
   
   if(confId == -1) {
-    Servermem->inne[nodnr].brevpek = getnextletter(inloggad) - amount;
+    CURRENT_USER->brevpek = getnextletter(inloggad) - amount;
     mailId = getfirstletter(inloggad);
-    if(mailId > Servermem->inne[nodnr].brevpek) {
-      Servermem->inne[nodnr].brevpek = mailId;
+    if(mailId > CURRENT_USER->brevpek) {
+      CURRENT_USER->brevpek = mailId;
     }
   } else {
     conf = getmotpek(confId);
@@ -101,7 +102,7 @@ int personlig(void) {
         return 0;
       }
       confId = GetConferenceForText(nummer);
-      if(!MayBeMemberConf(confId, inloggad, &Servermem->inne[nodnr])) {
+      if(!MayBeMemberConf(confId, inloggad, CURRENT_USER)) {
         SendString("\r\n\n%s\r\n\n", CATSTR(MSG_COMMENT_NO_PERMISSIONS));
         return 0;
       }
@@ -162,7 +163,7 @@ void radtext(void) {
   if(readtexthead(textId,&radhead)) {
     return;
   }
-  if(radhead.person!=inloggad && !MayAdminConf(conf->nummer, inloggad, &Servermem->inne[nodnr])) {
+  if(radhead.person!=inloggad && !MayAdminConf(conf->nummer, inloggad, CURRENT_USER)) {
     SendString("\r\n\n%s\r\n\n", CATSTR(MSG_DELTEXT_ONLY_SELF));
     return;
   }
@@ -188,7 +189,7 @@ int radmot(void) {
     DisplayInternalError();
     return -5;
   }
-  if(!MayAdminConf(confId, inloggad, &Servermem->inne[nodnr])) {
+  if(!MayAdminConf(confId, inloggad, CURRENT_USER)) {
     SendString("\n\n\r%s\n\r", CATSTR(MSG_DELFORUM_NOPERM));
     return -5;
   }
@@ -239,7 +240,7 @@ int andmot(void) {
     return 0;
   }
   conf = getmotpek(confId);
-  if(!MayAdminConf(confId, inloggad, &Servermem->inne[nodnr])) {
+  if(!MayAdminConf(confId, inloggad, CURRENT_USER)) {
     SendString("\r\n\n%s\r\n\n", CATSTR(MSG_FORUM_CHANGE_NOPERM));
     return 0;
   }
@@ -466,8 +467,8 @@ int andmot(void) {
     }
   }
 
-  BAMSET(Servermem->inne[nodnr].motratt,tmpConf.nummer);
-  BAMSET(Servermem->inne[nodnr].motmed,tmpConf.nummer);
+  BAMSET(CURRENT_USER->motratt,tmpConf.nummer);
+  BAMSET(CURRENT_USER->motmed,tmpConf.nummer);
   return 0;
 }
 
@@ -537,7 +538,7 @@ void vilka(void) {
         if(!conf) {
           continue;
         }
-        if(!MaySeeConf(conf->nummer, inloggad, &Servermem->inne[nodnr])) {
+        if(!MaySeeConf(conf->nummer, inloggad, CURRENT_USER)) {
           strcpy(actionbuf, CATSTR(MSG_WHO_WRITES_TEXT));
         } else {
           sprintf(actionbuf, "%s %s", CATSTR(MSG_WHO_WRITES_IN), conf->namn);
@@ -552,7 +553,7 @@ void vilka(void) {
         if(!conf) {
           continue;
         }
-        if(!MaySeeConf(conf->nummer, inloggad, &Servermem->inne[nodnr])) {
+        if(!MaySeeConf(conf->nummer, inloggad, CURRENT_USER)) {
           strcpy(actionbuf,CATSTR(MSG_WHO_READS_TEXTS));
         } else {
           sprintf(actionbuf, "%s %s", CATSTR(MSG_WHO_READS_IN), conf->namn);
@@ -566,7 +567,7 @@ void vilka(void) {
       break;
     case UPLOAD :
       if(!Servermem->areor[Servermem->varmote[i]].namn[0]
-         || !arearatt(Servermem->varmote[i], inloggad, &Servermem->inne[nodnr])) {
+         || !arearatt(Servermem->varmote[i], inloggad, CURRENT_USER)) {
         strcpy(actionbuf, CATSTR(MSG_WHO_UPLOADING));
       } else {
         if(Servermem->vilkastr[i]) {
@@ -578,7 +579,7 @@ void vilka(void) {
       break;
     case DOWNLOAD :
       if(!Servermem->areor[Servermem->varmote[i]].namn[0]
-         || !arearatt(Servermem->varmote[i], inloggad, &Servermem->inne[nodnr])) {
+         || !arearatt(Servermem->varmote[i], inloggad, CURRENT_USER)) {
         strcpy(actionbuf, CATSTR(MSG_WHO_DOWNLOADING));
       } else {
         if(Servermem->vilkastr[i]) {
@@ -918,7 +919,7 @@ int dumpatext(void) {
     SendString("\r\n\n%s\r\n", CATSTR(MSG_FORUMS_NO_SUCH_TEXT));
     return 0;
   }
-  if(!MayReadConf(GetConferenceForText(tnr), inloggad, &Servermem->inne[nodnr])) {
+  if(!MayReadConf(GetConferenceForText(tnr), inloggad, CURRENT_USER)) {
     SendString("\r\n\n%s\r\n", CATSTR(MSG_DUMP_TEXT_NOPERM));
     return 0;
   }

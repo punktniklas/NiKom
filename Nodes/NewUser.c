@@ -7,6 +7,7 @@
 #include <string.h>
 
 #include "NiKomStr.h"
+#include "Nodes.h"
 #include "NiKomLib.h"
 #include "NiKomFuncs.h"
 #include "Terminal.h"
@@ -28,7 +29,7 @@ int RegisterNewUser(void) {
   long tid;
   int newUserId, isCorrect, tmp;
   struct ShortUser *shortUser;
-  struct User *user = &Servermem->inne[nodnr];
+  struct User *user = CURRENT_USER;
 
   memset(user, 0, sizeof(struct User));
 
@@ -38,7 +39,7 @@ int RegisterNewUser(void) {
       return 1;
     }
   } else {
-    Servermem->inne[nodnr].chrset = Servermem->cfg->defaultcharset;
+    CURRENT_USER->chrset = Servermem->cfg->defaultcharset;
   }
 
   SendString("\r\n\n");
@@ -170,12 +171,12 @@ int RegisterNewUser(void) {
 
 void initConfPermissions(void) {
   struct Mote *conf;
-  memset(Servermem->inne[nodnr].motmed, 0, MAXMOTE/8);
+  memset(CURRENT_USER->motmed, 0, MAXMOTE/8);
   ITER_EL(conf, Servermem->mot_list, mot_node, struct Mote *) {
     if(conf->status & (SKRIVSTYRT | SLUTET)) {
-      BAMCLEAR(Servermem->inne[nodnr].motratt, conf->nummer);
+      BAMCLEAR(CURRENT_USER->motratt, conf->nummer);
     } else {
-      BAMSET(Servermem->inne[nodnr].motratt, conf->nummer);
+      BAMSET(CURRENT_USER->motratt, conf->nummer);
     }
   }
 }
@@ -202,7 +203,7 @@ int createUserDirectory(int newUserId) {
     }
   }
   UnLock(lock);
-  if(!WriteUser(newUserId, &Servermem->inne[nodnr], TRUE)) {
+  if(!WriteUser(newUserId, CURRENT_USER, TRUE)) {
     return 0;
   }
   

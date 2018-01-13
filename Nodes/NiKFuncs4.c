@@ -19,6 +19,7 @@
 #endif
 #include <time.h>
 #include "NiKomStr.h"
+#include "Nodes.h"
 #include "NiKomFuncs.h"
 #include "NiKomLib.h"
 #include "Terminal.h"
@@ -85,12 +86,12 @@ int movetext(void) {
     return 0;
   }
   if(movehead.person != inloggad
-     && !MayAdminConf(conf->nummer, inloggad, &Servermem->inne[nodnr])) {
+     && !MayAdminConf(conf->nummer, inloggad, CURRENT_USER)) {
     SendString("\r\n\n%s\r\n", CATSTR(MSG_MOVE_TEXT_NO_PERM_TEXT));
     return 0;
   }
-  if(!MayWriteConf(newConfId, inloggad, &Servermem->inne[nodnr])
-     || !MayReplyConf(newConfId, inloggad, &Servermem->inne[nodnr])) {
+  if(!MayWriteConf(newConfId, inloggad, CURRENT_USER)
+     || !MayReplyConf(newConfId, inloggad, CURRENT_USER)) {
     SendString("\n\n\r%s\n\r", CATSTR(MSG_MOVE_TEXT_NO_PERM_FORUM));
     return 0;
   }
@@ -149,7 +150,7 @@ int skapagrupp(void) {
   int groupadmin, groupId;
   char buff[9];
   
-  if(Servermem->inne[nodnr].status < Servermem->cfg->st.grupper) {
+  if(CURRENT_USER->status < Servermem->cfg->st.grupper) {
     SendString("\r\n\n%s\r\n", CATSTR(MSG_CREATE_GROUP_NO_PERM));
     return 0;
   }
@@ -227,7 +228,7 @@ int skapagrupp(void) {
   
   Insert((struct List *)&Servermem->grupp_list, (struct Node *)newUserGroup,
          (struct Node *)userGroup->grupp_node.mln_Pred);
-  BAMSET((char *)&Servermem->inne[nodnr].grupper, groupId);
+  BAMSET((char *)&CURRENT_USER->grupper, groupId);
   return 0;
 }
 
@@ -261,7 +262,7 @@ void listagrupper(void) {
 
   SendString("\r\n\n");
   ITER_EL(group, Servermem->grupp_list, grupp_node, struct UserGroup *) {
-    isMember = gruppmed(group, Servermem->inne[nodnr].status, Servermem->inne[nodnr].grupper);
+    isMember = gruppmed(group, CURRENT_USER->status, CURRENT_USER->grupper);
     if((group->flaggor & HEMLIGT)
        && !isMember
        && Servermem->inloggad[nodnr] != group->groupadmin) {
@@ -305,7 +306,7 @@ static void changeGroupMembership(int isAdd) {
     return;
   }
   group = FindUserGroup(groupId);
-  if(inloggad != group->groupadmin && Servermem->inne[nodnr].status < Servermem->cfg->st.grupper) {
+  if(inloggad != group->groupadmin && CURRENT_USER->status < Servermem->cfg->st.grupper) {
     SendString("\r\n\n%s\r\n", CATSTR(MSG_CHANGE_GROUPMEM_NOPERM));
     return;
   }
@@ -398,7 +399,7 @@ int andragrupp(void) {
     return 0;
   }
   if(inloggad != userGroup->groupadmin
-     && Servermem->inne[nodnr].status < Servermem->cfg->st.grupper) {
+     && CURRENT_USER->status < Servermem->cfg->st.grupper) {
     SendString("\r\n\n%s\r\n", CATSTR(MSG_CHANGE_GROUP_NOPERM));
     return 0;
   }
@@ -465,7 +466,7 @@ void raderagrupp(void) {
     return;
   }
   if(inloggad != userGroup->groupadmin
-     && Servermem->inne[nodnr].status < Servermem->cfg->st.grupper) {
+     && CURRENT_USER->status < Servermem->cfg->st.grupper) {
     SendString("\r\n\n%s\r\n", CATSTR(MSG_DELETE_GROUP_NOPERM));
     return;
   }
@@ -487,8 +488,8 @@ void raderagrupp(void) {
 void initgrupp(void) {
   struct UserGroup *group;
   ITER_EL(group, Servermem->grupp_list, grupp_node, struct UserGroup *) {
-    if(group->autostatus != -1 && Servermem->inne[nodnr].status >= group->autostatus) {
-      BAMSET((char *)&Servermem->inne[nodnr].grupper, group->nummer);
+    if(group->autostatus != -1 && CURRENT_USER->status >= group->autostatus) {
+      BAMSET((char *)&CURRENT_USER->grupper, group->nummer);
     }
   }
 }
@@ -606,7 +607,7 @@ void motesstatus(void) {
         continue;
       }
       if((group->flaggor & HEMLIGT)
-         && !gruppmed(group, Servermem->inne[nodnr].status, Servermem->inne[nodnr].grupper)) {
+         && !gruppmed(group, CURRENT_USER->status, CURRENT_USER->grupper)) {
         continue;
       }
       SendString("%s\r\n", group->namn);

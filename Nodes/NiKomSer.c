@@ -16,6 +16,7 @@
 #include <string.h>
 #include <time.h>
 #include "NiKomStr.h"
+#include "Nodes.h"
 #include "NiKomFuncs.h"
 #include "NiKomLib.h"
 #include "InfoFiles.h"
@@ -82,7 +83,7 @@ void cleanup(int kod,char *text) {
 }
 
 void saveUserData(void) {
-  WriteUser(inloggad, &Servermem->inne[nodnr], FALSE);
+  WriteUser(inloggad, CURRENT_USER, FALSE);
   WriteUnreadTexts(&Servermem->unreadTexts[nodnr], inloggad);
 }
 
@@ -154,7 +155,7 @@ int main(int argc,char *argv[]) {
   conreqtkn();
   serreqtkn();
   StartHeartBeat(TRUE);
-  sprintf(titel,"Nod #%d SER: %s #%d",nodnr,Servermem->inne[nodnr].namn,inloggad);
+  sprintf(titel,"Nod #%d SER: %s #%d",nodnr,CURRENT_USER->namn,inloggad);
   SetWindowTitles(NiKwind,titel,(char *)-1L);
   if(!ReadUnreadTexts(&Servermem->unreadTexts[nodnr], inloggad)) {
     LogEvent(SYSTEM_LOG, ERROR,
@@ -162,7 +163,7 @@ int main(int argc,char *argv[]) {
     DisplayInternalError();
     cleanup(EXIT_ERROR, "Error reading unread text info.\n");
   }
-  SendInfoFile("Bulletin.txt", Servermem->inne[nodnr].senast_in);
+  SendInfoFile("Bulletin.txt", CURRENT_USER->senast_in);
 
   connection();
 
@@ -191,11 +192,11 @@ int main(int argc,char *argv[]) {
   }
   Servermem->action[nodnr]=0;
   time(&tid);
-  Servermem->inne[nodnr].senast_in=tid;
-  Servermem->inne[nodnr].tot_tid+=(tid-logintime);
-  Servermem->inne[nodnr].loggin++;
+  CURRENT_USER->senast_in=tid;
+  CURRENT_USER->tot_tid+=(tid-logintime);
+  CURRENT_USER->loggin++;
   Servermem->info.inloggningar++;
-  Servermem->inne[nodnr].defarea=area2;
+  CURRENT_USER->defarea=area2;
   writesenaste();
   StopHeartBeat();
   saveUserData();

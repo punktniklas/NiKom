@@ -14,6 +14,7 @@
 #include <stdio.h>
 #include <time.h>
 #include "NiKomStr.h"
+#include "Nodes.h"
 #include "NiKomFuncs.h"
 #include "NiKomLib.h"
 #include "VersionStrings.h"
@@ -76,13 +77,13 @@ void fido_visatext(int text,struct Mote *motpek) {
   struct FidoText *ft;
   struct FidoLine *fl;
   char filnamn[20],fullpath[100];
-  Servermem->inne[nodnr].read++;
+  CURRENT_USER->read++;
   Servermem->info.lasta++;
   Statstr.read++;
   sprintf(filnamn,"%ld.msg",text - motpek->renumber_offset);
   strcpy(fullpath,motpek->dir);
   AddPart(fullpath,filnamn,99);
-  if(Servermem->inne[nodnr].flaggor & SHOWKLUDGE) ft=ReadFidoTextTags(fullpath,TAG_DONE);
+  if(CURRENT_USER->flaggor & SHOWKLUDGE) ft=ReadFidoTextTags(fullpath,TAG_DONE);
   else ft=ReadFidoTextTags(fullpath,RFT_NoKludges,TRUE,RFT_NoSeenBy,TRUE,TAG_DONE);
   if(!ft) {
     LogEvent(SYSTEM_LOG, ERROR, "Can't read fido text %s.", fullpath);
@@ -90,14 +91,14 @@ void fido_visatext(int text,struct Mote *motpek) {
     return;
   }
 
-  SendString(Servermem->inne[nodnr].flaggor & CLEARSCREEN ? "\f" : "\r\n\n");
+  SendString(CURRENT_USER->flaggor & CLEARSCREEN ? "\f" : "\r\n\n");
 
   SendStringCat("%s\r\n", CATSTR(MSG_FIDO_TEXT_LINE_1), text, motpek->namn, ft->date);
   SendStringCat("%s\r\n", CATSTR(MSG_FIDO_TEXT_LINE_2),
              ft->fromuser,ft->fromzone,ft->fromnet,ft->fromnode,ft->frompoint);
   SendStringCat("%s\r\n", CATSTR(MSG_FIDO_TEXT_TO), ft->touser);
   SendStringCat("%s\r\n", CATSTR(MSG_ORG_TEXT_SUBJECT), ft->subject);
-  if(Servermem->inne[nodnr].flaggor & STRECKRAD) {
+  if(CURRENT_USER->flaggor & STRECKRAD) {
     length=strlen(outbuffer);
     SendRepeatedChr('-', length - 2);
     SendString("\r\n\n");
@@ -245,7 +246,7 @@ int fido_skriv(int komm,int komtill) {
     SendStringCat("%s\n\r", CATSTR(MSG_FIDO_TEXT_TO), ft.touser);
     SendStringCat("%s\n\r", CATSTR(MSG_ORG_TEXT_SUBJECT), ft.subject);
   }
-  if(Servermem->inne[nodnr].flaggor & STRECKRAD) {
+  if(CURRENT_USER->flaggor & STRECKRAD) {
     length=strlen(ft.subject);
     SendRepeatedChr('-', length);
     SendString("\r\n\n");
@@ -259,7 +260,7 @@ int fido_skriv(int komm,int komtill) {
   if(editret ==2 ) {
     return 0;
   }
-  Servermem->inne[nodnr].skrivit++;
+  CURRENT_USER->skrivit++;
   Servermem->info.skrivna++;
   Statstr.write++;
   NewList((struct List *)&ft.text);

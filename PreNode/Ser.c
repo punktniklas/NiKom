@@ -11,6 +11,7 @@
 #include <string.h>
 #include <time.h>
 #include "NiKomStr.h"
+#include "Nodes.h"
 #include "NiKomLib.h"
 #include "PreNodeFuncs.h"
 #include "Logging.h"
@@ -128,13 +129,13 @@ struct NodeType *selectNodeType(void) {
     return nt;
   }
 
-  if(Servermem->inne[nodnr].shell) {
-    nt =  GetNodeType(Servermem->inne[nodnr].shell);
+  if(CURRENT_USER->shell) {
+    nt =  GetNodeType(CURRENT_USER->shell);
     if(nt == NULL) {
-      Servermem->inne[nodnr].shell=0;
+      CURRENT_USER->shell=0;
     }
   }
-  if(Servermem->inne[nodnr].shell == 0) {
+  if(CURRENT_USER->shell == 0) {
     putstring("\n\n\rDu har ingen förinställd nodtyp.\n\n\rVälj mellan:\n\n\r",-1,0);
     for(i = 0; i < MAXNODETYPES; i++) {
       if(Servermem->cfg->nodetypes[i].nummer == 0) {
@@ -165,7 +166,7 @@ struct NodeType *selectNodeType(void) {
       return NULL;
     }
     if(isCorrect) {
-      Servermem->inne[nodnr].shell = nt->nummer;
+      CURRENT_USER->shell = nt->nummer;
     }
   }
   return nt;
@@ -229,14 +230,14 @@ int main(int argc,char *argv[]) {
     Servermem->inloggad[nodnr]=-2; /* Sätt till <Uppringd> för att även hantera -getty-fallet */
   reloginspec:
     StartHeartBeat(TRUE);
-    Servermem->inne[nodnr].flaggor = Servermem->cfg->defaultflags;
+    CURRENT_USER->flaggor = Servermem->cfg->defaultflags;
     if(!getty) Delay(100);
-    Servermem->inne[nodnr].rader=0;
-    Servermem->inne[nodnr].chrset = CHRS_LATIN1;
+    CURRENT_USER->rader=0;
+    CURRENT_USER->chrset = CHRS_LATIN1;
     sendfile("NiKom:Texter/Login.txt");
     if(Servermem->cfg->ar.preinlogg) sendrexx(Servermem->cfg->ar.preinlogg);
     car=TRUE;
-    Servermem->inne[nodnr].chrset = 0;
+    CURRENT_USER->chrset = 0;
     memset(commandhistory,0,1000);
     going=1;
     while(going && going<=Servermem->cfg->logintries) {
@@ -251,14 +252,14 @@ int main(int argc,char *argv[]) {
         car = tmp ? 0 : 1;
         going=FALSE;
       } else if((inloggad=parsenamn(inmat))>=0) {
-        if(!ReadUser(inloggad,&Servermem->inne[nodnr])) {
+        if(!ReadUser(inloggad,CURRENT_USER)) {
           goto panik;
         }
         // TODO: Extract password loop. Should be identical to in NiKomCon.c
         forsok=2;
         while(forsok) {
           SendStringNoBrk("\r\nPassword: ");
-          if(Servermem->inne[nodnr].flaggor & STAREKOFLAG)
+          if(CURRENT_USER->flaggor & STAREKOFLAG)
             {
               if(getstring(STAREKO,15,NULL)) { car=FALSE; break; }
             }
@@ -266,7 +267,7 @@ int main(int argc,char *argv[]) {
             {
               if(getstring(EJEKO,15,NULL)) { car=FALSE; break; }
             }
-          if(CheckPassword(inmat, Servermem->inne[nodnr].losen))
+          if(CheckPassword(inmat, CURRENT_USER->losen))
             {
               forsok=FALSE;
               going=FALSE;
