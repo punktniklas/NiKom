@@ -98,7 +98,7 @@ int RegisterNewUser(void) {
   user->brevpek = 0;
 
   initConfPermissions();
-  InitUnreadTexts(&Servermem->unreadTexts[nodnr]);
+  InitUnreadTexts(CUR_USER_UNREAD);
 
   SendString("\r\n\n%s : %s\r\n", CATSTR(MSG_USER_NAME), user->namn);
   SendString("%-20s : %s\r\n", CATSTR(MSG_USER_STREET), user->gata);
@@ -207,7 +207,7 @@ int createUserDirectory(int newUserId) {
     return 0;
   }
   
-  if(!WriteUnreadTexts(&Servermem->unreadTexts[nodnr], newUserId)) {
+  if(!WriteUnreadTexts(CUR_USER_UNREAD, newUserId)) {
     LogEvent(SYSTEM_LOG, ERROR, "Could not create UnreadTexts for user %d",
              newUserId);
     DisplayInternalError();

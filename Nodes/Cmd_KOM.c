@@ -18,7 +18,7 @@ extern char *argument;
 extern struct Header readhead;
 
 void Cmd_GoConf(void) {
-  struct UnreadTexts *unreadTexts = &Servermem->unreadTexts[nodnr];
+  struct UnreadTexts *unreadTexts = CUR_USER_UNREAD;
   int parsedConfId, newConfId = -2, becomeMember;
   char buffer[121];
   struct Mote *conf;
@@ -136,10 +136,10 @@ void Cmd_SkipReplies(void) {
   StackPush(skipStack, senast_text_nr);
   while(StackSize(skipStack) > 0) {
     textId = StackPop(skipStack);
-    if(IsTextUnread(textId, &Servermem->unreadTexts[nodnr])) {
+    if(IsTextUnread(textId, CUR_USER_UNREAD)) {
       cnt++;
     }
-    ChangeUnreadTextStatus(textId, 0, &Servermem->unreadTexts[nodnr]);
+    ChangeUnreadTextStatus(textId, 0, CUR_USER_UNREAD);
     if(readtexthead(textId, &skipHeader)) {
       LogEvent(SYSTEM_LOG, ERROR,
                "Couldn't read text %d in Cmd_SkipReplies()", textId);
@@ -156,7 +156,7 @@ void Cmd_SkipReplies(void) {
   DeleteStack(skipStack);
   while(StackSize(g_unreadRepliesStack) > 0) {
     if(!IsTextUnread(StackPeek(g_unreadRepliesStack),
-                    &Servermem->unreadTexts[nodnr])) {
+                    CUR_USER_UNREAD)) {
       StackPop(g_unreadRepliesStack);
     } else {
       break;

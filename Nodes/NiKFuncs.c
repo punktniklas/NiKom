@@ -510,7 +510,7 @@ int parsemot(char *skri) {
 }
 
 void medlem(char *args) {
-  struct UnreadTexts *unreadTexts = &Servermem->unreadTexts[nodnr];
+  struct UnreadTexts *unreadTexts = CUR_USER_UNREAD;
   struct Mote *conf;
   BPTR lock;
   int confId;
@@ -605,7 +605,7 @@ int countunread(int conf) {
   }
   motpek=getmotpek(conf);
   if(motpek->type==MOTE_ORGINAL) {
-    return CountUnreadTexts(conf, &Servermem->unreadTexts[nodnr]);
+    return CountUnreadTexts(conf, CUR_USER_UNREAD);
   }
   if(motpek->type==MOTE_FIDO) {
     return countfidomote(motpek);
@@ -614,7 +614,7 @@ int countunread(int conf) {
 }
 
 void trimLowestPossibleUnreadTextsForFido(void) {
-  struct UnreadTexts *unreadTexts = &Servermem->unreadTexts[nodnr];
+  struct UnreadTexts *unreadTexts = CUR_USER_UNREAD;
   struct Mote *motpek;
   ITER_EL(motpek, Servermem->mot_list, mot_node, struct Mote *) {
     if(motpek->type==MOTE_FIDO) {

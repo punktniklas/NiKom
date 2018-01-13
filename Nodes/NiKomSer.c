@@ -84,7 +84,7 @@ void cleanup(int kod,char *text) {
 
 void saveUserData(void) {
   WriteUser(inloggad, CURRENT_USER, FALSE);
-  WriteUnreadTexts(&Servermem->unreadTexts[nodnr], inloggad);
+  WriteUnreadTexts(CUR_USER_UNREAD, inloggad);
 }
 
 int main(int argc,char *argv[]) {
@@ -157,7 +157,7 @@ int main(int argc,char *argv[]) {
   StartHeartBeat(TRUE);
   sprintf(titel,"Nod #%d SER: %s #%d",nodnr,CURRENT_USER->namn,inloggad);
   SetWindowTitles(NiKwind,titel,(char *)-1L);
-  if(!ReadUnreadTexts(&Servermem->unreadTexts[nodnr], inloggad)) {
+  if(!ReadUnreadTexts(CUR_USER_UNREAD, inloggad)) {
     LogEvent(SYSTEM_LOG, ERROR,
              "Can't read unread text info for user %d", inloggad);
     DisplayInternalError();

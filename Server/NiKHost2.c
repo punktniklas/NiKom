@@ -609,65 +609,47 @@ void textinfo(struct RexxMsg *mess) {
 }
 
 void nextunread(struct RexxMsg *mess) {
-  int x,text,motnr,anv, nextUnread;
-        struct Mote *motpek;
-        char str[100];
-        struct UnreadTexts *unreadTexts, unreadTextsBuf;
+  int textId, confId, userId, nextUnread;
+  struct Mote *conf;
+  char str[100];
+  struct UnreadTexts *unreadTexts, unreadTextsBuf;
+  
+  if((!mess->rm_Args[1]) || (!mess->rm_Args[2]) || (!mess->rm_Args[3])) {
+    SetRexxErrorResult(mess, 1);
+    return;
+  }
+  textId = atoi(mess->rm_Args[1]);
+  if(textId < Servermem->info.lowtext || textId > Servermem->info.hightext) {
+    SetRexxResultString(mess, "-1");
+    return;
+  }
+  confId = atoi(mess->rm_Args[2]);
+  conf = getmotpek(confId);
+  if(!conf) {
+    SetRexxResultString(mess, "-2");
+    return;
+  }
+  userId = atoi(mess->rm_Args[3]);
+  if(!userexists(userId)) {
+    SetRexxResultString(mess, "-3");
+    return;
+  }
 
-        if((!mess->rm_Args[1]) || (!mess->rm_Args[2]) || (!mess->rm_Args[3])) {
-                mess->rm_Result1=1;
-                mess->rm_Result2=0;
-                return;
-        }
-        text=atoi(mess->rm_Args[1]);
-        if(text<Servermem->info.lowtext || text>Servermem->info.hightext) {
-                if(!(mess->rm_Result2=(long)CreateArgstring("-1",strlen("-1"))))
-                        printf("Kunde inte allokera en ArgString\n");
-                mess->rm_Result1=0;
-                return;
-        }
-        motnr=atoi(mess->rm_Args[2]);
-        motpek=getmotpek(motnr);
-        if(!motpek) {
-                if(!(mess->rm_Result2=(long)CreateArgstring("-2",strlen("-2"))))
-                        printf("Kunde inte allokera en ArgString\n");
-                mess->rm_Result1=0;
-                return;
-        }
-        anv=atoi(mess->rm_Args[3]);
-        if(!userexists(anv)) {
-                if(!(mess->rm_Result2=(long)CreateArgstring("-3",strlen("-3"))))
-                        printf("Kunde inte allokera en ArgString\n");
-                mess->rm_Result1=0;
-                return;
-        }
-
-        for(x=0;x<MAXNOD;x++)
-          if(anv==Servermem->inloggad[x]) break;
-
-        if(x < MAXNOD) {
-          unreadTexts = &Servermem->unreadTexts[x];
-        }
-        else {
-          if(!ReadUnreadTexts(&unreadTextsBuf, anv)) {
-            if(!(mess->rm_Result2=(long)CreateArgstring("-4",strlen("-4")))) {
-              printf("Kunde inte allokera en ArgString\n");
-              mess->rm_Result1=0;
-              return;
-            }
-          }
-          unreadTexts = &unreadTextsBuf;
-        }
-
-        nextUnread = FindNextUnreadText(text + 1, motnr, unreadTexts);
-        if(nextUnread == -1) {
-          strcpy(str, "-5");
-        } else {
-          sprintf(str, "%d", nextUnread);
-        }
-        if(!(mess->rm_Result2=(long)CreateArgstring(str,strlen(str))))
-                printf("Kunde inte allokera en ArgString\n");
-        mess->rm_Result1=0;
+  if(GetLoggedInUser(userId, &unreadTexts)) {
+    if(!ReadUnreadTexts(&unreadTextsBuf, userId)) {
+      SetRexxResultString(mess, "-4");
+      return;
+    }
+    unreadTexts = &unreadTextsBuf;
+  }
+  
+  nextUnread = FindNextUnreadText(textId + 1, confId, unreadTexts);
+  if(nextUnread == -1) {
+    SetRexxResultString(mess, "-5");
+    return;
+  }
+  sprintf(str, "%d", nextUnread);
+  SetRexxResultString(mess, str);
 }
 
 void freeeditlist(void) {

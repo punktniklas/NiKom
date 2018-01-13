@@ -45,12 +45,12 @@ void fido_lasa(int tnr,struct Mote *motpek) {
 }
 
 int HasUnreadInFidoConf(struct Mote *conf) {
-  return Servermem->unreadTexts[nodnr].lowestPossibleUnreadText[conf->nummer]
+  return CUR_USER_UNREAD->lowestPossibleUnreadText[conf->nummer]
     <= conf->texter;
 }
 
 void NextTextInFidoConf(struct Mote *conf) {
-  struct UnreadTexts *unreadTexts = &Servermem->unreadTexts[nodnr];
+  struct UnreadTexts *unreadTexts = CUR_USER_UNREAD;
 
   if(unreadTexts->lowestPossibleUnreadText[conf->nummer] < conf->lowtext) {
     unreadTexts->lowestPossibleUnreadText[conf->nummer] = conf->lowtext;
@@ -68,7 +68,7 @@ void NextTextInFidoConf(struct Mote *conf) {
 
 int countfidomote(struct Mote *motpek) {
   return motpek->texter
-    - Servermem->unreadTexts[nodnr].lowestPossibleUnreadText[motpek->nummer]
+    - CUR_USER_UNREAD->lowestPossibleUnreadText[motpek->nummer]
     + 1;
 }
 
@@ -307,7 +307,7 @@ int fido_skriv(int komm,int komtill) {
 }
 
 void fido_endast(struct Mote *motpek,int antal) {
-  struct UnreadTexts *unreadTexts = &Servermem->unreadTexts[nodnr];
+  struct UnreadTexts *unreadTexts = CUR_USER_UNREAD;
   unreadTexts->lowestPossibleUnreadText[motpek->nummer] = motpek->texter - antal + 1;
   if(unreadTexts->lowestPossibleUnreadText[motpek->nummer] < motpek->lowtext) {
     unreadTexts->lowestPossibleUnreadText[motpek->nummer] = motpek->lowtext;

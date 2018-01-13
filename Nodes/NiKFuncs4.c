@@ -641,12 +641,12 @@ void hoppaarende(void) {
   }
   nextUnread = -1;
   while((nextUnread = FindNextUnreadText(nextUnread + 1, mote2,
-                                         &Servermem->unreadTexts[nodnr])) != -1) {
+                                         CUR_USER_UNREAD)) != -1) {
     if(readtexthead(nextUnread, &header)) {
       return;
     }
     if(!strncmp(header.arende, argument, strlen(argument))) {
-      ChangeUnreadTextStatus(nextUnread, 0, &Servermem->unreadTexts[nodnr]);
+      ChangeUnreadTextStatus(nextUnread, 0, CUR_USER_UNREAD);
       skipped++;
     }
   }

@@ -70,7 +70,7 @@ int grabtext(int text,FILE *fpgrab) {
 		puttekn("\r\n\nDu har inte rätt att läsa den texten!\r\n\n",-1);
 		return(0);
 	}
-        ChangeUnreadTextStatus(text, 0, &Servermem->unreadTexts[nodnr]);
+        ChangeUnreadTextStatus(text, 0, CUR_USER_UNREAD);
 	ts=localtime(&grabhead.tid);
 	fprintf(fpgrab,"\n\nText %ld  Möte: %s    %4d%02d%02d %02d:%02d\n",
                 grabhead.nummer, getmotnamn(grabhead.mote), ts->tm_year + 1900,
@@ -188,7 +188,7 @@ int grabkom(FILE *fp) {
   while(kom[x]!=-1 && x<MAXKOM) {
     confId = GetConferenceForText(kom[x]);
     if(confId != -1
-       && IsTextUnread(kom[x], &Servermem->unreadTexts[nodnr])
+       && IsTextUnread(kom[x], CUR_USER_UNREAD)
        && IsMemberConf(confId, inloggad, CURRENT_USER)) {
       if((grabret=grabtext(kom[x],fp))==1) {
         if(grabkom(fp)) return(1);
@@ -233,7 +233,7 @@ void grab(void) {
     unreadText = 0;
     if(motpek->type==MOTE_ORGINAL) {
       while((unreadText = FindNextUnreadText(unreadText, motpek->nummer,
-          &Servermem->unreadTexts[nodnr])) != -1) {
+          CUR_USER_UNREAD)) != -1) {
         if((grabret = grabtext(unreadText, fp)) == 2) {
           sprintf(outbuffer,"\r\nFel under vid läsandet/skrivandet av text %d!\r\n",y);
           puttekn(outbuffer,-1);
@@ -245,7 +245,7 @@ void grab(void) {
         }
       }
     } else if(motpek->type==MOTE_FIDO) {
-      for(unreadText = Servermem->unreadTexts[nodnr].lowestPossibleUnreadText[motpek->nummer];unreadText <= motpek->texter; unreadText++) {
+      for(unreadText = CUR_USER_UNREAD->lowestPossibleUnreadText[motpek->nummer];unreadText <= motpek->texter; unreadText++) {
         if(grabfidotext(unreadText, motpek, fp)) {
           sprintf(outbuffer,"\r\nFel under vid läsandet/skrivandet av text %d!\r\n",y);
           puttekn(outbuffer,-1);
@@ -253,7 +253,7 @@ void grab(void) {
           return;
         }
       }
-      Servermem->unreadTexts[nodnr].lowestPossibleUnreadText[motpek->nummer] =
+      CUR_USER_UNREAD->lowestPossibleUnreadText[motpek->nummer] =
         motpek->texter+1;
     }
   }

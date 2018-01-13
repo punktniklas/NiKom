@@ -44,7 +44,7 @@ void Cmd_Status(void) {
   }
   if(argument[0] == 0) {
     user = CURRENT_USER;
-    unreadTexts = &Servermem->unreadTexts[nodnr];
+    unreadTexts = CUR_USER_UNREAD;
     userId = inloggad;
   } else {
     if((userId = parsenamn(argument)) == -1) {

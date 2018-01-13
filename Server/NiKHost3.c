@@ -214,7 +214,7 @@ void rexxmarktextunread(struct RexxMsg *mess) {
 }
   
 void rexxmarktext(struct RexxMsg *mess, int desiredUnreadStatus) {
-  int textNr, userId, i, needToSave = FALSE;
+  int textNr, userId, needToSave = FALSE;
   struct UnreadTexts *unreadTexts = NULL;
   static struct UnreadTexts unreadTextsBuf;
 
@@ -242,13 +242,7 @@ void rexxmarktext(struct RexxMsg *mess, int desiredUnreadStatus) {
   }
     
 
-  for(i=0; i < MAXNOD; i++) {
-    if(Servermem->inloggad[i] == userId) {
-      unreadTexts = &Servermem->unreadTexts[i];
-      break;
-    }
-  }
-  if(unreadTexts == NULL) {
+  if(!GetLoggedInUser(userId, &unreadTexts)) {
     unreadTexts = &unreadTextsBuf;
     if(!ReadUnreadTexts(unreadTexts, userId)) {
       SetRexxResultString(mess, "-4");

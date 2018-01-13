@@ -182,7 +182,7 @@ int main(int argc, char **argv) {
     }
     sprintf(titel,"Nod #%d CON: %s #%d",nodnr,CURRENT_USER->namn,inloggad);
     SetWindowTitles(NiKwind,titel,(UBYTE *)-1L);
-    if(!ReadUnreadTexts(&Servermem->unreadTexts[nodnr], inloggad)) {
+    if(!ReadUnreadTexts(CUR_USER_UNREAD, inloggad)) {
       LogEvent(SYSTEM_LOG, ERROR,
                "Can't read unread text info for user %d", inloggad);
       DisplayInternalError();
@@ -213,7 +213,7 @@ int main(int argc, char **argv) {
     Servermem->info.inloggningar++;
     CURRENT_USER->defarea=area2;
     WriteUser(inloggad, CURRENT_USER, FALSE);
-    WriteUnreadTexts(&Servermem->unreadTexts[nodnr], inloggad);
+    WriteUnreadTexts(CUR_USER_UNREAD, inloggad);
     writesenaste();
     freealiasmem();
     sprintf(tellstr,"loggade just ut från nod %d",nodnr);

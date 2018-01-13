@@ -120,9 +120,9 @@ void org_lasa(int tnr, char verbose) {
 int HasUnreadInOrgConf(int conf) {
   long unreadText;
 
-  unreadText = FindNextUnreadText(0, conf, &Servermem->unreadTexts[nodnr]);
+  unreadText = FindNextUnreadText(0, conf, CUR_USER_UNREAD);
   if(unreadText == -1) {
-    Servermem->unreadTexts[nodnr].lowestPossibleUnreadText[conf] =
+    CUR_USER_UNREAD->lowestPossibleUnreadText[conf] =
       Servermem->info.hightext + 1;
   }
   return unreadText != -1;
@@ -138,7 +138,7 @@ void pushTextRepliesToStack(struct Header *textHeader) {
     textId = textHeader->kom_i[i];
     confId = GetConferenceForText(textId);
     if(confId == -1
-       || !IsTextUnread(textId, &Servermem->unreadTexts[nodnr])
+       || !IsTextUnread(textId, CUR_USER_UNREAD)
        || !IsMemberConf(confId, inloggad, CURRENT_USER)) {
       continue;
     }
@@ -147,7 +147,7 @@ void pushTextRepliesToStack(struct Header *textHeader) {
 }
 
 void displayTextAndClearUnread(int textId) {
-  ChangeUnreadTextStatus(textId, 0, &Servermem->unreadTexts[nodnr]);
+  ChangeUnreadTextStatus(textId, 0, CUR_USER_UNREAD);
   if(org_visatext(textId, FALSE)) {
     pushTextRepliesToStack(&readhead);
   }
@@ -159,7 +159,7 @@ void displayTextAndClearUnread(int textId) {
 void NextTextInOrgConf(void) {
   int textId;
 
-  textId = FindNextUnreadText(0, mote2, &Servermem->unreadTexts[nodnr]);
+  textId = FindNextUnreadText(0, mote2, CUR_USER_UNREAD);
   if(textId == -1) {
     SendString("\n\n\r%s\n\r", CATSTR(MSG_NEXT_TEXT_NO_TEXTS));
     return;
@@ -414,5 +414,5 @@ int org_initheader(int komm) {
 }
 
 void org_endast(int conf,int amount) {
-  SetUnreadTexts(conf, amount, &Servermem->unreadTexts[nodnr]);
+  SetUnreadTexts(conf, amount, CUR_USER_UNREAD);
 }
