@@ -66,11 +66,14 @@ struct User *WriteUser(int userId, struct User *user, int newUser) {
   return retUser;
 }
 
-struct User *GetLoggedInUser(int userId) {
+struct User *GetLoggedInUser(int userId, struct UnreadTexts **unreadTexts) {
   int i;
 
   for(i = 0; i < MAXNOD; i++) {
     if(Servermem->inloggad[i] == userId) {
+      if(unreadTexts != NULL) {
+        *unreadTexts = &Servermem->unreadTexts[i];
+      }
       return &Servermem->inne[i];
     }
   }
@@ -81,7 +84,7 @@ struct User *GetUserData(int userId) {
   static struct User user;
   struct User *loggedInUser;
 
-  loggedInUser = GetLoggedInUser(userId);
+  loggedInUser = GetLoggedInUser(userId, NULL);
   if(loggedInUser != NULL) {
     memcpy(&user, loggedInUser, sizeof(struct User));
     return &user;
@@ -93,7 +96,7 @@ struct User *GetUserDataForUpdate(int userId, int *needsWrite) {
   static struct User user;
   struct User *loggedInUser;
 
-  loggedInUser = GetLoggedInUser(userId);
+  loggedInUser = GetLoggedInUser(userId, NULL);
   if(loggedInUser != NULL) {
     *needsWrite = FALSE;
     return loggedInUser;

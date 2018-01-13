@@ -32,7 +32,7 @@ extern char outbuffer[],inmat[], *argument;
 void Cmd_Status(void) {
   struct User *user;
   struct Mote *conf;
-  int userId, nod, cnt = 0, sumUnread = 0, showAllConf = FALSE, kb;
+  int userId, cnt = 0, sumUnread = 0, showAllConf = FALSE, kb;
   struct tm *ts;
   struct UserGroup *listpek;
   char filnamn[100];
@@ -51,15 +51,7 @@ void Cmd_Status(void) {
       SendString("\r\n\nFinns ingen som heter så eller har det numret\r\n\n");
       return;
     }
-    for(nod = 0; nod < MAXNOD; nod++) {
-      if(userId == Servermem->inloggad[nod]) {
-        break;
-      }
-    }
-    if(nod < MAXNOD) {
-      user =  &Servermem->inne[nod];
-      unreadTexts = &Servermem->unreadTexts[nod];
-    } else {
+    if(!(user = GetLoggedInUser(userId, &unreadTexts))) {
       if(!(user = GetUserData(userId))) {
         return;
       }

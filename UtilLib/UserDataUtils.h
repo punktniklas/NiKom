@@ -14,9 +14,11 @@ struct User *WriteUser(int userId, struct User *user, int newUser);
 
 /*
  * Returns a pointer to the users data in Severmem if the user is
- * logged in. Returns NULL otherwise.
+ * logged in. Returns NULL otherwise. If the unreadTexts pointer
+ * is non-null is will also be set to point to the user's
+ * UnreadTexts structure. (If a user is returned.)
  */
-struct User *GetLoggedInUser(int userId);
+struct User *GetLoggedInUser(int userId, struct UnreadTexts **unreadTexts);
 
 /*
  * Returns a pointer to a User structure for the given user, or NULL
