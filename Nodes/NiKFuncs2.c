@@ -28,44 +28,48 @@ extern struct timerequest *timerreq;
 extern char coninput;
 extern struct MinList edit_list;
 
-int parsenamn(skri)
-char *skri;
-{
-	int going=TRUE,going2=TRUE,found=-1,nummer;
-	char *faci,*skri2;
-	struct ShortUser *letpek;
-	if(skri[0]==0 || skri[0]==' ') return(-3);
-	if(IzDigit(skri[0]) || (skri[0]=='#' && IzDigit(skri[1]))) {
-		if(skri[0]=='#') skri++;
-		nummer=atoi(skri);
-		faci=getusername(nummer);
-		if(!strcmp(faci,"<Raderad Användare>") || !strcmp(faci,"<Felaktigt användarnummer>")) return(-1);
-		else return(nummer);
-	}
-	if(matchar(skri,"sysop")) return(0);
-	letpek=(struct ShortUser *)Servermem->user_list.mlh_Head;
-	while(letpek->user_node.mln_Succ && going) {
-		faci=letpek->namn;
-		skri2=skri;
-		going2=TRUE;
-		if(matchar(skri2,faci)) {
-			while(going2) {
-				skri2=hittaefter(skri2);
-				faci=hittaefter(faci);
-				if(skri2[0]==0) {
-					found=letpek->nummer;
-					going2=going=FALSE;
-				}
-				else if(faci[0]==0) going2=FALSE;
-				else if(!matchar(skri2,faci)) {
-					faci=hittaefter(faci);
-					if(faci[0]==0 || !matchar(skri2,faci)) going2=FALSE;
-				}
-			}
-		}
-		letpek=(struct ShortUser *)letpek->user_node.mln_Succ;
-	}
-	return(found);
+int parsenamn(char *skri) {
+  int going = TRUE, going2 = TRUE, found = -1, nummer;
+  char *faci, *skri2;
+  struct ShortUser *letpek;
+  if(skri[0] == 0 || skri[0] == ' ') {
+    return -3;
+  }
+  if(IzDigit(skri[0]) || (skri[0]=='#' && IzDigit(skri[1]))) {
+    if(skri[0] == '#') {
+      skri++;
+    }
+    nummer = atoi(skri);
+    return userexists(nummer) ? nummer : -1;
+  }
+  if(matchar(skri,"sysop")) {
+    return 0;
+  }
+  letpek = (struct ShortUser *)Servermem->user_list.mlh_Head;
+  while(letpek->user_node.mln_Succ && going) {
+    faci = letpek->namn;
+    skri2 = skri;
+    going2 = TRUE;
+    if(matchar(skri2, faci)) {
+      while(going2) {
+        skri2 = hittaefter(skri2);
+        faci = hittaefter(faci);
+        if(skri2[0] == 0) {
+          found = letpek->nummer;
+          going2 = going=FALSE;
+        } else if(faci[0] == 0) {
+          going2 = FALSE;
+        } else if(!matchar(skri2, faci)) {
+          faci = hittaefter(faci);
+          if(faci[0] == 0 || !matchar(skri2, faci)) {
+            going2 = FALSE;
+          }
+        }
+      }
+    }
+    letpek = (struct ShortUser *)letpek->user_node.mln_Succ;
+  }
+  return found;
 }
 
 int matchar(skrivet,facit)

@@ -130,7 +130,7 @@ void Cmd_Status(void) {
       cnt = CountUnreadTexts(conf->nummer, unreadTexts);
       break;
     case MOTE_FIDO:
-      cnt = conf->texter - unreadTexts[nodnr].lowestPossibleUnreadText[conf->nummer] + 1;
+      cnt = conf->texter - unreadTexts->lowestPossibleUnreadText[conf->nummer] + 1;
       break;
     default :
       break;
