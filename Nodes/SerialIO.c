@@ -25,6 +25,7 @@
 #define EXIT_ERROR	128
 #define EXIT_OK	0
 #define NOCARRIER 32
+#define EFFECTIVE_USER  (inloggad == -1 ? &g_preLoginUserData : &Servermem->userData[g_userDataSlot])
 
 struct IOStdReq *conwritereq=NULL;
 struct MsgPort *conwriteport=NULL;
@@ -40,11 +41,12 @@ struct timerequest *timerreq=NULL,*heartbeatreq=NULL;
 struct MsgPort *timerport=NULL,*heartbeatport=NULL;
 
 
-extern int nodnr, ypos, xpos, ysize, xsize, inloggad, nodestate;
+extern int nodnr, ypos, xpos, ysize, xsize, inloggad, nodestate, g_userDataSlot;
 extern char pubscreen[];
 extern struct Window *NiKwind;
 extern struct System *Servermem;
 extern struct MsgPort *nikomnodeport;
+extern struct User g_preLoginUserData;
 
 /* Dessa används bara i PreNoden */
 extern char svara[], init[], hangup[], nodid[];
@@ -348,7 +350,7 @@ char gettekn(void) {
       int conv;
       serbuf[seridx] = sergettkn();
       conv = ConvMBChrsToAmiga(&ch,serbuf,seridx+1,
-                               CURRENT_USER->chrset);
+                               EFFECTIVE_USER->chrset);
       if (conv < 0) {
         /* Need more bytes, continue reading. */
         ++seridx;
@@ -418,7 +420,7 @@ void eka(char tecken) {
 	conwritereq->io_Data=(APTR)&tecken;
 	conwritereq->io_Length=1;
 	if(DoIO((struct IORequest *)conwritereq)) printf("DoIO i eka() (1)\n");
-	bytes = ConvMBChrsFromAmiga(sertkn,&tecken,1,CURRENT_USER->chrset,0);
+	bytes = ConvMBChrsFromAmiga(sertkn,&tecken,1,EFFECTIVE_USER->chrset,0);
 	serwritereq->IOSer.io_Command=CMD_WRITE;
 	serwritereq->IOSer.io_Data=(APTR)sertkn;
 	serwritereq->IOSer.io_Length=bytes;
@@ -432,7 +434,7 @@ void sereka(char tecken)
 {
 	char sertkn[2];
 	int bytes;
-	bytes = ConvMBChrsFromAmiga(sertkn,&tecken,1,CURRENT_USER->chrset,0);
+	bytes = ConvMBChrsFromAmiga(sertkn,&tecken,1,EFFECTIVE_USER->chrset,0);
 	serwritereq->IOSer.io_Command=CMD_WRITE;
 	serwritereq->IOSer.io_Data=(APTR)sertkn;
 	serwritereq->IOSer.io_Length=bytes;
@@ -469,7 +471,7 @@ void putstring(char *pekare,int size, long flags) {
 	int bytes;
 
 	bytes = ConvMBChrsFromAmiga(serpekare, pekare, 199,
-				    CURRENT_USER->chrset, 0);
+				    EFFECTIVE_USER->chrset, 0);
 	serwritereq->IOSer.io_Command=CMD_WRITE;
 	serwritereq->IOSer.io_Data=serpekare;
 	serwritereq->IOSer.io_Length=bytes;
@@ -488,7 +490,7 @@ static void serputstring(char *pekare, int size, long flags)
 	int bytes;
 
 	bytes = ConvMBChrsFromAmiga(serpekare, pekare, 199,
-				    CURRENT_USER->chrset, 0);
+				    EFFECTIVE_USER->chrset, 0);
 	serwritereq->IOSer.io_Command=CMD_WRITE;
 	serwritereq->IOSer.io_Data=serpekare;
 	serwritereq->IOSer.io_Length=bytes;
@@ -572,8 +574,9 @@ void getnodeconfig(char *configname) {
 			strncpy(nodid,&buffer[7],19);
 			nodid[19] = 0;
 		}
-		else if(!strncmp(buffer,"INACTIVETIME",12)) Servermem->maxinactivetime[nodnr]=atoi(&buffer[13]);
-		else if(!strncmp(buffer,"HANDSKAKNING",12)) handskakning = atoi(&buffer[13]);
+		else if(!strncmp(buffer,"INACTIVETIME",12)) {
+                  Servermem->nodeInfo[nodnr].maxInactiveTime = atoi(&buffer[13]);
+		} else if(!strncmp(buffer,"HANDSKAKNING",12)) handskakning = atoi(&buffer[13]);
 	}
 	fclose(fp);
 	if(getty) highbaud=gettybps;
@@ -603,7 +606,7 @@ void RecordActivity(void) {
 }
 
 void CheckInactivity(void) {
-  if(time(NULL) > latestActivityTime + Servermem->maxinactivetime[nodnr] * 60) {
+  if(time(NULL) > latestActivityTime + Servermem->nodeInfo[nodnr].maxInactiveTime * 60) {
     nodestate |= NIKSTATE_INACTIVITY;
   }
 }
@@ -734,16 +737,16 @@ int puttekn(char *pekare,int size)
 	strncpy(localconstring,pekare,1199);
 	localconstring[1199]=0;
 	if(Servermem->cfg->cfgflags & NICFG_LOCALCOLOURS) {
-		bytes=ConvMBChrsFromAmiga(serpekare,pekare,1199,CURRENT_USER->chrset,0);
+		bytes=ConvMBChrsFromAmiga(serpekare,pekare,1199,EFFECTIVE_USER->chrset,0);
 		serpekare[bytes] = '\0';
-		if(!(CURRENT_USER->flaggor & ANSICOLOURS)) StripAnsiSequences(serpekare);
+		if(!(EFFECTIVE_USER->flaggor & ANSICOLOURS)) StripAnsiSequences(serpekare);
 	} else {
 		StripAnsiSequences(localconstring);
-		if(CURRENT_USER->flaggor & ANSICOLOURS) {
-			bytes=ConvMBChrsFromAmiga(serpekare,pekare,1199,CURRENT_USER->chrset,0);
+		if(EFFECTIVE_USER->flaggor & ANSICOLOURS) {
+			bytes=ConvMBChrsFromAmiga(serpekare,pekare,1199,EFFECTIVE_USER->chrset,0);
 			serpekare[bytes] = '\0';
 		} else  {
-			bytes=ConvMBChrsFromAmiga(serpekare,localconstring,1199,CURRENT_USER->chrset,0);
+			bytes=ConvMBChrsFromAmiga(serpekare,localconstring,1199,EFFECTIVE_USER->chrset,0);
 			serpekare[bytes] = '\0';
 		}
 	}
@@ -936,7 +939,7 @@ int sendtosercon(char *conpek, char *serpek, int consize, int sersize) {
         aborted = TRUE;
         console = serial = 0;
         putstring("^C\n\r",-1,0);
-      } else if((tecken==' ' && (CURRENT_USER->flaggor & MELLANSLAG))
+      } else if((tecken==' ' && (EFFECTIVE_USER->flaggor & MELLANSLAG))
                 || tecken==19) {
         paused=TRUE;
       } else if(tecken && typeaheadbuftkn < 50) {
@@ -958,7 +961,7 @@ int sendtosercon(char *conpek, char *serpek, int consize, int sersize) {
         aborted = TRUE;
         console = serial = 0;
         putstring("^C\n\r",-1,0);
-      } else if((tecken==' ' && (CURRENT_USER->flaggor & MELLANSLAG))
+      } else if((tecken==' ' && (EFFECTIVE_USER->flaggor & MELLANSLAG))
                 || tecken==19) {
         paused=TRUE;
       } else if(tecken && typeaheadbuftkn<50) {
@@ -1033,7 +1036,7 @@ int sendtocon(char *pekare, int size)
 				aborted=TRUE;
 				console=0;
 				putstring("^C\n\r",-1,0);
-			} else if((tecken==' ' && (CURRENT_USER->flaggor & MELLANSLAG)) || tecken==19) paused=TRUE;
+			} else if((tecken==' ' && (EFFECTIVE_USER->flaggor & MELLANSLAG)) || tecken==19) paused=TRUE;
 			else if(tecken && typeaheadbuftkn<50) {
 				typeaheadbuf[typeaheadbuftkn++]=tecken;
 				typeaheadbuf[typeaheadbuftkn]=0;
@@ -1069,7 +1072,7 @@ int serputtekn(char *pekare,int size)
 	serstring[1199]=0;
 	pekare = &serstring[0];
 
-	if(!(CURRENT_USER->flaggor & ANSICOLOURS)) StripAnsiSequences(pekare);
+	if(!(EFFECTIVE_USER->flaggor & ANSICOLOURS)) StripAnsiSequences(pekare);
 
 	if(size == -1 && !pekare[0]) return(aborted);
 
@@ -1154,7 +1157,7 @@ int sendtoser(char *pekare, int size) {
         aborted = TRUE;
         serial = 0;
         serputstring("^C\n\r",-1,0);
-      } else if((tecken == ' ' && (CURRENT_USER->flaggor & MELLANSLAG))
+      } else if((tecken == ' ' && (EFFECTIVE_USER->flaggor & MELLANSLAG))
                 || tecken == 19) {
         paused = TRUE;
       } else if(tecken && typeaheadbuftkn<50) {

@@ -5,11 +5,14 @@
 
 #include "InfoFiles.h"
 
+#define EFFECTIVE_USER  (inloggad == -1 ? &g_preLoginUserData : &Servermem->userData[g_userDataSlot])
+
 extern struct System *Servermem;
-extern int nodnr;
+extern int nodnr, g_userDataSlot, inloggad;
+extern struct User g_preLoginUserData;
 
 char *CreateLocalizedInfoFilePath(char *fileName, char *buf) {
-  sprintf(buf, "NiKom:Texter/%s/%s", Servermem->languages[CURRENT_USER->language], fileName);
+  sprintf(buf, "NiKom:Texter/%s/%s", Servermem->languages[EFFECTIVE_USER->language], fileName);
   return buf;
 }
 

@@ -16,7 +16,7 @@
 char *hittaefter(char *);
 
 extern struct System *Servermem;
-extern int nodnr,inloggad,radcnt;
+extern int nodnr,inloggad,radcnt, g_userDataSlot;
 extern char outbuffer[];
 extern struct Inloggning Statstr;
 extern struct MinList edit_list;

@@ -18,28 +18,30 @@
 #include "Languages.h"
 #include "UserDataUtils.h"
 
-void initConfPermissions(void);
-int createUserDirectory(int newUserId);
+#include "NewUser.h"
+
+void initConfPermissions(struct User *user);
+int createUserDirectory(struct User *user, int newUserId);
 
 extern struct System *Servermem;
-extern int nodnr, inloggad;
+extern int nodnr;
 extern char inmat[];
+extern struct UnreadTexts g_newUserUnreadTexts;
 
-int RegisterNewUser(void) {
+int RegisterNewUser(struct User *user) {
   long tid;
   int newUserId, isCorrect, tmp;
   struct ShortUser *shortUser;
-  struct User *user = CURRENT_USER;
 
   memset(user, 0, sizeof(struct User));
 
   AskUserForLanguage(user);
   if(Servermem->cfg->defaultcharset == 0) {
-    if(AskUserForCharacterSet(TRUE, FALSE)) {
-      return 1;
+    if(AskUserForCharacterSet(user, TRUE, FALSE)) {
+      return -1;
     }
   } else {
-    CURRENT_USER->chrset = Servermem->cfg->defaultcharset;
+    user->chrset = Servermem->cfg->defaultcharset;
   }
 
   SendString("\r\n\n");
@@ -49,7 +51,7 @@ int RegisterNewUser(void) {
   for(;;) {
     do {
       SendString("\r\n\n%s: ", CATSTR(MSG_USER_NAME));
-      if(GetString(40, NULL)) { return 1; }
+      if(GetString(40, NULL)) { return -1; }
     } while(inmat[0] == '\0');
     if(parsenamn(inmat) == -1) {
       break;
@@ -58,28 +60,28 @@ int RegisterNewUser(void) {
   }
   strncpy(user->namn, inmat, 41);
   SendString("\r\n%s: ", CATSTR(MSG_USER_STREET));
-  if(GetString(40, NULL)) { return 1; }
+  if(GetString(40, NULL)) { return -1; }
   strncpy(user->gata, inmat, 41);
   SendString("\r\n%s: ", CATSTR(MSG_USER_CITY));
-  if(GetString(40, NULL)) { return 1; }
+  if(GetString(40, NULL)) { return -1; }
   strncpy(user->postadress, inmat, 41);
   SendString("\r\n%s: ", CATSTR(MSG_USER_COUNTRY));
-  if(GetString(40, NULL)) { return 1; }
+  if(GetString(40, NULL)) { return -1; }
   strncpy(user->land, inmat, 41);
   SendString("\r\n%s: ", CATSTR(MSG_USER_PHONE));
-  if(GetString(20, NULL)) { return 1; }
+  if(GetString(20, NULL)) { return -1; }
   strncpy(user->telefon, inmat, 21);
   SendString("\r\n%s: ", CATSTR(MSG_USER_MISCINFO));
-  if(GetString(60, NULL)) { return 1; }
+  if(GetString(60, NULL)) { return -1; }
   strncpy(user->annan_info, inmat, 61);
   do {
     if(MaybeEditPassword(CATSTR(MSG_USER_PASSWORD), CATSTR(MSG_USER_PASSWORD_CONFIRM),
                          user->losen, 15)) {
-      return 1;
+      return -1;
     }
   } while(user->losen[0] == '\0');
   strcpy(user->prompt, "-->");
-  if(MaybeEditString(CATSTR(MSG_USER_PROMPT), user->prompt, 5)) { return 1; }
+  if(MaybeEditString(CATSTR(MSG_USER_PROMPT), user->prompt, 5)) { return -1; }
 
   user->tot_tid = 0L;
   time(&tid);
@@ -97,8 +99,8 @@ int RegisterNewUser(void) {
   user->status = Servermem->cfg->defaultstatus;
   user->brevpek = 0;
 
-  initConfPermissions();
-  InitUnreadTexts(CUR_USER_UNREAD);
+  initConfPermissions(user);
+  InitUnreadTexts(&g_newUserUnreadTexts);
 
   SendString("\r\n\n%s : %s\r\n", CATSTR(MSG_USER_NAME), user->namn);
   SendString("%-20s : %s\r\n", CATSTR(MSG_USER_STREET), user->gata);
@@ -111,13 +113,13 @@ int RegisterNewUser(void) {
   if(GetYesOrNo("\r\n\n", CATSTR(MSG_COMMON_IS_CORRECT), NULL, NULL,
                 CATSTR(MSG_COMMON_YES), CATSTR(MSG_COMMON_NO), "\r\n\n",
                 TRUE, &isCorrect)) {
-    return 1;
+    return -1;
   }
   while(!isCorrect) {
     for(;;) {
       SendString("\r\n%s : (%s) ", CATSTR(MSG_USER_NAME), user->namn);
       if(GetString(40,NULL)) {
-        return 1;
+        return -1;
       }
       if(inmat[0] == '\0') {
         break;
@@ -130,20 +132,20 @@ int RegisterNewUser(void) {
       }
     }
 
-    if(MaybeEditString(CATSTR(MSG_USER_STREET), user->gata, 40)) { return 1; }
-    if(MaybeEditString(CATSTR(MSG_USER_CITY), user->postadress, 40)) { return 1; }
-    if(MaybeEditString(CATSTR(MSG_USER_COUNTRY), user->land, 40)) { return 1; }
-    if(MaybeEditString(CATSTR(MSG_USER_PHONE), user->telefon, 20)) { return 1; }
-    if(MaybeEditString(CATSTR(MSG_USER_MISCINFO), user->annan_info, 60)) { return 1; }
+    if(MaybeEditString(CATSTR(MSG_USER_STREET), user->gata, 40)) { return -1; }
+    if(MaybeEditString(CATSTR(MSG_USER_CITY), user->postadress, 40)) { return -1; }
+    if(MaybeEditString(CATSTR(MSG_USER_COUNTRY), user->land, 40)) { return -1; }
+    if(MaybeEditString(CATSTR(MSG_USER_PHONE), user->telefon, 20)) { return -1; }
+    if(MaybeEditString(CATSTR(MSG_USER_MISCINFO), user->annan_info, 60)) { return -1; }
     if(MaybeEditPassword(CATSTR(MSG_USER_PASSWORD), CATSTR(MSG_USER_PASSWORD_CONFIRM), user->losen, 15)) {
-      return 1;
+      return -1;
     }
-    if(MaybeEditString(CATSTR(MSG_USER_PROMPT), user->prompt, 5)) { return 1; }
+    if(MaybeEditString(CATSTR(MSG_USER_PROMPT), user->prompt, 5)) { return -1; }
 
     if(GetYesOrNo("\r\n\n", CATSTR(MSG_COMMON_IS_CORRECT), NULL, NULL,
                   CATSTR(MSG_COMMON_YES), CATSTR(MSG_COMMON_NO), "\r\n\n",
                   TRUE, &isCorrect)) {
-      return 1;
+      return -1;
     }
   }
 
@@ -153,35 +155,34 @@ int RegisterNewUser(void) {
     LogEvent(SYSTEM_LOG, ERROR, "Could not allocate %d bytes.\n",
              sizeof(struct ShortUser));
     DisplayInternalError();
-    return 2;
+    return -2;
   }
 
   strcpy(shortUser->namn, user->namn);
   shortUser->nummer = newUserId;
   shortUser->status = user->status;
   AddTail((struct List *)&Servermem->user_list, (struct Node *)shortUser);
-  if(!createUserDirectory(newUserId)) {
-    return 2;
+  if(!createUserDirectory(user, newUserId)) {
+    return -2;
   }
-  inloggad = newUserId;
-  SendStringCat("\r\n\n%s\r\n", CATSTR(MSG_USER_YOU_GET_ID), inloggad);
-  if(Servermem->cfg->ar.nyanv) sendrexx(Servermem->cfg->ar.nyanv);
-  return 0;
+  SendStringCat("\r\n\n%s\r\n", CATSTR(MSG_USER_YOU_GET_ID), newUserId);
+  //  if(Servermem->cfg->ar.nyanv) sendrexx(Servermem->cfg->ar.nyanv);
+  return newUserId;
 }
 
-void initConfPermissions(void) {
+void initConfPermissions(struct User *user) {
   struct Mote *conf;
-  memset(CURRENT_USER->motmed, 0, MAXMOTE/8);
+  memset(user->motmed, 0, MAXMOTE/8);
   ITER_EL(conf, Servermem->mot_list, mot_node, struct Mote *) {
     if(conf->status & (SKRIVSTYRT | SLUTET)) {
-      BAMCLEAR(CURRENT_USER->motratt, conf->nummer);
+      BAMCLEAR(user->motratt, conf->nummer);
     } else {
-      BAMSET(CURRENT_USER->motratt, conf->nummer);
+      BAMSET(user->motratt, conf->nummer);
     }
   }
 }
 
-int createUserDirectory(int newUserId) {
+int createUserDirectory(struct User *user, int newUserId) {
   BPTR lock, fh;
   char dirPath[100], filename[40];
 
@@ -203,11 +204,11 @@ int createUserDirectory(int newUserId) {
     }
   }
   UnLock(lock);
-  if(!WriteUser(newUserId, CURRENT_USER, TRUE)) {
+  if(!WriteUser(newUserId, user, TRUE)) {
     return 0;
   }
   
-  if(!WriteUnreadTexts(CUR_USER_UNREAD, newUserId)) {
+  if(!WriteUnreadTexts(&g_newUserUnreadTexts, newUserId)) {
     LogEvent(SYSTEM_LOG, ERROR, "Could not create UnreadTexts for user %d",
              newUserId);
     DisplayInternalError();

@@ -70,11 +70,11 @@ struct User *GetLoggedInUser(int userId, struct UnreadTexts **unreadTexts) {
   int i;
 
   for(i = 0; i < MAXNOD; i++) {
-    if(Servermem->inloggad[i] == userId) {
+    if(Servermem->nodeInfo[i].nodeType != 0 && Servermem->nodeInfo[i].userLoggedIn == userId) {
       if(unreadTexts != NULL) {
-        *unreadTexts = &Servermem->unreadTexts[i];
+        *unreadTexts = &Servermem->unreadTexts[Servermem->nodeInfo[i].userDataSlot];
       }
-      return &Servermem->inne[i];
+      return &Servermem->userData[Servermem->nodeInfo[i].userDataSlot];
     }
   }
   return NULL;
@@ -103,4 +103,69 @@ struct User *GetUserDataForUpdate(int userId, int *needsWrite) {
   }
   *needsWrite = TRUE;
   return ReadUser(userId, &user);
+}
+
+int isSlotInUse(int slot, int nodeId) {
+  int i;
+  for(i = 0; i < MAXNOD; i++) {
+    if(i != nodeId
+       && Servermem->nodeInfo[i].nodeType != 0
+       && Servermem->nodeInfo[i].userLoggedIn >= 0
+       && Servermem->nodeInfo[i].userDataSlot == slot) {
+      return TRUE;
+    }
+  }
+  return FALSE;
+}
+
+int doAllocateUserDataSlot(int nodeId, int userId) {
+  int i, slot;
+
+  for(i = 0; i < MAXNOD; i++) {
+    if(i != nodeId
+       && Servermem->nodeInfo[i].nodeType != 0
+       && Servermem->nodeInfo[i].userLoggedIn == userId) {
+      Servermem->nodeInfo[nodeId].userDataSlot = Servermem->nodeInfo[i].userDataSlot;
+      return 1;
+    }
+  }
+
+  for(slot = 0; slot < MAXNOD; slot++) {
+    if(isSlotInUse(slot, nodeId)) {
+      continue;
+    }
+    Servermem->nodeInfo[nodeId].userDataSlot = slot;
+    return 2;
+  }
+  return 0;
+}
+
+int AllocateUserDataSlot(int nodeId, int userId) {
+  int res;
+  ObtainSemaphore(&Servermem->semaphores[NIKSEM_USERDATASLOT]);
+  res = doAllocateUserDataSlot(nodeId, userId);
+  ReleaseSemaphore(&Servermem->semaphores[NIKSEM_USERDATASLOT]);
+  return res;
+}
+
+void doReleaseUserDataSlot(int nodeId) {
+  Servermem->nodeInfo[nodeId].userLoggedIn = -1;
+  Servermem->nodeInfo[nodeId].userDataSlot = -1;
+}
+
+void ReleaseUserDataSlot(int nodeId) {
+  ObtainSemaphore(&Servermem->semaphores[NIKSEM_USERDATASLOT]);
+  doReleaseUserDataSlot(nodeId);
+  ReleaseSemaphore(&Servermem->semaphores[NIKSEM_USERDATASLOT]);
+}
+
+int FindUserDataSlot(int userId) {
+  int i;
+  for(i = 0; i < MAXNOD; i++) {
+    if(Servermem->nodeInfo[i].nodeType != 0
+       && Servermem->nodeInfo[i].userLoggedIn == userId) {
+      return Servermem->nodeInfo[i].userDataSlot;
+    }
+  }
+  return -1;
 }

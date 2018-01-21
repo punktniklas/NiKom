@@ -27,7 +27,7 @@
 #define EJEKO	0
 
 extern struct System *Servermem;
-extern int nodnr,inloggad,mote2,senast_text_typ,senast_text_nr,senast_text_mote,nu_skrivs,rad,connectbps;
+extern int nodnr,inloggad,mote2,senast_text_typ,senast_text_nr,senast_text_mote,nu_skrivs,rad,connectbps, g_userDataSlot;
 extern char outbuffer[],inmat[],*argument;
 extern struct Header sparhead,readhead;
 extern struct MsgPort *permitport,*serverport,*NiKomPort;
@@ -498,24 +498,25 @@ void vilka(void) {
   SendString("\r\n\n");
   timenow = time(NULL);
   for(i = 0; i < MAXNOD; i++) {
-    if(!Servermem->nodtyp[i] || (!allNodes && Servermem->inloggad[i] == -1)) {
+    if(Servermem->nodeInfo[i].nodeType == 0 || (!allNodes && Servermem->nodeInfo[i].userLoggedIn == -1)) {
       continue;
     }
-    userLoggedIn = Servermem->inloggad[i] >= 0;
-    if(Servermem->inloggad[i] == -1) {
+    userLoggedIn = Servermem->nodeInfo[i].userLoggedIn >= 0;
+    if(Servermem->nodeInfo[i].userLoggedIn == -1) {
       sprintf(name, "<%s>", CATSTR(MSG_WHO_NOONE));
-    } else if(Servermem->inloggad[i] == -2) {
+    } else if(Servermem->nodeInfo[i].userLoggedIn == -2) {
       sprintf(name, "<%s>", CATSTR(MSG_WHO_CONNECTED));
     } else {
-      strcpy(name, getusername(Servermem->inloggad[i]));
+      strcpy(name, getusername(Servermem->nodeInfo[i].userLoggedIn));
     }
 
-    idle = timenow - Servermem->idletime[i];
-    SendString("%s #%-2d %-40s %c %7s\n\r",
+    idle = timenow - Servermem->nodeInfo[i].lastActiveTime;
+    SendString("%s #%-2d %-40s %c %7s (%d)\n\r",
                CATSTR(MSG_WHO_NODE), i,
                name,
-               Servermem->say[i] ? '*' : ' ',
-               (idle < 60 && userLoggedIn) ? (const char *)CATSTR(MSG_WHO_ACTIVE) : FormatDuration(idle, idlebuf));
+               Servermem->waitingSayMessages[Servermem->nodeInfo[i].userDataSlot] ? '*' : ' ',
+               (idle < 60 && userLoggedIn) ? (const char *)CATSTR(MSG_WHO_ACTIVE) : FormatDuration(idle, idlebuf),
+               Servermem->nodeInfo[i].userDataSlot);
 
     if(!verbose) {
       continue;
@@ -526,15 +527,15 @@ void vilka(void) {
     }
 
     SendString("  %s %-20s ",
-               Servermem->nodtyp[i] == NODCON ? "CON" : "SER",
-               Servermem->nodid[i]);
-    switch(Servermem->action[i]) {
+               Servermem->nodeInfo[i].nodeType == NODCON ? "CON" : "SER",
+               Servermem->nodeInfo[i].nodeIdStr);
+    switch(Servermem->nodeInfo[i].action) {
     case INGET :
       strcpy(actionbuf, CATSTR(MSG_WHO_NO_UNREAD));
       break;
     case SKRIVER :
-      if(Servermem->varmote[i] !=- 1) {
-        conf = getmotpek(Servermem->varmote[i]);
+      if(Servermem->nodeInfo[i].currentConf !=- 1) {
+        conf = getmotpek(Servermem->nodeInfo[i].currentConf);
         if(!conf) {
           continue;
         }
@@ -548,8 +549,8 @@ void vilka(void) {
       }
       break;
     case LASER :
-      if(Servermem->varmote[i] != -1) {
-        conf = getmotpek(Servermem->varmote[i]);
+      if(Servermem->nodeInfo[i].currentConf != -1) {
+        conf = getmotpek(Servermem->nodeInfo[i].currentConf);
         if(!conf) {
           continue;
         }
@@ -563,27 +564,27 @@ void vilka(void) {
       }
       break;
     case GORNGTANNAT :
-      strcpy(actionbuf, Servermem->vilkastr[i]);
+      strcpy(actionbuf, Servermem->nodeInfo[i].currentActivity);
       break;
     case UPLOAD :
-      if(!Servermem->areor[Servermem->varmote[i]].namn[0]
-         || !arearatt(Servermem->varmote[i], inloggad, CURRENT_USER)) {
+      if(!Servermem->areor[Servermem->nodeInfo[i].currentConf].namn[0]
+         || !arearatt(Servermem->nodeInfo[i].currentConf, inloggad, CURRENT_USER)) {
         strcpy(actionbuf, CATSTR(MSG_WHO_UPLOADING));
       } else {
-        if(Servermem->vilkastr[i]) {
-          sprintf(actionbuf, "%s %s", CATSTR(MSG_WHO_UPLOADING), Servermem->vilkastr[i]);
+        if(Servermem->nodeInfo[i].currentActivity) {
+          sprintf(actionbuf, "%s %s", CATSTR(MSG_WHO_UPLOADING), Servermem->nodeInfo[i].currentActivity);
         } else {
           strcpy(actionbuf, CATSTR(MSG_WHO_SOON_UPLOAD));
         }
       }
       break;
     case DOWNLOAD :
-      if(!Servermem->areor[Servermem->varmote[i]].namn[0]
-         || !arearatt(Servermem->varmote[i], inloggad, CURRENT_USER)) {
+      if(!Servermem->areor[Servermem->nodeInfo[i].currentConf].namn[0]
+         || !arearatt(Servermem->nodeInfo[i].currentConf, inloggad, CURRENT_USER)) {
         strcpy(actionbuf, CATSTR(MSG_WHO_DOWNLOADING));
       } else {
-        if(Servermem->vilkastr[i]) {
-          sprintf(actionbuf, "%s %s", CATSTR(MSG_WHO_DOWNLOADING), Servermem->vilkastr[i]);
+        if(Servermem->nodeInfo[i].currentActivity) {
+          sprintf(actionbuf, "%s %s", CATSTR(MSG_WHO_DOWNLOADING), Servermem->nodeInfo[i].currentActivity);
         } else {
           strcpy(actionbuf, CATSTR(MSG_WHO_SOON_DOWNLOAD));
         }
@@ -742,8 +743,8 @@ void displaysay(void) {
   int textlen;
   char tmpchar, *fromStr;
 
-  sayStr = Servermem->say[nodnr];
-  Servermem->say[nodnr] = NULL;
+  sayStr = Servermem->waitingSayMessages[Servermem->nodeInfo[nodnr].userDataSlot];
+  Servermem->waitingSayMessages[Servermem->nodeInfo[nodnr].userDataSlot] = NULL;
   while(sayStr) {
     if(sayStr->fromuser == -1) {
       fromStr = CATSTR(MSG_SAY_DISPLAY_SYSTEM);
@@ -774,7 +775,7 @@ void displaysay(void) {
 }
 
 int sag(void) {
-  int userId, i;
+  int userId, slot;
   char *quick;
   struct SayString *sayStr, *prevSayStr = NULL, *newSayStr;
 
@@ -790,10 +791,8 @@ int sag(void) {
     SendString("\r\n\n%s\r\n\n", CATSTR(MSG_COMMON_NO_SUCH_USER));
     return 0;
   }
-  for(i = 0; i < MAXNOD; i++) {
-    if(Servermem->inloggad[i]==userId) { break; }
-  }
-  if(i == MAXNOD) {
+  
+  if((slot = FindUserDataSlot(userId)) == -1) {
     SendStringCat("\r\n\n%s\r\n", CATSTR(MSG_SAY_NOT_LOGGED_IN), getusername(userId));
     return 0;
   }
@@ -805,12 +804,12 @@ int sag(void) {
     if(!inmat[0]) {
       return 0;
     }
-    if(Servermem->inloggad[i] == -1) {
+    if((slot = FindUserDataSlot(userId)) == -1) {
       SendString("\r\n\n%s\r\n", CATSTR(MSG_SAY_USER_LOGGED_OUT));
       return 0;
     }
   }
-  sayStr = Servermem->say[i];
+  sayStr = Servermem->waitingSayMessages[slot];
   if(sayStr) {
     SendStringCat("\r\n%s\r\n", CATSTR(MSG_SAY_USER_HAS_UNREAD), getusername(userId));
   } else {
@@ -833,10 +832,10 @@ int sag(void) {
   } else {
     strcpy(newSayStr->text, inmat);
   }
-  if(Servermem->say[i]) {
+  if(Servermem->waitingSayMessages[slot]) {
     prevSayStr->NextSay = newSayStr;
   } else {
-    Servermem->say[i] = newSayStr;
+    Servermem->waitingSayMessages[slot] = newSayStr;
   }
   Permit();
   return 0;
@@ -1038,17 +1037,18 @@ void listaarende(void) {
 }
 
 void tellallnodes(char *str) {
-  int i;
+  int i, slot;
   struct SayString *sayStr, *prevSayStr=NULL, *newSayStr;
 
   for(i = 0; i < MAXNOD; i++) {
-    if((!Servermem->nodtyp[i]) || Servermem->inloggad[i] < 0 || i == nodnr) {
+    if((Servermem->nodeInfo[i].nodeType == 0) || Servermem->nodeInfo[i].userLoggedIn < 0 || i == nodnr) {
       continue;
     }
-    if(Servermem->inne[i].flaggor & NOLOGNOTIFY) {
+    slot = Servermem->nodeInfo[i].userDataSlot;
+    if(Servermem->userData[slot].flaggor & NOLOGNOTIFY) {
       continue;
     }
-    sayStr = Servermem->say[i];
+    sayStr = Servermem->waitingSayMessages[slot];
     Forbid();
     while(sayStr) {
       prevSayStr = sayStr;
@@ -1062,10 +1062,10 @@ void tellallnodes(char *str) {
     }
     newSayStr->fromuser = inloggad;
     strcpy(newSayStr->text, str);
-    if(Servermem->say[i]) {
+    if(Servermem->waitingSayMessages[slot]) {
       prevSayStr->NextSay = newSayStr;
     } else {
-      Servermem->say[i] = newSayStr;
+      Servermem->waitingSayMessages[slot] = newSayStr;
     }
     Permit();
   }

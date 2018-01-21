@@ -37,7 +37,7 @@
 extern struct System *Servermem;
 extern char outbuffer[],*argument,inmat[];
 extern int inloggad,nodnr,senast_text_typ,senast_text_nr,senast_text_mote,senast_brev_nr,senast_brev_anv,nu_skrivs;
-extern int g_lastKomTextType, g_lastKomTextNr, g_lastKomTextConf;
+extern int g_lastKomTextType, g_lastKomTextNr, g_lastKomTextConf, g_userDataSlot;
 extern struct Inloggning Statstr;
 extern struct MinList edit_list;
 extern struct Header readhead;
@@ -339,8 +339,8 @@ int initbrevheader(int tillpers) {
   struct User *toUser;
   char filnamn[40],*mottagare,tempbuf[100],*vemskrev;
 
-  Servermem->action[nodnr] = SKRIVER;
-  Servermem->varmote[nodnr] = -1;
+  Servermem->nodeInfo[nodnr].action = SKRIVER;
+  Servermem->nodeInfo[nodnr].currentConf = -1;
   memset(&brevspar, 0, sizeof(struct ReadLetter));
   if(tillpers == -1) {
     strcpy(brevspar.to, brevread.from);
@@ -443,8 +443,9 @@ int fido_brev(char *tillpers,char *adr,struct Mote *motpek) {
     SendString("\n\n\rDu har ingen rätt att skicka FidoNet NetMail.\n\r");
     return 0;
   }
-  Servermem->action[nodnr] = SKRIVER;
-  Servermem->varmote[nodnr] = -1;
+
+  Servermem->nodeInfo[nodnr].action = SKRIVER;
+  Servermem->nodeInfo[nodnr].currentConf = -1;
   memset(&ft, 0, sizeof(struct FidoText));
   if(!tillpers) { /* Det handlar om en kommentar */
     if(motpek) { /* Det är en personlig kommentar */
@@ -836,8 +837,8 @@ void initpersheader(void) {
   struct User *toUser;
   char filnamn[40], buf[100];
 
-  Servermem->action[nodnr] = SKRIVER;
-  Servermem->varmote[nodnr] = -1;
+  Servermem->nodeInfo[nodnr].action = SKRIVER;
+  Servermem->nodeInfo[nodnr].currentConf = -1;
   memset(&brevspar,0,sizeof(struct ReadLetter));
   sprintf(brevspar.to, "%ld", readhead.person);
   sprintf(brevspar.from, "%d", inloggad);

@@ -277,7 +277,7 @@ void waitconnect(void) {
 			{
 				sprintf(svarabuf,"%s\r",svara);
 				modemcmd(svarabuf,-1);
-				Servermem->inloggad[nodnr] = -2;
+				Servermem->nodeInfo[nodnr].userLoggedIn = -2;
 			}
 			else if(!strncmp(buf,"  HOST NAME",11))
 			{
@@ -292,22 +292,22 @@ void waitconnect(void) {
 				CallerIDHostIP[80] = 0;
 			}
 			else if(!strncmp(buf,"CONNECT",7) && !(nodestate & NIKSTATE_NOANSWER)) {
-				if(buf[7] == '\n') Servermem->connectbps[nodnr] = 300;
-				else Servermem->connectbps[nodnr] = atoi(hittaefter(buf));
+				if(buf[7] == '\n') Servermem->nodeInfo[nodnr].connectBps = 300;
+				else Servermem->nodeInfo[nodnr].connectBps = atoi(hittaefter(buf));
 				if(strcmp(CallerIDHost,"???") || CallerIDHostIP[0])
 				{
 					if(strcmp(CallerIDHost,"???"))
-						strcpy(Servermem->CallerID[nodnr], CallerIDHost);
+						strcpy(Servermem->nodeInfo[nodnr].callerId, CallerIDHost);
 					else
-						strcpy(Servermem->CallerID[nodnr], CallerIDHostIP);
+						strcpy(Servermem->nodeInfo[nodnr].callerId, CallerIDHostIP);
 				}
 
 				if(Servermem->cfg->logmask & LOG_CONNECTION) {
                                   len=strlen(buf);
                                   if(buf[len-1]=='\r') buf[len-1]=0;
-                                  if(Servermem->CallerID[nodnr]) {
+                                  if(Servermem->nodeInfo[nodnr].callerId) {
                                     LogEvent(USAGE_LOG, INFO, "%s (nod %d) CallerID %s",
-                                             buf, nodnr, Servermem->CallerID[nodnr]);
+                                             buf, nodnr, Servermem->nodeInfo[nodnr].callerId);
                                   } else {
                                     LogEvent(USAGE_LOG, INFO, "%s (nod %d)",buf,nodnr);
                                   }
@@ -353,7 +353,7 @@ void waitconnect(void) {
 					dtespeed = serchangereq->io_Baud;
 				}
 				serreqtkn();
-				sprintf(outbuffer,"Connect-speed: %ld, DTE-speed: %d\n\n",Servermem->connectbps[nodnr],dtespeed);
+				sprintf(outbuffer,"Connect-speed: %ld, DTE-speed: %d\n\n",Servermem->nodeInfo[nodnr].connectBps,dtespeed);
 				conputtekn(outbuffer,-1);
 				nodestate = nodestate & (NIKSTATE_CLOSESER | NIKSTATE_NOANSWER);
 				return;
@@ -361,7 +361,7 @@ void waitconnect(void) {
 				if(Servermem->cfg->logmask & LOG_NOCONNECT) {
                                   LogEvent(USAGE_LOG, INFO, "RING på nod %d, men ingen CONNECT", nodnr);
 				}
-				Servermem->inloggad[nodnr] = -1;
+				Servermem->nodeInfo[nodnr].userLoggedIn = -1;
 				sendat(init);
 			}
 		}

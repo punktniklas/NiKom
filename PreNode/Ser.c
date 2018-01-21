@@ -16,6 +16,7 @@
 #include "PreNodeFuncs.h"
 #include "Logging.h"
 #include "Terminal.h"
+#include "UserNotificationHooks.h"
 #include "NewUser.h"
 #include "BasicIO.h"
 #include "Languages.h"
@@ -35,9 +36,12 @@ struct RsxLib *RexxSysBase=NULL;
 struct Library *UtilityBase, *NiKomBase;
 struct Window *NiKwind=NULL;
 struct MsgPort *rexxport, *nikomnodeport;
+struct User g_preLoginUserData;
 
 char rexxportnamn[20], pubscreen[40],nodid[20], nikomnodeportnamn[15];
-int inloggad, getty,gettybps,relogin=FALSE,ypos,xpos,ysize,xsize;
+int inloggad, g_userDataSlot = -1, getty,gettybps,relogin=FALSE,ypos,xpos,ysize,xsize;
+struct User g_preLoginUserData;
+struct UnreadTexts g_newUserUnreadTexts;
 
 extern char commandhistory[], inmat[], outbuffer[];
 extern int hangupdelay, dtespeed, highbaud, nodnr, nodestate;
@@ -173,7 +177,7 @@ struct NodeType *selectNodeType(void) {
 }
 
 int main(int argc,char *argv[]) {
-  int going=TRUE, forsok=2, car=1, x, connectbps=0, i, tmp;
+  int going=TRUE, forsok=2, car=1, x, connectbps=0, i, newUser, tmpUserId;
   struct NodeType *nt;
   char *tmppscreen,commandstring[100], configname[50] = "NiKom:DatoCfg/SerNode.cfg";
   FILE *fil;
@@ -215,74 +219,78 @@ int main(int argc,char *argv[]) {
   if(getty) dtespeed = gettybps;
   else dtespeed = highbaud;
   if(!OpenIO(NiKwind)) cleanup(EXIT_ERROR,"Couldn't setup IO");
-  strcpy(Servermem->nodid[nodnr],nodid);
+  strcpy(Servermem->nodeInfo[nodnr].nodeIdStr, nodid);
   conreqtkn();
   serreqtkn();
   Delay(50);
   for(;;) {
     StopHeartBeat();
-    inloggad=-1;
-    Servermem->idletime[nodnr] = time(NULL);
-    Servermem->inloggad[nodnr]=-1;
-    if(getty) Servermem->connectbps[nodnr] = connectbps;
-    else waitconnect();
-    Servermem->idletime[nodnr] = time(NULL);
-    Servermem->inloggad[nodnr]=-2; /* Sätt till <Uppringd> för att även hantera -getty-fallet */
+    inloggad = -1;
+    Servermem->nodeInfo[nodnr].lastActiveTime = time(NULL);
+    Servermem->nodeInfo[nodnr].userLoggedIn = -1;
+    if(getty) {
+      Servermem->nodeInfo[nodnr].connectBps = connectbps;
+    } else {
+      waitconnect();
+    }
+    Servermem->nodeInfo[nodnr].lastActiveTime = time(NULL);
+    Servermem->nodeInfo[nodnr].userLoggedIn = -2; /* Sätt till <Uppringd> för att även hantera -getty-fallet */
   reloginspec:
     StartHeartBeat(TRUE);
-    CURRENT_USER->flaggor = Servermem->cfg->defaultflags;
+    g_preLoginUserData.flaggor = Servermem->cfg->defaultflags;
     if(!getty) Delay(100);
-    CURRENT_USER->rader=0;
-    CURRENT_USER->chrset = CHRS_LATIN1;
+    g_preLoginUserData.chrset = CHRS_LATIN1;
     sendfile("NiKom:Texter/Login.txt");
     if(Servermem->cfg->ar.preinlogg) sendrexx(Servermem->cfg->ar.preinlogg);
     car=TRUE;
-    CURRENT_USER->chrset = 0;
+    g_preLoginUserData.chrset = 0;
     memset(commandhistory,0,1000);
     going=1;
+    newUser = FALSE;
     while(going && going<=Servermem->cfg->logintries) {
       SendStringNoBrk("\r\nName: ");
       if(getstring(EKO,40,NULL)) { car=FALSE; break; }
       if(!stricmp(inmat,Servermem->cfg->ny)
          && !(Servermem->cfg->cfgflags & NICFG_CLOSEDBBS)) {
-        tmp = RegisterNewUser();
-        if(tmp == 2) {
+        tmpUserId = RegisterNewUser(&g_preLoginUserData);
+        if(tmpUserId == -2) {
           goto panik;
         }
-        car = tmp ? 0 : 1;
+        car = tmpUserId != -1;
+        newUser = TRUE;
         going=FALSE;
-      } else if((inloggad=parsenamn(inmat))>=0) {
-        if(!ReadUser(inloggad,CURRENT_USER)) {
+      } else if((tmpUserId = parsenamn(inmat)) >= 0) {
+        if(!ReadUser(tmpUserId, &g_preLoginUserData)) {
           goto panik;
         }
         // TODO: Extract password loop. Should be identical to in NiKomCon.c
         forsok=2;
         while(forsok) {
           SendStringNoBrk("\r\nPassword: ");
-          if(CURRENT_USER->flaggor & STAREKOFLAG)
-            {
-              if(getstring(STAREKO,15,NULL)) { car=FALSE; break; }
-            }
-          else
-            {
-              if(getstring(EJEKO,15,NULL)) { car=FALSE; break; }
-            }
-          if(CheckPassword(inmat, CURRENT_USER->losen))
-            {
-              forsok=FALSE;
-              going=FALSE;
-            } else forsok--;
+          if(g_preLoginUserData.flaggor & STAREKOFLAG) {
+            if(getstring(STAREKO,15,NULL)) { car=FALSE; break; }
+          } else {
+            if(getstring(EJEKO,15,NULL)) { car=FALSE; break; }
+          }
+          if(CheckPassword(inmat, g_preLoginUserData.losen)) {
+            forsok=FALSE;
+            going=FALSE;
+          } else {
+            forsok--;
+          }
         }
         if(going && (Servermem->cfg->logmask & LOG_FAILINLOGG)) {
           LogEvent(USAGE_LOG, WARN, "Nod %d, %s angivet som namn, fel lösen.",
                    nodnr, getusername(inloggad));
         }
-        if(going) going++;
-      } else if(inloggad==-1) {
+        if(going) {
+          going++;
+        }
+      } else if(tmpUserId == -1) {
         SendStringNoBrk("\r\nNo such user\r\n");
       }
     }
-    if(!car) {
+    if(!car) { //TODO: Replace with ConnectionList()?
       if(getty) cleanup(EXIT_OK,"");
       disconnect();
       continue;
@@ -291,8 +299,32 @@ int main(int argc,char *argv[]) {
       putstring("\n\n\rTyvärr. Du har försökt maximalt antal gånger att logga in. Kopplar ned.\n\r",-1,0);
       goto panik;      /* Urrk vad fult. :-) */
     }
-    Servermem->inloggad[nodnr]=inloggad;
-    Servermem->idletime[nodnr] = time(NULL);
+    inloggad = tmpUserId;
+    Servermem->nodeInfo[nodnr].userLoggedIn = inloggad;
+    switch(AllocateUserDataSlot(nodnr, inloggad)) {
+    case 0:
+      LogEvent(SYSTEM_LOG, ERROR, "Can't allocate userDataSlot for user %d", inloggad);
+      DisplayInternalError();
+      goto panik;
+    case 1:
+      break;
+    case 2:
+      memcpy(&Servermem->userData[Servermem->nodeInfo[nodnr].userDataSlot], &g_preLoginUserData, sizeof(struct User));
+      if(newUser) {
+        memcpy(&Servermem->unreadTexts[Servermem->nodeInfo[nodnr].userDataSlot],
+               &g_newUserUnreadTexts, sizeof(struct UnreadTexts));
+      } else {
+        if(!ReadUnreadTexts(&Servermem->unreadTexts[Servermem->nodeInfo[nodnr].userDataSlot], inloggad)) {
+          LogEvent(SYSTEM_LOG, ERROR,
+                   "Can't read unread text info for user %d", inloggad);
+          DisplayInternalError();
+          goto panik;
+        }
+      }
+      break;
+    }
+    g_userDataSlot = Servermem->nodeInfo[nodnr].userDataSlot;
+    Servermem->nodeInfo[nodnr].lastActiveTime = time(NULL);
     if((nt = selectNodeType()) == NULL) {
       goto panik;
     }
@@ -306,18 +338,18 @@ int main(int argc,char *argv[]) {
     RemPort(nikomnodeport);
     
     i = 0;
-    if(Servermem->connectbps[nodnr] > 0)
+    if(Servermem->nodeInfo[nodnr].connectBps > 0)
       {
-        while(Servermem->info.bps[i] != Servermem->connectbps[nodnr] && Servermem->info.bps[i] > 0 && i<49)
+        while(Servermem->info.bps[i] != Servermem->nodeInfo[nodnr].connectBps && Servermem->info.bps[i] > 0 && i<49)
           i++;
         
         if(i<49)
           {
-            if(Servermem->info.bps[i] == Servermem->connectbps[nodnr])
+            if(Servermem->info.bps[i] == Servermem->nodeInfo[nodnr].connectBps)
               Servermem->info.antbps[i]++;
             else
               {
-                Servermem->info.bps[i] = Servermem->connectbps[nodnr];
+                Servermem->info.bps[i] = Servermem->nodeInfo[nodnr].connectBps;
                 Servermem->info.antbps[i]++;
               }
           }
@@ -335,6 +367,10 @@ int main(int argc,char *argv[]) {
       }
     
     nodestate = SystemTags(commandstring, SYS_UserShell, TRUE, TAG_DONE);
+
+    ReleaseUserDataSlot(nodnr);
+    inloggad = -1;
+
     AddPort(nikomnodeport);
     if(!getty || (nodestate & NIKSTATE_RELOGIN)) {
       if(!(NiKwind = openmywindow(tmppscreen))) cleanup(EXIT_ERROR,"Kunde inte öppna fönstret\n");

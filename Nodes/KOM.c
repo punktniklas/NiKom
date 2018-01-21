@@ -37,7 +37,7 @@
 struct Stack *g_unreadRepliesStack;
 
 extern struct System *Servermem;
-extern int inloggad, nodnr, nodestate, mote2;
+extern int inloggad, nodnr, nodestate, mote2, g_userDataSlot;
 extern long logintime, extratime;
 extern char inmat[], *argument;
 
@@ -322,8 +322,8 @@ void ExecuteCommand(struct Kommando *cmd) {
     LogEvent(USAGE_LOG, INFO, "%s %s", getusername(inloggad), cmd->logstr);
   }
   if(cmd->vilkainfo[0]) {
-    Servermem->action[nodnr] = GORNGTANNAT;
-    Servermem->vilkastr[nodnr] = cmd->vilkainfo;
+    Servermem->nodeInfo[nodnr].action = GORNGTANNAT;
+    Servermem->nodeInfo[nodnr].currentActivity = cmd->vilkainfo;
   }
   // Save 'after' in case the command to execute is to reload the config and
   // cmd is not a valid pointer anymore when ExecuteCommandById() returns.
@@ -339,16 +339,16 @@ void displayPrompt(int defaultCmd) {
   char *cmdStr;
   struct Kommando *cmd;
 
-  if(Servermem->say[nodnr]) {
+  if(Servermem->waitingSayMessages[g_userDataSlot]) {
     displaysay();
   }
   if((minutesLeft = isUserOutOfTime()) == -1) {
     return;
   }
 
-  Servermem->idletime[nodnr] = time(NULL);
-  Servermem->action[nodnr] = LASER;
-  Servermem->varmote[nodnr] = mote2;
+  Servermem->nodeInfo[nodnr].lastActiveTime = time(NULL);
+  Servermem->nodeInfo[nodnr].action = LASER;
+  Servermem->nodeInfo[nodnr].currentConf = mote2;
   switch(defaultCmd) {
   case CMD_NEXTCONF:
     if(Servermem->cfg->ar.nextmeet) {
@@ -376,7 +376,7 @@ void displayPrompt(int defaultCmd) {
     cmdStr = CATSTR(MSG_PROMPT_READ_NEXT_COMMENT);
     break;
   case CMD_SEETIME:
-    Servermem->action[nodnr] = INGET;
+    Servermem->nodeInfo[nodnr].action = INGET;
     if(Servermem->cfg->ar.setid) {
       sendautorexx(Servermem->cfg->ar.setid);
     }

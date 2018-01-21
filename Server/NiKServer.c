@@ -90,7 +90,7 @@ void sparatext(struct NiKMess *message) {
 
 	if(message->nod >=0 ) {
           ChangeUnreadTextStatus(Servermem->info.hightext, 0,
-            &Servermem->unreadTexts[message->nod]);
+            &Servermem->unreadTexts[Servermem->nodeInfo[message->nod].userDataSlot]);
         }
 	message->data=Servermem->info.hightext;
 }
@@ -125,7 +125,7 @@ void writeinfo(void) {
 }
 
 int main(void) {
-  int Going=TRUE,noder=0,x=0;
+  int nodeCount = 0, nodeId = 0;
   long windmask, nikPortMask, signals, rexxmask, nodereplymask;
   struct NiKMess *MyNiKMess, *dummymess;
   struct IntuiMessage *myintmess;
@@ -140,36 +140,42 @@ int main(void) {
   rexxmask = 1L << rexxport->mp_SigBit;
   nodereplymask = 1l << nodereplyport->mp_SigBit;
 
-  while(Going) {
-    signals=Wait(windmask | nikPortMask | rexxmask | nodereplymask | SIGBREAKF_CTRL_C);
+  for(;;) {
+    signals = Wait(windmask | nikPortMask | rexxmask | nodereplymask | SIGBREAKF_CTRL_C);
     if(signals & windmask) {
-      myintmess=(struct IntuiMessage *)GetMsg(NiKWindow->UserPort);
+      myintmess = (struct IntuiMessage *)GetMsg(NiKWindow->UserPort);
       ReplyMsg((struct Message *)myintmess);
-      if(!noder) cleanup(EXIT_OK,"");
+      if(nodeCount == 0) {
+        cleanup(EXIT_OK, "");
+      }
     }
-    if(signals & SIGBREAKF_CTRL_C) if(!noder) cleanup(EXIT_OK,"");
+    if(signals & SIGBREAKF_CTRL_C) {
+      if(nodeCount == 0) {
+        cleanup(EXIT_OK, "");
+      }
+    }
     if(signals & nikPortMask) {
-      while((MyNiKMess=(struct NiKMess *)GetMsg(NiKPort))) {
+      while((MyNiKMess = (struct NiKMess *)GetMsg(NiKPort))) {
         switch(MyNiKMess->kommando) {
         case NYNOD :
-          if(noder<MAXNOD) {
-            noder++;
-            x=0;
-            while(Servermem->nodtyp[x++]);
-            Servermem->nodtyp[--x]=MyNiKMess->data;
-            MyNiKMess->nod=x;
-            MyNiKMess->data=(long)Servermem;
+          if(nodeCount < MAXNOD) {
+            nodeCount++;
+            nodeId = -1;
+            while(Servermem->nodeInfo[++nodeId].nodeType);
+            Servermem->nodeInfo[nodeId].nodeType = MyNiKMess->data;
+            MyNiKMess->nod = nodeId;
+            MyNiKMess->data = (long)Servermem;
           } else {
-            MyNiKMess->data=NULL;
+            MyNiKMess->data = NULL;
           }
-          sprintf(windowTitle, "NiKom %s,  %d noder aktiva", NiKomReleaseStr, noder);
+          sprintf(windowTitle, "NiKom %s,  %d noder aktiva", NiKomReleaseStr, nodeCount);
           SetWindowTitles(NiKWindow, windowTitle, (UBYTE *)-1L);
           break;
           
         case NODSLUTAR :
-          noder--;
-          Servermem->nodtyp[MyNiKMess->nod]=0;
-          sprintf(windowTitle, "NiKom %s,  %d noder aktiva", NiKomReleaseStr, noder);
+          nodeCount--;
+          Servermem->nodeInfo[MyNiKMess->nod].nodeType = 0;
+          sprintf(windowTitle, "NiKom %s,  %d noder aktiva", NiKomReleaseStr, nodeCount);
           SetWindowTitles(NiKWindow, windowTitle, (UBYTE *)-1L);
           break;
           
@@ -179,7 +185,7 @@ int main(void) {
         case FORBID :
           ReplyMsg((struct Message *)MyNiKMess);
           WaitPort(permitport);
-          dummymess=(struct NiKMess *)GetMsg(permitport);
+          dummymess = (struct NiKMess *)GetMsg(permitport);
           break;
         case RADERATEXTER :
           purgeOldTexts(MyNiKMess->data);
@@ -191,7 +197,7 @@ int main(void) {
           writeinfo();
           break;
         case GETADRESS :
-          MyNiKMess->data=(long)Servermem;
+          MyNiKMess->data = (long)Servermem;
           break;
         case NIKMESS_SETNODESTATE :
           setnodestate(MyNiKMess);
@@ -201,14 +207,14 @@ int main(void) {
       }
     }
     if(signals & rexxmask) {
-      while((rexxmess=(struct RexxMsg *)GetMsg(rexxport))) {
+      while((rexxmess = (struct RexxMsg *)GetMsg(rexxport))) {
         handlerexx(rexxmess);
         ReplyMsg((struct Message *)rexxmess);
       }
     }
     if(signals & nodereplymask) {
       while((MyNiKMess = (struct NiKMess *) GetMsg(nodereplyport)))
-        FreeMem(MyNiKMess,sizeof(struct NiKMess));
+        FreeMem(MyNiKMess, sizeof(struct NiKMess));
     }
   }
   return 0;

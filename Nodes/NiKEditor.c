@@ -24,7 +24,7 @@
 
 extern struct System *Servermem;
 extern char inmat[], crashmail;
-extern int rad,nu_skrivs,nodnr,senast_text_typ,senast_text_nr,senast_text_mote, inloggad;
+extern int rad,nu_skrivs,nodnr,senast_text_typ,senast_text_nr,senast_text_mote, inloggad, g_userDataSlot;
 extern struct Header sparhead;
 extern struct ReadLetter brevspar;
 extern struct Library *FifoBase;

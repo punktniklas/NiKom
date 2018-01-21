@@ -35,7 +35,7 @@
 #define EKO		1
 
 extern struct System *Servermem;
-extern int nodnr,inloggad,area2,rad;
+extern int nodnr,inloggad,area2,rad, g_userDataSlot;
 extern char outbuffer[],inmat[],*argument;
 extern struct Inloggning Statstr;
 extern struct MinList edit_list;

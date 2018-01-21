@@ -19,7 +19,7 @@
 #define EJEKO	0
 
 extern struct System *Servermem;
-extern int nodnr, inloggad;
+extern int nodnr, inloggad, g_userDataSlot;
 extern char outbuffer[],inmat[], *argument;
 
 struct Mote *getmotpek(int confId) {
@@ -93,8 +93,8 @@ int bytnodtyp(void) {
 
 void dellostsay(void) {
   struct SayString *say, *tmp;
-  say = Servermem->say[nodnr];
-  Servermem->say[nodnr] = NULL;
+  say = Servermem->waitingSayMessages[g_userDataSlot];
+  Servermem->waitingSayMessages[g_userDataSlot] = NULL;
   while(say) {
     tmp = say->NextSay;
     FreeMem(say, sizeof(struct SayString));
@@ -140,5 +140,5 @@ void bytteckenset(void) {
       return;
     }
   }
-  AskUserForCharacterSet(FALSE, showExample);
+  AskUserForCharacterSet(CURRENT_USER, FALSE, showExample);
 }

@@ -30,7 +30,7 @@
 extern struct System *Servermem;
 extern char outbuffer[],*argument,inmat[];
 extern int nodnr,senast_text_typ,senast_text_nr,senast_text_mote,nu_skrivs,inloggad,
-	rad,mote2;
+	rad,mote2, g_userDataSlot;
 extern int g_lastKomTextType, g_lastKomTextNr, g_lastKomTextConf;
 extern struct Header readhead,sparhead;
 extern struct Inloggning Statstr;
@@ -186,8 +186,8 @@ int fido_skriv(int komm,int komtill) {
   struct FidoLine *fl;
   char filnamn[15], fullpath[100], msgid[50];
 
-  Servermem->action[nodnr] = SKRIVER;
-  Servermem->varmote[nodnr] = mote2;
+  Servermem->nodeInfo[nodnr].action = SKRIVER;
+  Servermem->nodeInfo[nodnr].currentConf = mote2;
   motpek = getmotpek(mote2);
   memset(&ft, 0, sizeof(struct FidoText));
   if(komm) {

@@ -13,7 +13,7 @@
 #include "Languages.h"
 
 extern struct System *Servermem;
-extern int inloggad, nodnr, mote2, nodestate, senast_text_typ, senast_text_nr;
+extern int inloggad, nodnr, mote2, nodestate, senast_text_typ, senast_text_nr, g_userDataSlot;
 extern char *argument;
 extern struct Header readhead;
 

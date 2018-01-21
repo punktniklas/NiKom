@@ -43,7 +43,7 @@
 #define EJKOM   0
 
 extern struct System *Servermem;
-extern int nodnr,inloggad,radcnt,rxlinecount, nodestate;
+extern int nodnr,inloggad,radcnt,rxlinecount, nodestate, g_userDataSlot;
 extern char inmat[],backspace[],commandhistory[][1024];
 extern struct ReadLetter brevread;
 extern struct MinList edit_list;
@@ -635,10 +635,10 @@ void connection(void) {
   memset(&Statstr,0,sizeof(struct Inloggning));
   Statstr.anv=inloggad;
   mote2=-1;
-  LoadCatalogForUser();
-  Servermem->action[nodnr]=GORNGTANNAT;
+  LoadCatalogForUser(CURRENT_USER);
+  Servermem->nodeInfo[nodnr].action = GORNGTANNAT;
   strcpy(vilkabuf,"loggar in");
-  Servermem->vilkastr[nodnr]=vilkabuf;
+  Servermem->nodeInfo[nodnr].currentActivity = vilkabuf;
   senast_text_typ=0;
   if(Servermem->cfg->logmask & LOG_INLOGG) {
     LogEvent(USAGE_LOG, INFO, "%s loggar in på nod %d",

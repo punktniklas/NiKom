@@ -35,7 +35,7 @@
 #define EJEKO	0
 
 extern struct System *Servermem;
-extern int area2,inloggad,nodnr,rad;
+extern int area2,inloggad,nodnr,rad, g_userDataSlot;
 extern struct IOExtSer *serwritereq,*serreadreq,*serchangereq;
 extern struct timerequest *timerreq;
 extern struct MsgPort *serwriteport,*serreadport,*serchangeport,*timerport;
@@ -186,7 +186,9 @@ static long __saveds __regargs nik_update(struct XPR_UPDATE *update) {
 		sprintf(outbuffer,"\r\nFör över %s\r\n",update->xpru_filename);
 		conputtekn(outbuffer,-1);
 		strcpy(xprfilnamn,update->xpru_filename);
-		if(Servermem->action[nodnr]==UPLOAD || Servermem->action[nodnr]==DOWNLOAD) Servermem->vilkastr[nodnr] = FilePart(xprfilnamn);
+		if(Servermem->nodeInfo[nodnr].action == UPLOAD || Servermem->nodeInfo[nodnr].action == DOWNLOAD) {
+                  Servermem->nodeInfo[nodnr].currentActivity = FilePart(xprfilnamn);
+                }
 	}
 	if(update->xpru_updatemask & XPRU_FILESIZE) {
 		sprintf(outbuffer,"Filens längd %ld\r\n",update->xpru_filesize);
@@ -200,7 +202,7 @@ static long __saveds __regargs nik_update(struct XPR_UPDATE *update) {
 		sprintf(outbuffer,"\rBytes: %ld (%ld cps)",update->xpru_bytes,update->xpru_datarate);
 		conputtekn(outbuffer,-1);
 		countbytes=update->xpru_bytes;
-		if(countbytes == filesize && Servermem->action[nodnr]==UPLOAD) {
+		if(countbytes == filesize && Servermem->nodeInfo[nodnr].action == UPLOAD) {
 			tmptf = (struct TransferFiles *)tf_list.mlh_Head;
 			while(tmptf)
 			{
@@ -413,9 +415,9 @@ int download(void) {
 		puttekn("\n\rInga filer att skicka.\n\r",-1);
 		return(0);
 	}
-	Servermem->action[nodnr] = DOWNLOAD;
-	Servermem->varmote[nodnr] = area2;
-	Servermem->vilkastr[nodnr] = NULL;
+	Servermem->nodeInfo[nodnr].action = DOWNLOAD;
+	Servermem->nodeInfo[nodnr].currentConf = area2;
+	Servermem->nodeInfo[nodnr].currentActivity = NULL;
 	sendbinfile();
 	if(Servermem->cfg->logmask & LOG_DOWNLOAD) {
 		for(tf=(struct TransferFiles *)tf_list.mlh_Head;tf->node.mln_Succ;tf=(struct TransferFiles *)tf->node.mln_Succ)
@@ -479,9 +481,9 @@ int upload(void) {
     puttekn("\n\n\rDu har ingen rätt att ladda upp till den arean!\n\r",-1);
     return(0);
   }
-  Servermem->action[nodnr] = UPLOAD;
-  Servermem->varmote[nodnr] = area;
-  Servermem->vilkastr[nodnr] = NULL;
+  Servermem->nodeInfo[nodnr].action = UPLOAD;
+  Servermem->nodeInfo[nodnr].currentConf = area;
+  Servermem->nodeInfo[nodnr].currentActivity = NULL;
   if((ret=recbinfile(Servermem->cfg->ultmp))) {
     while((tf=(struct TransferFiles *)RemHead((struct List *)&tf_list)))
       FreeMem(tf,sizeof(struct TransferFiles));

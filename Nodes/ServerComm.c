@@ -50,8 +50,9 @@ int initnode(int type) {
 
 void shutdownnode(int type) {
 	if((type != NODSPAWNED) && (nodnr!=-1)) {
-		Servermem->inloggad[nodnr]=-1;
-		Servermem->action[nodnr]=0;
+		Servermem->nodeInfo[nodnr].userLoggedIn = -1;
+		Servermem->nodeInfo[nodnr].userDataSlot = -1;
+		Servermem->nodeInfo[nodnr].action = 0;
 		servermess->kommando=NODSLUTAR;
 		servermess->nod=nodnr;
 		PutMsg(NiKomPort,(struct Message *)servermess);

@@ -39,7 +39,6 @@ int ConvMBChrsToAmiga(char *, char *, int, int);
 int ConvMBChrsFromAmiga(char *, char *, int, int, int);
 void StripAnsiSequences(char *);
 int SetNodeState(int, int);
-int SendNodeMessage(int, int, char *);
 /* NiKHash *NewNiKHash(int);
 void DeleteNiKHash(NiKHash *);
 int InsertNiKHash(NiKHash *, int, void *);

@@ -1,1 +1,1 @@
-int RegisterNewUser(void);
+int RegisterNewUser(struct User *user);

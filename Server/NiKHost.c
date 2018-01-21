@@ -57,7 +57,6 @@ void handlerexx(struct RexxMsg *mess) {
 	else if(!stricmp(mess->rm_Args[0],"KEYINFO")) keyinfo(mess);
 	else if(!stricmp(mess->rm_Args[0],"GETDIR")) getdir(mess);
 	else if(!stricmp(mess->rm_Args[0],"DELOLDTEXTS")) rexxPurgeOldTexts(mess);
-	else if(!stricmp(mess->rm_Args[0],"SENDNODEMESS")) rxsendnodemess(mess);
 	else if(!stricmp(mess->rm_Args[0],"STATUSINFO")) rexxstatusinfo(mess);
 	else if(!stricmp(mess->rm_Args[0],"AREARIGHT")) rexxarearight(mess);
 	else if(!stricmp(mess->rm_Args[0],"SYSSETTINGS")) rexxsysteminfo(mess);
@@ -65,7 +64,6 @@ void handlerexx(struct RexxMsg *mess) {
 	else if(!stricmp(mess->rm_Args[0],"MARKTEXTREAD")) rexxmarktextread(mess);
 	else if(!stricmp(mess->rm_Args[0],"MARKTEXTUNREAD")) rexxmarktextunread(mess);
 	else if(!stricmp(mess->rm_Args[0],"NEXTPATTERNFILE")) rexxnextpatternfile(mess);
-	else if(!stricmp(mess->rm_Args[0],"CONSOLETEXT")) rexxconsoletext(mess);
 	else if(!stricmp(mess->rm_Args[0],"CHECKUSERPASSWORD")) rexxcheckuserpassword(mess);
 	else {
 		mess->rm_Result1=10;

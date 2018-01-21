@@ -20,7 +20,7 @@
 #include "UserDataUtils.h"
 
 extern struct System *Servermem;
-extern int nodnr,inloggad,senast_text_typ,rad,mote2,buftkn,senast_brev_nr,senast_brev_anv;
+extern int nodnr,inloggad,senast_text_typ,rad,mote2,buftkn,senast_brev_nr,senast_brev_anv, g_userDataSlot;
 extern char outbuffer[],inmat[],backspace[],*argument,vilkabuf[];
 extern struct MsgPort *timerport,*conreadport;
 extern struct Inloggning Statstr;
@@ -321,8 +321,8 @@ int ropa(void) {
   }
   SendString("\r\nSysop här! (Tryck Ctrl-Z för att avsluta samtalet.)\r\n");
   strcpy(vilkabuf,"pratar med sysop");
-  Servermem->vilkastr[nodnr] = vilkabuf;
-  Servermem->action[nodnr] = GORNGTANNAT;
+  Servermem->nodeInfo[nodnr].currentActivity = vilkabuf;
+  Servermem->nodeInfo[nodnr].action = GORNGTANNAT;
   for(;;) {
     ch = GetChar();
     if(ch == GETCHAR_LOGOUT) {

@@ -19,7 +19,7 @@
 #define TEXTTYPE_REPLY	 1
 
 extern char *argument;
-extern int mote2, inloggad, nodnr, senast_text_typ, senast_text_nr, senast_text_mote;
+extern int mote2, inloggad, nodnr, senast_text_typ, senast_text_nr, senast_text_mote, g_userDataSlot;
 extern struct System *Servermem;
 extern struct MinList edit_list;
 

@@ -20,6 +20,7 @@
 
 extern struct System *Servermem;
 
+/*
 void rxsendnodemess(struct RexxMsg *mess) {
 	int avs, nodnr, ret;
 	char *str, retstr[5];
@@ -50,6 +51,7 @@ void rxsendnodemess(struct RexxMsg *mess) {
 	if(!(mess->rm_Result2=(long)CreateArgstring(retstr,strlen(retstr))))
 		printf("Kunde inte allokera en ArgString\n");
 }
+*/
 
 void rexxstatusinfo(struct RexxMsg *mess)
 {
@@ -262,27 +264,6 @@ void rexxmarktext(struct RexxMsg *mess, int desiredUnreadStatus) {
   }
 
   SetRexxResultString(mess, "0");
-}
-
-void rexxconsoletext(struct RexxMsg *mess)
-{
-	int nodnr, varde;
-
-	if(!mess->rm_Args[1] || !mess->rm_Args[2])
-	{
-		mess->rm_Result1=1;
-		mess->rm_Result2=0;
-		return;
-	}
-
-	nodnr = atoi(mess->rm_Args[1]);
-	varde = atoi(mess->rm_Args[2]);
-
-	Servermem->watchserial[nodnr] = varde;
-
-	if(!(mess->rm_Result2=(long)CreateArgstring("0", 1)))
-		printf("Kunde inte allokera en ArgString\n");
-	mess->rm_Result1=0;
 }
 
 void rexxcheckuserpassword(struct RexxMsg *mess) {

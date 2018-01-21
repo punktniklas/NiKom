@@ -153,8 +153,9 @@
 #define NIKSEM_UNREAD     10
 #define NIKSEM_CONFTEXTS  11
 #define NIKSEM_LOGFILES   12
+#define NIKSEM_USERDATASLOT 13
 
-#define NIKSEM_NOOF       13 /* Hur många det finns */
+#define NIKSEM_NOOF       14 /* The total number of semaphores. */
 
 #define NUM_LANGUAGES     2
 
@@ -376,22 +377,33 @@ struct ConferenceTexts {
   short *texts;
 };
 
+/* The userLoggedIn field is only valid if nodeType != 0. All other fields are only valid
+ * when userLoggedIn is valid and >= 0.
+ */
+struct NodeInfo {
+  long nodeType, userLoggedIn, action, currentConf, extraTime, connectBps,
+    lastActiveTime, maxInactiveTime, userDataSlot;
+  char *currentActivity, nodeIdStr[20], callerId[81];
+};
+
 struct System {
   struct ConferenceTexts confTexts;
-  struct User inne[MAXNOD];
+
+  // These three arrays are indexed by userDataSlot
+  struct User userData[MAXNOD];
   struct UnreadTexts unreadTexts[MAXNOD];
-  long nodtyp[MAXNOD],inloggad[MAXNOD],action[MAXNOD],varmote[MAXNOD],
-    xtratime[MAXNOD],connectbps[MAXNOD], idletime[MAXNOD],
-    maxinactivetime[MAXNOD];
-  char *vilkastr[MAXNOD], nodid[MAXNOD][20], watchserial[MAXNOD],
-    CallerID[MAXNOD][81], *serverBuildTime;
+  struct SayString *waitingSayMessages[MAXNOD];
+
+  // This array is indexed by nodeId
+  struct NodeInfo nodeInfo[MAXNOD];
+
+  char *serverBuildTime;
   struct MinList mot_list;
   struct MinList user_list;
   struct MinList shell_list;
   struct MinList grupp_list;
   struct Config *cfg;
   struct SysInfo info;
-  struct SayString *say[MAXNOD];
   struct Inloggning senaste[MAXSENASTE];
   struct Area areor[MAXAREA];
   struct SignalSemaphore semaphores[NIKSEM_NOOF];

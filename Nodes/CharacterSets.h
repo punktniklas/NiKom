@@ -1,1 +1,1 @@
-int AskUserForCharacterSet(int forceChoice, int showExamples);
+int AskUserForCharacterSet(struct User *user, int forceChoice, int showExamples);

@@ -31,7 +31,7 @@ struct timerequest *timerreq=NULL;
 struct MsgPort *timerport=NULL;
 
 
-extern int nodnr, ypos, xpos, ysize, xsize, inloggad, nodestate;
+extern int nodnr, ypos, xpos, ysize, xsize, inloggad, nodestate, g_userDataSlot;
 extern char pubscreen[];
 extern struct Window *NiKwind;
 extern struct System *Servermem;

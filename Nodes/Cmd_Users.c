@@ -25,7 +25,7 @@
 #include "Cmd_Users.h"
 
 extern struct System *Servermem;
-extern int nodnr, inloggad;
+extern int nodnr, inloggad, g_userDataSlot;
 extern char outbuffer[],inmat[], *argument;
 
 

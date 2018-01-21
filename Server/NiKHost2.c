@@ -90,58 +90,50 @@ int writetexthead(int nummer,struct Header *head) {
 }
 
 void rexxnodeinfo(struct RexxMsg *mess) {
-        char str[100];
-        int nod;
-        if((!mess->rm_Args[1]) || (!mess->rm_Args[2])) {
-                mess->rm_Result1=1;
-                mess->rm_Result2=0;
-                return;
-        }
-        nod=atoi(mess->rm_Args[1]);
-        if(nod<0 || nod>=MAXNOD || !Servermem->nodtyp[nod]) {
-                if(!(mess->rm_Result2=(long)CreateArgstring("-1",strlen("-1"))))
-                printf("Kunde inte allokera en ArgString\n");
-                mess->rm_Result1=0;
-                return;
-        }
-        switch(mess->rm_Args[2][0]) {
-                case 'a' : case 'A' :
-                        strcpy(str,Servermem->vilkastr[nod]);
-                        break;
-                case 'c' : case 'C' :
-                        strcpy(str,Servermem->CallerID[nod]);
-                        break;
-                case 'd' : case 'D' :
-                        strcpy(str,Servermem->nodid[nod]);
-                        break;
-                case 'g' : case 'G' :
-                        sprintf(str,"%ld",Servermem->action[nod]);
-                        break;
-                case 'i' : case 'I' :
-                        sprintf(str,"%ld",Servermem->inloggad[nod]);
-                        break;
-                case 'm' : case 'M' :
-                        sprintf(str,"%ld",Servermem->varmote[nod]);
-                        break;
-                case 'p' : case 'P' :
-                        sprintf(str,"%ld",time(NULL)-Servermem->idletime[nod]);
-                        break;
-                case 's' : case 'S' :
-                        sprintf(str,"%ld",Servermem->connectbps[nod]);
-                        break;
-                case 't' : case 'T' :
-                        sprintf(str,"%ld",Servermem->nodtyp[nod]);
-                        break;
-                case 'u' : case 'U' :
-                        sprintf(str,"%c",Servermem->say[nod] ? '1' : '0');
-                        break;
-                default :
-                        str[0]=0;
-                        break;
-        }
-        if(!(mess->rm_Result2=(long)CreateArgstring(str,strlen(str))))
-                printf("Kunde inte allokera en ArgString\n");
-        mess->rm_Result1=0;
+  char str[100];
+  int nodeId;
+  if((!mess->rm_Args[1]) || (!mess->rm_Args[2])) {
+    SetRexxErrorResult(mess, 1);
+    return;
+  }
+  nodeId = atoi(mess->rm_Args[1]);
+  if(nodeId < 0 || nodeId >= MAXNOD || Servermem->nodeInfo[nodeId].nodeType == 0) {
+    SetRexxResultString(mess, "-1");
+    return;
+  }
+  switch(mess->rm_Args[2][0]) {
+  case 'a' : case 'A' :
+    strcpy(str, Servermem->nodeInfo[nodeId].currentActivity);
+    break;
+  case 'c' : case 'C' :
+    strcpy(str, Servermem->nodeInfo[nodeId].callerId);
+    break;
+  case 'd' : case 'D' :
+    strcpy(str, Servermem->nodeInfo[nodeId].nodeIdStr);
+    break;
+  case 'g' : case 'G' :
+    sprintf(str, "%ld", Servermem->nodeInfo[nodeId].action);
+    break;
+  case 'i' : case 'I' :
+    sprintf(str, "%ld", Servermem->nodeInfo[nodeId].userLoggedIn);
+    break;
+  case 'm' : case 'M' :
+    sprintf(str, "%ld", Servermem->nodeInfo[nodeId].currentConf);
+    break;
+  case 'p' : case 'P' :
+    sprintf(str, "%ld", time(NULL) - Servermem->nodeInfo[nodeId].lastActiveTime);
+    break;
+  case 's' : case 'S' :
+    sprintf(str, "%ld", Servermem->nodeInfo[nodeId].connectBps);
+    break;
+  case 't' : case 'T' :
+    sprintf(str, "%ld", Servermem->nodeInfo[nodeId].nodeType);
+    break;
+  default :
+    str[0] = '\0';
+    break;
+  }
+  SetRexxResultString(mess, str);
 }
 
 void rexxnextfile(struct RexxMsg *mess) {

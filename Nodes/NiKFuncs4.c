@@ -34,7 +34,7 @@
 #define EKO		1
 
 extern struct System *Servermem;
-extern int nodnr,inloggad,mote2,senast_text_typ,radcnt;
+extern int nodnr,inloggad,mote2,senast_text_typ,radcnt, g_userDataSlot;
 extern char inmat[],*argument,usernamebuf[];
 extern struct Inloggning Statstr;
 extern struct Header readhead;
@@ -265,7 +265,7 @@ void listagrupper(void) {
     isMember = gruppmed(group, CURRENT_USER->status, CURRENT_USER->grupper);
     if((group->flaggor & HEMLIGT)
        && !isMember
-       && Servermem->inloggad[nodnr] != group->groupadmin) {
+       && inloggad != group->groupadmin) {
       continue;
     }
     if(SendString("%c %s\r\n", isMember ? '*' : ' ', group->namn)) {

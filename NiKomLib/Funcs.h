@@ -55,7 +55,6 @@ int __saveds AASM LIBConvMBChrsFromAmiga(register __a0 char * AREG(a0),
                                          register __d2 int AREG(d2),
                                          register __a6 struct NiKomBase * AREG(a6));
 int __saveds AASM LIBSetNodeState(register __d0 int AREG(d0), register __d1 int AREG(d1));
-int __saveds AASM LIBSendNodeMessage(register __d0 int AREG(d0), register __d1 int AREG(d1), register __a0 char * AREG(a0), register __a6 struct NiKomBase * AREG(a6));
 NiKHash * __saveds AASM LIBNewNiKHash(register __d0 int AREG(d0));
 void __saveds AASM LIBDeleteNiKHash(register __a0 NiKHash * AREG(a0));
 int __saveds AASM LIBInsertNiKHash(register __a0 NiKHash * AREG(a0), register __d0 int AREG(d0), register __a1 void * AREG(a1));

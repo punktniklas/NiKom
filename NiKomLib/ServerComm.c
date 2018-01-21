@@ -29,64 +29,6 @@ int __saveds AASM LIBSetNodeState(register __d0 int node AREG(d0), register __d1
 	return(sendservermess(NIKMESS_SETNODESTATE,-1,node,state,0L));
 }
 
-/*
- * Name:        SendNodeMessage
- *
- * Parametrar:  d0 - Vilken nod meddelandet ska skickas till. -1 för samtliga noder.
- *              d1 - Från vilken användare.
- *              a0 - En pekare till strängen som ska skickas.
- *
- * Returvärden: 0 för misslyckande. 1 om mottagaren inte har olästa meddelanden.
- *              2 om användaren har olästa meddelanden. När meddelandet ska skickas till
- *              alla noder returneras det antal noder som meddelandet gått fram till.
- *				-1 om noden inte finns!
- *
- * Beskrivning: Skickar meddelandet som ett säg-meddelande till den angivna noden/noderna.
- *              Om man sätter avsändare till -1 tolkas det som ett systemmeddelande.
- */
-
-int __saveds AASM LIBSendNodeMessage(register __d0 int node AREG(d0), register __d1 int from AREG(d1), register __a0 char *str AREG(a0),
-	register __a6 struct NiKomBase *NiKomBase AREG(a6)) {
-	int i, ret = 0;
-
-	if(node > MAXNOD) return(-1);
-	if(node != -1) {
-		if(NiKomBase->Servermem->nodtyp[node] == 0) return(0);
-		else return(linksaystring(node, from, str, NiKomBase));
-	} else {
-		for(i = 0; i < MAXNOD; i++) {
-			if(NiKomBase->Servermem->nodtyp[i] == 0) continue;
-			if(linksaystring(i,from,str, NiKomBase)) ret++;
-		}
-		return(ret);
-	}
-}
-
-int linksaystring(int node, int from, char *str, struct NiKomBase *NiKomBase) {
-	struct SayString *ss, *pek;
-	int ret;
-	ss = AllocMem(sizeof(struct SayString), MEMF_CLEAR | MEMF_PUBLIC);
-	if(ss) {
-		ss->fromuser = from;
-		ss->timestamp = time(NULL);
-		strncpy(ss->text,str,MAXSAYTKN - 1);
-		ss->text[MAXSAYTKN - 1] = 0;
-		Forbid();
-		if(NiKomBase->Servermem->say[node]) {
-			pek = NiKomBase->Servermem->say[node];
-			while(pek->NextSay) pek = pek->NextSay;
-			pek->NextSay = ss;
-			ret = 2;
-		} else {
-			NiKomBase->Servermem->say[node] = ss;
-			ret = 1;
-		}
-		Permit();
-		return(ret);
-	}
-	return(0);
-}
-
 struct MsgPort *SafePutToPort(message,portname)
 struct NiKMess *message;
 char *portname;

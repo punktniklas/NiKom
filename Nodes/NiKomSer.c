@@ -46,7 +46,8 @@ struct Library *UtilityBase, *NiKomBase;
 struct Window *NiKwind=NULL;
 struct MsgPort *rexxport, *nikomnodeport;
 char rexxportnamn[15], pubscreen[40], nikomnodeportnamn[15];
-int inloggad, ypos,xpos,ysize,xsize;
+int inloggad = -1, g_userDataSlot = -1, ypos,xpos,ysize,xsize;
+struct User g_preLoginUserData;
 
 /* Följande behövs för att SerialIO ska kunna användas även i PreNoden */
 char svara[17],init[81],hangup[32],nodid[20];
@@ -151,7 +152,8 @@ int main(int argc,char *argv[]) {
                                                TAG_DONE)))
     cleanup(EXIT_ERROR,"Kunde inte öppna fönstret\n");
   if(!OpenIO(NiKwind)) cleanup(EXIT_ERROR,"Kunde inte öppna IO\n");
-  inloggad=Servermem->inloggad[nodnr];
+  inloggad = Servermem->nodeInfo[nodnr].userLoggedIn;
+  g_userDataSlot = Servermem->nodeInfo[nodnr].userDataSlot;
   conreqtkn();
   serreqtkn();
   StartHeartBeat(TRUE);
@@ -181,16 +183,18 @@ int main(int argc,char *argv[]) {
       SendString("\n\n\r*** %s ***\n\n\r", CATSTR(MSG_KOM_INACTIVITY_LOGOUT));
     }
     radcnt=-174711;
-    if(Servermem->say[nodnr]) displaysay();
+    if(Servermem->waitingSayMessages[g_userDataSlot]) displaysay();
     if(Servermem->cfg->ar.utlogg) sendautorexx(Servermem->cfg->ar.utlogg);
     SendInfoFile("Logout.txt", 0);
   }
-  Servermem->inloggad[nodnr]=-1;
+  Servermem->nodeInfo[nodnr].userLoggedIn = -1;
   if(Servermem->cfg->logmask & LOG_UTLOGG) {
     LogEvent(USAGE_LOG, INFO, "%s loggar ut från nod %d (%d skrivna, %d lästa)",
              getusername(inloggad), nodnr, Statstr.write, Statstr.read);
   }
-  Servermem->action[nodnr]=0;
+  sprintf(tellstr,"loggade just ut från nod %d",nodnr);
+  tellallnodes(tellstr);
+  Servermem->nodeInfo[nodnr].action = 0;
   time(&tid);
   CURRENT_USER->senast_in=tid;
   CURRENT_USER->tot_tid+=(tid-logintime);
@@ -201,8 +205,6 @@ int main(int argc,char *argv[]) {
   StopHeartBeat();
   saveUserData();
   freealiasmem();
-  sprintf(tellstr,"loggade just ut från nod %d",nodnr);
-  tellallnodes(tellstr);
 
   if(nodestate & NIKSTATE_NOCARRIER) {
     nodestate &= ~NIKSTATE_RELOGIN;

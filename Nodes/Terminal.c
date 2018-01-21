@@ -20,7 +20,7 @@
 #define LOWERCASE(ch) (ch | CASE_BIT)
 #define UPPERCASE(ch) (ch & ~CASE_BIT)
 
-extern int nodnr, rxlinecount;
+extern int nodnr, rxlinecount, g_userDataSlot, inloggad;
 extern char outbuffer[];
 extern struct System *Servermem;
 
@@ -79,7 +79,7 @@ int GetChar(void) {
       return GETCHAR_DELETE;
     case 127: // Delete
       return CURRENT_USER->flaggor & ASCII_7E_IS_DELETE
-          || Servermem->nodtyp[nodnr] == NODCON
+          || Servermem->nodeInfo[nodnr].nodeType == NODCON
         ? GETCHAR_DELETE : GETCHAR_BACKSPACE;
     case 24: // Ctrl-X
       return GETCHAR_DELETELINE;
@@ -446,7 +446,8 @@ int incantrader(void) {
   int ch;
   
   radcnt++;
-  if(CURRENT_USER->rader
+  if(inloggad != -1
+     && CURRENT_USER->rader
      && radcnt >= CURRENT_USER->rader
      && rxlinecount) {
     SendStringNoBrk("\r<RETURN>");

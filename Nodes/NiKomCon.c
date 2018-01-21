@@ -46,7 +46,9 @@ struct Window *NiKwind=NULL;
 struct MsgPort *rexxport, *nikomnodeport;
 
 char rexxportnamn[15], pubscreen[40], nikomnodeportnamn[15];
-int inloggad, ypos, xpos, ysize, xsize;
+int inloggad = -1, g_userDataSlot = -1, ypos, xpos, ysize, xsize;
+struct User g_preLoginUserData;
+struct UnreadTexts g_newUserUnreadTexts;
 extern char commandhistory[];
 
 static void freealiasmem(void) {
@@ -80,7 +82,7 @@ void cleanup(int kod,char *fel) {
 }
 
 int main(int argc, char **argv) {
-  int going = TRUE, forsok = 2,car = 1, tmp, ch;
+  int going = TRUE, forsok = 2, ch, newUser, tmpUserId;
   long tid;
   char tellstr[100],*tmppscreen, titel[80];
 
@@ -133,63 +135,83 @@ int main(int argc, char **argv) {
                                                TAG_DONE)))
     cleanup(EXIT_ERROR,"Kunde inte öppna fönstret\n");
   if(!OpenIO(NiKwind)) cleanup(EXIT_ERROR,"Kunde inte öppna IO\n");
-  strcpy(Servermem->nodid[nodnr],nodid);
+  strcpy(Servermem->nodeInfo[nodnr].nodeIdStr, nodid);
   sprintf(titel,"Nod #%d CON: <Ingen inloggad>",nodnr);
   SetWindowTitles(NiKwind,titel,(UBYTE *)-1L);
-  Servermem->connectbps[nodnr] = -1;
+  Servermem->nodeInfo[nodnr].connectBps = -1;
   conreqtkn();
   do {
-    Servermem->idletime[nodnr] = time(NULL);
+    Servermem->nodeInfo[nodnr].lastActiveTime = time(NULL);
     memset(commandhistory,0,1024);
-    CURRENT_USER->rader=0;
     sendfile("NiKom:Texter/Login.txt");
     if(Servermem->cfg->ar.preinlogg) sendautorexx(Servermem->cfg->ar.preinlogg);
     going=TRUE;
+    newUser = FALSE;
     while(going) {
-      Servermem->idletime[nodnr] = time(NULL);
+      Servermem->nodeInfo[nodnr].lastActiveTime = time(NULL);
       SendStringNoBrk("\r\nName: ");
       getstring(EKO,40,NULL);
       if(!stricmp(inmat,Servermem->cfg->ny)) {
-        tmp = RegisterNewUser();
-        if(tmp == 2) {
+        tmpUserId = RegisterNewUser(&g_preLoginUserData);
+        if(tmpUserId == -2) {
           goto panik;
         }
-        car = tmp ? 0 : 1;
+        newUser = TRUE;
         going=FALSE;
       }
-      else if((inloggad=parsenamn(inmat))>=0) {
-        if(!ReadUser(inloggad, CURRENT_USER)) {
+      else if((tmpUserId = parsenamn(inmat)) >= 0) {
+        if(!ReadUser(tmpUserId, &g_preLoginUserData)) {
           goto panik;
         }
         // TODO: Extract password loop. Should be identical to in PreNode/Ser.c
         forsok=2;
         while(forsok) {
           SendStringNoBrk("\r\nPassword: ");
-          if(CURRENT_USER->flaggor & STAREKOFLAG)
+          if(g_preLoginUserData.flaggor & STAREKOFLAG)
             getstring(STAREKO,15,NULL);
           else
             getstring(EJEKO,15,NULL);
-          if(CheckPassword(inmat, CURRENT_USER->losen)) {
+          if(CheckPassword(inmat, g_preLoginUserData.losen)) {
             forsok=FALSE;
             going=FALSE;
           } else {
             forsok--;
           }
         }
-      } else if(inloggad==-1) {
+      } else if(tmpUserId == -1) {
         SendStringNoBrk("\r\nNo such user\r\n");
       }
     }
-    sprintf(titel,"Nod #%d CON: %s #%d",nodnr,CURRENT_USER->namn,inloggad);
-    SetWindowTitles(NiKwind,titel,(UBYTE *)-1L);
-    if(!ReadUnreadTexts(CUR_USER_UNREAD, inloggad)) {
-      LogEvent(SYSTEM_LOG, ERROR,
-               "Can't read unread text info for user %d", inloggad);
+
+    inloggad = tmpUserId;
+    Servermem->nodeInfo[nodnr].userLoggedIn = inloggad;
+    switch(AllocateUserDataSlot(nodnr, inloggad)) {
+    case 0:
+      LogEvent(SYSTEM_LOG, ERROR, "Can't allocate userDataSlot for user %d", inloggad);
       DisplayInternalError();
       goto panik;
+    case 1:
+      break;
+    case 2:
+      memcpy(&Servermem->userData[Servermem->nodeInfo[nodnr].userDataSlot], &g_preLoginUserData, sizeof(struct User));
+      if(newUser) {
+        memcpy(&Servermem->unreadTexts[Servermem->nodeInfo[nodnr].userDataSlot],
+               &g_newUserUnreadTexts, sizeof(struct UnreadTexts));
+      } else {
+        if(!ReadUnreadTexts(&Servermem->unreadTexts[Servermem->nodeInfo[nodnr].userDataSlot], inloggad)) {
+          LogEvent(SYSTEM_LOG, ERROR,
+                   "Can't read unread text info for user %d", inloggad);
+          DisplayInternalError();
+          goto panik;
+        }
+      }
+      break;
     }
-    Servermem->inloggad[nodnr]=inloggad;
-    Servermem->idletime[nodnr] = time(NULL);
+    g_userDataSlot = Servermem->nodeInfo[nodnr].userDataSlot;
+    Servermem->nodeInfo[nodnr].lastActiveTime = time(NULL);
+
+    sprintf(titel,"Nod #%d CON: %s #%d",nodnr,CURRENT_USER->namn,inloggad);
+    SetWindowTitles(NiKwind,titel,(UBYTE *)-1L);
     SendInfoFile("Bulletin.txt", CURRENT_USER->senast_in);
 
     connection();
@@ -198,14 +220,18 @@ int main(int argc, char **argv) {
       LogEvent(USAGE_LOG, INFO, "%s loggar ut från nod %d (%d skrivna, %d lästa)",
                getusername(inloggad), nodnr, Statstr.write, Statstr.read);
     }
-    if(Servermem->say[nodnr]) displaysay();
+    if(Servermem->waitingSayMessages[g_userDataSlot] != NULL) {
+      displaysay();
+    }
     if(Servermem->cfg->ar.utlogg) sendautorexx(Servermem->cfg->ar.utlogg);
     SendInfoFile("Logout.txt", 0);
+    sprintf(tellstr,"loggade just ut från nod %d",nodnr);
+    tellallnodes(tellstr);
     sprintf(titel,"Nod #%d CON: <Ingen inloggad>",nodnr);
     SetWindowTitles(NiKwind,titel,(UBYTE *)-1L);
-    Servermem->inloggad[nodnr]=-1;
+    Servermem->nodeInfo[nodnr].userLoggedIn = -1;
     
-    Servermem->action[nodnr]=0;
+    Servermem->nodeInfo[nodnr].action = 0;
     time(&tid);
     CURRENT_USER->senast_in=tid;
     CURRENT_USER->tot_tid+=(tid-logintime);
@@ -214,10 +240,10 @@ int main(int argc, char **argv) {
     CURRENT_USER->defarea=area2;
     WriteUser(inloggad, CURRENT_USER, FALSE);
     WriteUnreadTexts(CUR_USER_UNREAD, inloggad);
+    ReleaseUserDataSlot(nodnr);
+    inloggad = -1;
     writesenaste();
     freealiasmem();
-    sprintf(tellstr,"loggade just ut från nod %d",nodnr);
-    tellallnodes(tellstr);
   panik:
     nodestate = 0;
     SendString("\r\n\nOne more login? (Y/n)",-1);

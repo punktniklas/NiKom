@@ -30,7 +30,7 @@ extern struct System *Servermem;
 extern char outbuffer[],*argument,inmat[];
 extern int nodnr,senast_text_typ,senast_text_nr,senast_text_mote,nu_skrivs,inloggad,
 	rad,mote2;
-extern int g_lastKomTextType, g_lastKomTextNr, g_lastKomTextConf;
+extern int g_lastKomTextType, g_lastKomTextNr, g_lastKomTextConf, g_userDataSlot;
 extern struct Header readhead,sparhead;
 extern struct Inloggning Statstr;
 extern struct MinList edit_list;
@@ -373,8 +373,8 @@ int org_initheader(int komm) {
     sparhead.mote = mote2;
     sparhead.root_text = 0;
   }
-  Servermem->action[nodnr] = SKRIVER;
-  Servermem->varmote[nodnr] = sparhead.mote;
+  Servermem->nodeInfo[nodnr].action = SKRIVER;
+  Servermem->nodeInfo[nodnr].currentConf = sparhead.mote;
   time(&tid);
   ts = localtime(&tid);
   sparhead.tid = tid;

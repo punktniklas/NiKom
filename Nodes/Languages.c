@@ -10,7 +10,7 @@
 #include "Languages.h"
 
 extern struct System *Servermem;
-extern int nodnr, inloggad;
+extern int nodnr, inloggad, g_userDataSlot;
 struct Catalog *g_Catalog;
 char *g_FlagNames[ANTFLAGG];
 
@@ -53,8 +53,8 @@ void initFlagNames(void) {
   g_FlagNames[13] = CATSTR(MSG_FLAG_ASCII_7E_IS_DELETE);
 }
 
-void LoadCatalogForUser(void) {
-  int lang = CURRENT_USER->language;
+void LoadCatalogForUser(struct User *user) {
+  int lang = user->language;
 
   loadNewCatalog(lang);
   initFlagNames();
@@ -85,5 +85,5 @@ void AskUserForLanguage(struct User *user) {
   }
   SendString("\r\n\n%s\n\r", languages[lang]);
   user->language = lang;
-  LoadCatalogForUser();
+  LoadCatalogForUser(user);
 }

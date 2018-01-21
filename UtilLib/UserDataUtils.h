@@ -41,3 +41,26 @@ struct User *GetUserData(int userId);
  * For any change to be permanent WriteUser() must be called.
  */
 struct User *GetUserDataForUpdate(int userId, int *needsWrite);
+
+/*
+ * Allocates a new or existing userDataSlot for userId logging in
+ * in nodeId and fills in the slot number in nodeInfo->userDataSlot.
+ * Returns 1 if an existing slot is used, 2 if a new slot is used
+ * and 0 if a slot could not be allocated. (This should normally never
+ * happen since the maximum number of slots is equal to the maximum number
+ * numer of nodes.)
+ */
+int AllocateUserDataSlot(int nodeId, int userId);
+
+/*
+ * Releases the user data slot used on the given nodeId. If this is the
+ * last node using that user data slot it will become available for re-use
+ * by some other user.
+ */
+void ReleaseUserDataSlot(int nodeId);
+
+/*
+ * Returns the userDataSlot for the given user of they are logged in or
+ * -1 if they are not.
+ */
+int FindUserDataSlot(int userId);

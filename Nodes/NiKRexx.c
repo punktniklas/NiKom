@@ -36,7 +36,7 @@ extern struct System *Servermem;
 extern long logintime,extratime;
 extern int nodnr,inloggad,senast_text_typ,senast_text_nr,senast_text_mote,
   nu_skrivs,rad,mote2,area2,senast_brev_nr,senast_brev_anv,rxlinecount,radcnt,
-  nodestate;
+  nodestate, g_userDataSlot;
 extern char outbuffer[],inmat[],*argument,brevtxt[][81],typeaheadbuf[],xprfilnamn[],vilkabuf[];
 extern struct MsgPort *rexxport;
 extern struct Header readhead;
@@ -249,7 +249,7 @@ void rexxsendstring(struct RexxMsg *mess) {
 void rexxsendserstring(struct RexxMsg *mess) {
   char *str, res;
   str = hittaefter(mess->rm_Args[0]);
-  if(Servermem->nodtyp[nodnr] != NODCON) {
+  if(Servermem->nodeInfo[nodnr].nodeType != NODCON) {
     res = serputtekn(str, -1);
   } else {
     res = conputtekn(str, -1);
@@ -603,9 +603,9 @@ void rexxrecbinfile(struct RexxMsg *mess) {
   char buf[1024];
   struct TransferFiles *tf;
 
-  Servermem->action[nodnr] = UPLOAD;
-  Servermem->varmote[nodnr] = 0;
-  Servermem->vilkastr[nodnr] = NULL;
+  Servermem->nodeInfo[nodnr].action = UPLOAD;
+  Servermem->nodeInfo[nodnr].currentConf = 0;
+  Servermem->nodeInfo[nodnr].currentActivity = NULL;
 
   if(recbinfile(hittaefter(mess->rm_Args[0]))) {
     SetRexxErrorResult(mess, ImmediateLogout() ? 100 : 10);
@@ -757,8 +757,8 @@ void rxsendserchar(struct RexxMsg *mess) {
 void rxsetnodeaction(struct RexxMsg *mess) {
   strncpy(vilkabuf, hittaefter(mess->rm_Args[0]), 49);
   vilkabuf[49] = '\0';
-  Servermem->action[nodnr] = GORNGTANNAT;
-  Servermem->vilkastr[nodnr] = vilkabuf;
+  Servermem->nodeInfo[nodnr].action = GORNGTANNAT;
+  Servermem->nodeInfo[nodnr].currentActivity = vilkabuf;
   SetRexxErrorResult(mess, 0);
 }
 

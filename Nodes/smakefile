@@ -3,11 +3,11 @@ FLAGS   = NMINC STRMERGE CPU=$(CPU) DEBUG=FULL GST=Include:all.gst ERROR=ALL \
           IDIR=/Include IDIR=/ExtInclude IDIR=/UtilLib
 OBJS    = ServerComm.o Terminal.o NiKFuncs.o NiKFuncs2.o NiKFuncs3.o NiKFuncs4.o \
           NiKFuncs5.o NiKEditor.o NiKRexx.o NiKFiles.o NiKVersion.o Brev.o \
-          OrgMeet.o FidoMeet.o NewUser.o CharacterSets.o KOM.o ConfCommon.o \
+          OrgMeet.o FidoMeet.o CharacterSets.o KOM.o ConfCommon.o \
           ConfHeaderExtensions.o Languages.o InfoFiles.o Fifo.o \
           _tzset.o \
 	  Cmd_KOM.o Cmd_Users.o Cmd_Conf.o Cmd_Misc.o
-CONOBJS = NiKomCon.o ConsoleIO.o NiKConTrans.o NiKConOffline.o
+CONOBJS = NiKomCon.o ConsoleIO.o NiKConTrans.o NiKConOffline.o NewUser.o
 SEROBJS = NiKomSer.o SerialIO.o NiKTransfer.o NiKOffline.o
 
 all:	NiKomCon NiKomSer

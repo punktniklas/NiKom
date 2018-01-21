@@ -658,11 +658,10 @@ void scanFidoConferences(void) {
 void initNodes(void) {
   int i;
   for(i = 0; i < MAXNOD; i++) {
-    Servermem->nodtyp[i] = 0;
-    Servermem->inloggad[i] = -1;
-    Servermem->action[i] = 0;
-    Servermem->maxinactivetime[i] = 5;
-    Servermem->watchserial[i] = 1;
+    Servermem->nodeInfo[i].nodeType = 0;
+    Servermem->nodeInfo[i].userLoggedIn = -1;
+    Servermem->nodeInfo[i].action = 0;
+    Servermem->nodeInfo[i].maxInactiveTime = 5;
   }
 }
 

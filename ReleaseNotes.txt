@@ -6,6 +6,13 @@
   closed/crashes they will not need to e.g. re-read texts that were read
   during the terminated login.
 
+- NiKom now handles a user being logged in one more than one node. The
+  state of the user is being shared between the nodes. As part of this the
+  following had to change:
+  - The ARexx function SendNodeMessage() has been deprecated since messages
+    are not sent to nodes, they are sent to users. Instead a new function
+    SendUserMessage() has been introduced.
+
 ---------------------------------------------------------------------------
                          NiKom v2.3.1, 2017-07-01
 ---------------------------------------------------------------------------
