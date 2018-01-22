@@ -53,11 +53,8 @@ void rexxPurgeOldTexts(struct RexxMsg *);
 void movefile(struct RexxMsg *);
 void rexxnextpatternfile(struct RexxMsg *);
 
-/* Prototypes for functions defined in NiKHost2.c */
-void rxsendnodemess(struct RexxMsg *);
-
 /* Prototypes for functions defined in NiKHost3.c */
-void rxsendnodemess(struct RexxMsg *);
+void rxSendUserMessage(struct RexxMsg *mess);
 void rexxstatusinfo(struct RexxMsg *);
 void rexxarearight(struct RexxMsg *);
 void sortbps(long *bps[], long *);

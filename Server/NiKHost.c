@@ -65,6 +65,7 @@ void handlerexx(struct RexxMsg *mess) {
 	else if(!stricmp(mess->rm_Args[0],"MARKTEXTUNREAD")) rexxmarktextunread(mess);
 	else if(!stricmp(mess->rm_Args[0],"NEXTPATTERNFILE")) rexxnextpatternfile(mess);
 	else if(!stricmp(mess->rm_Args[0],"CHECKUSERPASSWORD")) rexxcheckuserpassword(mess);
+	else if(!stricmp(mess->rm_Args[0],"SENDUSERMESSAGE")) rxSendUserMessage(mess);
 	else {
 		mess->rm_Result1=10;
 		mess->rm_Result2=1L;

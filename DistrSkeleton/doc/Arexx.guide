@@ -282,7 +282,7 @@ System:
 @{"SysInfo()          " link SysInfo} @{"CommandInfo()      " link CommandInfo} @{"lastlogin          " link LastLogin}
 @{"setlinecount       " link SetLineCount} @{"runfifo            " link RunFIFO} @{"readconfig         " link ReadConfig}
 @{"logout             " link Logout} @{"yesno              " link YesNo} @{"edit               " link Edit}
-@{"changelatestinfo   " link changelatestinfo} @{"SendNodeMess()     " link SendNodeMess}
+@{"changelatestinfo   " link changelatestinfo} @{"SendUserMessage()     " link SendUserMessage}
 
 Tecken:
 @{"sendchar           " link SendChar} @{"chkbuffer          " link ChkBuffer} @{"getchar            " link GetChar}
@@ -1310,10 +1310,10 @@ Returvärden:
 -2 - Finns inte så många texter.
 -3 - Antalet texter är inte jämt delbart med 512.
 @endnode
-@node SendNodeMess "Referens: SendNodeMess"
-SendNodeMess(nodnr, avsändare, meddelande)
+@node SendUserMessage "Referens: SendUserMessage"
+SendUserMessage(avsändare, mottagare, meddelande)
 
-Skickar ett säg-meddelande till den angivna noden. Anges -1 så skickas
+Skickar ett säg-meddelande till den angivna användaren. Anges -1 så skickas
 meddelandet till samtliga noder. Avsändare ska vara ett användarnummer
 eller -1, som tolkas som ett systemmeddelande.
 
@@ -1321,11 +1321,13 @@ Felvärden:
 1 - Fel antal argument givna
 
 Returvärden:
-1  - Meddelandet skickat, mottagaren hade inga olästa meddelanden
-0  - Meddelandet skickat, mottagaren hade olästa meddelanden
--1 - Skickandet misslyckades
--2 - Felaktigt nodnummer.
--3 - Felaktig avsändare
+ 2 - Den angivna användaren är inte inloggad. (Endast när mottagare är "-1")
+ 1 - Meddelandet skickat, mottagaren hade redan olästa meddelanden  (Endast när mottagare är "-1")
+ 0 - Meddelandet skickat, mottagaren hade inga olästa meddelanden
+-1 - Kunde inte allokera minne för ett nytt meddelande.
+-2 - Avsändarens användarnummer finns inte.
+-3 - Mottagarens användarnummer finns inte.
+
 @endnode
 @node MoveFile "Referens: MoveFile()"
 MoveFile(filnamn,area,ny area)

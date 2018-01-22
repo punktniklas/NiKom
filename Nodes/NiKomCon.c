@@ -26,6 +26,7 @@
 #include "NewUser.h"
 #include "Languages.h"
 #include "UserDataUtils.h"
+#include "UserMessageUtils.h"
 
 #define EXIT_ERROR	10
 #define EXIT_OK	0
@@ -220,13 +221,11 @@ int main(int argc, char **argv) {
       LogEvent(USAGE_LOG, INFO, "%s loggar ut från nod %d (%d skrivna, %d lästa)",
                getusername(inloggad), nodnr, Statstr.write, Statstr.read);
     }
-    if(Servermem->waitingSayMessages[g_userDataSlot] != NULL) {
-      displaysay();
-    }
+    displaysay();
     if(Servermem->cfg->ar.utlogg) sendautorexx(Servermem->cfg->ar.utlogg);
     SendInfoFile("Logout.txt", 0);
     sprintf(tellstr,"loggade just ut från nod %d",nodnr);
-    tellallnodes(tellstr);
+    SendUserMessage(inloggad, -1, tellstr, NIK_MESSAGETYPE_LOGNOTIFY);
     sprintf(titel,"Nod #%d CON: <Ingen inloggad>",nodnr);
     SetWindowTitles(NiKwind,titel,(UBYTE *)-1L);
     Servermem->nodeInfo[nodnr].userLoggedIn = -1;

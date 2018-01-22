@@ -26,6 +26,7 @@
 #include "BasicIO.h"
 #include "Languages.h"
 #include "UserDataUtils.h"
+#include "UserMessageUtils.h"
 
 #include "HeartBeat.h"
 
@@ -183,7 +184,7 @@ int main(int argc,char *argv[]) {
       SendString("\n\n\r*** %s ***\n\n\r", CATSTR(MSG_KOM_INACTIVITY_LOGOUT));
     }
     radcnt=-174711;
-    if(Servermem->waitingSayMessages[g_userDataSlot]) displaysay();
+    displaysay();
     if(Servermem->cfg->ar.utlogg) sendautorexx(Servermem->cfg->ar.utlogg);
     SendInfoFile("Logout.txt", 0);
   }
@@ -193,7 +194,7 @@ int main(int argc,char *argv[]) {
              getusername(inloggad), nodnr, Statstr.write, Statstr.read);
   }
   sprintf(tellstr,"loggade just ut från nod %d",nodnr);
-  tellallnodes(tellstr);
+  SendUserMessage(inloggad, -1, tellstr, NIK_MESSAGETYPE_LOGNOTIFY);
   Servermem->nodeInfo[nodnr].action = 0;
   time(&tid);
   CURRENT_USER->senast_in=tid;

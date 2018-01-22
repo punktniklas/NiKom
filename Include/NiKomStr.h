@@ -154,8 +154,9 @@
 #define NIKSEM_CONFTEXTS  11
 #define NIKSEM_LOGFILES   12
 #define NIKSEM_USERDATASLOT 13
+#define NIKSEM_USERMESSAGES 14
 
-#define NIKSEM_NOOF       14 /* The total number of semaphores. */
+#define NIKSEM_NOOF       15 /* The total number of semaphores. */
 
 #define NUM_LANGUAGES     2
 

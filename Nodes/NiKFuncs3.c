@@ -22,6 +22,7 @@
 #include "Languages.h"
 #include "DateUtils.h"
 #include "UserDataUtils.h"
+#include "UserMessageUtils.h"
 
 #define EKO		1
 #define EJEKO	0
@@ -514,7 +515,7 @@ void vilka(void) {
     SendString("%s #%-2d %-40s %c %7s (%d)\n\r",
                CATSTR(MSG_WHO_NODE), i,
                name,
-               Servermem->waitingSayMessages[Servermem->nodeInfo[i].userDataSlot] ? '*' : ' ',
+               HasUnreadUserMessages(Servermem->nodeInfo[i].userDataSlot) ? '*' : ' ',
                (idle < 60 && userLoggedIn) ? (const char *)CATSTR(MSG_WHO_ACTIVE) : FormatDuration(idle, idlebuf),
                Servermem->nodeInfo[i].userDataSlot);
 
@@ -743,8 +744,7 @@ void displaysay(void) {
   int textlen;
   char tmpchar, *fromStr;
 
-  sayStr = Servermem->waitingSayMessages[Servermem->nodeInfo[nodnr].userDataSlot];
-  Servermem->waitingSayMessages[Servermem->nodeInfo[nodnr].userDataSlot] = NULL;
+  sayStr = UnLinkUserMessages(g_userDataSlot);
   while(sayStr) {
     if(sayStr->fromuser == -1) {
       fromStr = CATSTR(MSG_SAY_DISPLAY_SYSTEM);
@@ -772,73 +772,6 @@ void displaysay(void) {
     FreeMem(prevSayStr, sizeof(struct SayString));
   }
   SendString("\n");
-}
-
-int sag(void) {
-  int userId, slot;
-  char *quick;
-  struct SayString *sayStr, *prevSayStr = NULL, *newSayStr;
-
-  quick = strchr(argument,',');
-  if(quick) {
-    *quick++ = 0;
-  }
-  if((userId = parsenamn(argument)) == -3) {
-    SendString("\r\n\n%s\r\n\n", CATSTR(MSG_SAY_SYNTAX));
-    return 0;
-  }
-  if(userId == -1) {
-    SendString("\r\n\n%s\r\n\n", CATSTR(MSG_COMMON_NO_SUCH_USER));
-    return 0;
-  }
-  
-  if((slot = FindUserDataSlot(userId)) == -1) {
-    SendStringCat("\r\n\n%s\r\n", CATSTR(MSG_SAY_NOT_LOGGED_IN), getusername(userId));
-    return 0;
-  }
-  if(!quick) {
-    SendString("\r\n\n%s\r\n", CATSTR(MSG_SAY_WHAT));
-    if(getstring(EKO, MAXSAYTKN - 1, NULL)) {
-      return 1;
-    }
-    if(!inmat[0]) {
-      return 0;
-    }
-    if((slot = FindUserDataSlot(userId)) == -1) {
-      SendString("\r\n\n%s\r\n", CATSTR(MSG_SAY_USER_LOGGED_OUT));
-      return 0;
-    }
-  }
-  sayStr = Servermem->waitingSayMessages[slot];
-  if(sayStr) {
-    SendStringCat("\r\n%s\r\n", CATSTR(MSG_SAY_USER_HAS_UNREAD), getusername(userId));
-  } else {
-    SendStringCat("\r\n%s\r\n", CATSTR(MSG_SAY_SENT), getusername(userId));
-  }
-  Forbid();
-  while(sayStr) {
-    prevSayStr = sayStr;
-    sayStr = prevSayStr->NextSay;
-  }
-  if(!(newSayStr = (struct SayString *)AllocMem(sizeof(struct SayString), MEMF_PUBLIC | MEMF_CLEAR))) {
-    Permit();
-    LogEvent(SYSTEM_LOG, ERROR, "Couldn't allocate %d bytes.", sizeof(struct SayString));
-    DisplayInternalError();
-    return 0;
-  }
-  newSayStr->fromuser = inloggad;
-  if(quick) {
-    strcpy(newSayStr->text, quick);
-  } else {
-    strcpy(newSayStr->text, inmat);
-  }
-  if(Servermem->waitingSayMessages[slot]) {
-    prevSayStr->NextSay = newSayStr;
-  } else {
-    Servermem->waitingSayMessages[slot] = newSayStr;
-  }
-  Permit();
-  return 0;
 }
 
 void writesenaste(void) {
@@ -1033,41 +966,6 @@ void listaarende(void) {
                   ts->tm_mday, lahead.arende)) {
       return;
     }
-  }
-}
-
-void tellallnodes(char *str) {
-  int i, slot;
-  struct SayString *sayStr, *prevSayStr=NULL, *newSayStr;
-
-  for(i = 0; i < MAXNOD; i++) {
-    if((Servermem->nodeInfo[i].nodeType == 0) || Servermem->nodeInfo[i].userLoggedIn < 0 || i == nodnr) {
-      continue;
-    }
-    slot = Servermem->nodeInfo[i].userDataSlot;
-    if(Servermem->userData[slot].flaggor & NOLOGNOTIFY) {
-      continue;
-    }
-    sayStr = Servermem->waitingSayMessages[slot];
-    Forbid();
-    while(sayStr) {
-      prevSayStr = sayStr;
-      sayStr = prevSayStr->NextSay;
-    }
-    if(!(newSayStr = (struct SayString *)AllocMem(sizeof(struct SayString), MEMF_PUBLIC | MEMF_CLEAR))) {
-      Permit();
-      LogEvent(SYSTEM_LOG, ERROR, "Could not allocate %d bytes.", sizeof(struct SayString));
-      DisplayInternalError();
-      return;
-    }
-    newSayStr->fromuser = inloggad;
-    strcpy(newSayStr->text, str);
-    if(Servermem->waitingSayMessages[slot]) {
-      prevSayStr->NextSay = newSayStr;
-    } else {
-      Servermem->waitingSayMessages[slot] = newSayStr;
-    }
-    Permit();
   }
 }
 

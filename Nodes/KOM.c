@@ -270,7 +270,7 @@ void ExecuteCommandById(int cmdId) {
   case 311: Cmd_ShowInfo(); break;
   case 312: getconfig(); break;
   case 313: writeinfo(); break;
-  case 314: sag(); break;
+  case 314: Cmd_Say(); break;
   case 315: skrivlapp(); break;
   case 316: radlapp(); break;
   case 317: grab(); break;
@@ -339,9 +339,7 @@ void displayPrompt(int defaultCmd) {
   char *cmdStr;
   struct Kommando *cmd;
 
-  if(Servermem->waitingSayMessages[g_userDataSlot]) {
-    displaysay();
-  }
+  displaysay();
   if((minutesLeft = isUserOutOfTime()) == -1) {
     return;
   }

@@ -15,43 +15,35 @@
 #include <string.h>
 #include <stdlib.h>
 #include "UserDataUtils.h"
+#include "UserMessageUtils.h"
 
 #include "RexxUtils.h"
 
 extern struct System *Servermem;
 
-/*
-void rxsendnodemess(struct RexxMsg *mess) {
-	int avs, nodnr, ret;
-	char *str, retstr[5];
-	if(!mess->rm_Args[1] || !mess->rm_Args[2] || !mess->rm_Args[3]) {
-		mess->rm_Result1=1;
-		mess->rm_Result2=0;
-		return;
-	}
-	nodnr = atoi(mess->rm_Args[1]);
-	if(nodnr != -1 && (nodnr < 0 || nodnr >= MAXNOD) && Servermem->nodtyp[nodnr] == 0) {
-		if(!(mess->rm_Result2=(long)CreateArgstring("-2",strlen("-2"))))
-		printf("Kunde inte allokera en ArgString\n");
-		mess->rm_Result1=0;
-		return;
-	}
-	avs = atoi(mess->rm_Args[2]);
-	if(avs != -1 && !userexists(avs)) {
-		if(!(mess->rm_Result2=(long)CreateArgstring("-3",strlen("-3"))))
-		printf("Kunde inte allokera en ArgString\n");
-		mess->rm_Result1=0;
-		return;
-	}
-	str = mess->rm_Args[3];
-	if(strlen(str) > MAXSAYTKN-1) str[MAXSAYTKN-1] = 0;
-	ret = SendNodeMessage(nodnr, avs, str);
-	sprintf(retstr, "%d",ret - 1);
-	mess->rm_Result1=0;
-	if(!(mess->rm_Result2=(long)CreateArgstring(retstr,strlen(retstr))))
-		printf("Kunde inte allokera en ArgString\n");
+void rxSendUserMessage(struct RexxMsg *mess) {
+  int fromUserId, toUserId, ret;
+  char retstr[5];
+  if(!mess->rm_Args[1] || !mess->rm_Args[2] || !mess->rm_Args[3]) {
+    SetRexxErrorResult(mess, 1);
+    return;
+  }
+  fromUserId = atoi(mess->rm_Args[1]);
+  toUserId = atoi(mess->rm_Args[2]);
+
+  if(fromUserId != -1 && !userexists(fromUserId)) {
+    SetRexxResultString(mess, "-2");
+    return;
+  }
+  if(toUserId != -1 && !userexists(toUserId)) {
+    SetRexxResultString(mess, "-3");
+    return;
+  }
+  
+  ret = SendUserMessage(fromUserId, toUserId, mess->rm_Args[3], 0);
+  sprintf(retstr, "%d", ret - 1);
+  SetRexxResultString(mess, retstr);
 }
-*/
 
 void rexxstatusinfo(struct RexxMsg *mess)
 {

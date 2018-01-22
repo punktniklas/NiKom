@@ -86,12 +86,10 @@ void gamlabrev(void);
 void getconfig(void);
 void writeinfo(void);
 void displaysay(void);
-int sag(void);
 void writesenaste(void);
 void listasenaste(void);
 int dumpatext(void);
 void listaarende(void);
-void tellallnodes(char *str);
 int skrivlapp(void);
 void radlapp(void);
 int userexists(int nummer);
@@ -134,7 +132,6 @@ struct Mote *getmotpek(int);
 char *getmotnamn(int);
 struct Kommando *getkmdpek(int);
 int bytnodtyp(void);
-void dellostsay(void);
 void bytteckenset(void);
 
 /* Prototypes for functions defined in NiKEditor.c */

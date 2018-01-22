@@ -91,17 +91,6 @@ int bytnodtyp(void) {
   return 0;
 }
 
-void dellostsay(void) {
-  struct SayString *say, *tmp;
-  say = Servermem->waitingSayMessages[g_userDataSlot];
-  Servermem->waitingSayMessages[g_userDataSlot] = NULL;
-  while(say) {
-    tmp = say->NextSay;
-    FreeMem(say, sizeof(struct SayString));
-    say = tmp;
-  }
-}
-
 void bytteckenset(void) {
   int showExample = FALSE;
 

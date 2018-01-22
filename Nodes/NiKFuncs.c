@@ -29,6 +29,7 @@
 #include "KOM.h"
 #include "Languages.h"
 #include "UserDataUtils.h"
+#include "UserMessageUtils.h"
 
 #if defined(__GNUC__) && !defined(max)
 #define max(a, b) \
@@ -627,7 +628,7 @@ void trimLowestPossibleUnreadTextsForFido(void) {
 
 void connection(void) {
   char tellstr[100];
-  dellostsay();
+  ClearUserMessages(g_userDataSlot);
   NewList((struct List *)&aliaslist);
   trimLowestPossibleUnreadTextsForFido();
   time(&logintime);
@@ -645,7 +646,7 @@ void connection(void) {
              getusername(inloggad), nodnr);
   }
   sprintf(tellstr,"loggade just in på nod %d",nodnr);
-  tellallnodes(tellstr);
+  SendUserMessage(inloggad, -1, tellstr, NIK_MESSAGETYPE_LOGNOTIFY);
   area2=CURRENT_USER->defarea;
   if(area2<0 || area2>Servermem->info.areor || !Servermem->areor[area2].namn || !arearatt(area2, inloggad, CURRENT_USER)) area2=-1;
   initgrupp();
