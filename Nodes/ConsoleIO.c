@@ -19,6 +19,7 @@
 #include "NiKomFuncs.h"
 #include "NiKomLib.h"
 #include "BasicIO.h"
+#include "StyleSheets.h"
 
 #define EXIT_ERROR	10
 #define EXIT_OK	0
@@ -238,68 +239,61 @@ void putstring(char *pekare,int size, long flags)
 	DoIO((struct IORequest *)conwritereq);
 }
 
-int puttekn(char *pekare,int size) {
-	int aborted=FALSE,x;
-	char *tmppek, buffer[1201], constring[1201];
+int puttekn(char *str, int size) {
+  int aborted=FALSE,x;
+  char *tmppek, *pekare, buffer[1201], constring[1201];
 
-	strncpy(constring,pekare,1199);
-	constring[1199]=0;
-	pekare = &constring[0];
+  if(size == -1 && str[0] == '\0') {
+    return FALSE;
+  }
 
-	if(!(CURRENT_USER->flaggor & ANSICOLOURS)) StripAnsiSequences(pekare);
+  RenderStyle(constring, str,
+              Servermem->cfg->cfgflags & NICFG_LOCALCOLOURS
+              ? &Servermem->cfg->styleSheets[CURRENT_USER->styleSheet]
+              : NULL);
 
-	if(size == -1 && !pekare[0]) return(aborted);
 
-	tmppek = pekare;
-	x = 0;
-	while((x < size || size == -1) && !aborted)
-	{
-		if(size < 1 && tmppek[0] == 0)
-		{
-			if(tmppek != pekare)
-			{
-				if(sendtocon(pekare, size)) aborted = TRUE;
-			}
-			break;
-		}
-		if(size > 0 && x++ == size)
-		{
-			if(pekare != tmppek)
-			{
-				tmppek[1] = 0;
-				if(sendtocon(pekare, -1)) aborted = TRUE;
-			}
-			break;
-		}
-		if(tmppek[0] == '\n')
-		{
-			buffer[0] = 0;
-			if(tmppek != pekare)
-			{
-				tmppek[0] = 0;
-				if(pekare[0] != 0)
-					strcpy(buffer, pekare);
+  tmppek = pekare = constring;
+  x = 0;
+  while((x < size || size == -1) && !aborted) {
+    if(size < 1 && tmppek[0] == 0) {
+      if(tmppek != pekare) {
+        if(sendtocon(pekare, size)) aborted = TRUE;
+      }
+      break;
+    }
+    if(size > 0 && x++ == size) {
+      if(pekare != tmppek) {
+        tmppek[1] = 0;
+        if(sendtocon(pekare, -1)) aborted = TRUE;
+      }
+      break;
+    }
+    if(tmppek[0] == '\n') {
+      buffer[0] = 0;
+      if(tmppek != pekare) {
+        tmppek[0] = 0;
+        if(pekare[0] != 0)
+          strcpy(buffer, pekare);
+        
+        strcat(buffer, "\n");
+        pekare = tmppek + 1;
+      } else {
+        buffer[0] = '\n';
+        buffer[1] = 0;
+        pekare = tmppek + 1;
+      }
+      x++;
 
-				strcat(buffer, "\n");
-				pekare = tmppek + 1;
-			}
-			else
-			{
-				buffer[0] = '\n';
-				buffer[1] = 0;
-				pekare = tmppek + 1;
-			}
-			x++;
+      if(!aborted)
+        if(sendtocon(&buffer[0], -1)) aborted = TRUE;
+      if(incantrader()) aborted = TRUE;
+      tmppek = pekare - 1;
+    }
+    tmppek++;
+  }
 
-			if(!aborted)
-				if(sendtocon(&buffer[0], -1)) aborted = TRUE;
-			if(incantrader()) aborted = TRUE;
-			tmppek = pekare - 1;
-		}
-		tmppek++;
-	}
-
-	return(aborted);
+  return(aborted);
 }
 
 int checkcharbuffer(void)

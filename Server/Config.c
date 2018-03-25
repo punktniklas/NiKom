@@ -26,7 +26,10 @@ int handleSystemConfigStatusSection(char *line, BPTR fh, struct Config *cfg);
 int handleSystemConfigLine(char *line, BPTR fh, struct Config *cfg);
 int handleStatusConfigLine(char *line, BPTR fh, struct Config *cfg);
 int handleFidoConfigLine(char *line, BPTR fh, struct Config *cfg);
+int handleStyleSheetsConfigLine(char *line, BPTR fh, struct Config *cfg);
 int handleCommandConfigLine(char *line, struct Kommando *command);
+
+static int currentStyleSheet;
 
 int InitLegacyConversionData(void) {
   BPTR file;
@@ -795,6 +798,67 @@ int handleFidoConfigLine(char *line, BPTR fh, struct Config *cfg) {
   return 1;
 }
 
+int readStyleSheetConfig(struct Config *cfg) {
+  int i;
+  for(i = 0; i < MAXSTYLESHEET; i++) {
+    NewList((struct List *)&cfg->styleSheets[i].codesList);
+  }
+  currentStyleSheet = -1;
+  return readConfigFile("NiKom:DatoCfg/StyleSheets.cfg", cfg, handleStyleSheetsConfigLine);
+}
+
+int handleStyleSheetsConfigLine(char *line, BPTR fh, struct Config *cfg) {
+  struct StyleCode *styleCode;
+  char *word;
+  if(isMatchingConfigLine(line, "STYLE")) {
+    word = FindNextWord(line);
+    if(word[0] == '\0') {
+      printf("No number given for stylesheet: '%s'\n", line);
+      return 0;
+    }
+    currentStyleSheet = atoi(word);
+    if(currentStyleSheet < 0 || currentStyleSheet >= MAXSTYLESHEET) {
+      printf("Invalid style sheet number: %d\n", currentStyleSheet);
+      return 0;
+    }
+    word = FindNextWord(word);
+    if(word[0] == '\0') {
+      printf("No name given for stylesheet %d\n", currentStyleSheet);
+      return 0;
+    }
+    strcpy(cfg->styleSheets[currentStyleSheet].name, word);
+    printf("  Reading style sheet %d '%s'\n", currentStyleSheet, cfg->styleSheets[currentStyleSheet].name);
+    return 1;
+  }
+  if(isMatchingConfigLine(line, "CODE")) {
+    if(currentStyleSheet == -1) {
+      printf("CODE line without any preceeding STYLE line found.\n");
+      return 0;
+    }
+    if(!(styleCode = AllocMem(sizeof(struct StyleCode), MEMF_PUBLIC | MEMF_CLEAR))) {
+      printf("Couldn't allocate memory for style code (%d bytes)\n", sizeof(struct StyleCode));
+      return 0;
+    }
+    AddTail((struct List *)&cfg->styleSheets[currentStyleSheet].codesList, (struct Node *)styleCode);
+    word = FindNextWord(line);
+    if(word[0] == '\0') {
+      printf("No name given for code: '%s'\n", line);
+      return 0;
+    }
+    CopyOneWord(styleCode->name, word);
+    word = FindNextWord(word);
+    if(word[0] == '\0') {
+      printf("No ANSI sequence for code '%s' defined.\n", styleCode->name);
+      return 0;
+    }
+    CopyOneWord(styleCode->ansi, word);
+    printf("    Added code '%s' -> '%s'\n", styleCode->name, styleCode->ansi);
+    return 1;
+  }
+  printf("Invalid config line: %s\n", line);
+  return 0;
+}
+
 struct Config *ReadAllConfigs(void) {
   struct Config *cfg;
 
@@ -811,7 +875,8 @@ struct Config *ReadAllConfigs(void) {
      && readFileKeyConfig(cfg)
      && readStatusConfig(cfg)
      && readNodeTypesConfig(cfg)
-     && readFidoConfig(cfg)) {
+     && readFidoConfig(cfg)
+     && readStyleSheetConfig(cfg)) {
     return cfg;
   }
   FreeAllConfigs(cfg);
@@ -820,9 +885,19 @@ struct Config *ReadAllConfigs(void) {
 
 void FreeAllConfigs(struct Config *cfg) {
   struct Kommando *command;
+  struct StyleCode *styleCode;
+  int i;
+
   while((command = (struct Kommando *)RemHead((struct List *)&cfg->kom_list))) {
     FreeMem(command, sizeof(struct Kommando));
   }
+
+  for(i = 0; i < MAXSTYLESHEET; i++) {
+    while((styleCode = (struct StyleCode *)RemHead((struct List *)&cfg->styleSheets[i].codesList))) {
+      FreeMem(styleCode, sizeof(struct StyleCode));
+    }
+  }
+
   FreeMem(cfg, sizeof(struct Config));
 }
 

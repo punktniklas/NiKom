@@ -476,8 +476,6 @@ int conputtekn(char *pekare,int size)
 	constring[1199]=0;
 	pekare = &constring[0];
 
-	if(!(CURRENT_USER->flaggor & ANSICOLOURS)) StripAnsiSequences(pekare);
-
 	if(size == -1 && !pekare[0]) return(aborted);
 
 	tmppek = pekare;

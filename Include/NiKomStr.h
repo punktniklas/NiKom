@@ -43,6 +43,7 @@
 #define MAXPRGCATCACHE		MAXNOD*2	/* Används inte ännu */
 #define MAXUSERSCACHED		15
 #define MAXTIMETOCACHEUSER	10	/* Tid i sekunder! */
+#define MAXSTYLESHEET           8
 
 #define UNREADTEXTS_BITMAPSIZE   32768
 
@@ -205,12 +206,23 @@ struct FidoConfig {
     littleEndianByteOrder;
 };
 
+struct StyleSheet {
+  struct MinList codesList;
+  char name[41];
+};
+
+struct StyleCode {
+  struct MinNode codeNode;
+  char name[20], ansi[20];
+};
+
 struct Config {
   struct NodeType nodetypes[MAXNODETYPES];
   struct Statuscfg st;
   struct AutoRexxCfg ar;
   struct MinList kom_list;
   struct FidoConfig fidoConfig;
+  struct StyleSheet styleSheets[MAXSTYLESHEET];
   char fileKeys[MAXNYCKLAR][41];
   long defaultflags, diskfree, logmask, cfgflags;
   short maxtid[101], logintries, noOfFileKeys, noOfCommands;
@@ -278,7 +290,7 @@ struct ShortUser {
 
 struct User {
    long tot_tid,forst_in,senast_in,read,skrivit,flaggor,former_textpek,brevpek,
-      grupper,defarea,downloadbytes,chrset,uploadbytes,reserv5,upload,download,
+      grupper,defarea,downloadbytes,chrset,uploadbytes,styleSheet,upload,download,
       loggin,shell;
    char namn[41],gata[41],postadress[41],land[41],telefon[21],
       annan_info[61],losen[16],status,rader;

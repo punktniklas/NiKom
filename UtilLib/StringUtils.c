@@ -18,6 +18,19 @@ char *FindNextWord(char *str) {
   return str;
 }
 
+/*
+ * Copies all characters of src to dst up until the first whitespace. dst
+ * will end with a NUL byte. Returns the dst pointer.
+ */
+char *CopyOneWord(char *dst, char *src) {
+  int i;
+  for(i = 0; !IzSpace(src[i]); i++) {
+    dst[i] = src[i];
+  }
+  dst[i] = '\0';
+  return dst;
+}
+
 int StartsWith(char *str, char *prefix) {
   return strncmp(str, prefix, strlen(prefix)) == 0;
 }

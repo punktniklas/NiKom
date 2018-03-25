@@ -106,57 +106,6 @@ UBYTE convnokludge(UBYTE tkn) {
 	return(rettkn);
 }
 
-/*	namn:		noansi()
-
-	argument:	pekare till textsträng
-
-	gör:		Strippar bor ANSI-sekvenser ur en textsträng.
-
-*/
-
-void __saveds AASM LIBStripAnsiSequences(register __a0 char *ansistr AREG(a0), register __a6 struct NiKomBase *NiKomBase AREG(a6)) {
-
-        char *strptr, *tempstr=NULL, *orgstr;
-        int index=0, status=0;
-
-
-        while( (strptr=strchr(ansistr,'\x1b'))!=NULL)
-        {
-                orgstr = ansistr;
-                index++;
-                if(strptr[index]=='[')
-                {
-                        index++;
-                        while( ((strptr[index]>='0' && strptr[index]<='9')
-                                        || strptr[index]==';')
-                                && strptr[index]!='\0')
-                        {
-                                index++;
-                                if(strptr[index]==';')
-                                {
-                                        tempstr=strptr;
-                                        strptr=&strptr[index];
-                                        index=1;
-                                }
-                        }
-                }
-                if(strptr[index]=='\0')
-                        return;
-                if(strptr[index]=='m')
-                {
-                        if(tempstr!=NULL)
-                                memmove(tempstr,&strptr[index+1],strlen(&strptr[index])+1);
-                        else
-                                memmove(strptr,&strptr[index+1],strlen(&strptr[index])+1);
-                        ansistr=orgstr;
-                }
-                else
-                        ansistr=&strptr[index];
-                index=status=0;
-                tempstr=NULL;
-        }
-}
-
 /* Lookup table for length of UTF-8 characters. */
 static const char utf8_extra[64] = {
   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,

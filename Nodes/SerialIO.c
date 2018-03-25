@@ -19,6 +19,7 @@
 #include "NiKomFuncs.h"
 #include "NiKomLib.h"
 #include "HeartBeat.h"
+#include "StyleSheets.h"
 
 #include "BasicIO.h"
 
@@ -64,6 +65,8 @@ char typeaheadbuf[51];   /* För att buffra inkommande tecken under utskrift */
 static char device[31];         /* Devicenamnet, från SerNode.cfg */
 static BOOL consoleyes, serialyes, timeryes;
 static long latestActivityTime;
+
+void prepareOutputStrings(char *input, char *conOutput, char *serOutput);
 
 int OpenIO(struct Window *iowin) {
 	if(!(timerport=(struct MsgPort *)CreateMsgPort()))
@@ -466,22 +469,21 @@ void serreqtkn(void) {
 	SendIO((struct IORequest *)serreadreq);
 }
 
-void putstring(char *pekare,int size, long flags) {
-	char serpekare[400];
-	int bytes;
+void putstring(char *str,int size, long flags) {
+  char serStr[2400], conStr[1200];
 
-	bytes = ConvMBChrsFromAmiga(serpekare, pekare, 199,
-				    EFFECTIVE_USER->chrset, 0);
-	serwritereq->IOSer.io_Command=CMD_WRITE;
-	serwritereq->IOSer.io_Data=serpekare;
-	serwritereq->IOSer.io_Length=bytes;
-	SendIO((struct IORequest *)serwritereq);
-	conwritereq->io_Command=CMD_WRITE;
-	conwritereq->io_Data=(APTR)pekare;
-	conwritereq->io_Length=size;
-	DoIO((struct IORequest *)conwritereq);
+  prepareOutputStrings(str, conStr, serStr);
 
-	WaitSerIOErr(serwritereq);
+  serwritereq->IOSer.io_Command = CMD_WRITE;
+  serwritereq->IOSer.io_Data = serStr;
+  serwritereq->IOSer.io_Length = -1;
+  SendIO((struct IORequest *)serwritereq);
+  conwritereq->io_Command = CMD_WRITE;
+  conwritereq->io_Data = conStr;
+  conwritereq->io_Length = -1;
+  DoIO((struct IORequest *)conwritereq);
+
+  WaitSerIOErr(serwritereq);
 }
 
 static void serputstring(char *pekare, int size, long flags)
@@ -716,159 +718,144 @@ int checkcharbuffer(void)
 	return typeaheadbuftkn;
 }
 
-int puttekn(char *pekare,int size)
-{
-	int aborted=FALSE, x1, x2, consize, sersize, nyrad, bytes;
-	char serpekare[2400],localconstring[1200];
-	char serbuf[1200], conbuf[1200], *concurpek, *sercurpek, *constartpek, *serstartpek;
-	char conready, serready, conlineready, serlineready;
+/*
+ * This function seems to be complete madness. It can't possibly be necessary for it to be this
+ * complicated...
+ */
+int sendStrWithLineCounting(char *conStr, char *serStr) {
+  int aborted=FALSE, x1, x2, consize, sersize, nyrad, size;
+  char serbuf[1200], conbuf[1200], *concurpek, *sercurpek, *constartpek, *serstartpek;
+  char conready, serready, conlineready, serlineready;
 
-	if(ConnectionLost()) {
-          return TRUE;
+  concurpek = constartpek = conStr;
+  sercurpek = serstartpek = serStr;
+  size = consize = sersize = -1;
+
+  x1 = 0;
+  x2 = 0;
+  conready = 0;
+  serready = 0;
+
+  while((x1 < consize || consize == -1)
+        && (x2 < sersize || sersize == -1)
+        && !aborted
+        && (!conready || !serready)) {
+    conbuf[0] = serbuf[0] = 0;
+    conlineready = 0;
+    serlineready = 0;
+
+    /* Start Console */
+    while((x1 < consize || consize == -1) && !conready && !conlineready) {
+      if(consize < 1 && concurpek[0] == 0) {
+        if(constartpek[0] != 0 && concurpek != constartpek) {
+          strcpy(conbuf, constartpek);
+        }
+        conready = 1;
+      } else if(size > 0 && x1++ == size) {
+        if(concurpek != constartpek) {
+          strncpy(conbuf, constartpek, concurpek - constartpek);
+        }
+        conready = 1;
+      } else if(concurpek[0] == '\n') {
+        conbuf[0] = 0;
+        if(concurpek != constartpek) {
+          concurpek[0] = 0;
+          if(constartpek[0] != 0) {
+            strcpy(conbuf, constartpek);
+          }
+
+          strcat(conbuf, "\n");
+          constartpek = concurpek + 1;
+        } else {
+          conbuf[0] = '\n';
+          conbuf[1] = 0;
+          constartpek = concurpek + 1;
         }
 
-	if(size == -1 && pekare[0] == 0)
-		return(0);
+        concurpek = constartpek - 1;
+        conlineready = 1;
+      }
 
-/* Följande kanske ser lite dubiöst ut men det är gjort så att man inte ska behöva
- * anropa noansi() mer än nödvändigt. Det går mycket snabbare att kopiera en redan
- * konverterad sträng än att konvertera den igen */
+      concurpek++;
+    }
+    /* End Console */
 
-	strncpy(localconstring,pekare,1199);
-	localconstring[1199]=0;
-	if(Servermem->cfg->cfgflags & NICFG_LOCALCOLOURS) {
-		bytes=ConvMBChrsFromAmiga(serpekare,pekare,1199,EFFECTIVE_USER->chrset,0);
-		serpekare[bytes] = '\0';
-		if(!(EFFECTIVE_USER->flaggor & ANSICOLOURS)) StripAnsiSequences(serpekare);
-	} else {
-		StripAnsiSequences(localconstring);
-		if(EFFECTIVE_USER->flaggor & ANSICOLOURS) {
-			bytes=ConvMBChrsFromAmiga(serpekare,pekare,1199,EFFECTIVE_USER->chrset,0);
-			serpekare[bytes] = '\0';
-		} else  {
-			bytes=ConvMBChrsFromAmiga(serpekare,localconstring,1199,EFFECTIVE_USER->chrset,0);
-			serpekare[bytes] = '\0';
-		}
-	}
+    nyrad = 0;
+    /* Start Serial */
+    while((x2 < sersize || sersize == -1) && !serlineready && !serready) {
+      if(sersize < 1 && sercurpek[0] == 0) {
+        if(serstartpek[0] != 0 && sercurpek != serstartpek) {
+          strcpy(serbuf, serstartpek);
+        }
+        serready = 1;
+      } else if(sersize > 0 && x2++ == sersize) {
+        if(sercurpek != serstartpek) {
+          strncpy(serbuf, serstartpek, sercurpek - serstartpek);
+        }
+        serready = 1;
+      } else if(sercurpek[0] == '\n') {
+        serbuf[0] = 0;
+        if(sercurpek != serstartpek) {
+          sercurpek[0] = 0;
+          if(serstartpek[0] != 0)
+            strcpy(serbuf, serstartpek);
 
-	concurpek = constartpek = &localconstring[0];
-	sercurpek = serstartpek = &serpekare[0];
-	consize = sersize = -1;
+          strcat(serbuf, "\n");
+          serstartpek = sercurpek + 1;
+        } else {
+          serbuf[0] = '\n';
+          serbuf[1] = 0;
+          serstartpek = sercurpek + 1;
+        }
+        
+        nyrad = 1;
+        sercurpek = serstartpek - 1;
+        serlineready = 1;
+      }
 
-	x1 = 0;
-	x2 = 0;
-	conready = 0;
-	serready = 0;
+      sercurpek++;
+    }
+    /* Serial end */
 
-	while((x1 < consize || consize == -1) && (x2 < sersize || sersize == -1) && !aborted && (!conready || !serready))
-	{
-		conbuf[0] = serbuf[0] = 0;
-		conlineready = 0;
-		serlineready = 0;
+    if(sendtosercon(conbuf, serbuf, -1, -1)) {
+      aborted = TRUE;
+    }
+    if(nyrad && incantrader()) {
+      aborted = TRUE;
+    }
+  }
 
-		/* Start Console */
-		while((x1 < consize || consize == -1) && !conready && !conlineready)
-		{
-			if(consize < 1 && concurpek[0] == 0)
-			{
-				if(constartpek[0] != 0 && concurpek != constartpek)
-				{
-					strcpy(conbuf, constartpek);
-				}
-				conready = 1;
-			}
-			else if(size > 0 && x1++ == size)
-			{
-				if(concurpek != constartpek)
-				{
-					strncpy(conbuf, constartpek, concurpek - constartpek);
-				}
-				conready = 1;
-			}
-			else if(concurpek[0] == '\n')
-			{
-				conbuf[0] = 0;
-				if(concurpek != constartpek)
-				{
-					concurpek[0] = 0;
-					if(constartpek[0] != 0)
-						strcpy(conbuf, constartpek);
+  return(aborted || ConnectionLost());
+}
 
-					strcat(conbuf, "\n");
-					constartpek = concurpek + 1;
-				}
-				else
-				{
-					conbuf[0] = '\n';
-					conbuf[1] = 0;
-					constartpek = concurpek + 1;
-				}
+void prepareOutputStrings(char *input, char *conOutput, char *serOutput) {
+  int bytes;
+  char tmpSerStr[1200];
+  
+  RenderStyle(tmpSerStr, input, &Servermem->cfg->styleSheets[EFFECTIVE_USER->styleSheet]);
+  if(Servermem->cfg->cfgflags & NICFG_LOCALCOLOURS) {
+    strcpy(conOutput, tmpSerStr);
+  } else {
+    RenderStyle(conOutput, input, NULL);
+  }
 
-				concurpek = constartpek - 1;
-				conlineready = 1;
-			}
+  bytes = ConvMBChrsFromAmiga(serOutput, tmpSerStr, 1199, EFFECTIVE_USER->chrset, 0);
+  serOutput[bytes] = '\0';
+}
 
-			concurpek++;
-		}
-		/* End Console */
+int puttekn(char *str,int size) {
+  char serStr[2400], conStr[1200];
 
-		nyrad = 0;
-		/* Start Serial */
-		while((x2 < sersize || sersize == -1) && !serlineready && !serready)
-		{
-			if(sersize < 1 && sercurpek[0] == 0)
-			{
-				if(serstartpek[0] != 0 && sercurpek != serstartpek)
-				{
-					strcpy(serbuf, serstartpek);
-				}
-				serready = 1;
-			}
-			else if(sersize > 0 && x2++ == sersize)
-			{
-				if(sercurpek != serstartpek)
-				{
-					strncpy(serbuf, serstartpek, sercurpek - serstartpek);
-				}
-				serready = 1;
-			}
-			else if(sercurpek[0] == '\n')
-			{
-				serbuf[0] = 0;
-				if(sercurpek != serstartpek)
-				{
-					sercurpek[0] = 0;
-					if(serstartpek[0] != 0)
-						strcpy(serbuf, serstartpek);
+  if(ConnectionLost()) {
+    return TRUE;
+  }
 
-					strcat(serbuf, "\n");
-					serstartpek = sercurpek + 1;
-				}
-				else
-				{
-					serbuf[0] = '\n';
-					serbuf[1] = 0;
-					serstartpek = sercurpek + 1;
-				}
+  if(size == -1 && str[0] == '\0') {
+    return FALSE;
+  }
 
-				nyrad = 1;
-				sercurpek = serstartpek - 1;
-				serlineready = 1;
-			}
-
-			sercurpek++;
-		}
-		/* Serial end */
-
-		if(sendtosercon(conbuf, serbuf, -1, -1)) {
-                  aborted = TRUE;
-                }
-		if(nyrad && incantrader()) {
-                  aborted = TRUE;
-                }
-	}
-
-	return(aborted || ConnectionLost());
+  prepareOutputStrings(str, conStr, serStr);
+  return sendStrWithLineCounting(conStr, serStr);
 }
 
 int sendtosercon(char *conpek, char *serpek, int consize, int sersize) {
@@ -1071,8 +1058,6 @@ int serputtekn(char *pekare,int size)
 	strncpy(serstring,pekare,1199);
 	serstring[1199]=0;
 	pekare = &serstring[0];
-
-	if(!(EFFECTIVE_USER->flaggor & ANSICOLOURS)) StripAnsiSequences(pekare);
 
 	if(size == -1 && !pekare[0]) return(aborted);
 

@@ -1,4 +1,5 @@
 char *FindNextWord(char *str);
+char *CopyOneWord(char *dest, char *src);
 int StartsWith(char *str, char *prefix);
 int IzSpace(char c);
 int IzDigit(char c);
