@@ -38,17 +38,17 @@ There is no such text.
 MSG_FORUMS_UNKNOWN (201//)
 Unknown forum
 MSG_ORG_TEXT_LINE1 (210//)
-Text: %d  Forum: %s
+Text: %d  Forum: «name»%s«reset»
 MSG_ORG_TEXT_LINE2 (211//)
-Written by %s
+Written by «name»%s«reset»
 MSG_ORG_TEXT_COMMENT_TO (212//)
-Comment to text %d by %s
+Comment to text %d by «name»%s«reset»
 MSG_ORG_TEXT_SUBJECT (213//)
-Subject: %s
+Subject: «subject»%s«reset»
 MSG_ORG_TEXT_END_OF_TEXT (214//)
-(End of text %d by %s)
+(End of text %d by «name»%s«reset»)
 MSG_ORG_TEXT_COMMENT_IN (215//)
-(Comment in text %d by %s)
+(Comment in text %d by «name»%s«reset»)
 MSG_ORG_TEXT_FOOTNOTE (216//)
 Footnote:
 MSG_TEXT_DELETED (217//)
@@ -57,7 +57,7 @@ MSG_TEXT_NO_PERM (218//)
 You don't have permissions to read that text.
 ;
 MSG_WHERE_YOU_ARE_IN (220//)
-You are in %s.
+You are in «name»%s«reset».
 MSG_WHERE_NO_TEXTS (221//)
 There are no texts.
 MSG_WHERE_TEXTS_NUMBERED (222//)
@@ -70,15 +70,15 @@ MSG_WHERE_MANY_UNREAD_TEXTS (225//)
 You have %d unread texts.
 ;
 MSG_FIDO_TEXT_LINE_1 (230//)
-Text: %d  Forum: %s    %s
+Text: %d  Forum: «name»%s«reset»    %s
 MSG_FIDO_TEXT_LINE_2 (231//)
-Written by %s (%d:%d/%d.%d)
+Written by «name»%s«reset» (%d:%d/%d.%d)
 MSG_FIDO_TEXT_TO (232//)
-To: %s
+To: «name»%s«reset»
 MSG_FIDO_WRITE_FORUM_DATE (233//)
-Forum: %s    %s
+Forum: «name»%s«reset»    %s
 MSG_FIDO_WRITE_WRITTEN_BY (234//)
-Written by %s (%d:%d/%d.%d)
+Written by «name»%s«reset» (%d:%d/%d.%d)
 MSG_FIDO_WRITE_TO (235//)
 To: (Return='All')
 MSG_FIDO_LIST_TEST_HEAD (236//)
@@ -89,9 +89,9 @@ Syntax: Go <forum name>
 MSG_GO_NO_SUCH_FORUM (251//)
 There is no such forum.
 MSG_GO_NOT_MEMBER_WANT_TO (252//)
-You are not a member of %s, would you like to be?
+You are not a member of «name»%s«reset», would you like to be?
 MSG_GO_NOT_MEMBER_NO_PERMS (253//)
-You are not a member of %s.
+You are not a member of «name»%s«reset».
 ;
 MSG_NEXT_CONF_NO_MORE_FORUM (260//)
 No more forum with unread texts.
@@ -115,9 +115,9 @@ MSG_COMMENT_REALLY_COMMENT (282//)
 Do you really want to comment in a comment protected forum?
 ;
 MSG_REACTION_TEXT_VERBOSE_PRS (290//)
-The text has been praised by %s
+The text has been praised by «name»%s«reset»
 MSG_REACTION_TEXT_VERBOSE_DIS (291//)
-The text has been dissed by %s
+The text has been dissed by «name»%s«reset»
 MSG_REACTION_TEXT_PRAISED (292//)
 The text has been praised by %d persons.
 MSG_REACTION_TEXT_DISSED (293//)
@@ -144,7 +144,7 @@ The text got number %d.
 MSG_WRITE_TOO_MANY_COMMENTS (306//)
 The commented text has maximum number of comments. No forward link created.
 MSG_WRITE_FORUM (307//)
-Forum: %s
+Forum: «name»%s«reset»
 MSG_WRITE_SUBJECT (308//)
 Subject:
 MSG_WRITE_NO_PERM_IN_FORUM (309//)
@@ -164,7 +164,7 @@ You can only add footnotes to your own texts.
 MSG_FOOTNOTE_ALREADY_HAS (322//)
 The text already has a footnote.
 MSG_FOOTNOTE_PRE_EDIT (323//)
-Footnote to text %d by %s
+Footnote to text %d by «name»%s«reset»
 ;
 MSG_SEARCH_SYNTAX (330//)
 Syntax: Search [-g] <search string>
@@ -175,7 +175,7 @@ Search doesn't work in Fido forums.
 MSG_SEARCH_NO_TEXTS_FOUND (333//)
 No texts found.
 MSG_SEARCH_RESULT_LINE1 (334//)
-Text: %d written %02d%02d%02d by %s
+Text: %d written %02d%02d%02d by «name»%s«reset»
 MSG_SEARCH_RESULT_LINE2 (335//)
 Forum: %s
 ;
@@ -196,19 +196,19 @@ You are in the mailbox.
 MSG_MAIL_NO_READ_PERM (347//)
 You don't have permissions to read that mail.
 MSG_MAIL_LINE1 (348//)
-Mail %d in the mailbox at %s
+Mail %d in the mailbox at «name»%s«reset»
 MSG_MAIL_LOCAL_MAIL (349//)
 Local mail,  %s
 MSG_MAIL_UNKNOWN_MAIL (350//)
 <Unknown mail type>,  %s
 MSG_MAIL_FROM (351//)
-From: %s
+From: «name»%s«reset»
 MSG_MAIL_COMMENT (352//)
-Comment to a mail by %s
+Comment to a mail by «name»%s«reset»
 MSG_MAIL_TO (353//)
-To: %s
+To: «name»%s«reset»
 MSG_MAIL_END (354//)
-(End of mail %d by %s)
+(End of mail %d by «name»%s«reset»)
 MSG_MAIL_FIDO_MAIL (355//)
 Fido netmail,  %s
 MSG_MAIL_FIDO_BAD_ZONE (356//)
@@ -220,7 +220,7 @@ Do you want a copy of the mail in your own mailbox?
 MSG_MAIL_GOT_NUMBER (359//)
 The mail got number %d.
 MSG_MAIL_GOT_NUMBER_AT_USER (360//)
-The mail got number %d at %s.
+The mail got number %d at «name»%s«reset».
 MSG_MAIL_LOCAL_SYNTAX (361//)
 Syntax: Mail <user>
 MSG_MAIL_FIDO_SYNTAX (362//)
@@ -718,6 +718,9 @@ MSG_READCFG_SUCCESS (1150//)
 The config was read successfully.
 MSG_READCFG_FAIL (1151//)
 There was an error reading the config. Keeping the old config.
+;
+MSG_STYLES_AVAILABLE (1160//)
+These style sheets are available
 ;
 ; ******** Dealing with flags **********
 MSG_FLAG_ON (9000//)

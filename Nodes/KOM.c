@@ -23,6 +23,7 @@
 #include "Languages.h"
 #include "CommandParser.h"
 #include "NiKomFuncs.h"
+#include "StyleSheets.h"
 
 #include "KOM.h"
 
@@ -285,6 +286,7 @@ void ExecuteCommandById(int cmdId) {
   case 326: bytnodtyp(); break;
   case 327: bytteckenset(); break;
   case 329: Cmd_ChangeLanguage(); break;
+  case 330: Cmd_ChangeStyleSheet(); break;
   case 401: bytarea(); break;
   case 402: filinfo(); break;
   case 403: upload(); break;
@@ -390,9 +392,9 @@ void displayPrompt(int defaultCmd) {
     cmdStr = "*** Undefined default command ***";
   }
   if(minutesLeft > 4) {
-    SendString("\r\n%s %s ", cmdStr, CURRENT_USER->prompt);
+    SendString("\r\n%s «prompt»%s«reset» ", cmdStr, CURRENT_USER->prompt);
   } else {
-    SendString("\r\n%s (%d) %s ", cmdStr, minutesLeft, CURRENT_USER->prompt);
+    SendString("\r\n%s (%d) «prompt»%s«reset» ", cmdStr, minutesLeft, CURRENT_USER->prompt);
   }
 
   if((cmd = getCommandToExecute(defaultCmd)) == NULL) {

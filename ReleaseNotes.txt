@@ -13,6 +13,10 @@
     are not sent to nodes, they are sent to users. Instead a new function
     SendUserMessage() has been introduced.
 
+- NiKom now has support for colors through style sheets. There is a new
+  config file StyleSheets.cfg that must be present in NiKom:DatoCfg.
+  Also the new command "CHANGE STYLESHEET" should be added to Commands.cfg.
+  
 ---------------------------------------------------------------------------
                          NiKom v2.3.1, 2017-07-01
 ---------------------------------------------------------------------------

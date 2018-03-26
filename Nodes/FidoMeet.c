@@ -72,6 +72,15 @@ int countfidomote(struct Mote *motpek) {
     + 1;
 }
 
+int isQuote(char *str) {
+  for(; *str == ' '; str++);
+  for(; *str != ' ' && *str != '>' && *str != '\0'; str++);
+  if(*str == '>') {
+    return TRUE;
+  }
+  return FALSE;
+}
+
 void fido_visatext(int text,struct Mote *motpek) {
   int length;
   struct FidoText *ft;
@@ -109,7 +118,11 @@ void fido_visatext(int text,struct Mote *motpek) {
     if(fl->text[0] == 1) {
       if(SendString("^A%s\r\n", &fl->text[1])) { break; }
     } else {
-      if(SendString("%s\r\n", fl->text)) break;
+      if(isQuote(fl->text)) {
+        if(SendString("«quote»%s«reset»\r\n", fl->text)) break;
+      } else {
+        if(SendString("%s\r\n", fl->text)) break;
+      }
     }
   }
   SendStringCat("\n%s\r\n", CATSTR(MSG_ORG_TEXT_END_OF_TEXT), text,ft->fromuser);

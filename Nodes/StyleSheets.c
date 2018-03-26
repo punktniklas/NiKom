@@ -3,8 +3,14 @@
 #include <math.h>
 //#include <proto/exec.h>
 #include "NiKomStr.h"
+#include "Terminal.h"
+#include "Languages.h"
+#include "Nodes.h"
 
 #include "StyleSheets.h"
+
+extern struct System *Servermem;
+extern int g_userDataSlot;
 
 int insertStyle(char *codeName, int codeNameLen, char *dst, struct StyleSheet *styleSheet) {
   struct StyleCode *styleCode = NULL, *iter;
@@ -93,3 +99,37 @@ void main(void) {
   //  testStyle("1 «black» 2", &styleSheet);
 }
 */
+
+void Cmd_ChangeStyleSheet(void) {
+  int i, newStyle, ch;
+  SendString("\n\n\r%s\n\r", CATSTR(MSG_STYLES_AVAILABLE));
+  for(i = 0 ; i < MAXSTYLESHEET; i++) {
+    if(Servermem->cfg->styleSheets[i].name[0] == '\0') {
+      continue;
+    }
+    SendString("%c %d: %s\r\n",
+               CURRENT_USER->styleSheet == i ? '*' : ' ',
+               i, Servermem->cfg->styleSheets[i].name);
+  }
+  SendString("\n\n\r%s ", CATSTR(MSG_COMMON_CHOICE));
+  for(;;) {
+    ch = GetChar();
+    if(ch == GETCHAR_LOGOUT) {
+      return;
+    }
+    if(ch == GETCHAR_RETURN) {
+        SendString("%s\n\r", CATSTR(MSG_COMMON_ABORTING));
+        return;
+    }
+    if(ch < '0' || ch > '7') {
+      continue;
+    }
+    newStyle = ch - '0';
+    if(Servermem->cfg->styleSheets[newStyle].name[0] == '\0') {
+      continue;
+    }
+    CURRENT_USER->styleSheet = newStyle;
+    SendString("%s\n\r", Servermem->cfg->styleSheets[newStyle].name);
+    break;
+  }
+}

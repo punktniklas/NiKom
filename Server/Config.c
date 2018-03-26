@@ -827,7 +827,6 @@ int handleStyleSheetsConfigLine(char *line, BPTR fh, struct Config *cfg) {
       return 0;
     }
     strcpy(cfg->styleSheets[currentStyleSheet].name, word);
-    printf("  Reading style sheet %d '%s'\n", currentStyleSheet, cfg->styleSheets[currentStyleSheet].name);
     return 1;
   }
   if(isMatchingConfigLine(line, "CODE")) {
@@ -852,7 +851,6 @@ int handleStyleSheetsConfigLine(char *line, BPTR fh, struct Config *cfg) {
       return 0;
     }
     CopyOneWord(styleCode->ansi, word);
-    printf("    Added code '%s' -> '%s'\n", styleCode->name, styleCode->ansi);
     return 1;
   }
   printf("Invalid config line: %s\n", line);

@@ -42,17 +42,17 @@ Finns ingen sådan text.
 MSG_FORUMS_UNKNOWN
 Okänt möte
 MSG_ORG_TEXT_LINE1
-Text %d  Möte: %s
+Text %d  Möte: «name»%s«reset»
 MSG_ORG_TEXT_LINE2
-Skriven av %s
+Skriven av «name»%s«reset»
 MSG_ORG_TEXT_COMMENT_TO
-Kommentar till text %d av %s
+Kommentar till text %d av «name»%s«reset»
 MSG_ORG_TEXT_SUBJECT
-Ärende: %s
+Ärende: «subject»%s«reset»
 MSG_ORG_TEXT_END_OF_TEXT
-(Slut på text %d av %s)
+(Slut på text %d av «name»%s«reset»)
 MSG_ORG_TEXT_COMMENT_IN
-(Kommentar i text %d av %s)
+(Kommentar i text %d av «name»%s«reset»)
 MSG_ORG_TEXT_FOOTNOTE
 Fotnot:
 MSG_TEXT_DELETED
@@ -61,7 +61,7 @@ MSG_TEXT_NO_PERM
 Du har inte rätt att läsa den texten.
 ;
 MSG_WHERE_YOU_ARE_IN
-Du befinner dig i %s.
+Du befinner dig i «name»%s«reset».
 MSG_WHERE_NO_TEXTS
 Det finns inga texter.
 MSG_WHERE_TEXTS_NUMBERED
@@ -74,15 +74,15 @@ MSG_WHERE_MANY_UNREAD_TEXTS
 Du har %d olästa texter.
 ;
 MSG_FIDO_TEXT_LINE_1
-Text %d  Möte: %s    %s
+Text %d  Möte: «name»%s«reset»    %s
 MSG_FIDO_TEXT_LINE_2
-Skriven av %s (%d:%d/%d.%d)
+Skriven av «name»%s«reset» (%d:%d/%d.%d)
 MSG_FIDO_TEXT_TO
-Till: %s
+Till: «name»%s«reset»
 MSG_FIDO_WRITE_FORUM_DATE
-Möte: %s    %s
+Möte: «name»%s«reset»    %s
 MSG_FIDO_WRITE_WRITTEN_BY
-Skriven av %s (%d:%d/%d.%d)
+Skriven av «name»%s«reset» (%d:%d/%d.%d)
 MSG_FIDO_WRITE_TO
 Till: (Return='All')
 MSG_FIDO_LIST_TEST_HEAD
@@ -93,9 +93,9 @@ Skriv: Gå <mötesnamn>
 MSG_GO_NO_SUCH_FORUM
 Finns inget sådant möte.
 MSG_GO_NOT_MEMBER_WANT_TO
-Du är inte medlem i mötet %s, vill du bli medlem?
+Du är inte medlem i mötet «name»%s«reset», vill du bli medlem?
 MSG_GO_NOT_MEMBER_NO_PERMS
-Du är inte medlem och har inte rätt att gå med i %s.
+Du är inte medlem och har inte rätt att gå med i «name»%s«reset».
 ;
 MSG_NEXT_CONF_NO_MORE_FORUM
 Finns inget mer möte med olästa texter.
@@ -119,9 +119,9 @@ MSG_COMMENT_REALLY_COMMENT
 Vill du verkligen kommentera i ett kommentarsskyddat möte?
 ;
 MSG_REACTION_TEXT_VERBOSE_PRS
-Texten har hyllats av %s
+Texten har hyllats av «name»%s«reset»
 MSG_REACTION_TEXT_VERBOSE_DIS
-Texten har dissats av %s
+Texten har dissats av «name»%s«reset»
 MSG_REACTION_TEXT_PRAISED
 Texten har hyllats av %d personer
 MSG_REACTION_TEXT_DISSED
@@ -148,7 +148,7 @@ Texten fick nummer %d.
 MSG_WRITE_TOO_MANY_COMMENTS
 Redan maximalt med kommentarer till den texten, sparar texten i alla fall.
 MSG_WRITE_FORUM
-Möte: %s
+Möte: «name»%s«reset»
 MSG_WRITE_SUBJECT
 Ärende:
 MSG_WRITE_NO_PERM_IN_FORUM
@@ -168,7 +168,7 @@ Du kan bara lägga till fotnoter på dina egna texter.
 MSG_FOOTNOTE_ALREADY_HAS
 Texten har redan en fotnot.
 MSG_FOOTNOTE_PRE_EDIT
-Fotnot till text %d av %s
+Fotnot till text %d av «name»%s«reset»
 ;
 MSG_SEARCH_SYNTAX
 Skriv: Sök [-g] <söksträng>
@@ -179,7 +179,7 @@ Sök fungerar inte i FidoNet-möten.
 MSG_SEARCH_NO_TEXTS_FOUND
 Inga texter hittades.
 MSG_SEARCH_RESULT_LINE1
-Text: %d skriven %02d%02d%02d av %s
+Text: %d skriven %02d%02d%02d av «name»%s«reset»
 MSG_SEARCH_RESULT_LINE2
 Möte: %s
 ;
@@ -200,19 +200,19 @@ Du befinner dig i brevlådan.
 MSG_MAIL_NO_READ_PERM
 Du har inte rätt att läsa det brevet.
 MSG_MAIL_LINE1
-Brev %d i brevlådan hos %s
+Brev %d i brevlådan hos «name»%s«reset»
 MSG_MAIL_LOCAL_MAIL
 Lokalt brev,  %s
 MSG_MAIL_UNKNOWN_MAIL
 <Okänd brevtyp>  %s
 MSG_MAIL_FROM
-Avsändare: %s
+Avsändare: «name»%s«reset»
 MSG_MAIL_COMMENT
-Kommentar till en text av %s
+Kommentar till en text av «name»%s«reset»
 MSG_MAIL_TO
-Mottagare: %s
+Mottagare: «name»%s«reset»
 MSG_MAIL_END
-(Slut på brev %d av %s)
+(Slut på brev %d av «name»%s«reset»)
 MSG_MAIL_FIDO_MAIL
 Fido-nätbrev,  %s
 MSG_MAIL_FIDO_BAD_ZONE
@@ -224,7 +224,7 @@ Vill du ha en kopia av brevet i din egen brevlåda?
 MSG_MAIL_GOT_NUMBER
 Brevet fick nummer %d
 MSG_MAIL_GOT_NUMBER_AT_USER
-Brevet fick nummer %d hos %s
+Brevet fick nummer %d hos «name»%s«reset»
 MSG_MAIL_LOCAL_SYNTAX
 Skriv: Brev <användare>
 MSG_MAIL_FIDO_SYNTAX
@@ -722,6 +722,9 @@ MSG_READCFG_SUCCESS
 Konfigurationen har lästs om.
 MSG_READCFG_FAIL
 Konfigurationen kunde inte läsas om. Behåller den gamla konfigurationen.
+;
+MSG_STYLES_AVAILABLE
+Dessa stilmallar finns att välja på.
 ;
 ; ******** Dealing with flags **********
 MSG_FLAG_ON
