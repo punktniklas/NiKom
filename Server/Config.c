@@ -12,6 +12,7 @@
 #include "ConfigUtils.h"
 #include "FidoUtils.h"
 #include "ServerMemUtils.h"
+#include "Trie.h"
 
 #include "Config.h"
 
@@ -801,7 +802,10 @@ int handleFidoConfigLine(char *line, BPTR fh, struct Config *cfg) {
 int readStyleSheetConfig(struct Config *cfg) {
   int i;
   for(i = 0; i < MAXSTYLESHEET; i++) {
-    NewList((struct List *)&cfg->styleSheets[i].codesList);
+    if((cfg->styleSheets[i].codes = CreateTrie()) == NULL) {
+      printf("Could not allocate a trie for stylesheet.");
+      return 0;
+    }
   }
   currentStyleSheet = -1;
   return readConfigFile("NiKom:DatoCfg/StyleSheets.cfg", cfg, handleStyleSheetsConfigLine);
@@ -809,7 +813,7 @@ int readStyleSheetConfig(struct Config *cfg) {
 
 int handleStyleSheetsConfigLine(char *line, BPTR fh, struct Config *cfg) {
   struct StyleCode *styleCode;
-  char *word;
+  char *word, codeKey[20];
   if(isMatchingConfigLine(line, "STYLE")) {
     word = FindNextWord(line);
     if(word[0] == '\0') {
@@ -834,23 +838,26 @@ int handleStyleSheetsConfigLine(char *line, BPTR fh, struct Config *cfg) {
       printf("CODE line without any preceeding STYLE line found.\n");
       return 0;
     }
-    if(!(styleCode = AllocMem(sizeof(struct StyleCode), MEMF_PUBLIC | MEMF_CLEAR))) {
-      printf("Couldn't allocate memory for style code (%d bytes)\n", sizeof(struct StyleCode));
-      return 0;
-    }
-    AddTail((struct List *)&cfg->styleSheets[currentStyleSheet].codesList, (struct Node *)styleCode);
-    word = FindNextWord(line);
+   word = FindNextWord(line);
     if(word[0] == '\0') {
       printf("No name given for code: '%s'\n", line);
       return 0;
     }
-    CopyOneWord(styleCode->name, word);
+    CopyOneWord(codeKey, word);
     word = FindNextWord(word);
     if(word[0] == '\0') {
-      printf("No ANSI sequence for code '%s' defined.\n", styleCode->name);
+      printf("No ANSI sequence for code '%s' defined.\n", codeKey);
+      return 0;
+    }
+    if(!(styleCode = AllocMem(sizeof(struct StyleCode), MEMF_PUBLIC | MEMF_CLEAR))) {
+      printf("Couldn't allocate memory for style code (%d bytes)\n", sizeof(struct StyleCode));
       return 0;
     }
     CopyOneWord(styleCode->ansi, word);
+    if(!TrieAdd(codeKey, styleCode, cfg->styleSheets[currentStyleSheet].codes)) {
+      printf("Could not add code '%s' to stylesheet %d.", styleCode->ansi);
+      return 0;
+    }
     return 1;
   }
   printf("Invalid config line: %s\n", line);
@@ -881,9 +888,12 @@ struct Config *ReadAllConfigs(void) {
   return NULL;
 }
 
+void freeStyleCode(void *styleCode) {
+  FreeMem(styleCode, sizeof(struct StyleCode));
+}
+
 void FreeAllConfigs(struct Config *cfg) {
   struct Kommando *command;
-  struct StyleCode *styleCode;
   int i;
 
   while((command = (struct Kommando *)RemHead((struct List *)&cfg->kom_list))) {
@@ -891,9 +901,7 @@ void FreeAllConfigs(struct Config *cfg) {
   }
 
   for(i = 0; i < MAXSTYLESHEET; i++) {
-    while((styleCode = (struct StyleCode *)RemHead((struct List *)&cfg->styleSheets[i].codesList))) {
-      FreeMem(styleCode, sizeof(struct StyleCode));
-    }
+    FreeTrie(cfg->styleSheets[i].codes, freeStyleCode);
   }
 
   FreeMem(cfg, sizeof(struct Config));

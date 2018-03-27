@@ -4,7 +4,8 @@ NLFLAGS  = NMINC STRMERGE CPU=$(CPU) DEBUG=LINE NOSTKCHK LIBCODE DEFINE=NIKOMLIB
            IDIR=/Include ERROR=ALL
 OBJS     = DiskUtils.o FileAreaUtils.o Logging.o RexxUtils.o ExecUtils.o \
 	   ServerMemUtils.o StringUtils.o ConfigUtils.o FidoUtils.o Stack.o \
-	   CommandParser.o DateUtils.o UserDataUtils.o UserMessageUtils.o
+	   CommandParser.o DateUtils.o UserDataUtils.o UserMessageUtils.o \
+           Trie.o
 NLIBOBJS = Logging_nlib.o
 
 all: nikomutils.lib nikomutils_nlib.lib
@@ -58,3 +59,5 @@ DateUtils.o: DateUtils.c DateUtils.h
 UserDataUtils.o: UserDataUtils.c UserDataUtils.h
 
 UserMessageUtils.o: UserMessageUtils.c UserMessageUtils.h
+
+Trie.o: Trie.c Trie.h

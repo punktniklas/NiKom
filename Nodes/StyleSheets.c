@@ -6,6 +6,7 @@
 #include "Terminal.h"
 #include "Languages.h"
 #include "Nodes.h"
+#include "Trie.h"
 
 #include "StyleSheets.h"
 
@@ -13,7 +14,7 @@ extern struct System *Servermem;
 extern int g_userDataSlot;
 
 int insertStyle(char *codeName, int codeNameLen, char *dst, struct StyleSheet *styleSheet) {
-  struct StyleCode *styleCode = NULL, *iter;
+  struct StyleCode *styleCode = NULL;
   char name[20];
   int len;
 
@@ -29,13 +30,7 @@ int insertStyle(char *codeName, int codeNameLen, char *dst, struct StyleSheet *s
     return 4;
   }
   
-  ITER_EL(iter, styleSheet->codesList, codeNode, struct StyleCode *) {
-    if(strcmp(name, iter->name) == 0) {
-      styleCode = iter;
-      break;
-    }
-  }
-  if(styleCode == NULL) {
+  if((styleCode = TrieGet(name, styleSheet->codes)) == NULL) {
     return 0;
   }
   *(dst++) = 0x1b;

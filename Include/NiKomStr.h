@@ -207,13 +207,12 @@ struct FidoConfig {
 };
 
 struct StyleSheet {
-  struct MinList codesList;
+  struct Trie *codes;
   char name[41];
 };
 
 struct StyleCode {
-  struct MinNode codeNode;
-  char name[20], ansi[20];
+  char ansi[20];
 };
 
 struct Config {
