@@ -19,6 +19,7 @@
 #include "ConfCommon.h"
 #include "ConfHeaderExtensions.h"
 #include "Languages.h"
+#include "StyleSheets.h"
 
 #include "OrgMeet.h"
 
@@ -263,12 +264,8 @@ int org_visatext(int textId, char verbose) {
   }
   SendStringCat("%s\r\n", CATSTR(MSG_ORG_TEXT_SUBJECT), readhead.arende);
   if(CURRENT_USER->flaggor & STRECKRAD) {
-    length = strlen(readhead.arende) + 8;
-    for(i = 0; i < length; i++) {
-      outbuffer[i] = '-';
-    }
-    outbuffer[i] = '\0';
-    SendString("%s\r\n\n", outbuffer);
+    SendRepeatedChr('-', RenderLength(outbuffer));
+    SendString("\r\n\n");
   } else {
     SendString("\n");
   }

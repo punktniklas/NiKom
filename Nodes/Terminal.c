@@ -592,6 +592,9 @@ int SendStringNoBrk(char *fmt, ...) {
 int SendRepeatedChr(char c, int count) {
   char buf[80];
   int i;
+  if(count > 79) {
+    count = 79;
+  }
   for(i = 0; i < count; i++) {
     buf[i] = c;
   }

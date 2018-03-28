@@ -22,6 +22,7 @@
 #include "Terminal.h"
 #include "UserNotificationHooks.h"
 #include "Languages.h"
+#include "StyleSheets.h"
 
 #include "FidoMeet.h"
 
@@ -82,7 +83,6 @@ int isQuote(char *str) {
 }
 
 void fido_visatext(int text,struct Mote *motpek) {
-  int length;
   struct FidoText *ft;
   struct FidoLine *fl;
   char filnamn[20],fullpath[100];
@@ -108,8 +108,7 @@ void fido_visatext(int text,struct Mote *motpek) {
   SendStringCat("%s\r\n", CATSTR(MSG_FIDO_TEXT_TO), ft->touser);
   SendStringCat("%s\r\n", CATSTR(MSG_ORG_TEXT_SUBJECT), ft->subject);
   if(CURRENT_USER->flaggor & STRECKRAD) {
-    length=strlen(outbuffer);
-    SendRepeatedChr('-', length - 2);
+    SendRepeatedChr('-', RenderLength(outbuffer));
     SendString("\r\n\n");
   } else {
     SendString("\n");

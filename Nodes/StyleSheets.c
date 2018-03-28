@@ -71,6 +71,29 @@ void RenderStyle(char *dst, char *src, struct StyleSheet *styleSheet) {
   *dst = '\0';
 }
 
+int RenderLength(char *str) {
+  int cnt = 0, taglen = 0;
+  for(; *str != '\0'; str++) {
+    if(taglen > 0) {
+      if(*str == (char)0xbb) {
+        taglen = 0;
+      } else if(*str >= 'a' && *str <= 'z') {
+        taglen++;
+      } else {
+        cnt += taglen + 1;
+        taglen = 0;
+      }
+    } else {
+      if(*str == (char)0xab) {
+        taglen = 1;
+      } else if(*str != '\r' && *str != '\n') {
+        cnt++;
+      }
+    }
+  }
+  return cnt;
+}
+
 /*
 void testStyle(char *str, struct StyleSheet *styleSheet) {
   char buf[100];
