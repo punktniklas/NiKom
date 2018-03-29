@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <time.h>
 
 #include "DateUtils.h"
 
@@ -18,4 +19,13 @@ const char *FormatDuration(long seconds, char *buf) {
     sprintf(buf, "%dy%dd", seconds / YEAR, (seconds % YEAR) / DAY);
   }
   return buf;
+}
+
+const char *FormatADate(long timestamp) {
+  struct tm *ts;
+  static char str[9];
+
+  ts = localtime(&timestamp);
+  sprintf(str, "%4d%02d%02d", ts->tm_year + 1900, ts->tm_mon + 1, ts->tm_mday);
+  return str;
 }

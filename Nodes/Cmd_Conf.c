@@ -13,6 +13,7 @@
 #include "StringUtils.h"
 #include "ConfHeaderExtensions.h"
 #include "Languages.h"
+#include "DateUtils.h"
 
 #include "Cmd_Conf.h"
 
@@ -215,7 +216,6 @@ void Cmd_Search(void) {
   struct Mote *conf;
   struct Header textHeader;
   struct EditLine *el;
-  struct tm *ts;
 
   global = FALSE;
   if(argptr[0] == '-') {
@@ -288,10 +288,8 @@ void Cmd_Search(void) {
         continue;
       }
       foundsomething = 1;
-      ts = localtime(&textHeader.tid);
       if(SendStringCat("\r\x1b\x5b\x4b%s\r\n", CATSTR(MSG_SEARCH_RESULT_LINE1),
-                    currentText, ts->tm_year % 100, ts->tm_mon + 1,
-                    ts->tm_mday, getusername(textHeader.person))) {
+                       currentText, FormatADate(textHeader.tid), getusername(textHeader.person))) {
         freeeditlist();
         return;
       }

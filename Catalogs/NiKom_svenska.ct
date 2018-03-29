@@ -179,7 +179,7 @@ Sök fungerar inte i FidoNet-möten.
 MSG_SEARCH_NO_TEXTS_FOUND
 Inga texter hittades.
 MSG_SEARCH_RESULT_LINE1
-Text: %d skriven %02d%02d%02d av «name»%s«reset»
+Text: %d skriven %s av «name»%s«reset»
 MSG_SEARCH_RESULT_LINE2
 Möte: %s
 ;

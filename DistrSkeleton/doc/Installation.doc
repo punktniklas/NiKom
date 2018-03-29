@@ -151,7 +151,7 @@ Detta kan användas för att ge en cosysop rättigheter att göra vissa saker
 som normalt bara sysop kan göra.
 
 
-Kommandon.cfg
+Commands.cfg
 -------------
 När de olika statusnivåerna är definierade skall man definiera lägsta
 statusnivå för alla kommandon. Dvs vilken minimistatus ett kommando
@@ -162,36 +162,47 @@ Definieringarna anges i filen "Kommandon.cfg".
 Ett kommando definieras som följer:
 Först av allt kommer en rad som börjar på stort N och efter det ett
 likamed-tecken. Därefter kommer namnet på kommandot. Tex:
-N=LISTA ANVÄNDARE
+N=LIST USERS
+Namnet för detta fält ska vara på default-språket, som är engelska.
+Vill man att kommandot ska vara tillgängligt på andra språk måste
+man ha en separat rad för varje språk på formatet "N<locale>=<namn>".
+Tex
+Nsvenska=LISTA ANVÄNDARE
+
+Vill man inte att kommandot ska vara tillgängligt på ett visst språk
+så är det bara att utelämna det språket. Vill man inte att kommandot
+ska vara tillgängligt på engelska så måste man fortfarande ha med
+den inledande "N="-raden. Man kan dock sätta namnet till "-". Tex
+N=-
 
 Därefter följer några andra fält:
 
-# = Kommandots nummer. Arexx-program har nummer 500 eller större. Detta
+# - Kommandots nummer. Arexx-program har nummer 500 eller större. Detta
     nummer använder NiKom för att identifiera kommandot.
 
-S = Minimistatus för att utföra kommandot.
+S - Minimistatus för att utföra kommandot.
 
-A = Vilken typ av argument kommandot tar. Ett '#'-tecken anger ett numeriskt
+A - Vilken typ av argument kommandot tar. Ett '#'-tecken anger ett numeriskt
     värde. Något annat anger att kommandot tar vad som helst i argument och
     utelämnar man A:et så tar kommandot inget argument.
 
-L = Minsta antalet inloggningar man måste ha gjort för att utföra kommandot.
+L - Minsta antalet inloggningar man måste ha gjort för att utföra kommandot.
 
-D = Minsta antal dagar man måste ha varit registrerad för att utföra
+D - Minsta antal dagar man måste ha varit registrerad för att utföra
     kommandot.
 
-X = Ett eventuellt lösenord för att utföra kommandot.
+X - Ett eventuellt lösenord för att utföra kommandot.
 
-V = Om detta är satt till 'N' så betyder det att det bara kommer vara synligt
+V - Om detta är satt till 'N' så betyder det att det bara kommer vara synligt
     för de som har rätt att utföra kommandot.
 
-W = En sträng som syns i Vilka-kommandot när en användare kör detta kommando.
+W - En sträng som syns i Vilka-kommandot när en användare kör detta kommando.
 
-F = En sträng som skrivas till loggfilen när en användare kör detta kommando.
+F - En sträng som skrivas till loggfilen när en användare kör detta kommando.
 
-( = Numret på ett ARexx-script som ska köras innan kommandot utförs.
+( - Numret på ett ARexx-script som ska köras innan kommandot utförs.
 
-) = Numret på ett ARexx-script som ska köras efter kommandot utförts.
+) - Numret på ett ARexx-script som ska köras efter kommandot utförts.
 
 V-flaggan kan kanske behöva en lite närmare förklaring så vi tar
 ett exempel:

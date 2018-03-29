@@ -175,7 +175,7 @@ Search doesn't work in Fido forums.
 MSG_SEARCH_NO_TEXTS_FOUND (333//)
 No texts found.
 MSG_SEARCH_RESULT_LINE1 (334//)
-Text: %d written %02d%02d%02d by «name»%s«reset»
+Text: %d written %s by «name»%s«reset»
 MSG_SEARCH_RESULT_LINE2 (335//)
 Forum: %s
 ;
