@@ -165,21 +165,35 @@ likamed-tecken. Därefter kommer namnet på kommandot. Tex:
 N=LISTA ANVÄNDARE
 
 Därefter följer några andra fält:
-#=Kommandots nummer. Arexx-program har nummer 500 eller större. Detta
-  nummer använder NiKom för att identifiera kommandot.
-O=Antal ord i kommandot, 1 eller 2.
-S=Minimistatus för att utföra kommandot.
-A=Vilken typ av argument kommandot tar. Ett '#'-tecken anger ett numeriskt
-  värde. Något annat anger att kommandot tar vad som helst i argument och
-  utelämnar man A:et så tar kommandot inget argument.
-L=Minsta antalet inloggningar man måste ha gjort för att utföra kommandot.
-D=Minsta antal dagar man måste ha varit registrerad för att utföra
-  kommandot.
-X=Ett eventuellt lösenord för att utföra kommandot.
-V=Om detta är satt till 'N' så betyder det att det bara kommer vara synligt
-  för de som har rätt att utföra kommandot.
 
-Den sista flaggan kan kanske behöva en lite närmare förklaring så vi tar
+# = Kommandots nummer. Arexx-program har nummer 500 eller större. Detta
+    nummer använder NiKom för att identifiera kommandot.
+
+S = Minimistatus för att utföra kommandot.
+
+A = Vilken typ av argument kommandot tar. Ett '#'-tecken anger ett numeriskt
+    värde. Något annat anger att kommandot tar vad som helst i argument och
+    utelämnar man A:et så tar kommandot inget argument.
+
+L = Minsta antalet inloggningar man måste ha gjort för att utföra kommandot.
+
+D = Minsta antal dagar man måste ha varit registrerad för att utföra
+    kommandot.
+
+X = Ett eventuellt lösenord för att utföra kommandot.
+
+V = Om detta är satt till 'N' så betyder det att det bara kommer vara synligt
+    för de som har rätt att utföra kommandot.
+
+W = En sträng som syns i Vilka-kommandot när en användare kör detta kommando.
+
+F = En sträng som skrivas till loggfilen när en användare kör detta kommando.
+
+( = Numret på ett ARexx-script som ska köras innan kommandot utförs.
+
+) = Numret på ett ARexx-script som ska köras efter kommandot utförts.
+
+V-flaggan kan kanske behöva en lite närmare förklaring så vi tar
 ett exempel:
 
 Nisse har ett sysop-kommando som heter 'Slasktratt', som det krävs
@@ -193,11 +207,10 @@ Sätts nu V=N så kan alla vanliga användare skriva 'sl' för att logga ut.
 Nisse får dock fortfarande upp båda kommandona, han kan ju utföra båda.
 
 
-Av fälten är N,#,O och S obligatoriska. Ett kommando kan tex definieras så
+Av fälten är N,# och S obligatoriska. Ett kommando kan tex definieras så
 här:
 N=DOWNLOAD
 #=404
-O=1
 S=3
 A=.
 L=10
