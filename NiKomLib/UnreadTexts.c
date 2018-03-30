@@ -30,7 +30,7 @@ int maybeConvertUnreadTextsData(int userId, struct UnreadTexts *unreadTexts,
         ChangeUnreadTextStatus -- Marks a text as read or unread.
 
     SYNOPSIS
-        ChangeUnreadTextStatus(textNumber, markAsUnread, unreadTexts)
+        ChangeUnreadTextStatus(textId, markAsUnread, unreadTexts)
                                D0          D1            A0
         void ChangeUnreadTextStatus(int, int, struct UnreadTexts *);
 
@@ -39,32 +39,40 @@ int maybeConvertUnreadTextsData(int userId, struct UnreadTexts *unreadTexts,
         given unreadTexts struct.
 
     INPUTS
-        textNumber   - the text number to mark.
+        textId   - the text number to mark.
         markAsUnread - 0 to mark as read, non-zero to mark as unread.
         unreadTexts  - the UnreadTexts structure to make changes to.
 
 **********************************************************************/
 
 void __saveds AASM LIBChangeUnreadTextStatus(
-   register __d0 int textNumber AREG(d0),
+   register __d0 int textId AREG(d0),
    register __d1 int markAsUnread AREG(d1),
    register __a0 struct UnreadTexts *unreadTexts AREG(a0),
    register __a6 struct NiKomBase *NiKomBase AREG(a6)) {
+  int confId;
 
-   if(textNumber < unreadTexts->bitmapStartText) {
+   if(textId < unreadTexts->bitmapStartText) {
       return;
    }
-   if(textNumber >= (unreadTexts->bitmapStartText + UNREADTEXTS_BITMAPSIZE)) {
+   confId = GetConferenceForText(textId);
+   if(confId == -1) {
+     return;
+   }
+   if(textId >= (unreadTexts->bitmapStartText + UNREADTEXTS_BITMAPSIZE)) {
      if(markAsUnread) {
        return;
      }
-     shiftBitmap(unreadTexts, textNumber);
+     shiftBitmap(unreadTexts, textId);
    }
 
    if(markAsUnread) {
-      BAMSET(unreadTexts->bitmap, textNumber % UNREADTEXTS_BITMAPSIZE);
+      BAMSET(unreadTexts->bitmap, textId % UNREADTEXTS_BITMAPSIZE);
+      if(unreadTexts->lowestPossibleUnreadText[confId] > textId) {
+        unreadTexts->lowestPossibleUnreadText[confId] = textId;
+      }
    } else {
-      BAMCLEAR(unreadTexts->bitmap, textNumber % UNREADTEXTS_BITMAPSIZE);
+      BAMCLEAR(unreadTexts->bitmap, textId % UNREADTEXTS_BITMAPSIZE);
    }
 }
 
