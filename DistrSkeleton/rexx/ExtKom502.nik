@@ -1,32 +1,63 @@
-/* Markera Text-kommandot
-$VER: Markera Text 1.0 (20.4.92)
-N=MARKERA TEXT
-O=2
+/* Mark Text command
+$VER: Mark Text 1.1 (28.3.18)
+N=MARK TEXT
 #=502
 A=#
 */
 
-parse arg nod person argument
+parse arg nodeId userId textId .
 
 options results
 
-filnamn='ram:NiKom/Mark'||nod
-if argument='' then do
-	'lasttext'
-	savestr=result
-	if savestr='RESULT' then do
-		'sendstring' '0d0a0a'x'Du har inte läst någon text ännu!' '0d0a'x
-		exit 0
-	end
+'sendstring' '0d0a0a'x
+
+filename = 'NiKom:Users/' || userId % 100 || '/' || userId || '/MarkedTexts'
+if textId = '' then do
+  'lasttext'
+  textStr = RESULT
+  if textStr = 'RESULT' then do
+    'sendstring Du har inte läst någon text ännu!' '0d0a'x
+     exit 0
+  end
+
+  if Abbrev(textStr, 'B') then do
+    'sendstring Du kan inte markera brev' '0d0a'x
+    exit 0
+  end
+
+  parse var textStr 'T' textId confId .
 end
-else if ~datatype(argument,'n') then do
-	'sendstring' '0d0a0a'x'Skriv: Markera Text <textnummer>' '0d0a'x
-	'sendstring eller bara: Markera Text för att markera den senast lästa texten' '0d0a'x
-	exit 0
+
+else do
+  if ~datatype(textId, 'n') then do
+    'sendstring Skriv: Markera Text <textnummer>' '0d0a'x
+    'sendstring eller bara: Markera Text för att markera den senast lästa texten' '0d0a'x
+    exit 0
+  end
+  
+  confId = TextInfo(textId, 'm')
+  if confId < 0 then do
+    'sendstring Text' textId 'finns inte.' '0d0a'x
+    exit 0
+  end
+
+  if MeetRight(userId, confId) ~= 1 then do
+    'sendstring Du har inte rätt att markera text' textId '0d0a'x
+    exit 0
+  end
+
+  textStr = 'T' textId confId
 end
-else savestr='T '||argument
-if ~open('fil',filnamn,'A') then do
-	'sendstring' '0d0a0a'x'Kunde inte öppna' filnamn '0d0a'x
-	exit 5
+
+if Exists(filename) then
+  mode = 'Append'
+else
+  mode = 'Write'
+if ~Open('file', filename,  mode) then do
+  'sendstring Kunde inte öppna' filename '0d0a'x
+  exit 5
 end
-call writeln('fil',savestr)
+call WriteLn('file', textStr)
+call Close('file')
+
+'sendstring Text' textId 'i mötet' MeetInfo(confId, 'n') 'markerad.' '0d0a'x

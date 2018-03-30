@@ -1,21 +1,27 @@
-/* Visa Markerade-kommandot
-$VER: Visa Markerade 1.0 (20.4.92)
-N=VISA MARKERADE
-O=2
+/* Display Marked command
+$VER: Display Marked 1.1 (28.3.18)
+N=DISPLAY MARKED
 #=503
 */
 
-parse arg nod person
+parse arg nodeId userId .
 
-filnamn='ram:NiKom/Mark'||nod
+'sendstring' '0d0a0a'x
 
-if ~open('fil',filnamn,'R') then do
-	'sendstring' '0d0a0a'x'Kunde inte öppna' filnamn
-	exit 5
+filename = 'NiKom:Users/' || userId % 100 || '/' || userId || '/MarkedTexts'
+
+if ~Exists(filename) then do
+  'sendstring Du har inga markerade texter.' '0d0a'x
+  exit 0
 end
-do until eof('fil')
-	foo=readln('fil')
-	parse var foo typ nr
-	if typ='B' then 'showletter' nr
-	else if typ='T' then 'showtext' nr
+
+if ~Open('file', filename, 'Read') then do
+  'sendstring Kunde inte öppna' filename
+  exit 5
+end
+do until Eof('file')
+ line = ReadLn('file')
+ if line = '' then iterate
+ parse var line 'T' textId confId .
+ 'sendstring Text' textId 'i mötet' MeetInfo(confId, 'n') '0d0a'x
 end
