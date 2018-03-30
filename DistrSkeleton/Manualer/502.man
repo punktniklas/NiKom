@@ -3,10 +3,10 @@
 Markera Text
 ------------
 
-Synopsis: Markera Text [<textnummer>]
+Syntax: Markera Text [<textnummer>]
 
 Beskrivning:
 Markerar den senast lästa texten för senare läsning. Om man anger ett
-textnummet så markeras den texten.
+textnummer så markeras den texten.
 
-Se Även: Visa Markerade
+Se Även: Visa Markerade, Oläs Markerade

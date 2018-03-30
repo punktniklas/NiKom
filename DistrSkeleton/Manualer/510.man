@@ -1,0 +1,13 @@
+
+
+Oläs Markerade
+--------------
+
+Syntax: Oläs Markerade [-p]
+
+Beskrivning:
+Går igenom tidigare markerade texter och gör de till olästa. Om man även
+anger flaggan "-p" (purge) så raderas den nuvarande listan över markerade
+texter.
+
+Se Även: Markera Text, Visa Markerade
