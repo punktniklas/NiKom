@@ -65,9 +65,6 @@ Log       - Här kommer NiKom att skapa loggfiler som innehåller information
 
 Kontrollera att dessa kataloger finns. Om inte, skapa dem.
 
-Det krävs även att det finns en katalog i Ram: som heter NiKom. Se
-till att denna skapas varje gång datorn startas.
-
 
 Körbara filer
 -------------

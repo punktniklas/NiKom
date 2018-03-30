@@ -6,9 +6,6 @@ signal ON ERROR
 LF= '0a0d'x
 LLF= '0a0a0d'x
 
-filnamn='ram:NiKom/Mark'||nod
-if ~open('fil',filnamn,'W') then 'sendstring' '0d0a0a'x'Kunde inte rensa markerade-texter-filen' '0d0a'x
-
 profile='NiKom:Users/'||person%100||'/'||person||'/Profile'
 
 if ~open('prfil',profile) then exit
