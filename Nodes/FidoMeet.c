@@ -23,6 +23,7 @@
 #include "UserNotificationHooks.h"
 #include "Languages.h"
 #include "StyleSheets.h"
+#include "StringUtils.h"
 
 #include "FidoMeet.h"
 
@@ -73,13 +74,10 @@ int countfidomote(struct Mote *motpek) {
     + 1;
 }
 
-int isQuote(char *str) {
-  for(; *str == ' '; str++);
-  for(; *str != ' ' && *str != '>' && *str != '\0'; str++);
-  if(*str == '>') {
-    return TRUE;
-  }
-  return FALSE;
+int isFidoSystemStr(char *str) {
+  return strncmp(str, "--- ", 4) == 0
+    || strncmp(str, " * Origin: ", 11) == 0
+    || strncmp(str, "SEEN-BY: ", 9) == 0;
 }
 
 void fido_visatext(int text,struct Mote *motpek) {
@@ -115,10 +113,12 @@ void fido_visatext(int text,struct Mote *motpek) {
   }
   ITER_EL(fl, ft->text, line_node, struct FidoLine *) {
     if(fl->text[0] == 1) {
-      if(SendString("^A%s\r\n", &fl->text[1])) { break; }
+      if(SendString("«system»^A%s«reset»\r\n", &fl->text[1])) { break; }
     } else {
-      if(isQuote(fl->text)) {
+      if(IsQuote(fl->text)) {
         if(SendString("«quote»%s«reset»\r\n", fl->text)) break;
+      } else if(isFidoSystemStr(fl->text)) {
+        if(SendString("«system»%s«reset»\r\n", fl->text)) break;
       } else {
         if(SendString("%s\r\n", fl->text)) break;
       }
@@ -348,7 +348,8 @@ void fidolistaarende(struct Mote *motpek,int dir) {
     }
     ft->date[6] = 0;
     ft->subject[27] = 0;
-    bryt = SendString("%-34s%5d %s %s\r\n", ft->fromuser, i, ft->date, ft->subject);
+    bryt = SendString("«name»%-34s«number»%5d«reset» %s «subject»%s«reset»\r\n",
+                      ft->fromuser, i, ft->date, ft->subject);
     FreeFidoText(ft);
     if(bryt) {
       break;

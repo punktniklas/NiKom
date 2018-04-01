@@ -915,12 +915,14 @@ void listabrev(void) {
         continue;
       }
       strcpy(namn, getusername(atoi(listhead.from)));
-      sendRet = SendString("%-34s%5d %s %s\r\n", namn, i, listhead.date, listhead.subject);
+      sendRet = SendString("«name»%-34s«number»%5d«reset» %s «subject»%s«reset»\r\n",
+                           namn, i, listhead.date, listhead.subject);
     } else if(!strcmp(listhead.systemid, "Fido")) {
       if(anv != inloggad) {
         continue;
       }
-      sendRet = SendString("%-34s%5d %s %s\r\n", listhead.from, i, listhead.date, listhead.subject);
+      sendRet = SendString("«name»%-34s«number»%5d«reset» %s «subject»%s«reset»\r\n",
+                           listhead.from, i, listhead.date, listhead.subject);
     } else {
       sendRet = SendString("%s\r\n", CATSTR(MSG_MAIL_LIST_UNKNOWN), i);
     }

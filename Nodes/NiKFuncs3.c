@@ -512,12 +512,11 @@ void vilka(void) {
     }
 
     idle = timenow - Servermem->nodeInfo[i].lastActiveTime;
-    SendString("%s #%-2d %-40s %c %7s (%d)\n\r",
+    SendString("%s #%-2d «name»%-40s«reset» %c %7s\n\r",
                CATSTR(MSG_WHO_NODE), i,
                name,
                HasUnreadUserMessages(Servermem->nodeInfo[i].userDataSlot) ? '*' : ' ',
-               (idle < 60 && userLoggedIn) ? (const char *)CATSTR(MSG_WHO_ACTIVE) : FormatDuration(idle, idlebuf),
-               Servermem->nodeInfo[i].userDataSlot);
+               (idle < 60 && userLoggedIn) ? (const char *)CATSTR(MSG_WHO_ACTIVE) : FormatDuration(idle, idlebuf));
 
     if(!verbose) {
       continue;
@@ -961,7 +960,7 @@ void listaarende(void) {
     } else {
       sprintf(kom,"%ld",lahead.kom_till_nr);
     }
-    if(SendString("%-34s%6ld %6s %02d%02d%02d %s\r\n", namn,
+    if(SendString("«name»%-34s«number»%6ld %6s«reset» %02d%02d%02d «subject»%s«reset»\r\n", namn,
                   lahead.nummer, kom, ts->tm_year % 100, ts->tm_mon + 1,
                   ts->tm_mday, lahead.arende)) {
       return;

@@ -42,21 +42,21 @@ Finns ingen sådan text.
 MSG_FORUMS_UNKNOWN
 Okänt möte
 MSG_ORG_TEXT_LINE1
-Text %d  Möte: «name»%s«reset»
+Text «number»%d«reset»  Möte: «name»%s«reset»
 MSG_ORG_TEXT_LINE2
 Skriven av «name»%s«reset»
 MSG_ORG_TEXT_COMMENT_TO
-Kommentar till text %d av «name»%s«reset»
+Kommentar till text «number»%d«reset» av «name»%s«reset»
 MSG_ORG_TEXT_SUBJECT
 Ärende: «subject»%s«reset»
 MSG_ORG_TEXT_END_OF_TEXT
-(Slut på text %d av «name»%s«reset»)
+(Slut på text «number»%d«reset» av «name»%s«reset»)
 MSG_ORG_TEXT_COMMENT_IN
-(Kommentar i text %d av «name»%s«reset»)
+(Kommentar i text «number»%d«reset» av «name»%s«reset»)
 MSG_ORG_TEXT_FOOTNOTE
 Fotnot:
 MSG_TEXT_DELETED
-Text %d är raderad.
+Text «number»%d«reset» är raderad.
 MSG_TEXT_NO_PERM
 Du har inte rätt att läsa den texten.
 ;
@@ -65,7 +65,7 @@ Du befinner dig i «name»%s«reset».
 MSG_WHERE_NO_TEXTS
 Det finns inga texter.
 MSG_WHERE_TEXTS_NUMBERED
-Det finns texter numrerade från %d till %d.
+Det finns texter numrerade från «number»%d«reset» till «number»%d«reset».
 MSG_WHERE_NO_UNREAD_TEXTS
 Du har inga olästa texter.
 MSG_WHERE_ONE_UNREAD_TEXT
@@ -74,7 +74,7 @@ MSG_WHERE_MANY_UNREAD_TEXTS
 Du har %d olästa texter.
 ;
 MSG_FIDO_TEXT_LINE_1
-Text %d  Möte: «name»%s«reset»    %s
+Text «number»%d«reset»  Möte: «name»%s«reset»    %s
 MSG_FIDO_TEXT_LINE_2
 Skriven av «name»%s«reset» (%d:%d/%d.%d)
 MSG_FIDO_TEXT_TO
@@ -168,7 +168,7 @@ Du kan bara lägga till fotnoter på dina egna texter.
 MSG_FOOTNOTE_ALREADY_HAS
 Texten har redan en fotnot.
 MSG_FOOTNOTE_PRE_EDIT
-Fotnot till text %d av «name»%s«reset»
+Fotnot till text «number»%d«reset» av «name»%s«reset»
 ;
 MSG_SEARCH_SYNTAX
 Skriv: Sök [-g] <söksträng>
@@ -179,7 +179,7 @@ Sök fungerar inte i FidoNet-möten.
 MSG_SEARCH_NO_TEXTS_FOUND
 Inga texter hittades.
 MSG_SEARCH_RESULT_LINE1
-Text: %d skriven %s av «name»%s«reset»
+Text: «number»%d«reset» skriven %s av «name»%s«reset»
 MSG_SEARCH_RESULT_LINE2
 Möte: %s
 ;
@@ -200,7 +200,7 @@ Du befinner dig i brevlådan.
 MSG_MAIL_NO_READ_PERM
 Du har inte rätt att läsa det brevet.
 MSG_MAIL_LINE1
-Brev %d i brevlådan hos «name»%s«reset»
+Brev «number»%d«reset» i brevlådan hos «name»%s«reset»
 MSG_MAIL_LOCAL_MAIL
 Lokalt brev,  %s
 MSG_MAIL_UNKNOWN_MAIL

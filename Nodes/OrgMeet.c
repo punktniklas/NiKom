@@ -20,6 +20,7 @@
 #include "ConfHeaderExtensions.h"
 #include "Languages.h"
 #include "StyleSheets.h"
+#include "StringUtils.h"
 
 #include "OrgMeet.h"
 
@@ -274,7 +275,7 @@ int org_visatext(int textId, char verbose) {
     return 0;
   }
   ITER_EL(el, edit_list, line_node, struct EditLine *) {
-    if(SendString("%s\r", el->text)) {
+    if(SendString(IsQuote(el->text) ? "«quote»%s«reset»\r" : "%s\r", el->text)) {
       break;
     }
   }

@@ -38,21 +38,21 @@ There is no such text.
 MSG_FORUMS_UNKNOWN (201//)
 Unknown forum
 MSG_ORG_TEXT_LINE1 (210//)
-Text: %d  Forum: «name»%s«reset»
+Text: «number»%d«reset»  Forum: «name»%s«reset»
 MSG_ORG_TEXT_LINE2 (211//)
 Written by «name»%s«reset»
 MSG_ORG_TEXT_COMMENT_TO (212//)
-Comment to text %d by «name»%s«reset»
+Comment to text «number»%d«reset» by «name»%s«reset»
 MSG_ORG_TEXT_SUBJECT (213//)
 Subject: «subject»%s«reset»
 MSG_ORG_TEXT_END_OF_TEXT (214//)
-(End of text %d by «name»%s«reset»)
+(End of text «number»%d«reset» by «name»%s«reset»)
 MSG_ORG_TEXT_COMMENT_IN (215//)
-(Comment in text %d by «name»%s«reset»)
+(Comment in text «number»%d«reset» by «name»%s«reset»)
 MSG_ORG_TEXT_FOOTNOTE (216//)
 Footnote:
 MSG_TEXT_DELETED (217//)
-Text %d is deleted.
+Text «number»%d«reset» is deleted.
 MSG_TEXT_NO_PERM (218//)
 You don't have permissions to read that text.
 ;
@@ -61,7 +61,7 @@ You are in «name»%s«reset».
 MSG_WHERE_NO_TEXTS (221//)
 There are no texts.
 MSG_WHERE_TEXTS_NUMBERED (222//)
-There are texts numbered from %d to %d.
+There are texts numbered from «number»%d«reset» to «number»%d«reset».
 MSG_WHERE_NO_UNREAD_TEXTS (223//)
 You have no unread texts.
 MSG_WHERE_ONE_UNREAD_TEXT (224//)
@@ -70,7 +70,7 @@ MSG_WHERE_MANY_UNREAD_TEXTS (225//)
 You have %d unread texts.
 ;
 MSG_FIDO_TEXT_LINE_1 (230//)
-Text: %d  Forum: «name»%s«reset»    %s
+Text: «number»%d«reset»  Forum: «name»%s«reset»    %s
 MSG_FIDO_TEXT_LINE_2 (231//)
 Written by «name»%s«reset» (%d:%d/%d.%d)
 MSG_FIDO_TEXT_TO (232//)
@@ -164,7 +164,7 @@ You can only add footnotes to your own texts.
 MSG_FOOTNOTE_ALREADY_HAS (322//)
 The text already has a footnote.
 MSG_FOOTNOTE_PRE_EDIT (323//)
-Footnote to text %d by «name»%s«reset»
+Footnote to text «number»%d«reset» by «name»%s«reset»
 ;
 MSG_SEARCH_SYNTAX (330//)
 Syntax: Search [-g] <search string>
@@ -175,7 +175,7 @@ Search doesn't work in Fido forums.
 MSG_SEARCH_NO_TEXTS_FOUND (333//)
 No texts found.
 MSG_SEARCH_RESULT_LINE1 (334//)
-Text: %d written %s by «name»%s«reset»
+Text: «number»%d«reset» written %s by «name»%s«reset»
 MSG_SEARCH_RESULT_LINE2 (335//)
 Forum: %s
 ;
@@ -196,7 +196,7 @@ You are in the mailbox.
 MSG_MAIL_NO_READ_PERM (347//)
 You don't have permissions to read that mail.
 MSG_MAIL_LINE1 (348//)
-Mail %d in the mailbox at «name»%s«reset»
+Mail «number»%d«reset» in the mailbox at «name»%s«reset»
 MSG_MAIL_LOCAL_MAIL (349//)
 Local mail,  %s
 MSG_MAIL_UNKNOWN_MAIL (350//)
