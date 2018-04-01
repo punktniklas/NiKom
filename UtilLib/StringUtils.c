@@ -53,11 +53,11 @@ int IzDigit(char c) {
  */
 int IsQuote(char *str) {
   for(; *str == ' '; str++);
-  for(; *str != ' ' && *str != '>' && *str != '\0'; str++);
-  if(*str == '>' && *(str+1) == ' ') {
-    return TRUE;
+  for(; *str != ' ' && *str != '\0'; str++);
+  if(*str == '\0') {
+    return FALSE;
   }
-  return FALSE;
+  return *(str - 1) == '>';
 }
 
 static const int cmpchars[] = {
