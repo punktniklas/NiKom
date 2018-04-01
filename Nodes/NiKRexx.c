@@ -43,6 +43,8 @@ extern struct Header readhead;
 extern struct MinList edit_list,tf_list;
 extern struct Inloggning Statstr;
 
+static int lastRexxCmd;
+
 void handleRexxFinished(struct RexxMsg *nikrexxmess);
 void handleRexxCommand(char *cmdName, struct RexxMsg *mess);
 void rexxgetstring(struct RexxMsg *mess);
@@ -132,6 +134,7 @@ void commonsendrexx(int komnr,int hasarg) {
   char rexxCmd[1081];
   struct RexxMsg *nikrexxmess, *mess;
 
+  lastRexxCmd = komnr;
   if(!hasarg) {
     sprintf(rexxCmd, "NiKom:rexx/ExtKom%d %d %d", komnr, nodnr, inloggad);
   } else {
@@ -220,7 +223,8 @@ void handleRexxCommand(char *cmdName, struct RexxMsg *mess) {
       else if(!strnicmp(cmdName,"getnumber",9)) rxgetnumber(mess);
       else {
         LogEvent(SYSTEM_LOG, WARN,
-                 "Unknown command from ARexx script: '%s'", cmdName);
+                 "Unknown command from ARexx script: '%s' (User: %d, last script: %d)",
+                 cmdName, inloggad, lastRexxCmd);
         SetRexxErrorResult(mess, 10);
       }
 }
