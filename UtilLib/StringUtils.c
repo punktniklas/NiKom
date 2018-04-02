@@ -52,11 +52,11 @@ int IzDigit(char c) {
  * Returns TRUE if the given string seems to be a quoted text line.
  */
 int IsQuote(char *str) {
-  for(; *str == ' '; str++);
-  for(; *str != ' ' && *str != '\0'; str++);
   if(*str == '\0') {
     return FALSE;
   }
+  for(; *str == ' '; str++);
+  for(; *str != ' ' && *str != '\0'; str++);
   return *(str - 1) == '>';
 }
 
