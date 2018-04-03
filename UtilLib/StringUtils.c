@@ -56,6 +56,9 @@ int IsQuote(char *str) {
     return FALSE;
   }
   for(; *str == ' '; str++);
+  if(*str == '>') {
+    return TRUE;
+  }
   for(; *str != ' ' && *str != '\0'; str++);
   return *(str - 1) == '>';
 }
