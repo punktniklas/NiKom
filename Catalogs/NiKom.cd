@@ -745,18 +745,16 @@ MSG_FLAG_SPACE_AS_PAUSE (10006//)
 Use space as pause button
 MSG_FLAG_NOTE_AT_MAIL (10007//)
 Display note at mail
-MSG_FLAG_ANSI_SEQUENCES (10008//)
-Send ANSI escape codes
 MSG_FLAG_DISPLAY_FIDO_KLUDGE (10009//)
 Display FidoNet kludge lines
 MSG_FLAG_CLEAR_SCREEN_FIDO (10010//)
 Clear screen before FidoNet text
 MSG_FLAG_NO_LOGIN_NOTIFICATIONS (10011//)
 No notifications of logins/logouts
-MSG_FLAG_COLORS (10012//)
-Colors
 MSG_FLAG_ASCII_7E_IS_DELETE (10013//)
 ASCII 127 (0x7e) is interpreted as delete.
+MSG_FLAG_UNUSED (10039//)
+(Unused flag)
 ;
 ; ******** Common strings **********
 MSG_COMMON_YES (20000//)

@@ -85,11 +85,11 @@
 #define FILLISTA           32
 #define MELLANSLAG         64
 #define LAPPBREV           128
-#define SEKVENSANSI        256
+// No flag currently for 256
 #define SHOWKLUDGE         512
 #define CLEARSCREEN        1024
 #define NOLOGNOTIFY        2048
-#define ANSICOLOURS        4096
+// No flag currently for 4096
 #define ASCII_7E_IS_DELETE 8192
 
 /* Status på texter */

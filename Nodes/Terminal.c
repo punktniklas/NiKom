@@ -291,12 +291,7 @@ int GetStringX(int echo, int maxchrs, char *defaultStr,
         continue;
       }
       if(echo) {
-        if(CURRENT_USER->flaggor & SEKVENSANSI) {
-          SendStringNoBrk("\x1b\x5b\x44\x1b\x5b\x50",-1,0);
-        }
-        else {
-          SendStringNoBrk("\b \b",-1,0);
-        }
+        SendStringNoBrk("\x1b\x5b\x44\x1b\x5b\x50",-1,0);
       }
       memmove(&inmat[pos - 1], &inmat[pos], size - pos);
       pos--;
@@ -394,9 +389,7 @@ int GetStringX(int echo, int maxchrs, char *defaultStr,
         continue;
       }
       if(echo) {
-        if(CURRENT_USER->flaggor & SEKVENSANSI) {
-          SendStringNoBrk("\x1b\x5b\x31\x40");
-        }
+        SendStringNoBrk("\x1b\x5b\x31\x40");
         if(echo != STAREKO) {
           if(ch == '+') {
             SendStringNoBrk(" \b");
@@ -419,11 +412,7 @@ int GetStringX(int echo, int maxchrs, char *defaultStr,
     }
 
     for(i = 0; i < size; i++) {
-      if(CURRENT_USER->flaggor & SEKVENSANSI) {
-        SendStringNoBrk("\x1b\x5b\x44\x1b\x5b\x50");
-      } else {
-        SendStringNoBrk("\b \b");
-      }
+      SendStringNoBrk("\x1b\x5b\x44\x1b\x5b\x50");
     }
   }
   eka('\r');

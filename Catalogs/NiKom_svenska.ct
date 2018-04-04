@@ -749,18 +749,16 @@ MSG_FLAG_SPACE_AS_PAUSE
 Mellanslag som paustangent
 MSG_FLAG_NOTE_AT_MAIL
 Lapp vid brev
-MSG_FLAG_ANSI_SEQUENCES
-ANSI-sekvenser skickas (markörförflyttningar etc)
 MSG_FLAG_DISPLAY_FIDO_KLUDGE
 Visa FidoNet Kludge-rader
 MSG_FLAG_CLEAR_SCREEN_FIDO
 Töm skärmen innan en Fido-text
 MSG_FLAG_NO_LOGIN_NOTIFICATIONS
 Inga meddelanden om in/utloggningar
-MSG_FLAG_COLORS
-Färger
 MSG_FLAG_ASCII_7E_IS_DELETE
 ASCII 127 (0x7e) tolkas som delete
+MSG_FLAG_UNUSED
+(Oanvänd flagga)
 ;
 ; ******** Common strings **********
 MSG_COMMON_YES
