@@ -392,9 +392,9 @@ void displayPrompt(int defaultCmd) {
     cmdStr = "*** Undefined default command ***";
   }
   if(minutesLeft > 4) {
-    SendString("\r\n%s «prompt»%s«reset» ", cmdStr, CURRENT_USER->prompt);
+    SendString("\r\n«prompttext»%s «promptarrow»%s«reset» ", cmdStr, CURRENT_USER->prompt);
   } else {
-    SendString("\r\n%s (%d) «prompt»%s«reset» ", cmdStr, minutesLeft, CURRENT_USER->prompt);
+    SendString("\r\n«prompttext»%s«reset» (%d) «promptarrow»%s«reset» ", cmdStr, minutesLeft, CURRENT_USER->prompt);
   }
 
   if((cmd = getCommandToExecute(defaultCmd)) == NULL) {
