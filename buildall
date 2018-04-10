@@ -29,11 +29,11 @@ MakeDir Ram:NiKomDistr/libs
 MakeDir Ram:NiKomDistr/libs/68020
 MakeDir Ram:NiKomDistr/bin
 MakeDir Ram:NiKomDistr/bin/68020
+MakeDir Ram:NiKomDistr/Tools
 
 IF NOT <mode> EQ "dev"
    MakeDir Ram:NiKomDistr/libs/68000
    MakeDir Ram:NiKomDistr/bin/68000
-   MakeDir Ram:NiKomDistr/Tools
 ENDIF
 
 
@@ -122,7 +122,6 @@ MakeDir Ram:NiKomDistr/Catalogs/svenska
 Copy Catalogs/svenska/NiKom.catalog Ram:NiKomDistr/Catalogs/svenska
 
 
-IF NOT <mode> EQ "dev"
 ; Start of Tools build
 
 cd Tools/CryptPasswords
@@ -141,7 +140,6 @@ cd //
 Copy Tools/CryptPasswords/CryptPasswords Ram:NiKomDistr/Tools/
 Copy Tools/SetNodeState/SetNodeState Ram:NiKomDistr/Tools
 Copy Tools/NiKomFido/NiKomFido Ram:NiKomDistr/Tools/
-ENDIF
 
 
 IF <mode> EQ "full"
