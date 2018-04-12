@@ -9,4 +9,4 @@ Beskrivning:
 Markerar den senast lästa texten för senare läsning. Om man anger ett
 textnummer så markeras den texten.
 
-Se Även: Visa Markerade, Oläs Markerade
+Se Även: Visa Markerade, Oläs Markerade, Rensa Markerade

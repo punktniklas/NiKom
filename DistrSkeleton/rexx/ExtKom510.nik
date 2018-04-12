@@ -36,9 +36,9 @@ do until Eof('file')
  else
    'sendstring Kunde inte oläsa text' textId 'i mötet' MeetInfo(confId, 'n') '0d0a'x
 end
-Close('file')
+call Close('file')
 
 if flag = '-p' then do
   address command 'delete' filename
-  'sendstring Raderar markerade texter-filen.' '0d0a'x
+  'sendstring Rensar markerade texter.' '0d0a'x
 end

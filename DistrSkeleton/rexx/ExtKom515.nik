@@ -1,0 +1,20 @@
+/* Purge Marked command
+$VER: Purge Marked 1.0 (11.4.18)
+N=PURGE MARKED
+#=515
+*/
+
+parse arg nodeId userId .
+options results
+
+'sendstring' '0d0a0a'x
+
+filename = 'NiKom:Users/' || userId % 100 || '/' || userId || '/MarkedTexts'
+
+if ~Exists(filename) then do
+  'sendstring Du har inga markerade texter.' '0d0a'x
+  exit 0
+end
+
+address command 'delete' filename
+'sendstring Rensar markerade texter.' '0d0a'x

@@ -8,4 +8,4 @@ Syntax: Visa Markerade
 Beskrivning:
 Visar de texter som man tidigare har markerat under samma inloggning.
 
-Se Även: Markera Text, Oläs Markerade
+Se Även: Markera Text, Oläs Markerade, Rensa Markerade

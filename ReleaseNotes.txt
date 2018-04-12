@@ -19,12 +19,13 @@
 
 - The commands Mark Text and Display Marked have been revamped to store
   the marked texts in the user's directory meaning that they will survive
-  between logins. Also a new command, Unread Marked, has been introduced
-  that will make all the marked texts unread.
+  between logins. Also two new commands have been introduced. Unrad Marked
+  that will make all the marked texts unread and Purge Marked that will
+  clear the list of marked texts.
   These commands are implemented in ARexx so the files ExtKom502.nik,
-  ExtKom503.nik and ExtKom510.nik need to be updated. Also the
-  corresponding man files have been updated. The new command (#510) must
-  be installed in Commands.cfg.
+  ExtKom503.nik, ExtKom510.nik and ExtKom515.nik need to be updated. Also
+  the corresponding man files have been updated. The new commands (#510 and
+  #515) must be installed in Commands.cfg.
 
 ---------------------------------------------------------------------------
                          NiKom v2.3.1, 2017-07-01

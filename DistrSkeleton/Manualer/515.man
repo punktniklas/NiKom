@@ -1,0 +1,11 @@
+
+
+Rensa Markerade
+---------------
+
+Syntax: Rensa Markerade
+
+Beskrivning:
+Rensar den nuvarande listan över markerade texter.
+
+Se Även: Markera Text, Visa Markerade, Oläs Markerade
