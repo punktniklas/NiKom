@@ -1,5 +1,5 @@
 ---------------------------------------------------------------------------
-                         NiKom v2.4.0, 2018-xx-yy
+                         NiKom v2.4.0, 2018-04-15
 ---------------------------------------------------------------------------
 - A user's data is now saved automatically every minute while being logged
   in. This means that if a user is logged in but idle and the node is

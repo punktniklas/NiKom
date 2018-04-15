@@ -16,7 +16,7 @@ char dosversion[]="\0$VER: NiKomCon/Ser " NIKRELEASE " " __AMIGADATE__;
 
 void DisplayVersionInfo(void) {
   SendString("\n\n\rNiKom " NIKRELEASE
-             " © Niklas Lindholm & contributors 1990-2017\r\n");
+             " © Niklas Lindholm & contributors 1990-2018\r\n");
   SendString("  KOM node      built " __DATE__ " " __TIME__ "\r\n");
   SendString("  Server        built %s\r\n",Servermem->serverBuildTime);
   SendString("  nikom.library built %s\r\n", GetBuildTime());
