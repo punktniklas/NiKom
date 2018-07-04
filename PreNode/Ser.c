@@ -325,6 +325,11 @@ int main(int argc,char *argv[]) {
     }
     g_userDataSlot = Servermem->nodeInfo[nodnr].userDataSlot;
     Servermem->nodeInfo[nodnr].lastActiveTime = time(NULL);
+    if(newUser) {
+      if(Servermem->cfg->ar.nyanv) {
+        sendrexx(Servermem->cfg->ar.nyanv);
+      }
+    }
     if((nt = selectNodeType()) == NULL) {
       goto panik;
     }

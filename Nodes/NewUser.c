@@ -166,7 +166,6 @@ int RegisterNewUser(struct User *user) {
     return -2;
   }
   SendStringCat("\r\n\n%s\r\n", CATSTR(MSG_USER_YOU_GET_ID), newUserId);
-  //  if(Servermem->cfg->ar.nyanv) sendrexx(Servermem->cfg->ar.nyanv);
   return newUserId;
 }
 

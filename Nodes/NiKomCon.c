@@ -210,6 +210,11 @@ int main(int argc, char **argv) {
     }
     g_userDataSlot = Servermem->nodeInfo[nodnr].userDataSlot;
     Servermem->nodeInfo[nodnr].lastActiveTime = time(NULL);
+    if(newUser) {
+      if(Servermem->cfg->ar.nyanv) {
+        sendrexx(Servermem->cfg->ar.nyanv);
+      }
+    }
 
     sprintf(titel,"Nod #%d CON: %s #%d",nodnr,CURRENT_USER->namn,inloggad);
     SetWindowTitles(NiKwind,titel,(UBYTE *)-1L);
