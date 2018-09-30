@@ -1,4 +1,13 @@
 ---------------------------------------------------------------------------
+                         NiKom v2.4.1, 2018-09-30
+---------------------------------------------------------------------------
+Some bugfixes:
+- ARexx script for new users was not executed.
+- Getting disconnected/logged out while reading a text would mark that
+  text as read.
+- NIKServer would crash when reading a bad config.
+
+---------------------------------------------------------------------------
                          NiKom v2.4.0, 2018-04-15
 ---------------------------------------------------------------------------
 - A user's data is now saved automatically every minute while being logged
