@@ -21,6 +21,7 @@
 #include "Languages.h"
 #include "StyleSheets.h"
 #include "StringUtils.h"
+#include "BasicIO.h"
 
 #include "OrgMeet.h"
 
@@ -149,9 +150,11 @@ void pushTextRepliesToStack(struct Header *textHeader) {
 }
 
 void displayTextAndClearUnread(int textId) {
-  ChangeUnreadTextStatus(textId, 0, CUR_USER_UNREAD);
   if(org_visatext(textId, FALSE)) {
     pushTextRepliesToStack(&readhead);
+  }
+  if(!ImmediateLogout()) {
+    ChangeUnreadTextStatus(textId, 0, CUR_USER_UNREAD);
   }
   g_lastKomTextType = TEXT;
   g_lastKomTextNr = textId;
