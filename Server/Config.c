@@ -800,13 +800,6 @@ int handleFidoConfigLine(char *line, BPTR fh, struct Config *cfg) {
 }
 
 int readStyleSheetConfig(struct Config *cfg) {
-  int i;
-  for(i = 0; i < MAXSTYLESHEET; i++) {
-    if((cfg->styleSheets[i].codes = CreateTrie()) == NULL) {
-      printf("Could not allocate a trie for stylesheet.");
-      return 0;
-    }
-  }
   currentStyleSheet = -1;
   return readConfigFile("NiKom:DatoCfg/StyleSheets.cfg", cfg, handleStyleSheetsConfigLine);
 }
@@ -865,6 +858,7 @@ int handleStyleSheetsConfigLine(char *line, BPTR fh, struct Config *cfg) {
 }
 
 struct Config *ReadAllConfigs(void) {
+  int i;
   struct Config *cfg;
 
   cfg = AllocMem(sizeof(struct Config), MEMF_PUBLIC | MEMF_CLEAR);
@@ -874,6 +868,13 @@ struct Config *ReadAllConfigs(void) {
   }
   
   NewList((struct List *)&cfg->kom_list);
+  for(i = 0; i < MAXSTYLESHEET; i++) {
+    if((cfg->styleSheets[i].codes = CreateTrie()) == NULL) {
+      printf("Could not allocate a trie for stylesheet.");
+      FreeMem(cfg, sizeof(struct Config));
+      return 0;
+    }
+  }
   
   if(readSystemConfig(cfg)
      && readCommandConfig(cfg)
@@ -895,6 +896,10 @@ void freeStyleCode(void *styleCode) {
 void FreeAllConfigs(struct Config *cfg) {
   struct Kommando *command;
   int i;
+
+  if(cfg == NULL) {
+    return;
+  }
 
   while((command = (struct Kommando *)RemHead((struct List *)&cfg->kom_list))) {
     FreeMem(command, sizeof(struct Kommando));
