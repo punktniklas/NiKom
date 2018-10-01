@@ -6,7 +6,7 @@
 
 #include "ConfigUtils.h"
 
-char *findStringCfgValue(char *str) {
+char *FindStringCfgValue(char *str) {
   char *tmp;
   int lastpos;
 
@@ -34,7 +34,7 @@ char *findStringCfgValue(char *str) {
 int GetStringCfgValue(char *str, char *dest, int len) {
   char *valstr;
 
-  if((valstr = findStringCfgValue(str)) == NULL) {
+  if((valstr = FindStringCfgValue(str)) == NULL) {
     return 0;
   }
   strncpy(dest, valstr, len);
@@ -45,7 +45,7 @@ int GetStringCfgValue(char *str, char *dest, int len) {
 int GetLongCfgValue(char *str, long *value) {
   char *valstr, *tmp;
 
-  if((valstr = findStringCfgValue(str)) == NULL) {
+  if((valstr = FindStringCfgValue(str)) == NULL) {
     return 0;
   }
   for(tmp = valstr; *tmp != '\0'; tmp++) {
@@ -89,7 +89,7 @@ int GetBoolCfgFlag(char *str, long *flagfield, long flag) {
   char *valstr;
   int boolvalue;
 
-  if((valstr = findStringCfgValue(str)) == NULL) {
+  if((valstr = FindStringCfgValue(str)) == NULL) {
     return 0;
   }
   if(stricmp(valstr, "YES") == 0 || stricmp(valstr, "JA") == 0) {

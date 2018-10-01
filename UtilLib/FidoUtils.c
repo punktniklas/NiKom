@@ -69,3 +69,22 @@ int ParseFidoAddress(char *str, int result[]) {
   }
   return 1;
 }
+
+/*
+ * Returns true if the given zone is found in the given zone string. The zone string
+ * is a list of zones separated by white space. Each zone is the zone number with a
+ * trailing ':'. E.g. "1: 2: 3:"
+ * If emptyMatchesAll is true then an empty zone string will match any zone.
+ */
+int IsZoneInStr(int zone, char *str, int emptyMatchesAll) {
+  if(emptyMatchesAll && str[0] == '\0') {
+    return 1;
+  }
+  while(str[0]) {
+    if(atoi(str) == zone) {
+      return 1;
+    }
+    str = FindNextWord(str);
+  }
+  return 0;
+}

@@ -27,6 +27,7 @@
 #include "StringUtils.h"
 #include "Languages.h"
 #include "UserDataUtils.h"
+#include "FidoUtils.h"
 
 #include "Brev.h"
 
@@ -588,6 +589,19 @@ int fido_brev(char *tillpers,char *adr,struct Mote *motpek) {
   case '3' : chrs=CHRS_MAC; break;
   case '4' : chrs=CHRS_SIS7; break;
   }
+
+  for(i = 0; i < 10; i++) {
+    if(IsZoneInStr(ft.tozone, Servermem->cfg->fidoConfig.matrixDirs[i].zones, TRUE)) {
+      break;
+    }
+  }
+  if(i == 10) {
+    DisplayInternalError();
+    LogEvent(SYSTEM_LOG, ERROR,
+             "No Fido matrixdir found for zone %d. Is a default dir missing?", ft.tozone);
+    return 0;
+  }
+  
   NewList((struct List *)&ft.text);
   first =  edit_list.mlh_Head;
   last = edit_list.mlh_TailPred;
@@ -596,12 +610,12 @@ int fido_brev(char *tillpers,char *adr,struct Mote *motpek) {
   last->mln_Succ = (struct MinNode *)&ft.text.mlh_Tail;
   first->mln_Pred = (struct MinNode *)&ft.text;
   if(tillpers) {
-    textId = WriteFidoTextTags(&ft,WFT_MailDir,Servermem->cfg->fidoConfig.matrixdir,
+    textId = WriteFidoTextTags(&ft,WFT_MailDir,Servermem->cfg->fidoConfig.matrixDirs[i].path,
                                WFT_Domain,fd->domain,
                                WFT_CharSet,chrs,
                                TAG_DONE);
   } else {
-    textId = WriteFidoTextTags(&ft,WFT_MailDir,Servermem->cfg->fidoConfig.matrixdir,
+    textId = WriteFidoTextTags(&ft,WFT_MailDir,Servermem->cfg->fidoConfig.matrixDirs[i].path,
                                WFT_Domain,fd->domain,
                                WFT_Reply,msgid,
                                WFT_CharSet,chrs,

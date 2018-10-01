@@ -71,7 +71,10 @@ ALIAS 10 Support
 
 Nyckelordet BOUNCE är inte implementerat ännu, låt det vara.
 
-MATRIXDIR anger i vilken katalog som filerna för brevlådan ligger.
+MATRIXDIR anger i vilken katalog(er) som filerna för brevlådan ligger.
+Om du deltar i mer än ett Fido-kompatibelt nätverk så är det möjligt
+att du behöver ha olika kataliger för de olika nätverken. Detta beror
+på din tosser och hur den kan konfigureras.
 
 MAILGROUP anger vilka användargrupper som ska få möjlighet att skicka
 nätbrev. Man kan ange godtyckligt antal rader med grupper.

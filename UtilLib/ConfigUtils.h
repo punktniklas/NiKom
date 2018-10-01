@@ -1,3 +1,4 @@
+char *FindStringCfgValue(char *str);
 int GetStringCfgValue(char *str, char *dest, int len);
 int GetLongCfgValue(char *str, long *value);
 int GetShortCfgValue(char *str, short *value);

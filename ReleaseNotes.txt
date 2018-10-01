@@ -1,7 +1,17 @@
 ---------------------------------------------------------------------------
                          NiKom v2.5.0, 2018-xx-yy
 ---------------------------------------------------------------------------
-
+- You can now configure multiple Fido netmail directories (matrix
+  directories). When importing incoming netmail NiKom will import
+  from all directories regardless of the recipient addresses. When
+  creating outgoing netmail NiKom will choose one directory depending
+  on the recipient's zone.
+  This also means that the file NiKom:Datocfg/LastMatrix is not used
+  anymore. Instead NiKom will keep a file "NiKomNext" inside each
+  netmail directory. When upgrading to this version you will need to
+  move the existing LastMatrix file accordingly to the existing netmail
+  directory. (If this is not done NiKom will re-import all existing
+  netmail the first time "NiKomFido UpdateFido" is run.)
 
 ---------------------------------------------------------------------------
                          NiKom v2.4.1, 2018-09-30

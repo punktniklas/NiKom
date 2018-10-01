@@ -24,6 +24,7 @@
 #include "Languages.h"
 #include "StyleSheets.h"
 #include "StringUtils.h"
+#include "FidoUtils.h"
 
 #include "FidoMeet.h"
 
@@ -164,7 +165,6 @@ void makefidousername(char *str,int anv) {
 
 struct FidoDomain *getfidodomain(int nr,int zone) {
   int i;
-  char *zonestr;
 
   for(i = 0; i < 10; i++) {
     if(!Servermem->cfg->fidoConfig.fd[i].domain[0]) {
@@ -175,13 +175,8 @@ struct FidoDomain *getfidodomain(int nr,int zone) {
         return &Servermem->cfg->fidoConfig.fd[i];
       }
     } else {
-      zonestr = Servermem->cfg->fidoConfig.fd[i].zones;
-      while(zonestr[0]) {
-        if(atoi(zonestr) == zone) {
-          return &Servermem->cfg->fidoConfig.fd[i];
-        } else {
-          zonestr = hittaefter(zonestr);
-        }
+      if(IsZoneInStr(zone, Servermem->cfg->fidoConfig.fd[i].zones, FALSE)) {
+        return &Servermem->cfg->fidoConfig.fd[i];
       }
     }
   }

@@ -13,20 +13,28 @@
 #include "Funcs.h"
 #include "Logging.h"
 
-static int getlastmatrix(void);
-
-static int getlastmatrix(void) {
-  char buffer[20];
-  if(GetVar("NiKom:DatoCfg/LastMatrix", buffer, 19, GVF_GLOBAL_ONLY) == -1) {
+static int getNextMsgNum(char *dir) {
+  char path[100], buffer[20];
+  strcpy(path, dir);
+  AddPart(path, "NiKomNext", 100);
+  if(GetVar(path, buffer, 19, GVF_GLOBAL_ONLY) == -1) {
     return 2;
   }
   return atoi(buffer);
 }
 
+static void setNextMsgNum(char *dir, int msgNum) {
+  char path[100], buffer[20];
+  strcpy(path, dir);
+  AddPart(path, "NiKomNext", 100);
+  sprintf(buffer, "%d", msgNum);
+  SetVar(path, buffer, -1, GVF_GLOBAL_ONLY);
+}
+
 void __saveds AASM LIBMatrix2NiKom(register __a6 struct NiKomBase *NiKomBase AREG(a6)) {
   struct FidoText *fidotext;
   struct FidoLine *fl;
-  int userId, mailId, lastMatrix, oldLastMatrix;
+  int userId, mailId, currentMsgNum, oldNextMsgNum, i;
   BPTR fh;
   char buffer[100], *subject, filename[20];
   struct TagItem ti = { TAG_DONE };
@@ -36,81 +44,90 @@ void __saveds AASM LIBMatrix2NiKom(register __a6 struct NiKomBase *NiKomBase ARE
   }
   
   LIBLockNiKomBase(NiKomBase);
-  oldLastMatrix = getlastmatrix();
-
-  for(lastMatrix = oldLastMatrix;; lastMatrix++) {
-    strcpy(buffer, NiKomBase->Servermem->cfg->fidoConfig.matrixdir);
-    sprintf(filename, "%d.msg", lastMatrix);
-    AddPart(buffer, filename, 99);
-    if(!(fidotext = LIBReadFidoText(buffer, &ti, NiKomBase))) {
+  for(i = 0; i < 10; i++) {
+    if(NiKomBase->Servermem->cfg->fidoConfig.matrixDirs[i].path[0] == '\0') {
       break;
     }
-    if(fidotext->attribut & FIDOT_LOCAL) {
-      LogEvent(NiKomBase->Servermem, FIDO_LOG, DEBUG,
-               "Netmail %d is created here, skipping.", lastMatrix);
-      continue;
-    }
-    LogEvent(NiKomBase->Servermem,
-             FIDO_LOG, INFO, "Importing netmail %d.msg for '%s' (%d:%d/%d.%d)",
-             lastMatrix,
-             fidotext->touser,
-             fidotext->tozone,
-             fidotext->tonet,
-             fidotext->tonode,
-             fidotext->topoint);
-    userId = fidoparsenamn(fidotext->touser, NiKomBase->Servermem);
-    if(userId == -1) {
-      LogEvent(NiKomBase->Servermem, FIDO_LOG, WARN,
-               "User '%s' not found, skipping netmail %d.msg", fidotext->touser, lastMatrix);
-      continue;
-    }
+    oldNextMsgNum = getNextMsgNum(NiKomBase->Servermem->cfg->fidoConfig.matrixDirs[i].path);
     LogEvent(NiKomBase->Servermem, FIDO_LOG, DEBUG,
-             "User '%s' is NiKom user #%d.", fidotext->touser, userId);
-    mailId = updatenextletter(userId);
-    if(mailId == -1) {
-      LogEvent(NiKomBase->Servermem, FIDO_LOG, WARN,
-               "Can't update .nextletter, skipping netmail %d.msg", lastMatrix);
-      continue;
+             "Scanning matrix dir %s with NiKomNext = %d",
+             NiKomBase->Servermem->cfg->fidoConfig.matrixDirs[i].path,
+             oldNextMsgNum);
+
+    for(currentMsgNum = oldNextMsgNum;; currentMsgNum++) {
+      strcpy(buffer, NiKomBase->Servermem->cfg->fidoConfig.matrixDirs[i].path);
+      sprintf(filename, "%d.msg", currentMsgNum);
+      AddPart(buffer, filename, 99);
+      if(!(fidotext = LIBReadFidoText(buffer, &ti, NiKomBase))) {
+        break;
+      }
+      if(fidotext->attribut & FIDOT_LOCAL) {
+        LogEvent(NiKomBase->Servermem, FIDO_LOG, DEBUG,
+                 "Netmail %d originates from here, skipping.", currentMsgNum);
+        continue;
+      }
+      LogEvent(NiKomBase->Servermem,
+               FIDO_LOG, INFO, "Importing netmail %d.msg for '%s' (%d:%d/%d.%d)",
+               currentMsgNum,
+               fidotext->touser,
+               fidotext->tozone,
+               fidotext->tonet,
+               fidotext->tonode,
+               fidotext->topoint);
+      userId = fidoparsenamn(fidotext->touser, NiKomBase->Servermem);
+      if(userId == -1) {
+        LogEvent(NiKomBase->Servermem, FIDO_LOG, WARN,
+                 "User '%s' not found, skipping netmail %d.msg", fidotext->touser, currentMsgNum);
+        continue;
+      }
+      LogEvent(NiKomBase->Servermem, FIDO_LOG, DEBUG,
+               "User '%s' is NiKom user #%d.", fidotext->touser, userId);
+      mailId = updatenextletter(userId);
+      if(mailId == -1) {
+        LogEvent(NiKomBase->Servermem, FIDO_LOG, WARN,
+                 "Can't update .nextletter, skipping netmail %d.msg", currentMsgNum);
+        continue;
+      }
+      sprintf(buffer, "NiKom:Users/%d/%d/%d.letter", userId / 100, userId, mailId);
+      if(!(fh = Open(buffer, MODE_NEWFILE))) {
+        LogEvent(NiKomBase->Servermem, FIDO_LOG, WARN,
+                 "Can't write to file %s, skipping netmail %d.msg.", buffer, currentMsgNum);
+        continue;
+      }
+      FPuts(fh, "System-ID: Fido\n");
+      sprintf(buffer, "From: %s (%d:%d/%d.%d)\n", 
+              fidotext->fromuser, fidotext->fromzone, fidotext->fromnet,
+              fidotext->fromnode, fidotext->frompoint);
+      FPuts(fh, buffer);
+      sprintf(buffer, "To: %s (%d:%d/%d.%d)\n",
+              fidotext->touser, fidotext->tozone, fidotext->tonet,
+              fidotext->tonode, fidotext->topoint);
+      FPuts(fh, buffer);
+      sprintf(buffer, "Message-ID: %s\n", fidotext->msgid);
+      FPuts(fh, buffer);
+      sprintf(buffer, "Date: %s\n", fidotext->date);
+      FPuts(fh, buffer);
+      subject = hittaefter(fidotext->subject);
+      if(fidotext->subject[0] == 0 ||
+         (fidotext->subject[0] == ' ' && subject[0] == 0)) {
+        strcpy(buffer,"Subject: -\n");
+      } else {
+        sprintf(buffer,"Subject: %s\n",fidotext->subject);
+      }
+      FPuts(fh, buffer);
+      ITER_EL(fl, fidotext->text, line_node, struct FidoLine *) {
+        FPuts(fh, fl->text);
+        FPutC(fh, '\n');
+      }
+      Close(fh);
+      FreeFidoText(fidotext);
     }
-    sprintf(buffer, "NiKom:Users/%d/%d/%d.letter", userId / 100, userId, mailId);
-    if(!(fh = Open(buffer, MODE_NEWFILE))) {
-      LogEvent(NiKomBase->Servermem, FIDO_LOG, WARN,
-               "Can't write to file %s, skipping netmail %d.msg.", buffer, lastMatrix);
-      continue;
-    }
-    FPuts(fh, "System-ID: Fido\n");
-    sprintf(buffer, "From: %s (%d:%d/%d.%d)\n", 
-            fidotext->fromuser, fidotext->fromzone, fidotext->fromnet,
-            fidotext->fromnode, fidotext->frompoint);
-    FPuts(fh, buffer);
-    sprintf(buffer, "To: %s (%d:%d/%d.%d)\n",
-            fidotext->touser, fidotext->tozone, fidotext->tonet,
-            fidotext->tonode, fidotext->topoint);
-    FPuts(fh, buffer);
-    sprintf(buffer, "Message-ID: %s\n", fidotext->msgid);
-    FPuts(fh, buffer);
-    sprintf(buffer, "Date: %s\n", fidotext->date);
-    FPuts(fh, buffer);
-    subject = hittaefter(fidotext->subject);
-    if(fidotext->subject[0] == 0 ||
-       (fidotext->subject[0] == ' ' && subject[0] == 0)) {
-      strcpy(buffer,"Subject: -\n");
-    } else {
-      sprintf(buffer,"Subject: %s\n",fidotext->subject);
-    }
-    FPuts(fh, buffer);
-    ITER_EL(fl, fidotext->text, line_node, struct FidoLine *) {
-      FPuts(fh, fl->text);
-      FPutC(fh, '\n');
-    }
-    Close(fh);
-    FreeFidoText(fidotext);
+    setNextMsgNum(NiKomBase->Servermem->cfg->fidoConfig.matrixDirs[i].path, currentMsgNum);
+    LogEvent(NiKomBase->Servermem, FIDO_LOG, INFO,
+             "Finished netmail import in %s. NiKomNext:  %d -> %d (%d new messages)",
+             NiKomBase->Servermem->cfg->fidoConfig.matrixDirs[i].path,
+             oldNextMsgNum, currentMsgNum, currentMsgNum - oldNextMsgNum);
   }
-  sprintf(buffer, "%d", lastMatrix);
-  SetVar("NiKom:DatoCfg/LastMatrix", buffer, -1, GVF_GLOBAL_ONLY);
-  LogEvent(NiKomBase->Servermem, FIDO_LOG, INFO,
-           "Finished netmail import. LastMatrix:  %d -> %d (%d new messages)",
-           oldLastMatrix, lastMatrix, lastMatrix - oldLastMatrix);
   LIBUnLockNiKomBase(NiKomBase);
 }
 

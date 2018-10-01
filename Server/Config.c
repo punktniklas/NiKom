@@ -755,9 +755,20 @@ int handleFidoConfigLine(char *line, BPTR fh, struct Config *cfg) {
       cfg->fidoConfig.bounce = TRUE;
     }
   } else if(isMatchingConfigLine(line, "MATRIXDIR")) {
-    if(!GetStringCfgValue(line, cfg->fidoConfig.matrixdir, 99)) {
+    for(i = 0; i < 10; i++) {
+      if(cfg->fidoConfig.matrixDirs[i].path[0] == '\0') {
+        break;
+      }
+    }
+    if(i == 10) {
+      printf("Too many FidoNet matrix dirs defined.\n");
       return 0;
     }
+    if(!(tmp1 = FindStringCfgValue(line))) {
+      return 0;
+    }
+    CopyOneWord(cfg->fidoConfig.matrixDirs[i].path, tmp1);
+    strncpy(cfg->fidoConfig.matrixDirs[i].zones, FindNextWord(tmp1), 49);
   } else if(isMatchingConfigLine(line, "MAILGROUP")) {
     if(!GetStringCfgValue(line, tmpbuf, 49)) {
       return 0;

@@ -198,11 +198,16 @@ struct FidoAlias {
   char namn[36];
 };
 
+struct MatrixDir {
+  char path[100], zones[50];
+};
+
 struct FidoConfig {
   struct FidoDomain fd[10];
   struct FidoAlias fa[20];
-  long lastmatrix,mailgroups;
-  char mailstatus, bounce, crashstatus, matrixdir[100],defaultorigin[70],
+  struct MatrixDir matrixDirs[10];
+  long mailgroups;
+  char mailstatus, bounce, crashstatus, defaultorigin[70],
     littleEndianByteOrder;
 };
 
