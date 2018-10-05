@@ -287,6 +287,7 @@ void ExecuteCommandById(int cmdId) {
   case 327: bytteckenset(); break;
   case 329: Cmd_ChangeLanguage(); break;
   case 330: Cmd_ChangeStyleSheet(); break;
+  case 331: Cmd_DisplayNotifications(); break;
   case 401: bytarea(); break;
   case 402: filinfo(); break;
   case 403: upload(); break;
@@ -338,7 +339,7 @@ void ExecuteCommand(struct Kommando *cmd) {
 
 void displayPrompt(int defaultCmd) {
   int minutesLeft;
-  char *cmdStr;
+  char *cmdStr, minutesLeftStr[10], notificationStr[40];
   struct Kommando *cmd;
 
   displaysay();
@@ -391,11 +392,19 @@ void displayPrompt(int defaultCmd) {
   default:
     cmdStr = "*** Undefined default command ***";
   }
-  if(minutesLeft > 4) {
-    SendString("\r\n«prompttext»%s «promptarrow»%s«reset» ", cmdStr, CURRENT_USER->prompt);
+
+  if(minutesLeft <= 4) {
+    sprintf(minutesLeftStr, "(%d) ", minutesLeft);
   } else {
-    SendString("\r\n«prompttext»%s«reset» (%d) «promptarrow»%s«reset» ", cmdStr, minutesLeft, CURRENT_USER->prompt);
+    minutesLeftStr[0] = '\0';
   }
+  if(Servermem->waitingNotifications[g_userDataSlot] > 0) {
+    sprintf(notificationStr, "«promptnotif»[%d] ", Servermem->waitingNotifications[g_userDataSlot]);
+  } else {
+    notificationStr[0] = '\0';
+  }
+  SendString("\r\n«prompttext»%s %s%s«promptarrow»%s«reset» ",
+             cmdStr, minutesLeftStr, notificationStr, CURRENT_USER->prompt);
 
   if((cmd = getCommandToExecute(defaultCmd)) == NULL) {
     return;

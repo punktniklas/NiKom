@@ -156,8 +156,9 @@
 #define NIKSEM_LOGFILES   12
 #define NIKSEM_USERDATASLOT 13
 #define NIKSEM_USERMESSAGES 14
+#define NIKSEM_NOTIFICATIONS 15
 
-#define NIKSEM_NOOF       15 /* The total number of semaphores. */
+#define NIKSEM_NOOF       16 /* The total number of semaphores. */
 
 #define NUM_LANGUAGES     2
 
@@ -410,6 +411,7 @@ struct System {
   struct User userData[MAXNOD];
   struct UnreadTexts unreadTexts[MAXNOD];
   struct SayString *waitingSayMessages[MAXNOD];
+  int waitingNotifications[MAXNOD];
 
   // This array is indexed by nodeId
   struct NodeInfo nodeInfo[MAXNOD];

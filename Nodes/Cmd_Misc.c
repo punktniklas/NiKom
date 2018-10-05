@@ -5,6 +5,7 @@
 #include <string.h>
 #include "NiKomStr.h"
 #include "NiKomFuncs.h"
+#include "NiKomLib.h"
 #include "Terminal.h"
 #include "UserNotificationHooks.h"
 #include "Logging.h"
@@ -12,6 +13,7 @@
 #include "InfoFiles.h"
 #include "UserDataUtils.h"
 #include "UserMessageUtils.h"
+#include "Notifications.h"
 
 #include "Cmd_Misc.h"
 
@@ -82,5 +84,41 @@ void Cmd_Say(void) {
   case 3:
     SendString("\r\n\n%s\r\n", CATSTR(MSG_SAY_USER_LOGGED_OUT));
     break;
+  }
+}
+
+void displayReaction(struct ReactionNotif *reaction) {
+  switch(reaction->reactionType) {
+  case NOTIF_REACTION_LIKE:
+    SendStringCat("%s\r\n", CATSTR(MSG_NOTIF_LIKE),
+                  getusername(reaction->userId), reaction->textId,
+                  getmotnamn(GetConferenceForText(reaction->textId)));
+    break;
+  case NOTIF_REACTION_DISLIKE:
+    SendStringCat("%s\r\n", CATSTR(MSG_NOTIF_DISLIKE),
+                  getusername(reaction->userId), reaction->textId,
+                  getmotnamn(GetConferenceForText(reaction->textId)));
+    break;
+  }
+}
+
+void Cmd_DisplayNotifications(void) {
+  struct Notification *list, *iter;
+
+  list = ReadNotifications(inloggad, TRUE);
+  if(list == NULL) {
+    SendString("\r\n\n%s\r\n", CATSTR(MSG_NOTIF_NO_NOTIFICATIONS));
+    return;
+  }
+
+  SendString("\r\n\n");
+  for(iter = list; iter != NULL; iter = iter->next) {
+    switch(iter->type) {
+    case NOTIF_TYPE_REACTION:
+      displayReaction(&iter->reaction);
+      break;
+    default:
+      SendString("%s\r\n", CATSTR(MSG_NOTIF_INVALID));
+    }
   }
 }

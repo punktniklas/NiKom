@@ -14,6 +14,7 @@
 #include "ConfHeaderExtensions.h"
 #include "Languages.h"
 #include "DateUtils.h"
+#include "Notifications.h"
 
 #include "Cmd_Conf.h"
 
@@ -375,6 +376,7 @@ void cmd_Reaction(long reaction) {
   int textId, confId;
   struct MemHeaderExtension *ext;
   struct Header textHeader;
+  struct Notification notification;
   
   if(argument[0]) {
     if(mote2 == -1) {
@@ -449,6 +451,12 @@ void cmd_Reaction(long reaction) {
                   textId);
   }
   DeleteMemHeaderExtension(ext);
+
+  notification.type = NOTIF_TYPE_REACTION;
+  notification.reaction.reactionType = reaction >> 24;
+  notification.reaction.userId = inloggad;
+  notification.reaction.textId = textId;
+  AddNotification(textHeader.person, &notification);
 }
 
 void Cmd_Like(void) {

@@ -722,6 +722,15 @@ There was an error reading the config. Keeping the old config.
 MSG_STYLES_AVAILABLE (1160//)
 These style sheets are available
 ;
+MSG_NOTIF_NO_NOTIFICATIONS (1170//)
+You have no notifications to read.
+MSG_NOTIF_INVALID (1171//)
+<Invalid notification>
+MSG_NOTIF_LIKE (1172//)
+«name»%s«reset» has praised your text «number»%d«reset» in «name»%s«reset».
+MSG_NOTIF_DISLIKE (1173//)
+«name»%s«reset» has disssed your text «number»%d«reset» in «name»%s«reset».
+;
 ; ******** Dealing with flags **********
 MSG_FLAG_ON (9000//)
 On

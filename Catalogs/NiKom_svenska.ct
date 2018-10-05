@@ -726,6 +726,15 @@ Konfigurationen kunde inte läsas om. Behåller den gamla konfigurationen.
 MSG_STYLES_AVAILABLE
 Dessa stilmallar finns att välja på.
 ;
+MSG_NOTIF_NO_NOTIFICATIONS
+Du har inga notifieringar att läsa.
+MSG_NOTIF_INVALID
+<Ogiltig notifiering>
+MSG_NOTIF_LIKE
+«name»%s«reset» har hyllat din text «number»%d«reset» i «name»%s«reset».
+MSG_NOTIF_DISLIKE
+«name»%s«reset» har dissat din text «number»%d«reset» i «name»%s«reset».
+;
 ; ******** Dealing with flags **********
 MSG_FLAG_ON
 På

@@ -30,6 +30,7 @@
 #include "Languages.h"
 #include "UserDataUtils.h"
 #include "UserMessageUtils.h"
+#include "Notifications.h"
 
 #if defined(__GNUC__) && !defined(max)
 #define max(a, b) \
@@ -652,6 +653,7 @@ void connection(void) {
   initgrupp();
   rxlinecount = TRUE;
   radcnt=0;
+  Servermem->waitingNotifications[g_userDataSlot] = CountNotifications(inloggad);
   if(Servermem->cfg->ar.postinlogg) sendautorexx(Servermem->cfg->ar.postinlogg);
   DisplayVersionInfo();
   var(mote2);
