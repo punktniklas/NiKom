@@ -35,6 +35,8 @@ MSG_KOM_AUTO_LOGOUT
 Automagisk utloggning
 MSG_KOM_INACTIVITY_LOGOUT
 Utloggning p.g.a inaktivitet
+MSG_PROMPT_DISPLAY_NOTIF
+Visa notifieringar
 ;
 ; ******** Forums **********
 MSG_FORUMS_NO_SUCH_TEXT

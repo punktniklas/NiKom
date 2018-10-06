@@ -33,6 +33,7 @@
 #define CMD_SEETIME   306
 #define CMD_GOMAIL    222
 #define CMD_READTEXT  212
+#define CMD_DISPNOTIF 331
 #define MAILBOX_CONFID -1
 
 struct Stack *g_unreadRepliesStack;
@@ -389,6 +390,9 @@ void displayPrompt(int defaultCmd) {
     }
     cmdStr = CATSTR(MSG_PROMPT_GO_TO_MAILBOX);
     break;
+  case CMD_DISPNOTIF:
+    cmdStr = CATSTR(MSG_PROMPT_DISPLAY_NOTIF);
+    break;
   default:
     cmdStr = "*** Undefined default command ***";
   }
@@ -430,6 +434,8 @@ void KomLoop(void) {
       defaultCmd = CMD_GOMAIL;
     } else if(FindNextUnreadConf(mote2) >= 0) {
       defaultCmd = CMD_NEXTCONF;
+    } else if(Servermem->waitingNotifications[g_userDataSlot] > 0) {
+      defaultCmd = CMD_DISPNOTIF;
     } else {
       defaultCmd = CMD_SEETIME;
     }

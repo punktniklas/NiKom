@@ -31,6 +31,8 @@ MSG_KOM_AUTO_LOGOUT (114//)
 Automatic logout
 MSG_KOM_INACTIVITY_LOGOUT (115//)
 Logout due to inactivity
+MSG_PROMPT_DISPLAY_NOTIF (116//)
+Display notifications
 ;
 ; ******** Forums **********
 MSG_FORUMS_NO_SUCH_TEXT (200//)

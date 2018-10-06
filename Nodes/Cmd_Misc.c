@@ -121,4 +121,5 @@ void Cmd_DisplayNotifications(void) {
       SendString("%s\r\n", CATSTR(MSG_NOTIF_INVALID));
     }
   }
+  FreeNotifications(list);
 }

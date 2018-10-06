@@ -13,6 +13,21 @@
   directory. (If this is not done NiKom will re-import all existing
   netmail the first time "NiKomFido UpdateFido" is run.)
 
+- There is a new concept in NiKom: notifications. These are things that
+  have happened that a user may want to know about but that is not
+  connected to the user being logged in. (I.e. it's not about knowing
+  who has logged in/out on other nodes, since this only is relevant when
+  the user is logged in themselves.) The first usage of this concept is
+  for knowing when another user has praised or dissed a text you have
+  written.
+  Any notifications for a user is stored in a file in the user directory.
+  When having unread notifications there will be a number in brackets in
+  the prompt indicating how many there are. To see the notifications
+  there is a command "Display Notfications" ("Visa Notifieringar"). As
+  soon as the notificatios are displayed they will be deleted.
+  If a user has unread notifications when the "(See) time" prompt normally
+  would be displayed there is a new prompt saying "Display notifications".
+
 ---------------------------------------------------------------------------
                          NiKom v2.4.1, 2018-09-30
 ---------------------------------------------------------------------------
