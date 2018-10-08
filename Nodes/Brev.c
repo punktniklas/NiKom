@@ -197,7 +197,7 @@ void varmail(void) {
   } else if(antal==1) {
     SendString("%s\r\n\n", CATSTR(MSG_MAIL_ONE_UNREAD));
   } else {
-    SendStringCat("%s\r\n\n", CATSTR(MSG_MAIL_ONE_UNREAD), antal);
+    SendStringCat("%s\r\n\n", CATSTR(MSG_MAIL_MANY_UNREAD), antal);
   }
 }
 
