@@ -426,6 +426,11 @@ void cmd_Reaction(long reaction) {
     return;
   }
 
+  if(textHeader.person == inloggad) {
+    SendString("\r\n\n%s\r\n\n", CATSTR(MSG_REACTION_NOT_SELF));
+    return;
+  }
+
   if(textHeader.extensionIndex > 0) {
     if(!(ext = ReadHeaderExtension(textId, textHeader.extensionIndex))) {
       DisplayInternalError();

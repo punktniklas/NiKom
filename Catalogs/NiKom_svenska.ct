@@ -142,6 +142,8 @@ MSG_REACTION_ALREADY_DIS
 Du har redan dissat text %d.
 MSG_REACTION_DONE_DIS
 Du har dissat text %d.
+MSG_REACTION_NOT_SELF
+Du kan inte hylla/dissa dina egna texter.
 ;
 MSG_WRITE_NO_MAIL
 Använd kommandot 'Brev' i brevlådan.

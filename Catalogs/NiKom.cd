@@ -138,6 +138,8 @@ MSG_REACTION_ALREADY_DIS (299//)
 You already have dissed text %d.
 MSG_REACTION_DONE_DIS (300//)
 You have dissed text %d.
+MSG_REACTION_NOT_SELF (301//)
+You can not praise/diss your own texts.
 ;
 MSG_WRITE_NO_MAIL (304//)
 Use the command 'Mail' in the mailbox.
