@@ -28,6 +28,10 @@
   If a user has unread notifications when the "(See) time" prompt normally
   would be displayed there is a new prompt saying "Display notifications".
 
+- SerNode.cfg has a new config entry called KEEPALIVEMINUTES which is used
+  for generating dummy network traffic regularly to keep the network
+  connection from timing out.
+
 ---------------------------------------------------------------------------
                          NiKom v2.4.1, 2018-09-30
 ---------------------------------------------------------------------------

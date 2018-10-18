@@ -14,6 +14,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 #include "NiKomStr.h"
 #include "Nodes.h"
 #include "NiKomFuncs.h"
@@ -64,7 +65,7 @@ static char coninput, serinput; /* Behövs för SendIO()-anropet */
 char typeaheadbuf[51];   /* För att buffra inkommande tecken under utskrift */
 static char device[31];         /* Devicenamnet, från SerNode.cfg */
 static BOOL consoleyes, serialyes, timeryes;
-static long latestActivityTime;
+static long latestActivityTime, lastKeepAliveTime, keepAliveMinutes = 0;
 
 void prepareOutputStrings(char *input, char *conOutput, char *serOutput);
 
@@ -578,7 +579,13 @@ void getnodeconfig(char *configname) {
 		}
 		else if(!strncmp(buffer,"INACTIVETIME",12)) {
                   Servermem->nodeInfo[nodnr].maxInactiveTime = atoi(&buffer[13]);
-		} else if(!strncmp(buffer,"HANDSKAKNING",12)) handskakning = atoi(&buffer[13]);
+		}
+                else if(!strncmp(buffer,"HANDSKAKNING",12)) {
+                  handskakning = atoi(&buffer[13]);
+                }
+                else if(!strncmp(buffer,"KEEPALIVEMINUTES",16)) {
+                  keepAliveMinutes = atoi(&buffer[17]);
+                }
 	}
 	fclose(fp);
 	if(getty) highbaud=gettybps;
@@ -610,6 +617,19 @@ void RecordActivity(void) {
 void CheckInactivity(void) {
   if(time(NULL) > latestActivityTime + Servermem->nodeInfo[nodnr].maxInactiveTime * 60) {
     nodestate |= NIKSTATE_INACTIVITY;
+  }
+}
+
+void HandleKeepAlive(void) {
+  int now;
+
+  if(keepAliveMinutes <= 0) {
+    return;
+  }
+  now = time(NULL);
+  if((now - max(latestActivityTime, lastKeepAliveTime)) > (keepAliveMinutes * 60)) {
+    putstring(" \b", -1, 0);
+    lastKeepAliveTime = now;
   }
 }
 

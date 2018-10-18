@@ -336,6 +336,13 @@ HANDSKAKNING  Anger de handskakningsflaggor som ska användas för den seriella
               Om detta inte anges så används alternativ "2", vilket också
               normalt sätt är det rekomenderade.
 
+KEEPALIVEMINUTES Om detta är satt till ett värde större än 0 så kommer
+              en inaktiv nod att skicka ett mellanslag följt av ett
+              backspace varje x minuter. (Där x är det konfigurerade
+              värdet.) Detta kan användas för att regelbundet generara
+              någon form av nätverkstrafik så att uppkopplingen inte
+              timear ut i tex brandväggar längs vägen.
+
 Höghastighetsmodem
 ------------------
 Hur NiKom ska konfigureras med ett höghastighetsmodem beror mycket på

@@ -218,4 +218,5 @@ int main(int argc,char *argv[]) {
 void HandleHeartBeat(void) {
   CheckInactivity();
   saveUserData();
+  HandleKeepAlive();
 }

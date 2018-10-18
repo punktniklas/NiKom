@@ -5,3 +5,4 @@ void StartHeartBeat(int recordActivity);
 void StopHeartBeat(void);
 void RecordActivity(void);
 void CheckInactivity(void);
+void HandleKeepAlive(void);
