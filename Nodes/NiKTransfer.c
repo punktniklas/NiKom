@@ -30,6 +30,7 @@
 #include "Logging.h"
 #include "Terminal.h"
 #include "BasicIO.h"
+#include "UserNotificationHooks.h"
 
 #define EKO		1
 #define EJEKO	0
@@ -629,7 +630,8 @@ int recbinfile(char *dir) {
 
   ulfiles = 0;
   if(access(dir,0)) {
-    puttekn("\r\nDirectoryt finns inte!\r\n",-1);
+    LogEvent(SYSTEM_LOG, ERROR, "Upload directory '%s' does not exist.", dir);
+    DisplayInternalError();
     return 2;
   }
 
