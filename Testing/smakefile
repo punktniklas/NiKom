@@ -1,0 +1,9 @@
+SCFLAGS  = NMINC STRMERGE IDIR=/Include IDIR=/UtilLib ERROR=ALL NOICONS
+
+clean:
+  -delete \#?.o \#?.lnk
+  -delete DiskMem-Tests
+
+DiskMem-Tests: DiskMem-Tests.c
+  sc $(SCFLAGS) LINK DiskMem-Tests.c /UtilLib/DiskMem.c UnitTest.c
+  DiskMem-Tests

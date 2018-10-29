@@ -1,6 +1,7 @@
 *~
 *.uaem
 *.o
+*.lnk
 Debug
 NoDebug
 /InitNiKom/InitNiKom
@@ -12,3 +13,4 @@ Tools/SetNodeState/SetNodeState
 Tools/CryptPasswords/CryptPasswords
 Tools/NiKomFido/NiKomFido
 Catalogs/svenska/
+Testing/DiskMem-Tests
