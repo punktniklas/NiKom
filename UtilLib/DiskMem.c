@@ -9,6 +9,8 @@
 #include "DiskMem.h"
 
 #define BITMAP_BYTES(b) (b / 8 + (b % 8 ? 1 : 0))
+#define MAX_FILE_SIZE 200000
+#define BLOCKS_PER_FILE(diskMem) (MAX_FILE_SIZE / diskMem->metadata.blockSize)
 
 struct DiskMemMetadata {
   int blockSize;
@@ -180,10 +182,51 @@ void FreeDiskMemBlock(struct DiskMem *diskMem, int block) {
   Close(fh);
 }
 
+char *dataFileName(struct DiskMem *diskMem, int block) {
+  static char fileName[120];
+  sprintf(fileName, "%s.data%d", diskMem->path, block / BLOCKS_PER_FILE(diskMem));
+  return fileName;
+}
+
 int ReadDiskMemBlock(struct DiskMem *diskMem, int block, void *buffer) {
-  return 0;
+  char *fileName = dataFileName(diskMem, block);
+  int posInFile = block % BLOCKS_PER_FILE(diskMem);
+  BPTR fh;
+
+  if((fh = Open(fileName, MODE_OLDFILE)) == NULL) {
+    return 0;
+  }
+  if(Seek(fh, posInFile, OFFSET_BEGINNING) == -1) {
+    Close(fh);
+    return 0;
+  }
+  if(Read(fh, buffer, diskMem->metadata.blockSize) != diskMem->metadata.blockSize) {
+    Close(fh);
+    return 0;
+  }
+  Close(fh);
+  return 1;
 }
 
 int WriteDiskMemBlock(struct DiskMem *diskMem, int block, void *buffer) {
-  return 0;
+  char *fileName = dataFileName(diskMem, block);
+  int posInFile = block % BLOCKS_PER_FILE(diskMem);
+  BPTR fh;
+
+  if((fh = Open(fileName, MODE_OLDFILE)) == NULL) {
+    if((fh = Open(fileName, MODE_NEWFILE)) == NULL) {
+      return 0;
+    }
+  } else {
+    if(Seek(fh, posInFile, OFFSET_BEGINNING) == -1) {
+      Close(fh);
+      return 0;
+    }
+  }
+  if(Write(fh, buffer, diskMem->metadata.blockSize) != diskMem->metadata.blockSize) {
+    Close(fh);
+    return 0;
+  }
+  Close(fh);
+  return 1;
 }
