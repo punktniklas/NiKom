@@ -340,13 +340,13 @@ void kommando(struct RexxMsg *mess) {
     break;
 
   case -1:
-    LogEvent(SYSTEM_LOG, WARN, "Empty command sent to ARexx 'NikCommand'");   
+    LogEvent(SYSTEM_LOG, WARN, "Empty command sent to ARexx 'NikCommand' (user %d)", inloggad);   
     SetRexxResultString(mess, "2");
     return;
 
   case 0:
     LogEvent(SYSTEM_LOG, WARN,
-             "Invalid NiKom command in ARexx 'NikCommand': '%s'", cmdStr);
+             "Invalid NiKom command in ARexx 'NikCommand' (user %d): '%s'", inloggad, cmdStr);
     SetRexxResultString(mess, "1");
     return;
 
@@ -365,7 +365,7 @@ void kommando(struct RexxMsg *mess) {
 
   default:
     LogEvent(SYSTEM_LOG, WARN,
-             "Ambigous NiKom command in ARexx 'NikCommand': '%s'", cmdStr);
+             "Ambigous NiKom command in ARexx 'NikCommand' (user %d): '%s'", inloggad, cmdStr);
     SetRexxResultString(mess, "4");
     return;
   }
