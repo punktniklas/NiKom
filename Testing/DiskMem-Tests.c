@@ -100,6 +100,14 @@ void TestReadWriteSmallBlocks(void) {
     TestAssert(memcmp(writebuf, readbuf, BLOCK_SIZE) == 0,
                "Read data does not match written data for block %d.", block);
   }
+  for(i = 9; i >= 0; i--) {
+    memset(writebuf, 17 + i, BLOCK_SIZE);
+    res = ReadDiskMemBlock(diskMem, i, readbuf);
+    TestAssert(res, "Error reading block %d in pass 2", i);
+    TestAssert(memcmp(writebuf, readbuf, BLOCK_SIZE) == 0,
+               "Read data does not match expected data for block %d in pass 2. (%d != %d)",
+               i, writebuf[0], readbuf[0]);
+  }
   CloseDiskMem(diskMem);
 }
 

@@ -190,7 +190,7 @@ char *dataFileName(struct DiskMem *diskMem, int block) {
 
 int ReadDiskMemBlock(struct DiskMem *diskMem, int block, void *buffer) {
   char *fileName = dataFileName(diskMem, block);
-  int posInFile = block % BLOCKS_PER_FILE(diskMem);
+  int posInFile = (block % BLOCKS_PER_FILE(diskMem)) * diskMem->metadata.blockSize;
   BPTR fh;
 
   if((fh = Open(fileName, MODE_OLDFILE)) == NULL) {
@@ -210,7 +210,7 @@ int ReadDiskMemBlock(struct DiskMem *diskMem, int block, void *buffer) {
 
 int WriteDiskMemBlock(struct DiskMem *diskMem, int block, void *buffer) {
   char *fileName = dataFileName(diskMem, block);
-  int posInFile = block % BLOCKS_PER_FILE(diskMem);
+  int posInFile = (block % BLOCKS_PER_FILE(diskMem)) * diskMem->metadata.blockSize;
   BPTR fh;
 
   if((fh = Open(fileName, MODE_OLDFILE)) == NULL) {
