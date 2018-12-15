@@ -2,8 +2,15 @@ SCFLAGS  = NMINC STRMERGE IDIR=/Include IDIR=/UtilLib ERROR=ALL NOICONS
 
 clean:
   -delete \#?.o \#?.lnk
-  -delete DiskMem-Tests
+  -delete DiskMem-Tests BTree-Tests
 
 DiskMem-Tests: DiskMem-Tests.c
   sc $(SCFLAGS) LINK DiskMem-Tests.c /UtilLib/DiskMem.c UnitTest.c
   DiskMem-Tests
+
+BTree-Tests: BTree-Tests.c
+  sc $(SCFLAGS) LINK BTree-Tests.c /UtilLib/BTree.c /UtilLib/DiskMem.c UnitTest.c
+  BTree-Tests
+
+DebugBTree: DebugBTree.c
+  sc $(SCFLAGS) LINK DebugBTree.c /UtilLib/BTree.c /UtilLib/DiskMem.c
