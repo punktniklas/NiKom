@@ -51,17 +51,29 @@ void TestOpenClose(void) {
   TestAssert(tree == NULL, "Open did not return NULL for non-existing path.");
 }
 
-void TestInsertAndGet(void) {
+void TestInsertUpdateAndGet(void) {
   struct BTree *tree;
-  int i, res, value;
-  char key[20], pass, keyCount = 50;
+  int i, res, value, keyCount = 50;
+  char key[20], pass;
   BTreeCreate(TEST_PATH "/Create", KEYS_PER_NODE, KEYSIZE, VALUESIZE);
   tree = BTreeOpen(TEST_PATH "/Create");
+
   for(pass = 'a'; pass <= 'c'; pass++) {
     for(i = 0; i < keyCount; i++) {
       memset(key, 0, 20);
       sprintf(key, "k%d%c", i, pass);
-      res = BTreeInsert(tree, key, &i);
+      value = i;
+      res = BTreeInsert(tree, key, &value);
+      TestAssert(res != 0, "Error inserting key %s", key);
+    }
+  }
+
+  for(pass = 'a'; pass <= 'c'; pass++) {
+    for(i = 0; i < keyCount; i++) {
+      memset(key, 0, 20);
+      sprintf(key, "k%d%c", i, pass);
+      value = i + 100;
+      res = BTreeInsert(tree, key, &value);
       TestAssert(res != 0, "Error inserting key %s", key);
     }
   }
@@ -72,7 +84,7 @@ void TestInsertAndGet(void) {
       sprintf(key, "k%d%c", i, pass);
       res = BTreeGet(tree, key, &value);
       TestAssert(res != 0, "Error getting key %s", key);
-      TestAssert(value == i, "Unecpected value for key %s: %d", key, value);
+      TestAssert(value == i + 100, "Unecpected value for key %s: %d", key, value);
     }
   }
 
@@ -102,37 +114,11 @@ void TestInsertReopenAndGet(void) {
   BTreeClose(tree);
 }
 
-void TestInsertKeyTwice(void) {
-  struct BTree *tree;
-  int res, value;
-
-  BTreeCreate(TEST_PATH "/Create", KEYS_PER_NODE, KEYSIZE, VALUESIZE);
-  tree = BTreeOpen(TEST_PATH "/Create");
-
-  value = 42;
-  res = BTreeInsert(tree, "k1", &value);
-  TestAssert(res != 0, "Error inserting key");
-
-  value = 43;
-  res = BTreeInsert(tree, "k1", &value);
-  TestAssert(res != 0, "Error inserting key");
-
-  value = 0;
-  res = BTreeGet(tree, "k1", &value);
-  TestAssert(res != 0, "Error getting key");
-  TestAssert(value == 43, "Unecpected value for key: %d", value);
-
-  // TODO: Assert that keycount == 1
-  
-  BTreeClose(tree);
-}
-
 void main(void) {
   RunTest(TestCreate, "Create");
   RunTest(TestOpenClose, "OpenClose");
-  RunTest(TestInsertAndGet, "InsertAndGet");
+  RunTest(TestInsertUpdateAndGet, "InsertUpdateAndGet");
   RunTest(TestInsertReopenAndGet, "InsertReopenAndGet");
-  RunTest(TestInsertKeyTwice, "InsertKeyTwice");
 }
 
 void SetupTest(void) {

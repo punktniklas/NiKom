@@ -4,11 +4,11 @@ clean:
   -delete \#?.o \#?.lnk
   -delete DiskMem-Tests BTree-Tests
 
-DiskMem-Tests: DiskMem-Tests.c
+DiskMem-Tests: DiskMem-Tests.c /UtilLib/DiskMem.c
   sc $(SCFLAGS) LINK DiskMem-Tests.c /UtilLib/DiskMem.c UnitTest.c
   DiskMem-Tests
 
-BTree-Tests: BTree-Tests.c
+BTree-Tests: BTree-Tests.c /UtilLib/BTree.c
   sc $(SCFLAGS) LINK BTree-Tests.c /UtilLib/BTree.c /UtilLib/DiskMem.c UnitTest.c
   BTree-Tests
 

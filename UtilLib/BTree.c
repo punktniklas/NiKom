@@ -44,7 +44,7 @@ struct BNode {
                                                  + tree->md.keysPerNode * (tree->md.keySize + tree->md.valueSize) \
                                                  + sizeof(int) * (childIndex)))
 
-static int debugMode = 0;
+static int debugKeyFormat = 0;
 
 int saveMetadata(char *path, struct BTreeMetadata *md) {
   BPTR fh;
@@ -62,11 +62,42 @@ int saveMetadata(char *path, struct BTreeMetadata *md) {
   return 1;
 }
 
+#ifndef NIKOMLIB
+char *formatKeyString(void *key, struct BTree *tree) {
+  static char buf[200];
+  switch(debugKeyFormat) {
+  case BTREE_DBG_KEY_STRING:
+    memcpy(buf, key, tree->md.keySize);
+    buf[tree->md.keySize] = '\0';
+    break;
+  case BTREE_DBG_KEY_INT:
+    sprintf(buf, "%d", *((int *)key));
+    break;
+  default:
+    strcpy(buf, "<Invalid key format>");
+  }
+  return buf;
+}
+
+char *formatValueString(void *value, struct BTree *tree) {
+  int i, *intValue = value;
+  static char buf[200]; 
+  char tmp[20];
+
+  buf[0] = '\0';
+  for(i = 0; i < (tree->md.valueSize / sizeof(int)); i++) {
+    sprintf(tmp, "%d ", intValue[i]);
+    strcat(buf, tmp);
+  }
+  return buf;
+}
+#endif
+
 void printNode(struct BTree *tree, struct BNode *node, char *header) {
 #ifndef NIKOMLIB
   int i;
 
-  if(!debugMode) {
+  if(debugKeyFormat == 0) {
     return;
   }
 
@@ -77,7 +108,9 @@ void printNode(struct BTree *tree, struct BNode *node, char *header) {
   printf("\n%s -----------------------\n", header);
   printf("Node: diskMemBlock = %d   noofKeys = %d   isLeaf = %d\n", node->diskMemBlock, node->noofKeys, node->isLeaf);
   for(i = 0; i < node->noofKeys; i++) {
-    printf("Key %d: '%s' -> %d\n", i, BTREE_KEYPTR(tree, node, i), *((int *)BTREE_VALUEPTR(tree, node, i)));
+    printf("Key %d: '%s' -> %s\n", i,
+           formatKeyString(BTREE_KEYPTR(tree, node, i), tree),
+           formatValueString(BTREE_VALUEPTR(tree, node, i), tree));
   }
   if(!node->isLeaf) {
     for(i = 0; i <= node->noofKeys; i++) {
@@ -90,7 +123,7 @@ void printNode(struct BTree *tree, struct BNode *node, char *header) {
 
 void printDebugString(char *str) {
 #ifndef NIKOMLIB
-  if(debugMode) {
+  if(debugKeyFormat != 0) {
     printf("### %s\n", str);
   }
 #endif
@@ -133,7 +166,11 @@ int writeNode(struct BTree *tree, struct BNode *node) {
 }
               
 void BTreePrintRoot(struct BTree *tree) {
+#ifndef NIKOMLIB
+  printf("keysPerNode: %d  keySize: %d  valueSize: %d  nodeSize: %d  rootBlock: %d\n",
+         tree->md.keysPerNode, tree->md.keySize, tree->md.valueSize, tree->md.nodeSize, tree->md.rootBlock);
   printNode(tree, tree->root, "Root node");
+#endif
 }
 
 void BTreePrintNodeFromBlock(struct BTree *tree, int block) {
@@ -148,8 +185,8 @@ void BTreePrintNodeFromBlock(struct BTree *tree, int block) {
 #endif
 }
 
-void BTreeSetDebugMode(int debug) {
-  debugMode = debug;
+void BTreeSetDebugMode(int keyFormat) {
+  debugKeyFormat = keyFormat;
 }
 
 int BTreeCreate(char *path, int keysPerNode, int keySize, int valueSize) {
@@ -306,13 +343,14 @@ int insertNonFull(struct BTree *tree, struct BNode *node, void *key, void *value
   int i, childBlock, res = 1, cmpRes;
   if(node->isLeaf) {
     printDebugString("Node is a leaf node, inserting key into node.");
-    for(i = node->noofKeys - 1; i >= 0; i--) {
-      cmpRes = memcmp(key, BTREE_KEYPTR(tree, node, i), tree->md.keySize);
-      if(cmpRes == 0) {
+    for(i = 0; i < node->noofKeys; i++) {
+      if(memcmp(key, BTREE_KEYPTR(tree, node, i), tree->md.keySize) == 0) {
         memcpy(BTREE_VALUEPTR(tree, node, i), value, tree->md.valueSize);
         return writeNode(tree, node);
       }
-      if(cmpRes > 0) {
+    }
+    for(i = node->noofKeys - 1; i >= 0; i--) {
+      if(memcmp(key, BTREE_KEYPTR(tree, node, i), tree->md.keySize) > 0) {
         break;
       }
       memcpy(BTREE_KEYPTR(tree, node, i + 1), BTREE_KEYPTR(tree, node, i), tree->md.keySize + tree->md.valueSize);
@@ -363,6 +401,8 @@ int BTreeInsert(struct BTree *tree, void *key, void *value) {
   struct BNode *newRootNode, *oldRootNode, *newChildNode;
   int res;
 
+  printDebugString("BTreeInsert() called");
+  printDebugString(key);
   printNode(tree, tree->root, "Before BTreeInsert() - root: ");
   if(tree->root->noofKeys < tree->md.keysPerNode) {
     printDebugString("Calling insertNonFull() on root.");

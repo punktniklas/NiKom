@@ -95,7 +95,7 @@ int linkComments(struct ExtMote *conf, struct NiKomBase *NiKomBase) {
       }
       strncpy(msgid, &fl->text[8], FIDO_MSGID_KEYLEN);
       if(BTreeGet(msgidTree, msgid, &commentedText)) {
-        if(BTreeGet(commentsTree, &commentedText, &forwardComments)) {
+        if(BTreeGet(commentsTree, &commentedText, forwardComments)) {
           for(j = 0; j < FIDO_FORWARD_COMMENTS && forwardComments[j] != 0; j++);
           if(j == FIDO_FORWARD_COMMENTS) {
             // No room for more comments

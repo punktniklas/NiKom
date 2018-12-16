@@ -99,7 +99,7 @@ int initComments(int argc, char *argv[]) {
   case 0:
     error = 0;
     printf("Comments initialized.\n");
-    break:
+    break;
   case 1:
     printf("There is no conference with number %d.\n", confId);
     break;
