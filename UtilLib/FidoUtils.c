@@ -1,4 +1,7 @@
+#include <proto/dos.h>
 #include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 #include "StringUtils.h"
 
 #include "FidoUtils.h"
@@ -88,3 +91,30 @@ int IsZoneInStr(int zone, char *str, int emptyMatchesAll) {
   }
   return 0;
 }
+
+char *MakeMsgFilePath(char *dir, int msgId, char *buf) {
+  char msgFilename[20];
+  strcpy(buf, dir);
+  sprintf(msgFilename, "%d.msg", msgId);
+  AddPart(buf, msgFilename,99);
+  return buf;
+}
+
+int GetNextMsgNum(char *dir) {
+  char path[100], buffer[20];
+  strcpy(path, dir);
+  AddPart(path, "NiKomNext", 100);
+  if(GetVar(path, buffer, 19, GVF_GLOBAL_ONLY) == -1) {
+    return 2;
+  }
+  return atoi(buffer);
+}
+
+void SetNextMsgNum(char *dir, int msgNum) {
+  char path[100], buffer[20];
+  strcpy(path, dir);
+  AddPart(path, "NiKomNext", 100);
+  sprintf(buffer, "%d", msgNum);
+  SetVar(path, buffer, -1, GVF_GLOBAL_ONLY);
+}
+

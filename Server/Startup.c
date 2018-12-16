@@ -310,37 +310,38 @@ void readGroupData(void) {
 void readConferenceData(void) {
   BPTR fh;
   int x = 0, ret;
-  struct Mote *newConf, *conf;
+  struct ExtMote *newConf, *conf;
 
   if(!(fh = Open("NiKom:DatoCfg/Möten.dat", MODE_OLDFILE))) {
     cleanup(EXIT_ERROR, "Could not open NiKom:DatoCfg/Möten.dat");
   }
   for(;;) {
-    if(!(newConf = (struct Mote *)AllocMem(sizeof(struct Mote),
+    if(!(newConf = (struct ExtMote *)AllocMem(sizeof(struct ExtMote),
                                            MEMF_CLEAR | MEMF_PUBLIC))) {
       cleanup(EXIT_ERROR, "Out of memory.");
     }
     ret = Read(fh, newConf, sizeof(struct Mote));
     if(ret == -1) {
-      FreeMem(newConf, sizeof(struct Mote));
+      FreeMem(newConf, sizeof(struct ExtMote));
       Close(fh);
       cleanup(EXIT_ERROR, "Error reading Möten.dat");
     } else if(ret == 0) {
-      FreeMem(newConf, sizeof(struct Mote));
+      FreeMem(newConf, sizeof(struct ExtMote));
       break;
     }
-    if(!newConf->namn[0]) {
+    if(!newConf->diskConf.namn[0]) {
       x++;
       continue;
     }
-    newConf->nummer = x;
-    ITER_EL(conf, Servermem->mot_list, mot_node, struct Mote *) {
-      if(conf->sortpri > newConf->sortpri) {
+    newConf->diskConf.nummer = x;
+    InitSemaphore(&newConf->fidoCommentsSemaphore);
+    ITER_EL(conf, Servermem->mot_list, diskConf.mot_node, struct ExtMote *) {
+      if(conf->diskConf.sortpri > newConf->diskConf.sortpri) {
         break;
       }
     }
     Insert((struct List *)&Servermem->mot_list, (struct Node *)newConf,
-           (struct Node *)conf->mot_node.mln_Pred);
+           (struct Node *)conf->diskConf.mot_node.mln_Pred);
     x++;
   }
   Close(fh);

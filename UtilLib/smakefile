@@ -6,7 +6,7 @@ OBJS     = DiskUtils.o FileAreaUtils.o Logging.o RexxUtils.o ExecUtils.o \
 	   ServerMemUtils.o StringUtils.o ConfigUtils.o FidoUtils.o Stack.o \
 	   CommandParser.o DateUtils.o UserDataUtils.o UserMessageUtils.o \
            Trie.o Notifications.o DiskMem.o BTree.o
-NLIBOBJS = Logging_nlib.o
+NLIBOBJS = Logging_nlib.o FidoUtils_nlib.o StringUtils_nlib.o DiskMem_nlib.o BTree_nlib.o
 
 all: nikomutils.lib nikomutils_nlib.lib
 
@@ -46,9 +46,15 @@ ServerMemUtils.o: ServerMemUtils.c ServerMemUtils.h
 
 StringUtils.o: StringUtils.c StringUtils.h
 
+StringUtils_nlib.o: StringUtils.c StringUtils.h
+  sc $(NLFLAGS) OBJNAME=StringUtils_nlib.o StringUtils.c
+
 ConfigUtils.o: ConfigUtils.c ConfigUtils.h
 
 FidoUtils.o: FidoUtils.c FidoUtils.h
+
+FidoUtils_nlib.o: FidoUtils.c FidoUtils.h
+  sc $(NLFLAGS) OBJNAME=FidoUtils_nlib.o FidoUtils.c
 
 Stack.o: Stack.c Stack.h
 
@@ -66,4 +72,10 @@ Notifications.o: Notifications.c Notifications.h
 
 DiskMem.o: DiskMem.c DiskMem.h
 
+DiskMem_nlib.o: DiskMem.c DiskMem.h
+  sc $(NLFLAGS) OBJNAME=DiskMem_nlib.o DiskMem.c
+
 BTree.o: BTree.c BTree.h
+
+BTree_nlib.o: BTree.c BTree.h
+  sc $(NLFLAGS) OBJNAME=BTree_nlib.o BTree.c

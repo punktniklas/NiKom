@@ -78,6 +78,9 @@ void __saveds AASM LIBInitServermem(
   register __a0 struct System *Servermem AREG(a0),
   register __a6 struct NiKomBase *NiKomBase AREG(a6));
 
+int __saveds AASM LIBFidoInitComments(register __d0 int confId AREG(d0),
+                                      register __a6 struct NiKomBase *NiKomBase AREG(a6));
+
 
 /* Other useful little functions */
 

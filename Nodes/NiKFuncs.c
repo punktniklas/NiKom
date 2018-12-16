@@ -362,19 +362,20 @@ int skapmot(void) {
     return 0;
   }
   tmpConf.nummer = i;
-  if(!(newConf = (struct Mote *)AllocMem(sizeof(struct Mote),
+  if(!(newConf = (struct Mote *)AllocMem(sizeof(struct ExtMote),
                                          MEMF_CLEAR | MEMF_PUBLIC))) {
-    LogEvent(SYSTEM_LOG, ERROR, "Could not allocate %d bytes.", sizeof(struct Mote));
+    LogEvent(SYSTEM_LOG, ERROR, "Could not allocate %d bytes.", sizeof(struct ExtMote));
     DisplayInternalError();
     return 0;
   }
   memcpy(newConf, &tmpConf, sizeof(struct Mote));
+  InitSemaphore(&((struct ExtMote *)newConf)->fidoCommentsSemaphore);
+
   ITER_EL(searchConf, Servermem->mot_list, mot_node, struct Mote *) {
     if(searchConf->sortpri > newConf->sortpri) {
       break;
     }
   }
-  
   searchConf = (struct Mote *)searchConf->mot_node.mln_Pred;
   Insert((struct List *)&Servermem->mot_list, (struct Node *)newConf,
          (struct Node *)searchConf);

@@ -10,6 +10,7 @@
 #include <proto/utility.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 #include <stdio.h>
 
@@ -17,6 +18,115 @@
 #include "NiKomLib.h"
 #include "Funcs.h"
 #include "Logging.h"
+#include "FidoUtils.h"
+#include "BTree.h"
+
+int linkComments(struct ExtMote *conf, struct NiKomBase *NiKomBase) {
+  struct BTree *msgidTree, *commentsTree;
+  struct FidoText *ft;
+  struct FidoLine *fl;
+  int i, j, commentedText, forwardComments[FIDO_FORWARD_COMMENTS], fromText, nikomNext;
+  char treepath[100], msgPath[100], msgid[FIDO_MSGID_KEYLEN];
+  struct TagItem ti = { TAG_DONE };
+
+  ObtainSemaphore(&conf->fidoCommentsSemaphore);
+  sprintf(treepath, "NiKom:FidoComments/%s_id", conf->diskConf.tagnamn);
+  if((msgidTree = BTreeOpen(treepath)) == NULL) {
+    ReleaseSemaphore(&conf->fidoCommentsSemaphore);
+    return 5;
+  }
+
+  nikomNext = GetNextMsgNum(conf->diskConf.dir);
+  fromText = max(nikomNext, conf->diskConf.lowtext);;
+  if(fromText > conf->diskConf.texter) {
+    BTreeClose(msgidTree);
+    ReleaseSemaphore(&conf->fidoCommentsSemaphore);
+    return 0;
+  }
+  LogEvent(NiKomBase->Servermem, FIDO_LOG, INFO, "Linking comments in %s, text %d to %d.",
+           conf->diskConf.tagnamn, fromText, conf->diskConf.texter);
+  
+  for(i = fromText; i <= conf->diskConf.texter; i++) {
+    if((ft = LIBReadFidoText(MakeMsgFilePath(conf->diskConf.dir, i, msgPath), &ti, NiKomBase)) == NULL) {
+      LogEvent(NiKomBase->Servermem, FIDO_LOG, WARN,
+               "FidoInitComments:  Could not open text file %s.", msgPath);
+      continue;
+    }
+    ITER_EL(fl, ft->text, line_node, struct FidoLine *) {
+      if(fl->text[0] != 1) {
+        break;
+      }
+      if(strncmp(&fl->text[1], "MSGID:", 6) == 0) {
+        strncpy(msgid, &fl->text[8], FIDO_MSGID_KEYLEN);
+        if(!BTreeInsert(msgidTree, msgid, &i)) {
+          LogEvent(NiKomBase->Servermem, FIDO_LOG, WARN,
+                   "FidoInitComments:  Error Inserting '%s' -> %d. BTree for %s is possibly corrupt.",
+                   msgid, i, conf->diskConf.tagnamn);
+          LIBFreeFidoText(ft);
+          BTreeClose(msgidTree);
+          ReleaseSemaphore(&conf->fidoCommentsSemaphore);
+          return 6;
+        }
+        break;
+      }
+    }
+    LIBFreeFidoText(ft);
+  }
+
+  sprintf(treepath, "NiKom:FidoComments/%s_c", conf->diskConf.tagnamn);
+  if((commentsTree = BTreeOpen(treepath)) == NULL) {
+    BTreeClose(msgidTree);
+    ReleaseSemaphore(&conf->fidoCommentsSemaphore);
+    return 5;
+  }
+
+  for(i = fromText; i <= conf->diskConf.texter; i++) {
+    if((ft = LIBReadFidoText(MakeMsgFilePath(conf->diskConf.dir, i, msgPath), &ti, NiKomBase)) == NULL) {
+      LogEvent(NiKomBase->Servermem, FIDO_LOG, WARN,
+               "FidoInitComments:  Could not open text file %s.", msgPath);
+      continue;
+    }
+    ITER_EL(fl, ft->text, line_node, struct FidoLine *) {
+      if(fl->text[0] != 1) {
+        break;
+      }
+      if(strncmp(&fl->text[1], "REPLY:", 6) != 0) {
+        continue;
+      }
+      strncpy(msgid, &fl->text[8], FIDO_MSGID_KEYLEN);
+      if(BTreeGet(msgidTree, msgid, &commentedText)) {
+        if(BTreeGet(commentsTree, &commentedText, &forwardComments)) {
+          for(j = 0; j < FIDO_FORWARD_COMMENTS && forwardComments[j] != 0; j++);
+          if(j == FIDO_FORWARD_COMMENTS) {
+            // No room for more comments
+            break;
+          }
+          forwardComments[j] = i;
+        } else {
+          memset(forwardComments, 0, FIDO_FORWARD_COMMENTS * sizeof(int));
+          forwardComments[0] = i;
+        }
+        if(!BTreeInsert(commentsTree, &commentedText, forwardComments)) {
+          LogEvent(NiKomBase->Servermem, FIDO_LOG, WARN,
+                   "FidoInitComments:  Error Inserting forward comments for text %d.  BTree for %s is possibly corrupt.",
+                   commentedText, conf->diskConf.tagnamn);
+          LIBFreeFidoText(ft);
+          BTreeClose(commentsTree);
+          BTreeClose(msgidTree);
+          ReleaseSemaphore(&conf->fidoCommentsSemaphore);
+          return 6;
+        }
+        break;
+      }
+    }
+    LIBFreeFidoText(ft);
+  }
+  BTreeClose(commentsTree);
+  BTreeClose(msgidTree);
+  ReleaseSemaphore(&conf->fidoCommentsSemaphore);
+  SetNextMsgNum(conf->diskConf.dir, conf->diskConf.texter + 1);
+  return 0;
+}
 
 void __saveds AASM LIBReScanFidoConf(register __a0 struct Mote *motpek AREG(a0),
                                       register __d0 int motnr AREG(d0),
@@ -76,22 +186,20 @@ void __saveds AASM LIBReScanFidoConf(register __a0 struct Mote *motpek AREG(a0),
   LogEvent(NiKomBase->Servermem, FIDO_LOG, INFO,
            "Full scan of area %s. Low %d (%d.msg), high %d (%d.msg)",
            newmotpek->tagnamn, newmotpek->lowtext, min, newmotpek->texter, max);
+  linkComments((struct ExtMote *)newmotpek, NiKomBase);
 }
 
 void __saveds AASM LIBUpdateFidoConf(register __a0 struct Mote *motpek AREG(a0),register __a6 struct NiKomBase *NiKomBase AREG(a6)) {
   int tmpmin, tmpmax, oldmin, oldmax;
   BPTR lock;
-  char filnamn[20],fullpath[100];
+  char fullpath[100];
 
   if(!NiKomBase->Servermem) return;
 
   oldmax = motpek->texter;
   tmpmax = motpek->texter + 1 - motpek->renumber_offset;
   for(;;) {
-    strcpy(fullpath,motpek->dir);
-    sprintf(filnamn,"%d.msg",tmpmax);
-    AddPart(fullpath,filnamn,99);
-    lock = Lock(fullpath, ACCESS_READ);
+    lock = Lock(MakeMsgFilePath(motpek->dir, tmpmax, fullpath), ACCESS_READ);
     if(lock) {
       UnLock(lock);
       tmpmax++;
@@ -102,10 +210,7 @@ void __saveds AASM LIBUpdateFidoConf(register __a0 struct Mote *motpek AREG(a0),
   oldmin = motpek->lowtext;
   tmpmin=motpek->lowtext - motpek->renumber_offset;
   while(tmpmin<=motpek->texter) {
-    strcpy(fullpath,motpek->dir);
-    sprintf(filnamn,"%d.msg",tmpmin);
-    AddPart(fullpath,filnamn,99);
-    lock = Lock(fullpath, ACCESS_READ);
+    lock = Lock(MakeMsgFilePath(motpek->dir, tmpmin, fullpath), ACCESS_READ);
     if(lock) {
       UnLock(lock);
       break;
@@ -121,6 +226,7 @@ void __saveds AASM LIBUpdateFidoConf(register __a0 struct Mote *motpek AREG(a0),
            oldmax, oldmax - motpek->renumber_offset,
            motpek->texter, motpek->texter - motpek->renumber_offset,
            motpek->texter - oldmax);
+  linkComments((struct ExtMote *)motpek, NiKomBase);
 }
 
 void __saveds AASM LIBUpdateAllFidoConf(register __a6 struct NiKomBase *NiKomBase AREG(a6)) {
@@ -171,7 +277,7 @@ int __saveds AASM LIBReNumberConf(register __a0 struct Mote *conf AREG(a0),regis
                                    register __a6 struct NiKomBase *NiKomBase AREG(a6)) {
   struct Mote *confToRenum;
   int i, reallowest, realhighest, diff, hwm;
-  char oldpath[100], newpath[100], filename[20];
+  char oldpath[100], newpath[100];
   
   if(!NiKomBase->Servermem) {
     return -1;
@@ -195,12 +301,8 @@ int __saveds AASM LIBReNumberConf(register __a0 struct Mote *conf AREG(a0),regis
   }
   diff = reallowest - newlowest;
   for(i = reallowest; i <= realhighest; i++) {
-    sprintf(filename, "%d.msg", i);
-    strcpy(oldpath, confToRenum->dir);
-    AddPart(oldpath, filename, 99);
-    sprintf(filename, "%d.msg", i - diff);
-    strcpy(newpath, confToRenum->dir);
-    AddPart(newpath, filename, 99);
+    MakeMsgFilePath(confToRenum->dir, i, oldpath);
+    MakeMsgFilePath(confToRenum->dir, i - diff, newpath);
     Rename(oldpath, newpath);
   }
   confToRenum->renumber_offset += diff;
@@ -252,4 +354,50 @@ int __saveds AASM LIBWriteConf(register __a0 struct Mote *motpek AREG(a0), regis
 	}
 	Close(fh);
 	return(0);
+}
+
+/*
+ * 1 - No conf with that confId.
+ * 2 - The conf is not a FidoNet conf.
+ * 3 - Comments are already initiated for this conf.
+ * 4 - Couldn't create data structure on disk.
+ * 5 - Couldn't open the newly created data structure.
+ * 6 - Error inserting a key, init aborted. See log.
+ * -1 - No Servermem
+ */
+int __saveds AASM LIBFidoInitComments(register __d0 int confId AREG(d0),
+                                     register __a6 struct NiKomBase *NiKomBase AREG(a6)) {
+  struct Mote *conf;
+  struct BTree *msgidTree;
+  char treepath[100];
+  
+  if(!NiKomBase->Servermem) {
+    return -1;
+  }
+
+  conf = LIBGetConfPoint(confId, NiKomBase);
+  if(conf == NULL) {
+    return 1;
+  }
+
+  if(conf->type != MOTE_FIDO) {
+    return 2;
+  }
+
+  sprintf(treepath, "NiKom:FidoComments/%s_id", conf->tagnamn);
+  if((msgidTree = BTreeOpen(treepath)) != NULL) {
+    BTreeClose(msgidTree);
+    return 3;
+  }
+
+  if(!BTreeCreate(treepath, 15, FIDO_MSGID_KEYLEN, sizeof(int))) {
+    return 4;
+  }
+
+  sprintf(treepath, "NiKom:FidoComments/%s_c", conf->tagnamn);
+  if(!BTreeCreate(treepath, 15, sizeof(int), FIDO_FORWARD_COMMENTS * sizeof(int))) {
+    return 4;
+  }
+
+  return linkComments((struct ExtMote *)conf, NiKomBase);
 }

@@ -32,9 +32,9 @@ void freefilemem(void) {
 }
 
 void freemotmem(void) {
-	struct Mote *pek;
-	while((pek=(struct Mote *)RemHead((struct List *)&Servermem->mot_list)))
-		FreeMem(pek,sizeof(struct Mote));
+	struct ExtMote *pek;
+	while((pek=(struct ExtMote *)RemHead((struct List *)&Servermem->mot_list)))
+		FreeMem(pek,sizeof(struct ExtMote));
 }
 
 void freeshortusermem(void) {

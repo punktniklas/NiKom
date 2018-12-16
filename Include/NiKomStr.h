@@ -27,9 +27,7 @@
 #define NIKMESS_SENDNODEMESS 13
 
 /* Maximala antal */
-#define MAXMOT			5
 #define MAXKOM			15
-#define MAXBREV			2048
 #define MAXNOD			32
 #define MAXMOTE			2048
 #define MAXSAYTKN		1000
@@ -162,6 +160,9 @@
 
 #define NUM_LANGUAGES     2
 
+#define FIDO_MSGID_KEYLEN     100
+#define FIDO_FORWARD_COMMENTS 10
+
 #define BAMTEST(a,b) (((char *)(a))[(b)/8] & 1 << (8 - 1 - (b)%8))
 #define BAMSET(a,b) (((char *)(a))[(b)/8] |= 1 << (8 - 1 - (b)%8))
 #define BAMCLEAR(a,b) (((char *)(a))[(b)/8] &= ~(1 << (8 - 1 - (b)%8)))
@@ -285,6 +286,16 @@ struct Mote {
   	   reserv1, reserv2, reserv3, reserv4, reserv5;
    short gren,status,charset,nummer;
    char type,namn[41],origin[70],tagnamn[50],dir[80];
+};
+
+/*
+ * This is an extension of struct Mote with extra fields that are not saved to disk.
+ * A pointer to this structure is compatible with struct Mote *, avoiding having to
+ * refactor the whole codebase where struct Mote * is used.
+ */
+struct ExtMote {
+  struct Mote diskConf;
+  struct SignalSemaphore fidoCommentsSemaphore;
 };
 
 struct ShortUser {

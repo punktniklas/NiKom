@@ -20,6 +20,7 @@ void ReScanFidoConf(struct Mote *,int);
 void UpdateFidoConf(struct Mote *);
 void UpdateAllFidoConf(void);
 void ReScanAllFidoConf(void);
+int FidoInitComments(int confId);
 struct NodeType *GetNodeType(long);
 int ReNumberConf(struct Mote *, int, int);
 int WriteConf(struct Mote *);

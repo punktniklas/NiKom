@@ -14,6 +14,7 @@ void printUsage(void) {
   printf("  NiKomFido RescanConf <conf number>\n");
   printf("  NiKomFido RescanAllConf\n");
   printf("  NiKomFido RenumberConf <conf number> <new lowest text number>\n");
+  printf("  NiKomFido InitComments <conf number>\n");
 }
 
 void updateFido(void) {
@@ -83,6 +84,46 @@ int renumberConf(int argc, char *argv[]) {
   return error;
 }
 
+int initComments(int argc, char *argv[]) {
+  int confId, res, error = 10;
+  if(argc != 3) {
+    printf("InitComments takes exactly one parameter.\n");
+    printf(" - the number of the conf to init comments for.\n");
+    return 5;
+  }
+
+  confId = atoi(argv[2]);
+  res = FidoInitComments(confId);
+
+  switch(res) {
+  case 0:
+    error = 0;
+    printf("Comments initialized.\n");
+    break:
+  case 1:
+    printf("There is no conference with number %d.\n", confId);
+    break;
+  case 2:
+    printf("Conference %d is not a Fido conference.\n", confId);
+    break;
+  case 3:
+    printf("Comments have already been initialized for conference %d.\n", confId);
+    break;
+  case 4:
+    printf("Couldn't create data structures on disk. (Does the directory 'NiKom:FidoComments' exist?)\n");
+    break;
+  case 5:
+    printf("Couldn't open data structures after they had been created..\n");
+    break;
+  case 6:
+    printf("Error inserting data into data structures. See Fido.log.\n");
+    break;
+  default:
+    printf("Unexpected error code: %d\n", res);
+  }
+  return error;
+}
+
 int main(int argc, char *argv[]) {
   int ret = 0;
 
@@ -104,6 +145,8 @@ int main(int argc, char *argv[]) {
     rescanAllConf();
   } else if(stricmp(argv[1], "RenumberConf") == 0) {
     ret = renumberConf(argc, argv);
+  } else if(stricmp(argv[1], "InitComments") == 0) {
+    ret = initComments(argc, argv);
   } else {
     printUsage();
     ret = 5;

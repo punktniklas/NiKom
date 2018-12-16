@@ -11,25 +11,8 @@
 #include "NiKomBase.h"
 #include "NiKomLib.h"
 #include "Funcs.h"
+#include "FidoUtils.h"
 #include "Logging.h"
-
-static int getNextMsgNum(char *dir) {
-  char path[100], buffer[20];
-  strcpy(path, dir);
-  AddPart(path, "NiKomNext", 100);
-  if(GetVar(path, buffer, 19, GVF_GLOBAL_ONLY) == -1) {
-    return 2;
-  }
-  return atoi(buffer);
-}
-
-static void setNextMsgNum(char *dir, int msgNum) {
-  char path[100], buffer[20];
-  strcpy(path, dir);
-  AddPart(path, "NiKomNext", 100);
-  sprintf(buffer, "%d", msgNum);
-  SetVar(path, buffer, -1, GVF_GLOBAL_ONLY);
-}
 
 void __saveds AASM LIBMatrix2NiKom(register __a6 struct NiKomBase *NiKomBase AREG(a6)) {
   struct FidoText *fidotext;
@@ -48,7 +31,7 @@ void __saveds AASM LIBMatrix2NiKom(register __a6 struct NiKomBase *NiKomBase ARE
     if(NiKomBase->Servermem->cfg->fidoConfig.matrixDirs[i].path[0] == '\0') {
       break;
     }
-    oldNextMsgNum = getNextMsgNum(NiKomBase->Servermem->cfg->fidoConfig.matrixDirs[i].path);
+    oldNextMsgNum = GetNextMsgNum(NiKomBase->Servermem->cfg->fidoConfig.matrixDirs[i].path);
     LogEvent(NiKomBase->Servermem, FIDO_LOG, DEBUG,
              "Scanning matrix dir %s with NiKomNext = %d",
              NiKomBase->Servermem->cfg->fidoConfig.matrixDirs[i].path,
@@ -122,7 +105,7 @@ void __saveds AASM LIBMatrix2NiKom(register __a6 struct NiKomBase *NiKomBase ARE
       Close(fh);
       FreeFidoText(fidotext);
     }
-    setNextMsgNum(NiKomBase->Servermem->cfg->fidoConfig.matrixDirs[i].path, currentMsgNum);
+    SetNextMsgNum(NiKomBase->Servermem->cfg->fidoConfig.matrixDirs[i].path, currentMsgNum);
     LogEvent(NiKomBase->Servermem, FIDO_LOG, INFO,
              "Finished netmail import in %s. NiKomNext:  %d -> %d (%d new messages)",
              NiKomBase->Servermem->cfg->fidoConfig.matrixDirs[i].path,

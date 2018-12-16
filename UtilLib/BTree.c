@@ -63,6 +63,7 @@ int saveMetadata(char *path, struct BTreeMetadata *md) {
 }
 
 void printNode(struct BTree *tree, struct BNode *node, char *header) {
+#ifndef NIKOMLIB
   int i;
 
   if(!debugMode) {
@@ -84,12 +85,15 @@ void printNode(struct BTree *tree, struct BNode *node, char *header) {
     }
   }
   printf("\n");
+#endif
 }
 
 void printDebugString(char *str) {
+#ifndef NIKOMLIB
   if(debugMode) {
     printf("### %s\n", str);
   }
+#endif
 }
 
 struct BNode *allocateNode(struct BTree *tree) {
@@ -133,6 +137,7 @@ void BTreePrintRoot(struct BTree *tree) {
 }
 
 void BTreePrintNodeFromBlock(struct BTree *tree, int block) {
+#ifndef NIKOMLIB
   struct BNode *node;
   if((node = readNode(tree, block)) == NULL) {
     printf("Could not read node %d.\n", block);
@@ -140,6 +145,7 @@ void BTreePrintNodeFromBlock(struct BTree *tree, int block) {
   }
   printNode(tree, node, "Node");
   FreeMem(node, tree->md.nodeSize);
+#endif
 }
 
 void BTreeSetDebugMode(int debug) {

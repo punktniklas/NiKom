@@ -25,6 +25,7 @@
 #include "StyleSheets.h"
 #include "StringUtils.h"
 #include "FidoUtils.h"
+#include "BTree.h"
 
 #include "FidoMeet.h"
 
@@ -81,16 +82,74 @@ int isFidoSystemStr(char *str) {
     || strncmp(str, "SEEN-BY: ", 9) == 0;
 }
 
-void fido_visatext(int text,struct Mote *motpek) {
-  struct FidoText *ft;
+int lookupRepliedText(struct FidoText *ft, struct Mote *conf) {
   struct FidoLine *fl;
-  char filnamn[20],fullpath[100];
+  struct BTree *msgidTree;
+  int replyTextId = -1;
+  char replyMsgid[FIDO_MSGID_KEYLEN] = "";
+  char treePath[100];
+  ITER_EL(fl, ft->text, line_node, struct FidoLine *) {
+    if(fl->text[0] != 1) {
+      break;
+    }
+    if(strncmp(&fl->text[1], "REPLY:", 6) == 0) {
+      strncpy(replyMsgid, &fl->text[8], FIDO_MSGID_KEYLEN);
+      break;
+    }
+  }
+  if(replyMsgid[0] == '\0') {
+    return -1;
+  }
+  sprintf(treePath, "NiKom:FidoComments/%s_id", conf->tagnamn);
+  ObtainSemaphore(&((struct ExtMote *)conf)->fidoCommentsSemaphore);
+  if((msgidTree = BTreeOpen(treePath)) == NULL) {
+    ReleaseSemaphore(&((struct ExtMote *)conf)->fidoCommentsSemaphore);
+    return -1;
+  }
+  BTreeGet(msgidTree, replyMsgid, &replyTextId);
+  BTreeClose(msgidTree);
+  ReleaseSemaphore(&((struct ExtMote *)conf)->fidoCommentsSemaphore);
+  return replyTextId;
+}
+
+void displayComments(int text, struct Mote *conf) {
+  struct BTree *commentsTree;
+  struct FidoText *commentFt;
+  int i, comments[FIDO_FORWARD_COMMENTS];
+
+  char path[100];
+  sprintf(path, "NiKom:FidoComments/%s_c", conf->tagnamn);
+  ObtainSemaphore(&((struct ExtMote *)conf)->fidoCommentsSemaphore);
+  if((commentsTree = BTreeOpen(path)) == NULL) {
+    ReleaseSemaphore(&((struct ExtMote *)conf)->fidoCommentsSemaphore);
+    return;
+  }
+  if(!BTreeGet(commentsTree, &text, comments)) {
+    ReleaseSemaphore(&((struct ExtMote *)conf)->fidoCommentsSemaphore);
+    BTreeClose(commentsTree);
+    return;
+  }
+  BTreeClose(commentsTree);
+  ReleaseSemaphore(&((struct ExtMote *)conf)->fidoCommentsSemaphore);
+
+  for(i = 0; i < FIDO_FORWARD_COMMENTS && comments[i] != 0; i++) {
+    MakeMsgFilePath(conf->dir, comments[i] - conf->renumber_offset, path);
+    if((commentFt = ReadFidoTextTags(path, RFT_HeaderOnly, TRUE, TAG_DONE)) != NULL) {
+      SendStringCat("  %s\r\n", CATSTR(MSG_ORG_TEXT_COMMENT_IN), comments[i], commentFt->fromuser);
+      FreeFidoText(commentFt);
+    }
+  }
+}
+
+void fido_visatext(int text,struct Mote *motpek) {
+  struct FidoText *ft, *repliedFt;
+  struct FidoLine *fl;
+  char fullpath[100];
+  int repliedTextId;
   CURRENT_USER->read++;
   Servermem->info.lasta++;
   Statstr.read++;
-  sprintf(filnamn,"%ld.msg",text - motpek->renumber_offset);
-  strcpy(fullpath,motpek->dir);
-  AddPart(fullpath,filnamn,99);
+  MakeMsgFilePath(motpek->dir, text - motpek->renumber_offset, fullpath);
   if(CURRENT_USER->flaggor & SHOWKLUDGE) ft=ReadFidoTextTags(fullpath,TAG_DONE);
   else ft=ReadFidoTextTags(fullpath,RFT_NoKludges,TRUE,RFT_NoSeenBy,TRUE,TAG_DONE);
   if(!ft) {
@@ -98,6 +157,7 @@ void fido_visatext(int text,struct Mote *motpek) {
     DisplayInternalError();
     return;
   }
+  repliedTextId = lookupRepliedText(ft, motpek);
 
   SendString(CURRENT_USER->flaggor & CLEARSCREEN ? "\f" : "\r\n\n");
 
@@ -105,6 +165,14 @@ void fido_visatext(int text,struct Mote *motpek) {
   SendStringCat("%s\r\n", CATSTR(MSG_FIDO_TEXT_LINE_2),
              ft->fromuser,ft->fromzone,ft->fromnet,ft->fromnode,ft->frompoint);
   SendStringCat("%s\r\n", CATSTR(MSG_FIDO_TEXT_TO), ft->touser);
+  if(repliedTextId != -1) {
+    MakeMsgFilePath(motpek->dir, repliedTextId - motpek->renumber_offset, fullpath);
+    repliedFt = ReadFidoTextTags(fullpath, RFT_HeaderOnly, TRUE, TAG_DONE);
+    if(repliedFt != NULL) {
+      SendStringCat("%s\r\n", CATSTR(MSG_ORG_TEXT_COMMENT_TO), repliedTextId, repliedFt->fromuser);
+      FreeFidoText(repliedFt);
+    }
+  }
   SendStringCat("%s\r\n", CATSTR(MSG_ORG_TEXT_SUBJECT), ft->subject);
   if(CURRENT_USER->flaggor & STRECKRAD) {
     SendRepeatedChr('-', RenderLength(outbuffer));
@@ -127,6 +195,7 @@ void fido_visatext(int text,struct Mote *motpek) {
   }
   SendStringCat("\n%s\r\n", CATSTR(MSG_ORG_TEXT_END_OF_TEXT), text,ft->fromuser);
   FreeFidoText(ft);
+  displayComments(text, motpek);
   senast_text_typ=TEXT;
   senast_text_nr=text;
   senast_text_mote=motpek->nummer;

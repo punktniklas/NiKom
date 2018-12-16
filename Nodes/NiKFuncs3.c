@@ -208,7 +208,7 @@ int radmot(void) {
   Remove((struct Node *)conf);
   conf->namn[0] = 0;
   writemeet(conf);
-  FreeMem(conf, sizeof(struct Mote));
+  FreeMem(conf, sizeof(struct ExtMote));
   sprintf(lappfile, "NiKom:Lappar/%d.motlapp", confId);
   DeleteFile(lappfile);
   
