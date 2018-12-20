@@ -6,15 +6,15 @@
 
 #include "ConfCommon.h"
 
-extern int g_lastKomTextType, g_lastKomTextNr, g_lastKomTextConf, senast_text_typ, senast_text_mote;
+extern int g_lastKomTextType, g_lastKomTextNr, g_lastKomTextConf, senast_text_typ, senast_text_mote,
+  senast_text_reply_to;
 extern struct ReadLetter brevread;
-extern struct Header readhead;
 extern struct System *Servermem;
 extern char *argument;
 
 int parseTextNumber(char *str, int requestedType) {
   struct Mote *conf;
-  int mailId, userIdOwningMail;
+  int mailId, userIdOwningMail, lowtext;
   static char fakeArgumentBuf[20];
   
   if(IzDigit(str[0])) {
@@ -41,13 +41,8 @@ int parseTextNumber(char *str, int requestedType) {
       return mailId;
     case TEXT:
       conf = getmotpek(senast_text_mote);
-      if(conf->type==MOTE_ORGINAL) {
-        if(readhead.kom_till_nr == -1 || readhead.kom_till_nr < Servermem->info.lowtext) {
-          return -1;
-        }
-        return readhead.kom_till_nr;
-      }
-      return -1;
+      lowtext = conf->type == MOTE_ORGINAL ? Servermem->info.lowtext : conf->lowtext;
+      return senast_text_reply_to < lowtext ? -1 : senast_text_reply_to;
     default:
       return -1;
     }

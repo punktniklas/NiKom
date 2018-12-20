@@ -51,8 +51,8 @@ extern struct ReadLetter brevread;
 extern struct MinList edit_list;
 
 long logintime, extratime;
-int mote2,rad,senast_text_typ,nu_skrivs,area2,
-        senast_brev_nr,senast_brev_anv,senast_text_nr,senast_text_mote;
+int mote2, rad, senast_text_typ, nu_skrivs, area2, senast_brev_nr, senast_brev_anv,
+  senast_text_nr, senast_text_mote, senast_text_reply_to;
 int g_lastKomTextType, g_lastKomTextNr, g_lastKomTextConf;
 char *monthNames[2][12] =
   {{ "January", "February", "March", "April", "May", "June",

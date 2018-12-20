@@ -32,7 +32,7 @@
 extern struct System *Servermem;
 extern char outbuffer[],*argument,inmat[];
 extern int nodnr,senast_text_typ,senast_text_nr,senast_text_mote,nu_skrivs,inloggad,
-	rad,mote2;
+  rad,mote2, senast_text_reply_to;
 extern int g_lastKomTextType, g_lastKomTextNr, g_lastKomTextConf, g_userDataSlot;
 extern struct Header readhead,sparhead;
 extern struct Inloggning Statstr;
@@ -315,6 +315,7 @@ int org_visatext(int textId, char verbose) {
   senast_text_typ=TEXT;
   senast_text_nr=readhead.nummer;
   senast_text_mote=readhead.mote;
+  senast_text_reply_to = readhead.kom_till_nr;
   if(readhead.kom_i[0]!=-1) {
     return 1;
   }

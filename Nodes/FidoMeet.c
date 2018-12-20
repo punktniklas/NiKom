@@ -34,9 +34,8 @@
 extern struct System *Servermem;
 extern char outbuffer[],*argument,inmat[];
 extern int nodnr,senast_text_typ,senast_text_nr,senast_text_mote,nu_skrivs,inloggad,
-	rad,mote2, g_userDataSlot;
+  rad,mote2, g_userDataSlot, senast_text_reply_to;
 extern int g_lastKomTextType, g_lastKomTextNr, g_lastKomTextConf;
-extern struct Header readhead,sparhead;
 extern struct Inloggning Statstr;
 extern struct MinList edit_list;
 
@@ -199,6 +198,7 @@ void fido_visatext(int text,struct Mote *motpek) {
   senast_text_typ=TEXT;
   senast_text_nr=text;
   senast_text_mote=motpek->nummer;
+  senast_text_reply_to = repliedTextId;
 }
 
 void makefidodate(char *str) {
