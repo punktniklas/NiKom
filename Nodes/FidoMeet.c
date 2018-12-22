@@ -149,8 +149,7 @@ void fido_visatext(int text,struct Mote *motpek) {
   Servermem->info.lasta++;
   Statstr.read++;
   MakeMsgFilePath(motpek->dir, text - motpek->renumber_offset, fullpath);
-  if(CURRENT_USER->flaggor & SHOWKLUDGE) ft=ReadFidoTextTags(fullpath,TAG_DONE);
-  else ft=ReadFidoTextTags(fullpath,RFT_NoKludges,TRUE,RFT_NoSeenBy,TRUE,TAG_DONE);
+  ft = ReadFidoTextTags(fullpath, RFT_NoSeenBy, !(CURRENT_USER->flaggor & SHOWKLUDGE), TAG_DONE);
   if(!ft) {
     LogEvent(SYSTEM_LOG, ERROR, "Can't read fido text %s.", fullpath);
     DisplayInternalError();
@@ -181,7 +180,9 @@ void fido_visatext(int text,struct Mote *motpek) {
   }
   ITER_EL(fl, ft->text, line_node, struct FidoLine *) {
     if(fl->text[0] == 1) {
-      if(SendString("«system»^A%s«reset»\r\n", &fl->text[1])) { break; }
+      if(CURRENT_USER->flaggor & SHOWKLUDGE) {
+        if(SendString("«system»^A%s«reset»\r\n", &fl->text[1])) { break; }
+      }
     } else {
       if(IsQuote(fl->text)) {
         if(SendString("«quote»%s«reset»\r\n", fl->text)) break;
