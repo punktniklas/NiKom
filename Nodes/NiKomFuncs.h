@@ -217,7 +217,7 @@ void org_endast(int, int);
 /* Prototypes for functions defined in FidoMeet.c */
 void fido_lasa(int tnr,struct Mote *motpek);
 int countfidomote(struct Mote *motpek);
-void fido_visatext(int text,struct Mote *motpek);
+void fido_visatext(int text, struct Mote *motpek, struct Stack *repliesStack);
 void fido_endast(struct Mote *,int);
 void makefidodate(char *);
 void makefidousername(char *,int);

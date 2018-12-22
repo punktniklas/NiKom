@@ -174,10 +174,6 @@ void NextTextInOrgConf(void) {
 }
 
 void NextReplyInOrgConf(void) {
-  if(StackSize(g_unreadRepliesStack) == 0) {
-    SendString("\n\n\r%s\n\r", CATSTR(MSG_NEXT_COMMENT_NO_COMMENTS));
-    return;
-  }
   displayTextAndClearUnread(StackPop(g_unreadRepliesStack));
 }
 

@@ -5,7 +5,7 @@ NLFLAGS  = NMINC STRMERGE CPU=$(CPU) DEBUG=LINE NOSTKCHK LIBCODE DEFINE=NIKOMLIB
 OBJS     = DiskUtils.o FileAreaUtils.o Logging.o RexxUtils.o ExecUtils.o \
 	   ServerMemUtils.o StringUtils.o ConfigUtils.o FidoUtils.o Stack.o \
 	   CommandParser.o DateUtils.o UserDataUtils.o UserMessageUtils.o \
-           Trie.o Notifications.o DiskMem.o BTree.o
+           Trie.o Notifications.o DiskMem.o BTree.o IntList.o
 NLIBOBJS = Logging_nlib.o FidoUtils_nlib.o StringUtils_nlib.o DiskMem_nlib.o BTree_nlib.o
 
 all: nikomutils.lib nikomutils_nlib.lib
@@ -79,3 +79,5 @@ BTree.o: BTree.c BTree.h
 
 BTree_nlib.o: BTree.c BTree.h
   sc $(NLFLAGS) OBJNAME=BTree_nlib.o BTree.c
+
+IntList.o: IntList.c IntList.h

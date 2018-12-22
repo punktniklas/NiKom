@@ -693,6 +693,8 @@ MSG_SKIP_SUBJECT_ONE (1114//)
 One text was skipped.
 MSG_SKIP_SUBJECT_MANY (1115//)
 %d texts were skipped.
+MSG_SKIP_SUBJECT_BAD_FORUM (1116//)
+Skip Subject is not supported in this forum.
 ;
 MSG_LIST_GROUPMEM_SYNTAX (1120//)
 Syntax: List Members -g <group>

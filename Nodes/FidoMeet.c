@@ -23,9 +23,12 @@
 #include "UserNotificationHooks.h"
 #include "Languages.h"
 #include "StyleSheets.h"
+#include "KOM.h"
 #include "StringUtils.h"
 #include "FidoUtils.h"
 #include "BTree.h"
+#include "IntList.h"
+#include "Stack.h"
 
 #include "FidoMeet.h"
 
@@ -44,17 +47,32 @@ void fido_lasa(int tnr,struct Mote *motpek) {
     SendString("\r\n\n%s\r\n", CATSTR(MSG_FORUMS_NO_SUCH_TEXT));
     return;
   }
-  fido_visatext(tnr,motpek);
+  fido_visatext(tnr, motpek, NULL);
+}
+
+void skipAlreadyReadTexts(struct Mote *conf) {
+  while(IntListRemoveValue(g_readRepliesList, CUR_USER_UNREAD->lowestPossibleUnreadText[conf->nummer]) != -1) {
+    CUR_USER_UNREAD->lowestPossibleUnreadText[conf->nummer]++;
+  }
 }
 
 int HasUnreadInFidoConf(struct Mote *conf) {
+  skipAlreadyReadTexts(conf);
   return CUR_USER_UNREAD->lowestPossibleUnreadText[conf->nummer]
     <= conf->texter;
+}
+
+static void displayFidoTextFromKOM(int textId, struct Mote *conf) {
+  fido_visatext(textId, conf, g_unreadRepliesStack);
+  g_lastKomTextType = TEXT_FIDO;
+  g_lastKomTextNr = textId;
+  g_lastKomTextConf = conf->nummer;
 }
 
 void NextTextInFidoConf(struct Mote *conf) {
   struct UnreadTexts *unreadTexts = CUR_USER_UNREAD;
 
+  skipAlreadyReadTexts(conf);
   if(unreadTexts->lowestPossibleUnreadText[conf->nummer] < conf->lowtext) {
     unreadTexts->lowestPossibleUnreadText[conf->nummer] = conf->lowtext;
   }
@@ -62,17 +80,23 @@ void NextTextInFidoConf(struct Mote *conf) {
     SendString("\n\n\r%s\n\r", CATSTR(MSG_NEXT_TEXT_NO_TEXTS));
     return;
   }
-  fido_visatext(unreadTexts->lowestPossibleUnreadText[conf->nummer], conf);
+  StackClear(g_unreadRepliesStack);
+  displayFidoTextFromKOM(unreadTexts->lowestPossibleUnreadText[conf->nummer], conf);
   unreadTexts->lowestPossibleUnreadText[conf->nummer]++;
-  g_lastKomTextType = TEXT_FIDO;
-  g_lastKomTextNr = unreadTexts->lowestPossibleUnreadText[conf->nummer];
-  g_lastKomTextConf = conf->nummer;
+}
+
+void NextReplyInFidoConf(struct Mote *conf) {
+  int textId;
+  textId = StackPop(g_unreadRepliesStack);
+  displayFidoTextFromKOM(textId, conf);
+  IntListAppend(g_readRepliesList, textId);
 }
 
 int countfidomote(struct Mote *motpek) {
   return motpek->texter
     - CUR_USER_UNREAD->lowestPossibleUnreadText[motpek->nummer]
-    + 1;
+    + 1
+    - (motpek->nummer == mote2 ? IntListSize(g_readRepliesList) : 0);
 }
 
 int isFidoSystemStr(char *str) {
@@ -111,7 +135,7 @@ int lookupRepliedText(struct FidoText *ft, struct Mote *conf) {
   return replyTextId;
 }
 
-void displayComments(int text, struct Mote *conf) {
+void displayComments(int text, struct Mote *conf, struct Stack *repliesStack) {
   struct BTree *commentsTree;
   struct FidoText *commentFt;
   int i, comments[FIDO_FORWARD_COMMENTS];
@@ -138,9 +162,14 @@ void displayComments(int text, struct Mote *conf) {
       FreeFidoText(commentFt);
     }
   }
+  for(i = FIDO_FORWARD_COMMENTS - 1; i >= 0; i--) {
+    if(repliesStack != NULL && comments[i] != 0) {
+      StackPush(repliesStack, comments[i]);
+    }
+  }
 }
 
-void fido_visatext(int text,struct Mote *motpek) {
+void fido_visatext(int text,struct Mote *motpek, struct Stack *repliesStack) {
   struct FidoText *ft, *repliedFt;
   struct FidoLine *fl;
   char fullpath[100];
@@ -195,7 +224,7 @@ void fido_visatext(int text,struct Mote *motpek) {
   }
   SendStringCat("\n%s\r\n", CATSTR(MSG_ORG_TEXT_END_OF_TEXT), text,ft->fromuser);
   FreeFidoText(ft);
-  displayComments(text, motpek);
+  displayComments(text, motpek, repliesStack);
   senast_text_typ=TEXT;
   senast_text_nr=text;
   senast_text_mote=motpek->nummer;

@@ -13,7 +13,8 @@
 #include "Languages.h"
 
 extern struct System *Servermem;
-extern int inloggad, nodnr, mote2, nodestate, senast_text_typ, senast_text_nr, g_userDataSlot;
+extern int inloggad, nodnr, mote2, nodestate, senast_text_typ, senast_text_nr, senast_text_mote,
+  g_userDataSlot;
 extern char *argument;
 extern struct Header readhead;
 
@@ -68,6 +69,17 @@ void Cmd_GoConf(void) {
   }
 }
 
+static struct Mote *findConfOrDisplayError(int confId) {
+  struct Mote *conf;
+
+  conf = getmotpek(mote2);
+  if(conf == NULL) {
+    LogEvent(SYSTEM_LOG, ERROR, "Couldn't find conference %d.", mote2);
+    DisplayInternalError();
+    return NULL;
+  }
+  return conf;
+}
 
 void Cmd_NextText(void) {
   struct Mote *conf;
@@ -75,11 +87,8 @@ void Cmd_NextText(void) {
     NextMail();
     return;
   }
-  conf = getmotpek(mote2);
-  if(conf == NULL) {
-    LogEvent(SYSTEM_LOG, ERROR,
-             "Couldn't find conference %d in Cmd_NextText.", mote2);
-    DisplayInternalError();
+  if((conf = findConfOrDisplayError(mote2)) == NULL) {
+    return;
   }
   switch(conf->type) {
   case MOTE_ORGINAL:
@@ -95,7 +104,28 @@ void Cmd_NextText(void) {
 }
 
 void Cmd_NextReply(void) {
-  NextReplyInOrgConf();
+  struct Mote *conf;
+
+  if(StackSize(g_unreadRepliesStack) == 0) {
+    SendString("\n\n\r%s\n\r", CATSTR(MSG_NEXT_COMMENT_NO_COMMENTS));
+    return;
+  }
+
+  if((conf = findConfOrDisplayError(mote2)) == NULL) {
+    return;
+  }
+  switch(conf->type) {
+  case MOTE_ORGINAL:
+    NextReplyInOrgConf();
+    break;
+  case MOTE_FIDO:
+    NextReplyInFidoConf(conf);
+    break;
+  default:
+    LogEvent(SYSTEM_LOG, ERROR, "Unknown type for conf %d: %d.", mote2, conf->type);
+    DisplayInternalError();
+  }
+
 }
 
 void Cmd_NextConf(void) {
@@ -106,9 +136,7 @@ void Cmd_NextConf(void) {
     SendString("\n\n\r%s\n\r", CATSTR(MSG_NEXT_CONF_NO_MORE_FORUM));
     return;
   }
-  mote2 = newConfId;
-  StackClear(g_unreadRepliesStack);
-  var(mote2);
+  GoConf(newConfId);
 }
 
 void Cmd_Logout(void) {
@@ -121,6 +149,7 @@ void Cmd_ReLogin(void) {
 
 void Cmd_SkipReplies(void) {
   struct Stack *skipStack = CreateStack();
+  struct Mote *conf;
   struct Header skipHeader;
   int textId, i, cnt = 0;
 
@@ -129,6 +158,11 @@ void Cmd_SkipReplies(void) {
     return;
   }
   if(senast_text_typ != TEXT) {
+    SendString("\r\n\n%s\r\n", CATSTR(MSG_SKIP_ONLY_LOCAL));
+    return;
+  }
+  conf = getmotpek(senast_text_mote);
+  if(conf->type != MOTE_ORGINAL) {
     SendString("\r\n\n%s\r\n", CATSTR(MSG_SKIP_ONLY_LOCAL));
     return;
   }

@@ -5,6 +5,7 @@
 #include "NiKomStr.h"
 #include "Nodes.h"
 #include "Stack.h"
+#include "IntList.h"
 #include "Logging.h"
 #include "StringUtils.h"
 #include "OrgMeet.h"
@@ -37,6 +38,7 @@
 #define MAILBOX_CONFID -1
 
 struct Stack *g_unreadRepliesStack;
+struct IntList *g_readRepliesList;
 
 extern struct System *Servermem;
 extern int inloggad, nodnr, nodestate, mote2, g_userDataSlot;
@@ -424,6 +426,7 @@ int shouldLogout(void) {
 void KomLoop(void) {
   int defaultCmd;
   g_unreadRepliesStack = CreateStack();
+  g_readRepliesList = CreateIntList(100);
 
   for(;;) {
     if(StackSize(g_unreadRepliesStack) > 0) {
@@ -447,10 +450,12 @@ void KomLoop(void) {
   }
 
   DeleteStack(g_unreadRepliesStack);
+  DeleteIntList(g_readRepliesList);
 }
 
 void GoConf(int confId) {
   mote2 = confId;
   StackClear(g_unreadRepliesStack);
+  IntListClear(g_readRepliesList);
   var(mote2);
 }

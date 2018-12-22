@@ -76,7 +76,7 @@ void igen(void) {
     if(conf->type == MOTE_ORGINAL) {
       org_visatext(senast_text_nr, FALSE);
     } else if(conf->type == MOTE_FIDO) {
-      fido_visatext(senast_text_nr, conf);
+      fido_visatext(senast_text_nr, conf, NULL);
     }
   }
   else {

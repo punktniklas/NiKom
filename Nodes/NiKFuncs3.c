@@ -82,8 +82,7 @@ void endast(void) {
     }
   }
   if(confId == mote2) {
-    StackClear(g_unreadRepliesStack);
-    var(mote2);
+    GoConf(confId);
   }
 }
 

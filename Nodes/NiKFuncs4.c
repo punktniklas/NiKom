@@ -620,6 +620,7 @@ void motesstatus(void) {
 }
 
 void hoppaarende(void) {
+  struct Mote *conf;
   struct Header header;
   int skipped = 0, nextUnread;
 
@@ -635,6 +636,12 @@ void hoppaarende(void) {
     SendString("\r\n\n%s\r\n", CATSTR(MSG_SKIP_SUBJECT_MAIL));
     return;
   }
+  conf = getmotpek(mote2);
+  if(conf->type != MOTE_ORGINAL) {
+    SendString("\r\n\n%s\r\n", CATSTR(MSG_SKIP_SUBJECT_BAD_FORUM));
+    return;
+  }
+
   if(strlen(argument) > 40) {
     SendString("\r\n\n%s\r\n", CATSTR(MSG_SKIP_SUBJECT_TOO_LONG));
     return;

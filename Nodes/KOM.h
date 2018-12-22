@@ -1,6 +1,7 @@
 #include "NiKomStr.h"
 
 extern struct Stack *g_unreadRepliesStack;
+extern struct IntList *g_readRepliesList;
 
 void KomLoop(void);
 int FindNextUnreadConf(int currentConfId);
