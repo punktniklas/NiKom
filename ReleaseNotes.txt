@@ -1,5 +1,5 @@
 ---------------------------------------------------------------------------
-                         NiKom v2.5.0, 2018-xx-yy
+                         NiKom v2.5.0, 2019-01-20
 ---------------------------------------------------------------------------
 - You can now configure multiple Fido netmail directories (matrix
   directories). When importing incoming netmail NiKom will import
