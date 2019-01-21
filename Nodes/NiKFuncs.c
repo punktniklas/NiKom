@@ -31,6 +31,7 @@
 #include "UserDataUtils.h"
 #include "UserMessageUtils.h"
 #include "Notifications.h"
+#include "InfoFiles.h"
 
 #if defined(__GNUC__) && !defined(max)
 #define max(a, b) \
@@ -654,6 +655,8 @@ void connection(void) {
   initgrupp();
   rxlinecount = TRUE;
   radcnt=0;
+
+  SendInfoFile("Bulletin.txt", CURRENT_USER->senast_in);
   Servermem->waitingNotifications[g_userDataSlot] = CountNotifications(inloggad);
   if(Servermem->cfg->ar.postinlogg) sendautorexx(Servermem->cfg->ar.postinlogg);
   DisplayVersionInfo();

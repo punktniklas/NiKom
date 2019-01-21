@@ -218,7 +218,6 @@ int main(int argc, char **argv) {
 
     sprintf(titel,"Nod #%d CON: %s #%d",nodnr,CURRENT_USER->namn,inloggad);
     SetWindowTitles(NiKwind,titel,(UBYTE *)-1L);
-    SendInfoFile("Bulletin.txt", CURRENT_USER->senast_in);
 
     connection();
 

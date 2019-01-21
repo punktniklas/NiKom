@@ -166,7 +166,6 @@ int main(int argc,char *argv[]) {
     DisplayInternalError();
     cleanup(EXIT_ERROR, "Error reading unread text info.\n");
   }
-  SendInfoFile("Bulletin.txt", CURRENT_USER->senast_in);
 
   connection();
 
