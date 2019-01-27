@@ -27,6 +27,10 @@
   soon as the notificatios are displayed they will be deleted.
   If a user has unread notifications when the "(See) time" prompt normally
   would be displayed there is a new prompt saying "Display notifications".
+  The new command needs to be added to Commands.cfg. See the included
+  default Commands.cfg file for an example. There is also a new style
+  code for the number of notifications displayed in the prompt named
+  "promptnotif". See the included file StyleSheets.cfg for an example.
 
 - SerNode.cfg has a new config entry called KEEPALIVEMINUTES which is used
   for generating dummy network traffic regularly to keep the network
