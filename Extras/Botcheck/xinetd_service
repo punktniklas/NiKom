@@ -1,0 +1,10 @@
+service mybbs
+{
+    flags       = NAMEINARGS
+    socket_type = stream
+    protocol    = tcp
+    wait        = no
+    user        = nobody
+    server      = /<path-to>/botcheck
+    server_args = botcheck <code-in-botcheck> <ip-address-or-hostname-of-bbs> <bbs port>
+}
