@@ -9,3 +9,6 @@ I have used a clone of the hard drive contents of my old Amiga 3000 now running 
 Also see the wiki pages: https://github.com/punktniklas/NiKom/wiki
 
 NiKom is published as open source under the MIT License. See LICENSE.txt.
+
+### Related GitHub repos
+* https://github.com/stripecat/NikomStat - generates statistics of user activity (in Swedish)
