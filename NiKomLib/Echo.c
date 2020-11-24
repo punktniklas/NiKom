@@ -47,7 +47,9 @@ int linkComments(struct ExtMote *conf, struct NiKomBase *NiKomBase) {
            conf->diskConf.tagnamn, fromText, conf->diskConf.texter);
   
   for(i = fromText; i <= conf->diskConf.texter; i++) {
-    if((ft = LIBReadFidoText(MakeMsgFilePath(conf->diskConf.dir, i, msgPath), &ti, NiKomBase)) == NULL) {
+    if((ft = LIBReadFidoText(MakeMsgFilePath(conf->diskConf.dir,
+                                             i - conf->diskConf.renumber_offset,
+                                             msgPath), &ti, NiKomBase)) == NULL) {
       LogEvent(NiKomBase->Servermem, FIDO_LOG, WARN,
                "FidoInitComments:  Could not open text file %s.", msgPath);
       continue;
@@ -81,7 +83,9 @@ int linkComments(struct ExtMote *conf, struct NiKomBase *NiKomBase) {
   }
 
   for(i = fromText; i <= conf->diskConf.texter; i++) {
-    if((ft = LIBReadFidoText(MakeMsgFilePath(conf->diskConf.dir, i, msgPath), &ti, NiKomBase)) == NULL) {
+    if((ft = LIBReadFidoText(MakeMsgFilePath(conf->diskConf.dir,
+                                             i - conf->diskConf.renumber_offset,
+                                             msgPath), &ti, NiKomBase)) == NULL) {
       LogEvent(NiKomBase->Servermem, FIDO_LOG, WARN,
                "FidoInitComments:  Could not open text file %s.", msgPath);
       continue;
