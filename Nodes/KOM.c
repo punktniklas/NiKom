@@ -231,6 +231,7 @@ void ExecuteCommandById(int cmdId) {
   case 114: listagrupper(); break;
   case 115: listgruppmed(); break;
   case 116: listabrev(); break;
+  case 117: Cmd_ListActive(); break;
   case 202: skriv(); break;
   case 203: Cmd_Reply(); break;
   case 204: personlig(); break;

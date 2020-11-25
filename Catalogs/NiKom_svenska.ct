@@ -741,6 +741,9 @@ MSG_NOTIF_LIKE
 MSG_NOTIF_DISLIKE
 «name»%s«reset» har dissat din text «number»%d«reset» i «name»%s«reset».
 ;
+MSG_LIST_ACTIVE_SYNTAX
+Skriv: Lista Aktiva [antal texter]
+;
 ; ******** Dealing with flags **********
 MSG_FLAG_ON
 På

@@ -4,3 +4,4 @@ void Cmd_FootNote(void);
 void Cmd_Search(void);
 void Cmd_Like(void);
 void Cmd_Dislike(void);
+void Cmd_ListActive(void);

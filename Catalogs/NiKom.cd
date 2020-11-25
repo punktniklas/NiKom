@@ -737,6 +737,9 @@ MSG_NOTIF_LIKE (1172//)
 MSG_NOTIF_DISLIKE (1173//)
 «name»%s«reset» has disssed your text «number»%d«reset» in «name»%s«reset».
 ;
+MSG_LIST_ACTIVE_SYNTAX (1180//)
+Syntax: List Active [number of texts]
+;
 ; ******** Dealing with flags **********
 MSG_FLAG_ON (9000//)
 On
