@@ -1,4 +1,17 @@
 ---------------------------------------------------------------------------
+                         NiKom v2.6.0, 202?-??-??
+---------------------------------------------------------------------------
+
+- A new command "List Active" that lists which forums the most recent
+  texts are written in. Thereby showing which forums that have most
+  recently been active. The command must be added to Commands.cfg. E.g:
+
+    N=LIST ACTIVE
+    Nsvenska=LISTA AKTIVA
+    S=1
+    #=117
+
+---------------------------------------------------------------------------
                          NiKom v2.5.0, 2019-01-20
 ---------------------------------------------------------------------------
 - You can now configure multiple Fido netmail directories (matrix
