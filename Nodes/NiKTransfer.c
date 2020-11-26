@@ -30,6 +30,8 @@
 #include "Logging.h"
 #include "Terminal.h"
 #include "BasicIO.h"
+#include "UserNotificationHooks.h"
+#include "InfoFiles.h"
 
 #define EKO		1
 #define EJEKO	0
@@ -553,7 +555,7 @@ int upload(void) {
         allokpek->flaggor|=FILE_FREEDL;
       }
     } else if(Servermem->cfg->cfgflags & NICFG_VALIDATEFILES) allokpek->flaggor|=FILE_NOTVALID;
-    sendfile("NiKom:Texter/Nyckelhjälp.txt");
+    SendInfoFile("FileKeyHelp.txt", 0);
     puttekn("\r\nVilka söknycklar ska filen ha? (? för att få en lista)\r\n",-1);
     if(editkey(allokpek->nycklar)) { FreeMem(allokpek,sizeof(struct Fil)); return(1); }
     puttekn("\r\nBeskrivning:\r\n",-1);
@@ -629,7 +631,8 @@ int recbinfile(char *dir) {
 
   ulfiles = 0;
   if(access(dir,0)) {
-    puttekn("\r\nDirectoryt finns inte!\r\n",-1);
+    LogEvent(SYSTEM_LOG, ERROR, "Upload directory '%s' does not exist.", dir);
+    DisplayInternalError();
     return 2;
   }
 

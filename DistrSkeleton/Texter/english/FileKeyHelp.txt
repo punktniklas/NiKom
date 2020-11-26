@@ -1,0 +1,10 @@
+Now it's time to set file keys for the file you just uploaded. To
+display a list of alla available keys type '?'. You can enter a key
+by typing the beginning of it followed by return. To see what keys
+you have already set type '!'. If you have set a key by mistake and
+want to unset it you simply type the name of the key again and press
+return.
+Try setting as many appropriate keys as possible to make it easier
+for other users to find the files they are looking for.
+
+WHen you are done setting keys you press return on an empty line.
