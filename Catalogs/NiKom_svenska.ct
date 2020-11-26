@@ -94,8 +94,6 @@ MSG_GO_SYNTAX
 Skriv: Gå <mötesnamn>
 MSG_GO_NO_SUCH_FORUM
 Finns inget sådant möte.
-MSG_GO_NOT_MEMBER_WANT_TO
-Du är inte medlem i mötet «name»%s«reset», vill du bli medlem?
 MSG_GO_NOT_MEMBER_NO_PERMS
 Du är inte medlem och har inte rätt att gå med i «name»%s«reset».
 ;

@@ -19,9 +19,7 @@ extern char *argument;
 extern struct Header readhead;
 
 void Cmd_GoConf(void) {
-  struct UnreadTexts *unreadTexts = CUR_USER_UNREAD;
-  int parsedConfId, newConfId = -2, becomeMember;
-  char buffer[121];
+  int parsedConfId, newConfId;
   struct Mote *conf;
 
   if(matchar(argument, CATSTR(MSG_MAIL_MAILBOX))) {
@@ -29,44 +27,23 @@ void Cmd_GoConf(void) {
   } else {
     parsedConfId = parsemot(argument);
     if(parsedConfId == -3) {
-      SendString("\r\n\n%s\r\n\n", CATSTR(MSG_GO_SYNTAX));
+      SendString("\r\n\n%s\r\n", CATSTR(MSG_GO_SYNTAX));
       return;
     }
     if(parsedConfId == -1) {
-      SendString("\r\n\n%s\r\n\n", CATSTR(MSG_GO_NO_SUCH_FORUM));
+      SendString("\r\n\n%s\r\n", CATSTR(MSG_GO_NO_SUCH_FORUM));
       return;
     }
-    newConfId = parsedConfId;
-
-    if(!IsMemberConf(newConfId, inloggad, CURRENT_USER)) {
-      conf = getmotpek(newConfId);
-      if(MayBeMemberConf(conf->nummer, inloggad, CURRENT_USER)) {
-
-        sprintf(buffer, CATSTR(MSG_GO_NOT_MEMBER_WANT_TO), conf->namn);
-        if(GetYesOrNo("\r\n\n", buffer, NULL, NULL, "Ja", "Nej", "\r\n",
-                      TRUE, &becomeMember)) {
-          return;
-        }
-        if(!becomeMember) {
-          return;
-        }
-        BAMSET(CURRENT_USER->motmed, parsedConfId);
-        if(conf->type == MOTE_ORGINAL) {
-          unreadTexts->lowestPossibleUnreadText[parsedConfId] = 0;
-        }
-        else if(conf->type == MOTE_FIDO) {
-          unreadTexts->lowestPossibleUnreadText[parsedConfId] = conf->lowtext;
-        }
-      } else {
-        SendStringCat("\r\n\n%s\r\n\n", CATSTR(MSG_GO_NOT_MEMBER_NO_PERMS), conf->namn);
-        return;
-      }
+    if(!IsMemberConf(parsedConfId, inloggad, CURRENT_USER)) {
+      conf = getmotpek(parsedConfId);
+      SendStringCat("\r\n\n%s\r\n", CATSTR(MSG_GO_NOT_MEMBER_NO_PERMS), conf->namn);
+      return;
     }
+
+    newConfId = parsedConfId;
   }
 
-  if(newConfId != -2) {
-    GoConf(newConfId);
-  }
+  GoConf(newConfId);
 }
 
 static struct Mote *findConfOrDisplayError(int confId) {
