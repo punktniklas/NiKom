@@ -1,0 +1,12 @@
+
+
+Lista Aktiva
+------------
+
+Syntax: Lista Aktiva [<antal texter>]
+
+Beskrivning:
+Listar vilka möten de senaste texterna har skrivits i. Detta ger en
+överblick över vilka möten som är mest aktiva. Som standard visas de
+100 senaset texterna men detta kan ändras genom att ge önskat antal
+texter som argument.
