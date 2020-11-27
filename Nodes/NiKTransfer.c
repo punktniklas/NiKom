@@ -25,6 +25,7 @@
 #include "NiKomStr.h"
 #include "Nodes.h"
 #include "NiKomFuncs.h"
+#include "NiKEditor.h"
 #include "DiskUtils.h"
 #include "FileAreaUtils.h"
 #include "Logging.h"

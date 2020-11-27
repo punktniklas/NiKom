@@ -22,11 +22,11 @@
 #include "Logging.h"
 #include "Languages.h"
 
+#include "NiKEditor.h"
+
 extern struct System *Servermem;
 extern char inmat[], crashmail;
 extern int rad,nu_skrivs,nodnr,senast_text_typ,senast_text_nr,senast_text_mote, inloggad, g_userDataSlot;
-extern struct Header sparhead;
-extern struct ReadLetter brevspar;
 extern struct Library *FifoBase;
 
 char yankbuffer[81],edxxcombuf[257];
@@ -40,21 +40,21 @@ void quote(void);
 void fidotextquote(struct Mote *);
 void orgtextquote(struct Mote *);
 void brevquote(void);
-int lineedit(char *filename);
+int lineedit(struct EditContext *context);
 int linegetline(char *str,char *wrap,int linenr);
 void linerenumber(void);
 void lineloadfile(char *filename);
 void linedelline(char *arg);
 int lineinsert(int before);
 void lineread(void);
-void lineflyttatext(char *vart);
-void linearende(char *nytt);
-void lineaddera(char *vem);
+void lineflyttatext(char *vart, struct EditContext *context);
+void linearende(char *newSubject, struct EditContext *context);
+void lineaddera(char *vem, struct EditContext *context);
 int linechange(int foorad);
 int linedump(void);
 void linequote(void);
 void linecrash(void);
-int fulledit(char *filename);
+int fulledit(struct EditContext *context);
 void fullnormalchr(char tecken);
 void fullbackspace(void);
 void fulldelete(void);
@@ -70,10 +70,10 @@ void fullright(void);
 void fullup(void);
 void fulldown(void);
 void fullreturn(void);
-int doedkmd(void);
-void fulladdera(char *vem);
-void fullflyttatext(char *vart);
-void fullarende(char *nytt);
+int doedkmd(struct EditContext *context);
+void fulladdera(char *vem, struct EditContext *context);
+void fullflyttatext(char *vart, struct EditContext *context);
+void fullarende(char *newSubject, struct EditContext *context);
 int fulldumpa(void);
 int fullnewline(void);
 void fullloadtext(char *filename);
@@ -81,13 +81,13 @@ void fulldisplaytext(void);
 void fullquote(void);
 void fullcrash(void);
 
-int edittext(char *filename) {
+int edittext(struct EditContext *context) {
   int ret;
   freeeditlist();
   if(CURRENT_USER->flaggor & FULLSCREEN) {
-    ret = fulledit(filename);
+    ret = fulledit(context);
   } else {
-    ret = lineedit(filename);
+    ret = lineedit(context);
   }
   if(ret) {
     freeeditlist();
@@ -148,7 +148,7 @@ void orgtextquote(struct Mote *conf) { }
 
 void brevquote(void) { }
 
-int lineedit(char *filename) {
+int lineedit(struct EditContext *context) {
   int currow, getret;
   struct EditLine *el;
   char letmp[81], wrap[81];
@@ -158,8 +158,8 @@ int lineedit(char *filename) {
     SendStringNoBrk("%s\n\r", CATSTR(MSG_EDIT_LINE_HELP1));
     SendStringNoBrk("%s\n\n\r", CATSTR(MSG_EDIT_LINE_HELP2));
   }
-  if(filename) {
-    lineloadfile(filename);
+  if(context != NULL && context->fileName != NULL) {
+    lineloadfile(context->fileName);
     linerenumber();
   }
   letmp[0] = 0;
@@ -187,14 +187,14 @@ int lineedit(char *filename) {
         else if(letmp[1] == 'k' || letmp[1] == 'K') return 2;
         else if(letmp[1] == 's' || letmp[1] == 'S') return 0;
         else if(letmp[1] == 'f' || letmp[1] == 'F') {
-          lineflyttatext(hittaefter(&letmp[1]));
+          lineflyttatext(hittaefter(&letmp[1]), context);
         } else if(letmp[1] == 'a' || letmp[1] == 'A') {
-          lineaddera(hittaefter(&letmp[1]));
+          lineaddera(hittaefter(&letmp[1]), context);
         } else if(letmp[1] == 'ä' || letmp[1] == 'Ä') {
           if(letmp[2] == 'n' || letmp[2] == 'N') {
             if(linechange(atoi(hittaefter(&letmp[1])))) return 1;
           } else if(letmp[2]=='r' || letmp[2]=='R') {
-            linearende(hittaefter(&letmp[1]));
+            linearende(hittaefter(&letmp[1]), context);
           }
         }
         else if(letmp[1] == 'd' || letmp[1] == 'D') linedump();
@@ -372,7 +372,7 @@ void lineread(void) {
   }
 }
 
-void lineflyttatext(char *vart) {
+void lineflyttatext(char *vart, struct EditContext *context) {
   int confId;
   if(nu_skrivs!=TEXT) {
     SendStringNoBrk("\r\nDu kan bara flytta texter, inte brev!\r\n");
@@ -391,12 +391,12 @@ void lineflyttatext(char *vart) {
     SendStringNoBrk("\n\rDu har ingen rätt att flytta texten till det mötet.\n\r");
     return;
   }
-  sparhead.mote = confId;
+  *context->confId = confId;
   SendStringNoBrk("\r\nFlyttar texten till mötet %s.\r\n", getmotnamn(confId));
 }
 
-void linearende(char *newSubject) {
-  if(nu_skrivs != TEXT && nu_skrivs != BREV) {
+void linearende(char *newSubject, struct EditContext *context) {
+  if(context == NULL || context->subject == NULL) {
     SendStringNoBrk("\n\rKan inte ändra ärendet!\n\r");
     return;
   }
@@ -404,11 +404,7 @@ void linearende(char *newSubject) {
     SendStringNoBrk("\r\nSkriv: !ärende <nytt ärende>\r\n");
     return;
   }
-  if(nu_skrivs == TEXT) {
-    strncpy(sparhead.arende, newSubject, 40);
-  } else {
-    strncpy(brevspar.subject, newSubject, 40);
-  }
+  strncpy(context->subject, newSubject, context->subjectMaxLen);
 }
 
 int ismotthere(int mot,char *motstr) {
@@ -422,7 +418,7 @@ int ismotthere(int mot,char *motstr) {
 }
 
 
-void lineaddera(char *vem) {
+void lineaddera(char *vem, struct EditContext *context) {
   int userId;
   char nrbuf[10];
   if(nu_skrivs != BREV) {
@@ -437,16 +433,16 @@ void lineaddera(char *vem) {
     SendStringNoBrk("\n\rSkriv: !Addera <användare>\n\r");
     return;
   }
-  if(ismotthere(userId, brevspar.to)) {
+  if(ismotthere(userId, context->mailRecipients)) {
     SendStringNoBrk("\n\rAnvändaren är redan mottagare av brevet!\n\r");
     return;
   }
   sprintf(nrbuf, " %d", userId);
-  if(strlen(nrbuf) + strlen(brevspar.to) > 98) {
+  if(strlen(nrbuf) + strlen(context->mailRecipients) > 98) {
     SendStringNoBrk("\n\rKan inte addera flera användare!\n\r");
     return;
   }
-  strcat(brevspar.to, nrbuf);
+  strcat(context->mailRecipients, nrbuf);
   SendStringNoBrk("\n\rAdderar %s\n\r", getusername(userId));
 }
 
@@ -561,7 +557,7 @@ void linecrash(void) {
 
 /*********** Fullskärmseditorn **************/
 
-int fulledit(char *filename) {
+int fulledit(struct EditContext *context) {
   int ch;
   NewList((struct List *)&edit_list);
   yankbuffer[0] = 0;
@@ -574,8 +570,8 @@ int fulledit(char *filename) {
   }
   AddTail((struct List *)&edit_list, (struct Node *)curline);
   antkol = kolpos = 0;
-  if(filename) {
-    fullloadtext(filename);
+  if(context != NULL && context->fileName != NULL) {
+    fullloadtext(context->fileName);
     fulldisplaytext();
   }
   for(;;) {
@@ -590,7 +586,7 @@ int fulledit(char *filename) {
     else if(ch == GETCHAR_DELETE) fulldelete();
     else if(ch == '\t' && antkol < 66) fulltab();
     else if(ch == GETCHAR_RETURN) fullreturn();
-    else if(ch == 17) { if(doedkmd()) return 1; }
+    else if(ch == 17) { if(doedkmd(context)) return 1; }
     else if(ch == GETCHAR_SOL) fullctrla();
     else if(ch == GETCHAR_EOL) fullctrle();
     else if(ch == GETCHAR_LEFT) fullleft();
@@ -896,13 +892,13 @@ void fullreturn(void) {
   }
 }
 
-int doedkmd(void) {
+int doedkmd(struct EditContext *context) {
   SendStringNoBrk("\r\x1b\x5b\x4b\x1b\x5b\x31\x6d Kommando: ");
   if(GetString(45, NULL)) return 1;
-  if(inmat[0]=='f' || inmat[0]=='F') fullflyttatext(hittaefter(inmat));
-  else if(inmat[0]=='a' || inmat[0]=='A') fulladdera(hittaefter(inmat));
+  if(inmat[0]=='f' || inmat[0]=='F') fullflyttatext(hittaefter(inmat), context);
+  else if(inmat[0]=='a' || inmat[0]=='A') fulladdera(hittaefter(inmat), context);
   else if(inmat[0]=='d' || inmat[0]=='D') { if(fulldumpa()) return 1; }
-  else if(inmat[0]=='ä' || inmat[0]=='Ä') fullarende(hittaefter(inmat));
+  else if(inmat[0]=='ä' || inmat[0]=='Ä') fullarende(hittaefter(inmat), context);
   else if(inmat[0]=='c' || inmat[0]=='C') fullcrash();
   else if(inmat[0]=='?' || inmat[0]=='h' || inmat[0]=='H') {
     SendStringNoBrk("\rCtrl-Z=Spara, Ctrl-C=Avbryt, 'Info Full' för mer hjälp. <RETURN>");
@@ -921,7 +917,7 @@ int doedkmd(void) {
   return 0;
 }
 
-void fulladdera(char *userName) {
+void fulladdera(char *userName, struct EditContext *context) {
   int userId;
   char nrbuf[10];
   if(nu_skrivs != BREV) {
@@ -939,23 +935,23 @@ void fulladdera(char *userName) {
     GetChar();
     return;
   }
-  if(ismotthere(userId, brevspar.to)) {
+  if(ismotthere(userId, context->mailRecipients)) {
     SendStringNoBrk("\rAnvändaren är redan mottagare av brevet! <RETURN>");
     GetChar();
     return;
   }
   sprintf(nrbuf, " %d", userId);
-  if(strlen(nrbuf) + strlen(brevspar.to) > 98) {
+  if(strlen(nrbuf) + strlen(context->mailRecipients) > 98) {
     SendStringNoBrk("\rKan inte addera flera användare! <RETURN>");
     GetChar();
     return;
   }
-  strcat(brevspar.to, nrbuf);
+  strcat(context->mailRecipients, nrbuf);
   SendStringNoBrk("\rAdderar %s <RETURN>", getusername(userId));
   GetChar();
 }
 
-void fullflyttatext(char *confName) {
+void fullflyttatext(char *confName, struct EditContext *context) {
   int confId;
   if(nu_skrivs != TEXT) {
     SendStringNoBrk("\rDu kan bara flytta texter i möten! <RETURN>");
@@ -977,13 +973,13 @@ void fullflyttatext(char *confName) {
     SendStringNoBrk("\rDu har ingen rätt att flytta texten till det mötet. <RETURN>");
     return;
   }
-  sparhead.mote = confId;
+  *context->confId = confId;
   SendStringNoBrk("\rFlyttar texten till mötet %s. <RETURN>", getmotnamn(confId));
   GetChar();
 }
 
-void fullarende(char *newSubject) {
-  if(nu_skrivs != TEXT && nu_skrivs != BREV) {
+void fullarende(char *newSubject, struct EditContext *context) {
+  if(context == NULL || context->subject == NULL) {
     SendStringNoBrk("\rKan inte ändra ärende! <RETURN>");
     GetChar();
     return;
@@ -993,11 +989,7 @@ void fullarende(char *newSubject) {
     GetChar();
     return;
   }
-  if(nu_skrivs == TEXT) {
-    strncpy(sparhead.arende, newSubject,40);
-  } else {
-    strncpy(brevspar.subject, newSubject,40);
-  }
+  strncpy(context->subject, newSubject, context->subjectMaxLen);
 }
 
 int fulldumpa(void) {

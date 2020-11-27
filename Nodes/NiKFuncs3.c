@@ -16,6 +16,7 @@
 #include "Terminal.h"
 #include "UserNotificationHooks.h"
 #include "KOM.h"
+#include "NiKEditor.h"
 #include "Logging.h"
 #include "StringUtils.h"
 #include "Stack.h"
@@ -89,6 +90,8 @@ void endast(void) {
 int personlig(void) {
   int nummer, editret, confId;
   struct Mote *conf;
+  struct EditContext editContext;
+
   if(argument[0]) {
     if(mote2 == -1) {
       SendString("\r\n\n%s\r\n\n", CATSTR(MSG_PERSONAL_MAIL));
@@ -137,7 +140,12 @@ int personlig(void) {
   }
   nu_skrivs = BREV;
   initpersheader();
-  if((editret = edittext(NULL)) == 1) {
+
+  memset(&editContext, 0, sizeof(struct EditContext));
+  editContext.subject = brevspar.subject;
+  editContext.subjectMaxLen = 99;
+  editContext.mailRecipients = brevspar.to;
+  if((editret = edittext(&editContext)) == 1) {
     return 1;
   }
   if(!editret) {
@@ -972,10 +980,14 @@ int skrivlapp(void) {
   struct EditLine *el;
   FILE *fp;
   char filename[100];
+  struct EditContext editContext;
 
   sprintf(filename, "NiKom:Users/%d/%d/Lapp", inloggad / 100, inloggad);
   SendString("\r\n\n%s\r\n", CATSTR(MSG_COMMON_ENTERING_EDITOR));
-  if((editret = edittext(filename)) == 1) {
+
+  memset(&editContext, 0, sizeof(struct EditContext));
+  editContext.fileName = filename;
+  if((editret = edittext(&editContext)) == 1) {
     return 1;
   } else if(editret == 2) {
     return 0;

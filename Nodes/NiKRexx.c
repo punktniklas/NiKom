@@ -20,6 +20,7 @@
 #include "Nodes.h"
 #include "NiKomLib.h"
 #include "NiKomFuncs.h"
+#include "NiKEditor.h"
 #include "Terminal.h"
 #include "RexxUtils.h"
 #include "ExecUtils.h"
@@ -407,6 +408,8 @@ void rxedit(struct RexxMsg *mess) {
   char *filename;
   BPTR fh;
   struct EditLine *el;
+  struct EditContext editContext;
+
   nu_skrivs = ANNAT;
   filename = hittaefter(mess->rm_Args[0]);
   if(filename[0] == '\0') {
@@ -414,7 +417,9 @@ void rxedit(struct RexxMsg *mess) {
     return;
   }
 
-  if((editret = edittext(filename)) == 1) {
+  memset(&editContext, 0, sizeof(struct EditContext));
+  editContext.fileName = filename;
+  if((editret = edittext(&editContext)) == 1) {
     SetRexxErrorResult(mess, 100);
     return;
   } else if(editret == 0) {

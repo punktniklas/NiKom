@@ -11,6 +11,7 @@
 #include "Nodes.h"
 #include "NiKomFuncs.h"
 #include "NiKomLib.h"
+#include "NiKEditor.h"
 #include "Logging.h"
 #include "Stack.h"
 #include "Terminal.h"
@@ -39,17 +40,26 @@ extern struct Inloggning Statstr;
 extern struct MinList edit_list;
 
 int org_skriv(void) {
-	int editret;
-	if(org_initheader(EJKOM)) return(1);
-	nu_skrivs=TEXT;
-	if((editret=edittext(NULL))==1) return(1);
-	if(!editret) org_sparatext();
-	return(0);
+  int editret;
+  struct EditContext editContext;
+
+  if(org_initheader(EJKOM)) return(1);
+  nu_skrivs=TEXT;
+  
+  memset(&editContext, 0, sizeof(struct EditContext));
+  editContext.subject = sparhead.arende;
+  editContext.subjectMaxLen = 40;
+  editContext.confId = &sparhead.mote;
+  if((editret=edittext(&editContext))==1) return(1);
+  if(!editret) org_sparatext();
+  return(0);
 }
 
 void org_kommentera(void) {
   int textId, editret, confId, isCorrect;
   struct Mote *conf;
+  struct EditContext editContext;
+
   if(argument[0]) {
     textId = parseTextNumber(argument, TEXT);
     if(textId < Servermem->info.lowtext || textId > Servermem->info.hightext) {
@@ -103,7 +113,12 @@ void org_kommentera(void) {
     return;
   }
   nu_skrivs = TEXT;
-  if((editret = edittext(NULL))==1) {
+
+  memset(&editContext, 0, sizeof(struct EditContext));
+  editContext.subject = sparhead.arende;
+  editContext.subjectMaxLen = 40;
+  editContext.confId = &sparhead.mote;
+  if((editret = edittext(&editContext))==1) {
     return;
   }
   else if(!editret)	{

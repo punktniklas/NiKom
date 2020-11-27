@@ -17,6 +17,7 @@
 #include "Nodes.h"
 #include "NiKomFuncs.h"
 #include "NiKomLib.h"
+#include "NiKEditor.h"
 #include "VersionStrings.h"
 #include "Logging.h"
 #include "Terminal.h"
@@ -291,6 +292,7 @@ int fido_skriv(int komm,int komtill) {
   struct Mote *motpek;
   struct FidoLine *fl;
   char filnamn[15], fullpath[100], msgid[50];
+  struct EditContext editContext;
 
   Servermem->nodeInfo[nodnr].action = SKRIVER;
   Servermem->nodeInfo[nodnr].currentConf = mote2;
@@ -359,7 +361,11 @@ int fido_skriv(int komm,int komtill) {
   } else {
     SendString("\n");
   }
-  editret = edittext(NULL);
+
+  memset(&editContext, 0, sizeof(struct EditContext));
+  editContext.subject = ft.subject;
+  editContext.subjectMaxLen = 71;
+  editret = edittext(&editContext);
   if(editret == 1) {
     return 1;
   }

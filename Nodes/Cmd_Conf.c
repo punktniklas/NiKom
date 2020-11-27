@@ -7,6 +7,7 @@
 #include "Nodes.h"
 #include "NiKomLib.h"
 #include "NiKomFuncs.h"
+#include "NiKEditor.h"
 #include "Terminal.h"
 #include "UserNotificationHooks.h"
 #include "Logging.h"

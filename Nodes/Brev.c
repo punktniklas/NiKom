@@ -21,6 +21,7 @@
 #include "Nodes.h"
 #include "NiKomLib.h"
 #include "NiKomFuncs.h"
+#include "NiKEditor.h"
 #include "Logging.h"
 #include "Terminal.h"
 #include "UserNotificationHooks.h"
@@ -81,6 +82,8 @@ int brev_kommentera(void) {
   BPTR fh;
   int nummer,editret,anv;
   char *brevpers,filnamn[50];
+  struct EditContext editContext;
+
   if(argument[0]) {
     if(!IzDigit(argument[0])) {
       SendString("\r\n\n%s\r\n", CATSTR(MSG_MAIL_NO_SUCH_MAIL));
@@ -133,7 +136,11 @@ int brev_kommentera(void) {
   if(editret == 2) {
     return 0;
   }
-  if((editret = edittext(NULL)) == 1) {
+  memset(&editContext, 0, sizeof(struct EditContext));
+  editContext.subject = brevspar.subject;
+  editContext.subjectMaxLen = 99;
+  editContext.mailRecipients = brevspar.to;
+  if((editret = edittext(&editContext)) == 1) {
     return 1;
   } else if(!editret) {
     sparabrev();
@@ -438,6 +445,7 @@ int fido_brev(char *tillpers,char *adr,struct Mote *motpek) {
   struct FidoText *komft,ft;
   struct MinNode *first, *last;
   char *foo, tmpfrom[100], fullpath[100], filnamn[20], subject[80], msgid[50];
+  struct EditContext editContext;
 
   if(!(CURRENT_USER->grupper & Servermem->cfg->fidoConfig.mailgroups)
      && CURRENT_USER->status < Servermem->cfg->fidoConfig.mailstatus) {
@@ -551,7 +559,11 @@ int fido_brev(char *tillpers,char *adr,struct Mote *motpek) {
     SendString("\n");
   }
   crashmail = FALSE;
-  editret = edittext(NULL);
+
+  memset(&editContext, 0, sizeof(struct EditContext));
+  editContext.subject = ft.subject;
+  editContext.subjectMaxLen = 71;
+  editret = edittext(&editContext);
   if(editret == 1) {
     return 1;
   }
@@ -805,6 +817,7 @@ static void savefidocopy(struct FidoText *ft, int anv) {
 int skickabrev(void) {
   int pers=0, editret;
   char *adr;
+  struct EditContext editContext;
   if(!(adr = strchr(argument, '@'))) {
     if((pers = parsenamn(argument)) == -1) {
       SendString("\r\n\n%s\r\n\n", CATSTR(MSG_COMMON_NO_SUCH_USER));
@@ -836,7 +849,11 @@ int skickabrev(void) {
   if(editret == 2) {
     return 0;
   }
-  if((editret = edittext(NULL)) == 1) {
+  memset(&editContext, 0, sizeof(struct EditContext));
+  editContext.subject = brevspar.subject;
+  editContext.subjectMaxLen = 99;
+  editContext.mailRecipients = brevspar.to;
+  if((editret = edittext(&editContext)) == 1) {
     return 1;
   }
   if(!editret) {

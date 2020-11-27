@@ -5,7 +5,7 @@
 #include <NiKomStr.h>
 #include <NiKomNodeCommon.h>
 /*
- * TODO: The long time goal is for this file to die. Every .c
+ * TODO: The long term goal is for this file to die. Every .c
  * file should be a module that should have a corresponding .h
  * file that contains the public functions of that module.
  */
@@ -133,9 +133,6 @@ char *getmotnamn(int);
 struct Kommando *getkmdpek(int);
 int bytnodtyp(void);
 void bytteckenset(void);
-
-/* Prototypes for functions defined in NiKEditor.c */
-int edittext(char *filnamn);
 
 /* Prototypes for functions defined in NiKFiles.c */
 int parsearea(char *skri);
