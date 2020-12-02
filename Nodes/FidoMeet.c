@@ -365,6 +365,10 @@ int fido_skriv(int komm,int komtill) {
   memset(&editContext, 0, sizeof(struct EditContext));
   editContext.subject = ft.subject;
   editContext.subjectMaxLen = 71;
+  if(komm) {
+    editContext.replyingToText = komtill;
+    editContext.replyingInConfId = mote2;
+  }
   editret = edittext(&editContext);
   if(editret == 1) {
     return 1;

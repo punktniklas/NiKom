@@ -26,7 +26,7 @@
 
 extern struct System *Servermem;
 extern char inmat[], crashmail;
-extern int rad,nu_skrivs,nodnr,senast_text_typ,senast_text_nr,senast_text_mote, inloggad, g_userDataSlot;
+extern int rad,nu_skrivs,nodnr, inloggad, g_userDataSlot;
 extern struct Library *FifoBase;
 
 char yankbuffer[81],edxxcombuf[257];
@@ -36,10 +36,7 @@ struct MinList edit_list;
 struct EditLine *curline,*tmpline;
 
 struct EditLine *allocEditLine(void);
-void quote(void);
-void fidotextquote(struct Mote *);
-void orgtextquote(struct Mote *);
-void brevquote(void);
+void quote(struct EditContext *context);
 int lineedit(struct EditContext *context);
 int linegetline(char *str,char *wrap,int linenr);
 void linerenumber(void);
@@ -52,7 +49,7 @@ void linearende(char *newSubject, struct EditContext *context);
 void lineaddera(char *vem, struct EditContext *context);
 int linechange(int foorad);
 int linedump(void);
-void linequote(void);
+void linequote(struct EditContext *context);
 void linecrash(void);
 int fulledit(struct EditContext *context);
 void fullnormalchr(char tecken);
@@ -78,8 +75,9 @@ int fulldumpa(void);
 int fullnewline(void);
 void fullloadtext(char *filename);
 void fulldisplaytext(void);
-void fullquote(void);
+void fullquote(struct EditContext *context);
 void fullcrash(void);
+void reprintCurrentLine(void);
 
 int edittext(struct EditContext *context) {
   int ret;
@@ -106,27 +104,17 @@ struct EditLine *allocEditLine(void) {
   return el;
 }
 
-void quote(void) {
+void quote(struct EditContext *context) {
   struct Mote *conf;
-  if(senast_text_typ == TEXT || senast_text_typ == TEXT_FIDO) {
-    if(!(conf = getmotpek(senast_text_mote))) {
-      return;
-    }
-    if(conf->type == MOTE_FIDO) {
-      fidotextquote(conf);
-    } else if(conf->type == MOTE_ORGINAL) {
-      orgtextquote(conf);
-    }
-  } else if(senast_text_typ == BREV || senast_text_typ == BREV_FIDO) {
-    brevquote();
-  }
-}
-
-void fidotextquote(struct Mote *conf) {
   struct FidoText *ft;
   struct Node *line;
   char filename[10],fullpath[100];
-  sprintf(filename, "%ld.msg", senast_text_nr - conf->renumber_offset);
+
+  if((conf = getmotpek(context->replyingInConfId)) == NULL) {
+    return;
+  }
+
+  sprintf(filename, "%ld.msg", context->replyingToText - conf->renumber_offset);
   strcpy(fullpath, conf->dir);
   AddPart(fullpath, filename, 99);
   ft = ReadFidoTextTags(fullpath,
@@ -143,10 +131,6 @@ void fidotextquote(struct Mote *conf) {
   }
   FreeFidoText(ft);
 }
-
-void orgtextquote(struct Mote *conf) { }
-
-void brevquote(void) { }
 
 int lineedit(struct EditContext *context) {
   int currow, getret;
@@ -199,7 +183,7 @@ int lineedit(struct EditContext *context) {
         }
         else if(letmp[1] == 'd' || letmp[1] == 'D') linedump();
         else if(letmp[1] == 'c' || letmp[1] == 'C') {
-          if(letmp[2] == 'i' || letmp[2] == 'I') linequote();
+          if(letmp[2] == 'i' || letmp[2] == 'I') linequote(context);
           else if(letmp[2] == 'r' || letmp[2] == 'R') linecrash();
         }
         else if(letmp[1] == '?') SendInfoFile("EditorHelp.txt", 0);
@@ -537,8 +521,12 @@ int linedump(void) {
   return 0;
 }
 
-void linequote(void) {
-  quote();
+void linequote(struct EditContext *context) {
+  if(context->replyingToText == 0) {
+    SendStringNoBrk("\n\rCan't quote.\n\r");
+    return;
+  }
+  quote(context);
   linerenumber();
 }
 
@@ -595,7 +583,7 @@ int fulledit(struct EditContext *context) {
     else if(ch == GETCHAR_DOWN) fulldown();
     else if(ch == 11) fullctrlk();
     else if(ch == 12) fullctrll();
-    else if(ch == 18) fullquote();
+    else if(ch == 18) fullquote(context);
     else if(ch == GETCHAR_DELETELINE) fullctrlx();
     else if(ch == 25) fullctrly();
     else if(ch == 26) {
@@ -907,6 +895,11 @@ int doedkmd(struct EditContext *context) {
     SendStringNoBrk("\rFelaktigt kommando! <RETURN>");
     GetChar();
   }
+  reprintCurrentLine();
+  return 0;
+}
+
+void reprintCurrentLine(void) {
   SendStringNoBrk("\r\x1b\x5b\x4b\x1b\x5b\x30\x6d");
   SendStringNoBrk("\r%s", curline->text);
   if(kolpos) {
@@ -914,7 +907,6 @@ int doedkmd(struct EditContext *context) {
   } else {
     eka('\r');
   }
-  return 0;
 }
 
 void fulladdera(char *userName, struct EditContext *context) {
@@ -1066,9 +1058,15 @@ void fulldisplaytext(void) {
   kolpos = 0;
 }
 
-void fullquote(void) {
+void fullquote(struct EditContext *context) {
+  if(context->replyingToText == 0) {
+    SendStringNoBrk("\rCan't quote.  <RETURN>");
+    GetChar();
+    reprintCurrentLine();
+    return;
+  }
   SendStringNoBrk("\r\x1b\x5b\x4a");
-  quote();
+  quote(context);
   fulldisplaytext();
 }
 
