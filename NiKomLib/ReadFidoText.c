@@ -303,6 +303,9 @@ struct FidoText * __saveds AASM LIBReadFidoText(register __a0 char *filename ARE
 			}
 		}
 		if(!strncmp(foo,"---",3) && foo[3]!='-') tearlinefound=TRUE;
+                if(tearlinefound && quote) {
+                  continue;
+                }
 		if(headeronly) continue;
 		if(!(fltmp = (struct FidoLine *)AllocMem(sizeof(struct FidoLine),MEMF_CLEAR))) {
 			Close(fh);
