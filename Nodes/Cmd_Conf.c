@@ -379,6 +379,7 @@ void cmd_Reaction(long reaction) {
   struct MemHeaderExtension *ext;
   struct Header textHeader;
   struct Notification notification;
+  char tmpstr[50];
   
   if(argument[0]) {
     if(mote2 == -1) {
@@ -456,6 +457,13 @@ void cmd_Reaction(long reaction) {
     SendStringCat("\r\n\n%s\r\n", reaction == EXT_REACTION_LIKE
                   ? CATSTR(MSG_REACTION_DONE_PRS) : CATSTR(MSG_REACTION_DONE_DIS),
                   textId);
+    strcpy(tmpstr, getusername(inloggad));
+    LogEvent(USAGE_LOG, INFO, "%s %s text %d av %s i %s",
+             tmpstr,
+             reaction == EXT_REACTION_LIKE ? "hyllar" : "dissar",
+             textId,
+             getusername(textHeader.person),
+             conf->namn);
   }
   DeleteMemHeaderExtension(ext);
 
