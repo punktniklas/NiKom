@@ -11,6 +11,12 @@
     S=1
     #=117
 
+Small fixes:
+- "Go" will no longer ask if you want to be a member.
+- Fix so you can change the subject when writing a Fido text/mail.
+- Quoting the corrext text when replying with a text number.
+- Quoting a Fido text will now skip from the tear line and down.
+
 ---------------------------------------------------------------------------
                          NiKom v2.5.0, 2019-01-20
 ---------------------------------------------------------------------------
