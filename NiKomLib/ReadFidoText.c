@@ -40,109 +40,110 @@
 static int getfidoline(char *fidoline, char *buffer, int linelen,
 		       enum nikom_chrs chrs, BPTR fh, char *quotepre,
 		       struct NiKomBase *NiKomBase) {
-	int anttkn,foo,tmpret,hasquoted=FALSE,donotwordwrap=FALSE;
-	char fidobuf[8];
-	unsigned fidoidx;
-	UBYTE tmp,*findquotesign,insquotebuf[81];
-	strcpy(fidoline,buffer);
-	anttkn=strlen(fidoline);
-	buffer[0]=0;
-	fidoidx = 0;
-	for(;;) {
-		tmpret=FGetC(fh);
-		if(tmpret==-1) return(FALSE);
-		tmp=tmpret;
-		if(tmp==0x8d) continue;
-		if(tmp==0x0a) continue;
-		if(tmp==0x00) continue;
-		if(tmp==0x0d) {
-			if(quotepre && !hasquoted) {                // Om detta är sant så har ett return kommit
-				if(fidoline[0]!=1 && fidoline[0]!=0) {   // men raden var kortare än fem tecken så
-					findquotesign=strchr(fidoline,'>');   // den har inte blivit citerad.
-					if(findquotesign) {                   // Det kan också vara så att strängen som
-						strcpy(insquotebuf,findquotesign); // kommer i buffervariabeln följs direkt av
-						findquotesign[1]=0;                // return.
-						strcat(fidoline,insquotebuf);
-					} else {
-						strcpy(insquotebuf,fidoline);
-						strcpy(fidoline,quotepre);
-						strcat(fidoline,insquotebuf);
-					}
-				}
-			}
-			break;
-		}
-		fidobuf[fidoidx] = tmp;
-		switch(chrs) {
-			case CHRS_CP437 :
-				if(tmp<128) fidoline[anttkn++]=tmp;
-				else fidoline[anttkn++]=NiKomBase->IbmToAmiga[tmp];
-				break;
-			case CHRS_CP850 :
-				if(tmp<128) fidoline[anttkn++]=tmp;
-				else fidoline[anttkn++]=NiKomBase->CP850ToAmiga[tmp];
-				break;
-			case CHRS_CP866 :
-				if(tmp<128) fidoline[anttkn++]=tmp;
-				else fidoline[anttkn++]=NiKomBase->CP866ToAmiga[tmp];
-				break;
-			case CHRS_SIS7 :
-				fidoline[anttkn++]=NiKomBase->SF7ToAmiga[tmp];
-				break;
-			case CHRS_MAC :
-				if(tmp<128) fidoline[anttkn++]=tmp;
-				else fidoline[anttkn++]=NiKomBase->MacToAmiga[tmp];
-				break;
-			case CHRS_LATIN1 :
-				fidoline[anttkn++]=tmp;
-				break;
-			case CHRS_UTF8 :
-				tmpret = convUTF8ToAmiga(fidoline+anttkn, fidobuf, fidoidx+1);
-				if (tmpret < 0) {
-					/* Need more bytes, continue reading. */
-					++fidoidx;
-					continue;
-				}
-				anttkn += tmpret;
-				fidoidx = 0;
-				break;
-			case CHRS_UNKNOWN :
-				fidoline[anttkn++]=convnokludge(tmp);
-				break;
-		}
-		fidoline[anttkn]=0;
-		if(quotepre && !hasquoted && anttkn>=5) {    // När antal tecken överstiger fem är det dags
-			hasquoted = TRUE;                         // att kolla om raden redan är ett citat eller
-			if(fidoline[0]!=1) {                      // inte. Om det är det ska bara ett extra '>'
-				findquotesign=strchr(fidoline,'>');    // in. Annars ska hela quotepre in.
-				if(findquotesign) {
-					if(linelen<79) linelen = 79;
-					donotwordwrap = TRUE;
-					strcpy(insquotebuf,findquotesign);
-					findquotesign[1]=0;
-					strcat(fidoline,insquotebuf);
-				} else {
-					strcpy(insquotebuf,fidoline);
-					strcpy(fidoline,quotepre);
-					strcat(fidoline,insquotebuf);
-				}
-				anttkn=strlen(fidoline);
-			}
-		}
-		if(anttkn>=linelen) {
-			for(foo=anttkn;fidoline[foo]!=' ' && foo>0;foo--);
-			if(foo!=0) {
-				if(quotepre && foo <= strlen(quotepre)); // Om hela citatet är ett ord, wrappa inte
-				else if(!donotwordwrap) {
-					fidoline[foo]=0;
-					strncpy(buffer,&fidoline[foo+1],anttkn-foo-1);
-					buffer[anttkn-foo-1]=0;
-				}
-			}
-			break;
-		}
-	}
-	return(TRUE);
+  int anttkn,foo,tmpret,hasquoted=FALSE,donotwordwrap=FALSE;
+  char fidobuf[8];
+  unsigned fidoidx;
+  UBYTE tmp,*findquotesign,insquotebuf[81];
+  strcpy(fidoline,buffer);
+  anttkn=strlen(fidoline);
+  buffer[0]=0;
+  fidoidx = 0;
+  for(;;) {
+    tmpret=FGetC(fh);
+    if(tmpret==-1) return(FALSE);
+    tmp=tmpret;
+    if(tmp==0x8d) continue;
+    if(tmp==0x0a) continue;
+    if(tmp==0x00) continue;
+    if(tmp==0x0d) {
+      if(quotepre && !hasquoted) {                // Om detta är sant så har ett return kommit
+        if(fidoline[0]!=1 && fidoline[0]!=0) {   // men raden var kortare än fem tecken så
+          findquotesign=strchr(fidoline,'>');   // den har inte blivit citerad.
+          if(findquotesign) {                   // Det kan också vara så att strängen som
+            strcpy(insquotebuf,findquotesign); // kommer i buffervariabeln följs direkt av
+            findquotesign[1]=0;                // return.
+            strcat(fidoline,insquotebuf);
+          } else {
+            strcpy(insquotebuf,fidoline);
+            strcpy(fidoline,quotepre);
+            strcat(fidoline,insquotebuf);
+          }
+        }
+      }
+      break;
+    }
+    fidobuf[fidoidx] = tmp;
+    switch(chrs) {
+    case CHRS_CP437 :
+      if(tmp<128) fidoline[anttkn++]=tmp;
+      else fidoline[anttkn++]=NiKomBase->IbmToAmiga[tmp];
+      break;
+    case CHRS_CP850 :
+      if(tmp<128) fidoline[anttkn++]=tmp;
+      else fidoline[anttkn++]=NiKomBase->CP850ToAmiga[tmp];
+      break;
+    case CHRS_CP866 :
+      if(tmp<128) fidoline[anttkn++]=tmp;
+      else fidoline[anttkn++]=NiKomBase->CP866ToAmiga[tmp];
+      break;
+    case CHRS_SIS7 :
+      fidoline[anttkn++]=NiKomBase->SF7ToAmiga[tmp];
+      break;
+    case CHRS_MAC :
+      if(tmp<128) fidoline[anttkn++]=tmp;
+      else fidoline[anttkn++]=NiKomBase->MacToAmiga[tmp];
+      break;
+    case CHRS_LATIN1 :
+    case CHRS_PASSTHROUGH:
+      fidoline[anttkn++]=tmp;
+      break;
+    case CHRS_UTF8 :
+      tmpret = convUTF8ToAmiga(fidoline+anttkn, fidobuf, fidoidx+1);
+      if (tmpret < 0) {
+        /* Need more bytes, continue reading. */
+        ++fidoidx;
+        continue;
+      }
+      anttkn += tmpret;
+      fidoidx = 0;
+      break;
+    case CHRS_UNKNOWN :
+      fidoline[anttkn++]=convnokludge(tmp);
+      break;
+    }
+    fidoline[anttkn]=0;
+    if(quotepre && !hasquoted && anttkn>=5) {    // När antal tecken överstiger fem är det dags
+      hasquoted = TRUE;                         // att kolla om raden redan är ett citat eller
+      if(fidoline[0]!=1) {                      // inte. Om det är det ska bara ett extra '>'
+        findquotesign=strchr(fidoline,'>');    // in. Annars ska hela quotepre in.
+        if(findquotesign) {
+          if(linelen<79) linelen = 79;
+          donotwordwrap = TRUE;
+          strcpy(insquotebuf,findquotesign);
+          findquotesign[1]=0;
+          strcat(fidoline,insquotebuf);
+        } else {
+          strcpy(insquotebuf,fidoline);
+          strcpy(fidoline,quotepre);
+          strcat(fidoline,insquotebuf);
+        }
+        anttkn=strlen(fidoline);
+      }
+    }
+    if(anttkn>=linelen) {
+      for(foo=anttkn;fidoline[foo]!=' ' && foo>0;foo--);
+      if(foo!=0) {
+        if(quotepre && foo <= strlen(quotepre)); // Om hela citatet är ett ord, wrappa inte
+        else if(!donotwordwrap) {
+          fidoline[foo]=0;
+          strncpy(buffer,&fidoline[foo+1],anttkn-foo-1);
+          buffer[anttkn-foo-1]=0;
+        }
+      }
+      break;
+    }
+  }
+  return(TRUE);
 }
 
 char *hittaefter(strang)
@@ -204,175 +205,188 @@ static void writeTwoByteField(USHORT value, UBYTE *bytes, char littleEndian) {
   }
 }
 
-struct FidoText * __saveds AASM LIBReadFidoText(register __a0 char *filename AREG(a0), register __a1 struct TagItem *taglist AREG(a1), register __a6 struct NiKomBase *NiKomBase AREG(a6)) {
-	int nokludge, noseenby,chrset=0, x, tearlinefound=FALSE, headeronly,quote,linelen;
-	struct FidoText *fidotext;
-	struct FidoLine *fltmp;
-	BPTR fh;
-	UBYTE intl[30],replyto[20],origin[20],topt[5],fmpt[5],ftshead[190],fidoline[81],flbuffer[81],*foo,prequote[10];
-	int bytes;
-
-	if(!NiKomBase->Servermem) return(NULL);
-
-	intl[0]=replyto[0]=origin[0]=topt[0]=fmpt[0]=0;
-	nokludge=GetTagData(RFT_NoKludges,0,taglist);
-	noseenby=GetTagData(RFT_NoSeenBy,0,taglist);
-	headeronly=GetTagData(RFT_HeaderOnly,0,taglist);
-	quote = GetTagData(RFT_Quote,0,taglist);
-	linelen = GetTagData(RFT_LineLen,79,taglist);
-	if(!(fidotext = (struct FidoText *)AllocMem(sizeof(struct FidoText),MEMF_CLEAR))) return(NULL);
-	NewList((struct List *)&fidotext->text);
-	if(!(fh=Open(filename,MODE_OLDFILE))) {
-          FreeMem(fidotext,sizeof(struct FidoText));
-          return(NULL);
-	}
-	Read(fh,ftshead,190);
-	/* Re-extracted after we know charset. */
-	strcpy(fidotext->fromuser,&ftshead[0]);
-	/* touser and subject extracted after we know charset. */
-	strcpy(fidotext->date,&ftshead[144]);
-	fidotext->tonode = getTwoByteField(&ftshead[166], NIK_LITTLE_ENDIAN);
-	fidotext->fromnode = getTwoByteField(&ftshead[168], NIK_LITTLE_ENDIAN);
-	fidotext->fromnet = getTwoByteField(&ftshead[172], NIK_LITTLE_ENDIAN);
-	fidotext->tonet = getTwoByteField(&ftshead[174], NIK_LITTLE_ENDIAN);
-	fidotext->attribut = getTwoByteField(&ftshead[186], NIK_LITTLE_ENDIAN);
-	Flush(fh);
-	if(quote) {
-		prequote[0]=' ';
-		prequote[1]=0;
-		x=1;
-		foo = flbuffer; // Temporarily borrowing flbuffer...
-		bytes = LIBConvMBChrsToAmiga(flbuffer, fidotext->fromuser, 0, 0,
-					     NiKomBase);
-		flbuffer[bytes] = '\0';
-		while(foo[0]) {
-			prequote[x]=foo[0];
-			prequote[x+1]=0;
-			x++;
-			foo = hittaefter(foo);
-		}
-		prequote[x]='>';
-		prequote[x+1]=' ';
-		prequote[x+2]=0;
-	}
-	flbuffer[0]=0;
-	while(getfidoline(fidoline,flbuffer,linelen,chrset,fh,quote ? prequote : NULL,NiKomBase)) {
-		if(fidoline[0]==1) {
-			foo=hittaefter(&fidoline[1]);
-			if(!strncmp(&fidoline[1],"INTL",4)) strcpy(intl,foo);
-			else if(!strncmp(&fidoline[1],"TOPT",4)) strcpy(topt,foo);
-			else if(!strncmp(&fidoline[1],"FMPT",4)) strcpy(fmpt,foo);
-			else if(!strncmp(&fidoline[1],"MSGID",5)) {
-				strncpy(fidotext->msgid,foo,49);
-				fidotext->msgid[49]=0;
-			} else if(!strncmp(&fidoline[1],"REPLY",5)) {
-				strncpy(replyto,foo,19);
-				replyto[19]=0;
-			} else if(!strncmp(&fidoline[1],"CHRS",4)) {
-				if(!strncmp(foo, "LATIN-1 2", 9)) {
-					chrset = CHRS_LATIN1;
-				} else if(!strncmp(foo, "CP437 2", 7) ||
-					  !strncmp(foo, "IBMPC 2", 7)) {
-					chrset = CHRS_CP437;
-				} else if(!strncmp(foo, "CP850 2", 7)) {
-					chrset = CHRS_CP850;
-				} else if(!strncmp(foo, "CP866 2", 7)) {
-					chrset = CHRS_CP866;
-				} else if(!strncmp(foo, "SWEDISH 1", 9)) {
-					chrset = CHRS_SIS7;
-				} else if(!strncmp(foo, "CP10000 2", 9) ||
-					  !strncmp(foo, "MAC 2", 5)) {
-					chrset = CHRS_MAC;
-				} else if(!strncmp(foo, "UTF-8 4", 7) ||
-					  !strncmp(foo, "UTF-8 2", 7)) {
-					/* The latter variant is incorrect, but quite common in
-						practice. */
-					chrset = CHRS_UTF8;
-				}
-			}
-			if(nokludge) continue;
-		}
-		if(quote) foo=hittaefter(&fidoline[1]);
-		else foo=fidoline;
-		if(tearlinefound && noseenby &&  !strncmp(foo,"SEEN-BY:",8)) continue;
-		if(tearlinefound && !strncmp(foo," * Origin:",10)) {
-			for(x=strlen(fidoline)-1;x>0 && fidoline[x]!='('; x--);
-			if(x>0) {
-				strncpy(origin,&fidoline[x+1],19);
-				origin[19]=0;
-			}
-		}
-		if(!strncmp(foo,"---",3) && foo[3]!='-') tearlinefound=TRUE;
-                if(tearlinefound && quote) {
-                  continue;
-                }
-		if(headeronly) continue;
-		if(!(fltmp = (struct FidoLine *)AllocMem(sizeof(struct FidoLine),MEMF_CLEAR))) {
-			Close(fh);
-			while((fltmp=(struct FidoLine *)RemHead((struct List *)&fidotext->text))) FreeMem(fltmp,sizeof(struct FidoLine));
-			FreeMem(fidotext,sizeof(struct FidoText));
-			return(NULL);
-		}
-		strcpy(fltmp->text,fidoline);
-		AddTail((struct List *)&fidotext->text,(struct Node *)fltmp);
-	}
-	Close(fh);
-	if(fidotext->attribut & FIDOT_PRIVATE) {
-		if(fidotext->msgid[0]) {
-			if((x=getzone(fidotext->msgid))) fidotext->fromzone=x;
-			if((x=getnet(fidotext->msgid))) fidotext->fromnet=x;
-			if((x=getnode(fidotext->msgid))) fidotext->fromnode=x;
-			if((x=getpoint(fidotext->msgid))) fidotext->frompoint=x;
-		}
-		if(replyto[0]) {
-			if((x=getzone(replyto))) fidotext->tozone=x;
-			if((x=getnet(replyto))) fidotext->tonet=x;
-			if((x=getnode(replyto))) fidotext->tonode=x;
-			if((x=getpoint(replyto))) fidotext->topoint=x;
-		}
-		if(intl[0]) {
-			if((x=getzone(intl))) fidotext->tozone=x;
-			if((x=getnet(intl))) fidotext->tonet=x;
-			if((x=getnode(intl))) fidotext->tonode=x;
-			foo=hittaefter(intl);
-			if((x=getzone(foo))) fidotext->fromzone=x;
-			if((x=getnet(foo))) fidotext->fromnet=x;
-			if((x=getnode(foo))) fidotext->fromnode=x;
-		}
-		if(topt[0]) fidotext->topoint = atoi(topt);
-		if(fmpt[0]) fidotext->frompoint = atoi(fmpt);
-	} else {
-		if(fidotext->msgid[0]) {
-			if((x=getzone(fidotext->msgid))) fidotext->fromzone=x;
-			if((x=getnet(fidotext->msgid))) fidotext->fromnet=x;
-			if((x=getnode(fidotext->msgid))) fidotext->fromnode=x;
-			if((x=getpoint(fidotext->msgid))) fidotext->frompoint=x;
-		}
-		if(replyto[0]) {
-			if((x=getzone(replyto))) fidotext->tozone=x;
-			if((x=getnet(replyto))) fidotext->tonet=x;
-			if((x=getnode(replyto))) fidotext->tonode=x;
-			if((x=getpoint(replyto))) fidotext->topoint=x;
-		}
-		if(origin[0]) {
-			if((x=getzone(origin))) fidotext->fromzone=x;
-			if((x=getnet(origin))) fidotext->fromnet=x;
-			if((x=getnode(origin))) fidotext->fromnode=x;
-			if((x=getpoint(origin))) fidotext->frompoint=x;
-		}
-	}
-	if(fidotext->tozone==0) fidotext->tozone=fidotext->fromzone;
-
-	bytes = LIBConvMBChrsToAmiga(fidotext->fromuser, &ftshead[0], 0,
-				     chrset, NiKomBase);
-	fidotext->fromuser[bytes] = '\0';
-	bytes = LIBConvMBChrsToAmiga(fidotext->touser, &ftshead[36], 0,
-				     chrset, NiKomBase);
-	fidotext->touser[bytes] = '\0';
-	bytes = LIBConvMBChrsToAmiga(fidotext->subject, &ftshead[72], 0,
-				     chrset, NiKomBase);
-	fidotext->subject[bytes] = '\0';
-	return(fidotext);
+struct FidoText * __saveds AASM LIBReadFidoText(register __a0 char *filename AREG(a0),
+                                                register __a1 struct TagItem *taglist AREG(a1),
+                                                register __a6 struct NiKomBase *NiKomBase AREG(a6)) {
+  int nokludge, noseenby, chrset=0, x, tearlinefound=FALSE, headeronly, quote,
+    linelen, passthroughCharset;
+  struct FidoText *fidotext;
+  struct FidoLine *fltmp;
+  BPTR fh;
+  UBYTE intl[30], replyto[20], origin[20], topt[5], fmpt[5], ftshead[190],
+    fidoline[81],flbuffer[81],*foo,prequote[10];
+  int bytes;
+  
+  if(!NiKomBase->Servermem) return(NULL);
+  
+  intl[0]=replyto[0]=origin[0]=topt[0]=fmpt[0]=0;
+  nokludge=GetTagData(RFT_NoKludges,0,taglist);
+  noseenby=GetTagData(RFT_NoSeenBy,0,taglist);
+  headeronly=GetTagData(RFT_HeaderOnly,0,taglist);
+  quote = GetTagData(RFT_Quote,0,taglist);
+  linelen = GetTagData(RFT_LineLen,79,taglist);
+  passthroughCharset = GetTagData(RFT_PassthroughCharset, CHRS_PASSTHROUGH, taglist);
+  
+  if(!(fidotext = (struct FidoText *)AllocMem(sizeof(struct FidoText),MEMF_CLEAR))) return(NULL);
+  NewList((struct List *)&fidotext->text);
+  if(!(fh=Open(filename,MODE_OLDFILE))) {
+    FreeMem(fidotext,sizeof(struct FidoText));
+    return(NULL);
+  }
+  Read(fh,ftshead,190);
+  /* Re-extracted after we know charset. */
+  strcpy(fidotext->fromuser,&ftshead[0]);
+  /* touser and subject extracted after we know charset. */
+  strcpy(fidotext->date,&ftshead[144]);
+  fidotext->tonode = getTwoByteField(&ftshead[166], NIK_LITTLE_ENDIAN);
+  fidotext->fromnode = getTwoByteField(&ftshead[168], NIK_LITTLE_ENDIAN);
+  fidotext->fromnet = getTwoByteField(&ftshead[172], NIK_LITTLE_ENDIAN);
+  fidotext->tonet = getTwoByteField(&ftshead[174], NIK_LITTLE_ENDIAN);
+  fidotext->attribut = getTwoByteField(&ftshead[186], NIK_LITTLE_ENDIAN);
+  Flush(fh);
+  if(quote) {
+    prequote[0]=' ';
+    prequote[1]=0;
+    x=1;
+    foo = flbuffer; // Temporarily borrowing flbuffer...
+    bytes = LIBConvMBChrsToAmiga(flbuffer, fidotext->fromuser, 0, 0,
+                                 NiKomBase);
+    flbuffer[bytes] = '\0';
+    while(foo[0]) {
+      prequote[x]=foo[0];
+      prequote[x+1]=0;
+      x++;
+      foo = hittaefter(foo);
+    }
+    prequote[x]='>';
+    prequote[x+1]=' ';
+    prequote[x+2]=0;
+  }
+  flbuffer[0]=0;
+  while(getfidoline(fidoline,
+                    flbuffer,
+                    linelen,
+                    chrset == passthroughCharset ? CHRS_PASSTHROUGH : chrset,
+                    fh,
+                    quote ? prequote : NULL,
+                    NiKomBase)) {
+    if(fidoline[0]==1) {
+      foo=hittaefter(&fidoline[1]);
+      if(!strncmp(&fidoline[1],"INTL",4)) strcpy(intl,foo);
+      else if(!strncmp(&fidoline[1],"TOPT",4)) strcpy(topt,foo);
+      else if(!strncmp(&fidoline[1],"FMPT",4)) strcpy(fmpt,foo);
+      else if(!strncmp(&fidoline[1],"MSGID",5)) {
+        strncpy(fidotext->msgid,foo,49);
+        fidotext->msgid[49]=0;
+      } else if(!strncmp(&fidoline[1],"REPLY",5)) {
+        strncpy(replyto,foo,19);
+        replyto[19]=0;
+      } else if(!strncmp(&fidoline[1],"CHRS",4)) {
+        if(!strncmp(foo, "LATIN-1 2", 9)) {
+          chrset = CHRS_LATIN1;
+        } else if(!strncmp(foo, "CP437 2", 7) ||
+                  !strncmp(foo, "IBMPC 2", 7)) {
+          chrset = CHRS_CP437;
+        } else if(!strncmp(foo, "CP850 2", 7)) {
+          chrset = CHRS_CP850;
+        } else if(!strncmp(foo, "CP866 2", 7)) {
+          chrset = CHRS_CP866;
+        } else if(!strncmp(foo, "SWEDISH 1", 9)) {
+          chrset = CHRS_SIS7;
+        } else if(!strncmp(foo, "CP10000 2", 9) ||
+                  !strncmp(foo, "MAC 2", 5)) {
+          chrset = CHRS_MAC;
+        } else if(!strncmp(foo, "UTF-8 4", 7) ||
+                  !strncmp(foo, "UTF-8 2", 7)) {
+          /* The latter variant is incorrect, but quite common in
+             practice. */
+          chrset = CHRS_UTF8;
+        }
+      }
+      if(nokludge) continue;
+    }
+    if(quote) foo=hittaefter(&fidoline[1]);
+    else foo=fidoline;
+    if(tearlinefound && noseenby &&  !strncmp(foo,"SEEN-BY:",8)) continue;
+    if(tearlinefound && !strncmp(foo," * Origin:",10)) {
+      for(x=strlen(fidoline)-1;x>0 && fidoline[x]!='('; x--);
+      if(x>0) {
+        strncpy(origin,&fidoline[x+1],19);
+        origin[19]=0;
+      }
+    }
+    if(!strncmp(foo,"---",3) && foo[3]!='-') tearlinefound=TRUE;
+    if(tearlinefound && quote) {
+      continue;
+    }
+    if(headeronly) continue;
+    if(!(fltmp = (struct FidoLine *)AllocMem(sizeof(struct FidoLine),MEMF_CLEAR))) {
+      Close(fh);
+      while((fltmp=(struct FidoLine *)RemHead((struct List *)&fidotext->text))) FreeMem(fltmp,sizeof(struct FidoLine));
+      FreeMem(fidotext,sizeof(struct FidoText));
+      return(NULL);
+    }
+    strcpy(fltmp->text,fidoline);
+    AddTail((struct List *)&fidotext->text,(struct Node *)fltmp);
+  }
+  Close(fh);
+  fidotext->charset = chrset;
+  if(fidotext->attribut & FIDOT_PRIVATE) {
+    if(fidotext->msgid[0]) {
+      if((x=getzone(fidotext->msgid))) fidotext->fromzone=x;
+      if((x=getnet(fidotext->msgid))) fidotext->fromnet=x;
+      if((x=getnode(fidotext->msgid))) fidotext->fromnode=x;
+      if((x=getpoint(fidotext->msgid))) fidotext->frompoint=x;
+    }
+    if(replyto[0]) {
+      if((x=getzone(replyto))) fidotext->tozone=x;
+      if((x=getnet(replyto))) fidotext->tonet=x;
+      if((x=getnode(replyto))) fidotext->tonode=x;
+      if((x=getpoint(replyto))) fidotext->topoint=x;
+    }
+    if(intl[0]) {
+      if((x=getzone(intl))) fidotext->tozone=x;
+      if((x=getnet(intl))) fidotext->tonet=x;
+      if((x=getnode(intl))) fidotext->tonode=x;
+      foo=hittaefter(intl);
+      if((x=getzone(foo))) fidotext->fromzone=x;
+      if((x=getnet(foo))) fidotext->fromnet=x;
+      if((x=getnode(foo))) fidotext->fromnode=x;
+    }
+    if(topt[0]) fidotext->topoint = atoi(topt);
+    if(fmpt[0]) fidotext->frompoint = atoi(fmpt);
+  } else {
+    if(fidotext->msgid[0]) {
+      if((x=getzone(fidotext->msgid))) fidotext->fromzone=x;
+      if((x=getnet(fidotext->msgid))) fidotext->fromnet=x;
+      if((x=getnode(fidotext->msgid))) fidotext->fromnode=x;
+      if((x=getpoint(fidotext->msgid))) fidotext->frompoint=x;
+    }
+    if(replyto[0]) {
+      if((x=getzone(replyto))) fidotext->tozone=x;
+      if((x=getnet(replyto))) fidotext->tonet=x;
+      if((x=getnode(replyto))) fidotext->tonode=x;
+      if((x=getpoint(replyto))) fidotext->topoint=x;
+    }
+    if(origin[0]) {
+      if((x=getzone(origin))) fidotext->fromzone=x;
+      if((x=getnet(origin))) fidotext->fromnet=x;
+      if((x=getnode(origin))) fidotext->fromnode=x;
+      if((x=getpoint(origin))) fidotext->frompoint=x;
+    }
+  }
+  if(fidotext->tozone==0) fidotext->tozone=fidotext->fromzone;
+  
+  bytes = LIBConvMBChrsToAmiga(fidotext->fromuser, &ftshead[0], 0,
+                               chrset, NiKomBase);
+  fidotext->fromuser[bytes] = '\0';
+  bytes = LIBConvMBChrsToAmiga(fidotext->touser, &ftshead[36], 0,
+                               chrset, NiKomBase);
+  fidotext->touser[bytes] = '\0';
+  bytes = LIBConvMBChrsToAmiga(fidotext->subject, &ftshead[72], 0,
+                               chrset, NiKomBase);
+  fidotext->subject[bytes] = '\0';
+  return(fidotext);
 }
 
 void __saveds AASM LIBFreeFidoText(register __a0 struct FidoText *fidotext AREG(a0)) {

@@ -21,6 +21,7 @@
 #include "VersionStrings.h"
 #include "Logging.h"
 #include "Terminal.h"
+#include "BasicIO.h"
 #include "UserNotificationHooks.h"
 #include "Languages.h"
 #include "StyleSheets.h"
@@ -174,12 +175,17 @@ void fido_visatext(int text,struct Mote *motpek, struct Stack *repliesStack) {
   struct FidoText *ft, *repliedFt;
   struct FidoLine *fl;
   char fullpath[100];
-  int repliedTextId;
+  int repliedTextId, effectiveCharset;
   CURRENT_USER->read++;
   Servermem->info.lasta++;
   Statstr.read++;
   MakeMsgFilePath(motpek->dir, text - motpek->renumber_offset, fullpath);
-  ft = ReadFidoTextTags(fullpath, RFT_NoSeenBy, !(CURRENT_USER->flaggor & SHOWKLUDGE), TAG_DONE);
+  effectiveCharset = Servermem->nodeInfo[nodnr].nodeType == NODCON
+    ? CHRS_LATIN1 : CURRENT_USER->chrset;
+  ft = ReadFidoTextTags(fullpath,
+                        RFT_NoSeenBy, !(CURRENT_USER->flaggor & SHOWKLUDGE),
+                        RFT_PassthroughCharset, effectiveCharset,
+                        TAG_DONE);
   if(!ft) {
     LogEvent(SYSTEM_LOG, ERROR, "Can't read fido text %s.", fullpath);
     DisplayInternalError();
@@ -208,6 +214,7 @@ void fido_visatext(int text,struct Mote *motpek, struct Stack *repliesStack) {
   } else {
     SendString("\n");
   }
+  SetCharacterSetPassthrough(CURRENT_USER->chrset == ft->charset);
   ITER_EL(fl, ft->text, line_node, struct FidoLine *) {
     if(fl->text[0] == 1) {
       if(CURRENT_USER->flaggor & SHOWKLUDGE) {
@@ -223,6 +230,7 @@ void fido_visatext(int text,struct Mote *motpek, struct Stack *repliesStack) {
       }
     }
   }
+  SetCharacterSetPassthrough(FALSE);
   SendStringCat("\n%s\r\n", CATSTR(MSG_ORG_TEXT_END_OF_TEXT), text,ft->fromuser);
   FreeFidoText(ft);
   displayComments(text, motpek, repliesStack);

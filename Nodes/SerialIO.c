@@ -66,6 +66,7 @@ char typeaheadbuf[51];   /* För att buffra inkommande tecken under utskrift */
 static char device[31];         /* Devicenamnet, från SerNode.cfg */
 static BOOL consoleyes, serialyes, timeryes;
 static long latestActivityTime, lastKeepAliveTime, keepAliveMinutes = 0;
+static char characterSetPassthrough = 0;
 
 void prepareOutputStrings(char *input, char *conOutput, char *serOutput);
 
@@ -859,8 +860,12 @@ void prepareOutputStrings(char *input, char *conOutput, char *serOutput) {
     RenderStyle(conOutput, input, NULL);
   }
 
-  bytes = ConvMBChrsFromAmiga(serOutput, tmpSerStr, 1199, EFFECTIVE_USER->chrset, 0);
-  serOutput[bytes] = '\0';
+  if(characterSetPassthrough) {
+    strcpy(serOutput, tmpSerStr);
+  } else {
+    bytes = ConvMBChrsFromAmiga(serOutput, tmpSerStr, 1199, EFFECTIVE_USER->chrset, 0);
+    serOutput[bytes] = '\0';
+  }
 }
 
 int puttekn(char *str,int size) {
@@ -1189,4 +1194,8 @@ int sendtoser(char *pekare, int size) {
     return(TRUE);
   }
   return(aborted);
+}
+
+void SetCharacterSetPassthrough(char enabled) {
+  characterSetPassthrough = enabled;
 }

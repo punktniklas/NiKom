@@ -9,9 +9,6 @@
 #include <exec/lists.h>
 #endif
 
-/* Fältet structversion ska initialiseras med FIDOTEXTVER */
-#define FIDOTEXTVER 1
-
 /* Flagor för attribut-fältet*/
 #define FIDOT_PRIVATE     (1<<0)  /* Texten är ett NetMail */
 #define FIDOT_CRASH       (1<<1)  /* Crashmail */
@@ -32,10 +29,10 @@
 
 struct FidoText
 {
-	UBYTE fromuser[36], touser[36], subject[72],date[20], msgid[50];
-	USHORT fromzone,fromnet,fromnode,frompoint,tozone,tonet,tonode,topoint,attribut;
-	USHORT structversion;
-	struct MinList text;
+  UBYTE fromuser[36], touser[36], subject[72],date[20], msgid[50];
+  USHORT fromzone,fromnet,fromnode,frompoint,tozone,tonet,tonode,topoint,attribut;
+  int charset;
+  struct MinList text;
 };
 
 /* FidoLine-strukturen är identisk med EditLine i NiKomStr.h. Detta för
@@ -57,6 +54,8 @@ struct FidoLine
 #define RFT_HeaderOnly (RFT_Dummy + 3) /* Bara FidoText-strukturen */
 #define RFT_Quote      (RFT_Dummy + 4) /* Om texten ska användas som citat */
 #define RFT_LineLen    (RFT_Dummy + 5) /* Hur långa raderna ska vara */
+// If the text is in this charset, don't do any character conversion.
+#define RFT_PassthroughCharset (RFT_Dummy + 6)
 
 /* Tags att skicka med till WriteFidoText() */
 #define WFT_Dummy (TAG_USER + 1742)
@@ -69,6 +68,7 @@ struct FidoLine
 
 /* Character sets */
 enum nikom_chrs {
+  CHRS_PASSTHROUGH = -1,
   CHRS_UNKNOWN =  0,
   CHRS_LATIN1  =  1,
   CHRS_CP437   =  2,

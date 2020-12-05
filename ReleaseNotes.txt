@@ -16,6 +16,9 @@ Small fixes:
 - Fix so you can change the subject when writing a Fido text/mail.
 - Quoting the corrext text when replying with a text number.
 - Quoting a Fido text will now skip from the tear line and down.
+- When reading a Fido text that is originally in the same character
+  set as the terminal uses it will be displayed without any character
+  set conversion. (Especially useful for UTF-8)
 
 ---------------------------------------------------------------------------
                          NiKom v2.5.0, 2019-01-20

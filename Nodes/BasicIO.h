@@ -6,3 +6,4 @@ void StopHeartBeat(void);
 void RecordActivity(void);
 void CheckInactivity(void);
 void HandleKeepAlive(void);
+void SetCharacterSetPassthrough(char enabled);

@@ -477,3 +477,5 @@ void sereka(char tecken)
 {
 
 }
+
+void SetCharacterSetPassthrough(char enabled) { }
