@@ -90,7 +90,7 @@ MSG_GO_SYNTAX (250//)
 Syntax: Go <forum name>
 MSG_GO_NO_SUCH_FORUM (251//)
 There is no such forum.
-MSG_GO_NOT_MEMBER_NO_PERMS (253//)
+MSG_GO_NOT_MEMBER (253//)
 You are not a member of «name»%s«reset».
 ;
 MSG_NEXT_CONF_NO_MORE_FORUM (260//)

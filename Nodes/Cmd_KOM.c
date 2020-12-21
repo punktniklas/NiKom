@@ -36,7 +36,7 @@ void Cmd_GoConf(void) {
     }
     if(!IsMemberConf(parsedConfId, inloggad, CURRENT_USER)) {
       conf = getmotpek(parsedConfId);
-      SendStringCat("\r\n\n%s\r\n", CATSTR(MSG_GO_NOT_MEMBER_NO_PERMS), conf->namn);
+      SendStringCat("\r\n\n%s\r\n", CATSTR(MSG_GO_NOT_MEMBER), conf->namn);
       return;
     }
 
