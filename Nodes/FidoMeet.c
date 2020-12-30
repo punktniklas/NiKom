@@ -317,11 +317,7 @@ int fido_skriv(int komm,int komtill) {
       return 0;
     }
     strcpy(ft.touser, komft->fromuser);
-    if(!strncmp(komft->subject, "Re:", 3)) {
-      strcpy(ft.subject, komft->subject);
-    } else {
-      sprintf(ft.subject, "Re: %s", komft->subject);
-    }
+    strcpy(ft.subject, komft->subject);
     strcpy(msgid, komft->msgid);
     FreeFidoText(komft);
   }
