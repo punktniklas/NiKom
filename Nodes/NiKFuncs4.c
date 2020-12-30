@@ -21,6 +21,7 @@
 #include "NiKomStr.h"
 #include "Nodes.h"
 #include "NiKomFuncs.h"
+#include "FidoMeet.h"
 #include "NiKomLib.h"
 #include "Terminal.h"
 #include "UserNotificationHooks.h"
@@ -34,7 +35,7 @@
 #define EKO		1
 
 extern struct System *Servermem;
-extern int nodnr,inloggad,mote2,senast_text_typ,radcnt, g_userDataSlot;
+extern int nodnr, inloggad, mote2, senast_text_typ, senast_text_nr, radcnt, g_userDataSlot;
 extern char inmat[],*argument,usernamebuf[];
 extern struct Inloggning Statstr;
 extern struct Header readhead;
@@ -619,45 +620,51 @@ void motesstatus(void) {
   }
 }
 
-void hoppaarende(void) {
-  struct Mote *conf;
-  struct Header header;
+int skipSubjectInOrgConf(void) {
   int skipped = 0, nextUnread;
+  struct Header header;
 
-  if(!argument[0]) {
-    if(senast_text_typ != TEXT) {
-      SendString("\r\n\n%s\r\n", CATSTR(MSG_SKIP_SUBJECT_SYNTAX));
-      return;
-    } else {
-      argument = readhead.arende;
-    }
-  }
-  if(mote2 == -1) {
-    SendString("\r\n\n%s\r\n", CATSTR(MSG_SKIP_SUBJECT_MAIL));
-    return;
-  }
-  conf = getmotpek(mote2);
-  if(conf->type != MOTE_ORGINAL) {
-    SendString("\r\n\n%s\r\n", CATSTR(MSG_SKIP_SUBJECT_BAD_FORUM));
-    return;
-  }
-
-  if(strlen(argument) > 40) {
-    SendString("\r\n\n%s\r\n", CATSTR(MSG_SKIP_SUBJECT_TOO_LONG));
-    return;
+  if(argument[0] == '\0') {
+    argument = readhead.arende;
   }
   nextUnread = -1;
   while((nextUnread = FindNextUnreadText(nextUnread + 1, mote2,
                                          CUR_USER_UNREAD)) != -1) {
     if(readtexthead(nextUnread, &header)) {
-      return;
+      return skipped;
     }
     if(!strncmp(header.arende, argument, strlen(argument))) {
       ChangeUnreadTextStatus(nextUnread, 0, CUR_USER_UNREAD);
       skipped++;
     }
   }
-  if(!skipped) {
+  return skipped;
+}
+
+void hoppaarende(void) {
+  struct Mote *conf;
+  int skipped;
+
+  if(argument[0] == '\0' && senast_text_typ != TEXT) {
+    SendString("\r\n\n%s\r\n", CATSTR(MSG_SKIP_SUBJECT_SYNTAX));
+    return;
+  }
+  if(mote2 == -1) {
+    SendString("\r\n\n%s\r\n", CATSTR(MSG_SKIP_SUBJECT_MAIL));
+    return;
+  }
+  conf = getmotpek(mote2);
+
+  if(strlen(argument) > 40) {
+    SendString("\r\n\n%s\r\n", CATSTR(MSG_SKIP_SUBJECT_TOO_LONG));
+    return;
+  }
+
+  skipped = conf->type == MOTE_FIDO
+    ? SkipSubjectInFidoConf(conf, argument, senast_text_nr)
+    : skipSubjectInOrgConf();
+
+  if(skipped == 0) {
     SendString("\r\n\n%s\r\n", CATSTR(MSG_SKIP_SUBJECT_NONE));
   } else if(skipped==1) {
     SendString("\r\n\n%s\r\n", CATSTR(MSG_SKIP_SUBJECT_ONE));

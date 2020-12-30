@@ -10,3 +10,4 @@ int IntListRemoveIndex(struct IntList *list, int index);
 int IntListFind(struct IntList *list, int value);
 int IntListRemoveValue(struct IntList *list, int value);
 void IntListClear(struct IntList *list);
+void IntListDebugPrint(struct IntList *list, char *label);

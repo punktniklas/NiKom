@@ -695,8 +695,6 @@ MSG_SKIP_SUBJECT_ONE
 En text överhoppad.
 MSG_SKIP_SUBJECT_MANY
 %d texter överhoppade.
-MSG_SKIP_SUBJECT_BAD_FORUM
-Hoppa Ärende fungerar inte i detta möte.
 ;
 MSG_LIST_GROUPMEM_SYNTAX
 Skriv: Lista Medlemmar -g <grupp>

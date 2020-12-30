@@ -468,3 +468,44 @@ void fidolistaarende(struct Mote *motpek,int dir) {
     }
   }
 }
+
+int SkipSubjectInFidoConf(struct Mote *conf, char *args, int lastReadText) {
+  struct FidoText *ft;
+  int arglen, skipCount = 0, i;
+  char path[100], subject[72];
+
+  if(args[0] == '\0') {
+    MakeMsgFilePath(conf->dir, lastReadText - conf->renumber_offset, path);
+    if((ft = ReadFidoTextTags(path, RFT_HeaderOnly, TRUE, TAG_DONE)) == NULL) {
+      LogEvent(SYSTEM_LOG, ERROR,
+               "Could not read fido text '%s' as the latest read text for 'Skip Subject'",
+               path);
+      DisplayInternalError();
+      return 0;
+    }
+    strcpy(subject, ft->subject);
+    args = subject;
+    FreeFidoText(ft);
+  }
+
+  arglen = strlen(args);
+  for(i = CUR_USER_UNREAD->lowestPossibleUnreadText[conf->nummer]; i <= conf->texter; i++) {
+    if(IntListFind(g_readRepliesList, i) != -1) {
+      continue;
+    }
+    MakeMsgFilePath(conf->dir, i - conf->renumber_offset, path);
+    if((ft = ReadFidoTextTags(path, RFT_HeaderOnly, TRUE, TAG_DONE)) == NULL) {
+      LogEvent(SYSTEM_LOG, ERROR,
+               "Could not read fido text '%s' when searching for texts in 'Skip Subject'",
+               path);
+      DisplayInternalError();
+      return skipCount;
+    }
+    if(strncmp(ft->subject, args, arglen) == 0) {
+      IntListAppend(g_readRepliesList, i);
+      skipCount++;
+    }
+    FreeFidoText(ft);
+  }
+  return skipCount;
+}

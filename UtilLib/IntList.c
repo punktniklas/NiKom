@@ -1,6 +1,7 @@
 #include <exec/memory.h>
 #include <proto/exec.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "IntList.h"
 
@@ -103,4 +104,13 @@ int IntListRemoveValue(struct IntList *list, int value) {
 
 void IntListClear(struct IntList *list) {
   list->size = 0;
+}
+
+void IntListDebugPrint(struct IntList *list, char *label) {
+  int i;
+  printf("%s: size = %d  [", label, list->size);
+  for(i = 0; i < list->size; i++) {
+    printf("%d, ", list->array[i]);
+  }
+  printf("]\n");
 }
