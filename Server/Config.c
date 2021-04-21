@@ -23,12 +23,12 @@
 int parsegrupp(char *skri);
 
 void initSystemConfigDefaults(struct Config *cfg);
-int handleSystemConfigStatusSection(char *line, BPTR fh, struct Config *cfg);
-int handleSystemConfigLine(char *line, BPTR fh, struct Config *cfg);
-int handleStatusConfigLine(char *line, BPTR fh, struct Config *cfg);
-int handleFidoConfigLine(char *line, BPTR fh, struct Config *cfg);
-int handleStyleSheetsConfigLine(char *line, BPTR fh, struct Config *cfg);
-int handleCommandConfigLine(char *line, struct Kommando *command);
+int handleSystemConfigStatusSection(char *line, BPTR fh, struct Config *cfg, int *lineCnt);
+int handleSystemConfigLine(char *line, BPTR fh, struct Config *cfg, int *lineCnt);
+int handleStatusConfigLine(char *line, BPTR fh, struct Config *cfg, int *lineCnt);
+int handleFidoConfigLine(char *line, BPTR fh, struct Config *cfg, int *lineCnt);
+int handleStyleSheetsConfigLine(char *line, BPTR fh, struct Config *cfg, int *lineCnt);
+int handleCommandConfigLine(char *line, struct Kommando *command, int lineCnt);
 
 static int currentStyleSheet;
 
@@ -64,10 +64,10 @@ int InitLegacyConversionData(void) {
 }
 
 int readConfigFile(char *filename, struct Config *cfg,
-                   int (*handleLine)(char *, BPTR, struct Config *)) {
+                   int (*handleLine)(char *, BPTR, struct Config *, int *)) {
   BPTR fh;
   char buffer[200], *tmp;
-  int len;
+  int len, lineCnt = 0;
 
   printf("Reading %s\n", filename);
 
@@ -81,6 +81,7 @@ int readConfigFile(char *filename, struct Config *cfg,
       Close(fh);
       return 1;
     }
+    lineCnt++;
     if(buffer[0] == '#' || buffer[0] == '*') {
       continue;
     }
@@ -94,7 +95,7 @@ int readConfigFile(char *filename, struct Config *cfg,
     if(buffer[len - 1] == '\n') {
       buffer[len - 1] = '\0';
     }
-    if(!handleLine(buffer, fh, cfg)) {
+    if(!handleLine(buffer, fh, cfg, &lineCnt)) {
       Close(fh);
       return 0;
     }
@@ -157,7 +158,7 @@ void initSystemConfigDefaults(struct Config *cfg) {
   cfg->defaultcharset = 1;
 }
 
-int handleSystemConfigStatusSection(char *line, BPTR fh, struct Config *cfg) {
+int handleSystemConfigStatusSection(char *line, BPTR fh, struct Config *cfg, int *lineCnt) {
   int status;
   char buffer[100];
 
@@ -177,38 +178,39 @@ int handleSystemConfigStatusSection(char *line, BPTR fh, struct Config *cfg) {
         printf("Invalid config file, 'ENDSTATUS' not found.\n");
         return 0;
       }
+      (*lineCnt)++;
       if(line[0] == '#' || line[0] == '*' || line[0] == '\n') {
         continue;
       }
       if(StartsWith(line, "ENDSTATUS")) {
         return 1;
       } else if(isMatchingConfigLine(line, "MAXTID") || isMatchingConfigLine(line, "MAXTIME")) {
-        if(!GetShortCfgValue(line, &cfg->maxtid[status])) {
+        if(!GetShortCfgValue(line, &cfg->maxtid[status], *lineCnt)) {
           return 0;
         }
       } else if(isMatchingConfigLine(line, "ULDL")) {
-        if(!GetCharCfgValue(line, &cfg->uldlratio[status])) {
+        if(!GetCharCfgValue(line, &cfg->uldlratio[status], *lineCnt)) {
           return 0;
         }
       } else if(StartsWith(line, "STATUS")) {
         break;
       } else {
-        printf("Invalid config line in status section: %s\n", line);
+        printf("Invalid config line %d in status section: %s\n", *lineCnt, line);
         return 0;
       }
     }
   }
 }
 
-int handleSystemConfigLine(char *line, BPTR fh, struct Config *cfg) {
+int handleSystemConfigLine(char *line, BPTR fh, struct Config *cfg, int *lineCnt) {
   int len;
 
   if(isMatchingConfigLine(line, "DEFAULTFLAGS")) {
-    if(!GetLongCfgValue(line, &cfg->defaultflags)) {
+    if(!GetLongCfgValue(line, &cfg->defaultflags, *lineCnt)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "DEFAULTSTATUS")) {
-    if(!GetCharCfgValue(line, &cfg->defaultstatus)) {
+    if(!GetCharCfgValue(line, &cfg->defaultstatus, *lineCnt)) {
       return 0;
     }
     if(cfg->defaultstatus < 0 || cfg->defaultstatus > 100) {
@@ -216,15 +218,15 @@ int handleSystemConfigLine(char *line, BPTR fh, struct Config *cfg) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "DEFAULTRADER") || isMatchingConfigLine(line, "DEFAULTLINES")) {
-    if(!GetCharCfgValue(line, &cfg->defaultrader)) {
+    if(!GetCharCfgValue(line, &cfg->defaultrader, *lineCnt)) {
       return 0;
     }
   } else if(StartsWith(line, "STATUS")) {
-    if(!handleSystemConfigStatusSection(line, fh, cfg)) {
+    if(!handleSystemConfigStatusSection(line, fh, cfg, lineCnt)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "CLOSEDBBS")) {
-    if(!GetBoolCfgFlag(line, &cfg->cfgflags, NICFG_CLOSEDBBS)) {
+    if(!GetBoolCfgFlag(line, &cfg->cfgflags, NICFG_CLOSEDBBS, *lineCnt)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "NY") || isMatchingConfigLine(line, "NEWUSERLOGIN")) {
@@ -232,7 +234,7 @@ int handleSystemConfigLine(char *line, BPTR fh, struct Config *cfg) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "DISKFREE")) {
-    if(!GetLongCfgValue(line, &cfg->diskfree)) {
+    if(!GetLongCfgValue(line, &cfg->diskfree, *lineCnt)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "ULTMP")) {
@@ -245,67 +247,67 @@ int handleSystemConfigLine(char *line, BPTR fh, struct Config *cfg) {
       cfg->ultmp[len + 1] = '\0';
     }
   } else if(isMatchingConfigLine(line, "PREINLOGG") || isMatchingConfigLine(line, "AREXX_PRELOGIN")) {
-    if(!GetLongCfgValue(line, &cfg->ar.preinlogg)) {
+    if(!GetLongCfgValue(line, &cfg->ar.preinlogg, *lineCnt)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "POSTINLOGG") || isMatchingConfigLine(line, "AREXX_POSTLOGIN")) {
-    if(!GetLongCfgValue(line, &cfg->ar.postinlogg)) {
+    if(!GetLongCfgValue(line, &cfg->ar.postinlogg, *lineCnt)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "UTLOGG") || isMatchingConfigLine(line, "AREXX_LOGOUT")) {
-    if(!GetLongCfgValue(line, &cfg->ar.utlogg)) {
+    if(!GetLongCfgValue(line, &cfg->ar.utlogg, *lineCnt)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "NYANV") || isMatchingConfigLine(line, "AREXX_NEWUSER")) {
-    if(!GetLongCfgValue(line, &cfg->ar.nyanv)) {
+    if(!GetLongCfgValue(line, &cfg->ar.nyanv, *lineCnt)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "PREUPLOAD1") || isMatchingConfigLine(line, "AREXX_PREUPLOAD1")) {
-    if(!GetLongCfgValue(line, &cfg->ar.preup1)) {
+    if(!GetLongCfgValue(line, &cfg->ar.preup1, *lineCnt)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "PREUPLOAD2") || isMatchingConfigLine(line, "AREXX_PREUPLOAD2")) {
-    if(!GetLongCfgValue(line, &cfg->ar.preup2)) {
+    if(!GetLongCfgValue(line, &cfg->ar.preup2, *lineCnt)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "POSTUPLOAD1") || isMatchingConfigLine(line, "AREXX_POSTUPLOAD1")) {
-    if(!GetLongCfgValue(line, &cfg->ar.postup1)) {
+    if(!GetLongCfgValue(line, &cfg->ar.postup1, *lineCnt)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "POSTUPLOAD2") || isMatchingConfigLine(line, "AREXX_POSTUPLOAD2")) {
-    if(!GetLongCfgValue(line, &cfg->ar.postup2)) {
+    if(!GetLongCfgValue(line, &cfg->ar.postup2, *lineCnt)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "NORIGHT") || isMatchingConfigLine(line, "AREXX_NOPERMISSION")) {
-    if(!GetLongCfgValue(line, &cfg->ar.noright)) {
+    if(!GetLongCfgValue(line, &cfg->ar.noright, *lineCnt)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "NEXTMEET") || isMatchingConfigLine(line, "AREXX_NEXTFORUM")) {
-    if(!GetLongCfgValue(line, &cfg->ar.nextmeet)) {
+    if(!GetLongCfgValue(line, &cfg->ar.nextmeet, *lineCnt)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "NEXTTEXT") || isMatchingConfigLine(line, "AREXX_NEXTTEXT")) {
-    if(!GetLongCfgValue(line, &cfg->ar.nexttext)) {
+    if(!GetLongCfgValue(line, &cfg->ar.nexttext, *lineCnt)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "NEXTKOM") || isMatchingConfigLine(line, "AREXX_NEXTREPLY")) {
-    if(!GetLongCfgValue(line, &cfg->ar.nextkom)) {
+    if(!GetLongCfgValue(line, &cfg->ar.nextkom, *lineCnt)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "SETID") || isMatchingConfigLine(line, "AREXX_SEETIME")) {
-    if(!GetLongCfgValue(line, &cfg->ar.setid)) {
+    if(!GetLongCfgValue(line, &cfg->ar.setid, *lineCnt)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "NEXTLETTER") || isMatchingConfigLine(line, "AREXX_NEXTMAIL")) {
-    if(!GetLongCfgValue(line, &cfg->ar.nextletter)) {
+    if(!GetLongCfgValue(line, &cfg->ar.nextletter, *lineCnt)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "CARDROPPED") || isMatchingConfigLine(line, "AREXX_AUTOLOGOUT")) {
-    if(!GetLongCfgValue(line, &cfg->ar.cardropped)) {
+    if(!GetLongCfgValue(line, &cfg->ar.cardropped, *lineCnt)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "LOGMASK")) {
-    if(!GetLongCfgValue(line, &cfg->logmask)) {
+    if(!GetLongCfgValue(line, &cfg->logmask, *lineCnt)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "SCREEN")) {
@@ -313,36 +315,36 @@ int handleSystemConfigLine(char *line, BPTR fh, struct Config *cfg) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "YPOS") || isMatchingConfigLine(line, "WIN_YPOS")) {
-    if(!GetLongCfgValue(line, (long *)&ypos)) {
+    if(!GetLongCfgValue(line, (long *)&ypos, *lineCnt)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "XPOS") || isMatchingConfigLine(line, "WIN_XPOS")) {
-    if(!GetLongCfgValue(line, (long *)&xpos)) {
+    if(!GetLongCfgValue(line, (long *)&xpos, *lineCnt)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "VALIDERAFILER") || isMatchingConfigLine(line, "UPLOADSNOTVALIDATED")) {
-    if(!GetBoolCfgFlag(line, &cfg->cfgflags, NICFG_VALIDATEFILES)) {
+    if(!GetBoolCfgFlag(line, &cfg->cfgflags, NICFG_VALIDATEFILES, *lineCnt)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "LOGINTRIES") || isMatchingConfigLine(line, "LOGINATTEMPTS")) {
-    if(!GetShortCfgValue(line, &cfg->logintries)) {
+    if(!GetShortCfgValue(line, &cfg->logintries, *lineCnt)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "LOCALCOLOURS") || isMatchingConfigLine(line, "LOCALCOLORS")) {
-    if(!GetBoolCfgFlag(line, &cfg->cfgflags, NICFG_LOCALCOLOURS)) {
+    if(!GetBoolCfgFlag(line, &cfg->cfgflags, NICFG_LOCALCOLOURS, *lineCnt)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "CRYPTEDPASSWORDS")
             || isMatchingConfigLine(line, "ENCRYPTEDPASSWORDS")) {
-    if(!GetBoolCfgFlag(line, &cfg->cfgflags, NICFG_CRYPTEDPASSWORDS)) {
+    if(!GetBoolCfgFlag(line, &cfg->cfgflags, NICFG_CRYPTEDPASSWORDS, *lineCnt)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "NEWUSERCHARSET")) {
-    if(!GetCharCfgValue(line, &cfg->defaultcharset)) {
+    if(!GetCharCfgValue(line, &cfg->defaultcharset, *lineCnt)) {
       return 0;
     }
   } else {
-    printf("Invalid config line: %s\n", line);
+    printf("Invalid config line number %d: %s\n", *lineCnt, line);
     return 0;
   }
   return 1;
@@ -364,7 +366,7 @@ int readCommandConfig(struct Config *cfg) {
   BPTR fh;
   struct Kommando *command = NULL;
   char buffer[100];
-  int cnt = 0;
+  int cnt = 0, lineCnt = 0;
   
   if(!(fh = Open("NiKom:DatoCfg/Commands.cfg", MODE_OLDFILE))) {
     printf("Kunde inte öppna NiKom:DatoCfg/Commands.cfg\n");
@@ -372,6 +374,7 @@ int readCommandConfig(struct Config *cfg) {
   }
 
   while(FGets(fh, buffer, 100)) {
+    lineCnt++;
     if(buffer[0] == '\n' || buffer[0] == '*') {
       continue;
     }
@@ -394,11 +397,11 @@ int readCommandConfig(struct Config *cfg) {
     }
 
     if(command == NULL) {
-      printf("Found command detail line before command start (\"N=\"): %s\n", buffer);
+      printf("Line %d, found command detail line before command start (\"N=\"): %s\n", lineCnt, buffer);
       Close(fh);
       return 0;
     }
-    if(!handleCommandConfigLine(buffer, command)) {
+    if(!handleCommandConfigLine(buffer, command, lineCnt)) {
       Close(fh);
       return 0;
     }
@@ -409,21 +412,21 @@ int readCommandConfig(struct Config *cfg) {
   return 1;
 }
 
-int handleCommandConfigLine(char *line, struct Kommando *command) {
+int handleCommandConfigLine(char *line, struct Kommando *command, int lineCnt) {
   char tmp[100], *pos;
   int group, langId;
 
   switch(line[0]) {
   case 'N':
     if((pos = strchr(line, '=')) == NULL) {
-      printf("Can't find equals sign: '%s'\n", line);
+      printf("Line %d, can't find equals sign: '%s'\n", lineCnt, line);
       return 0;
     }
     *pos = '\0';
     langId = FindLanguageId(&line[1]);
     *pos = '=';
     if(langId == -1) {
-      printf("Unknown language: %s\n", line);
+      printf("Line %d, unknown language: %s\n", lineCnt, line);
       return 0;
     }
     if(!populateLangCommand(&command->langCmd[langId], line)) {
@@ -431,7 +434,7 @@ int handleCommandConfigLine(char *line, struct Kommando *command) {
     }
     break;
   case '#' :
-    if(!GetLongCfgValue(line, &command->nummer)) {
+    if(!GetLongCfgValue(line, &command->nummer, lineCnt)) {
       return 0;
     }
     break;
@@ -442,17 +445,17 @@ int handleCommandConfigLine(char *line, struct Kommando *command) {
     command->argument = tmp[0] == '#' ? KOMARGNUM : KOMARGCHAR;
     break;
   case 'S' :
-    if(!GetCharCfgValue(line, &command->status)) {
+    if(!GetCharCfgValue(line, &command->status, lineCnt)) {
       return 0;
     }
     break;
   case 'L' :
-    if(!GetLongCfgValue(line, &command->minlogg)) {
+    if(!GetLongCfgValue(line, &command->minlogg, lineCnt)) {
       return 0;
     }
     break;
   case 'D' :
-    if(!GetLongCfgValue(line, &command->mindays)) {
+    if(!GetLongCfgValue(line, &command->mindays, lineCnt)) {
       return 0;
     }
     break;
@@ -483,12 +486,12 @@ int handleCommandConfigLine(char *line, struct Kommando *command) {
     }
     break;
   case '(' :
-    if(!GetLongCfgValue(line, &command->before)) {
+    if(!GetLongCfgValue(line, &command->before, lineCnt)) {
       return 0;
     }
     break;
   case ')' :
-    if(!GetLongCfgValue(line, &command->after)) {
+    if(!GetLongCfgValue(line, &command->after, lineCnt)) {
       return 0;
     }
     break;
@@ -498,13 +501,13 @@ int handleCommandConfigLine(char *line, struct Kommando *command) {
     }
     group = parsegrupp(tmp);
     if(group == -1) {
-      printf("Unknown group name: %s\n", tmp);
+      printf("Line %d, unknown group name: %s\n", lineCnt, tmp);
       return 0;
     }
     BAMSET((char *)&command->grupper, group);
     break;
   default:
-    printf("Invalid line: %s\n", line);
+    printf("Invalid line %d: %s\n", lineCnt, line);
     return 0;
   }
   return 1;
@@ -558,61 +561,61 @@ int readStatusConfig(struct Config *cfg) {
   return readConfigFile("NiKom:DatoCfg/Status.cfg", cfg, handleStatusConfigLine);
 }
 
-int handleStatusConfigLine(char *line, BPTR fh, struct Config *cfg) {
+int handleStatusConfigLine(char *line, BPTR fh, struct Config *cfg, int *lineCnt) {
   if(isMatchingConfigLine(line, "SKRIV") || isMatchingConfigLine(line, "WRITE")) {
-    if(!GetCharCfgValue(line, &cfg->st.skriv)) {
+    if(!GetCharCfgValue(line, &cfg->st.skriv, *lineCnt)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "TEXTER") || isMatchingConfigLine(line, "MANAGETEXTS")) {
-    if(!GetCharCfgValue(line, &cfg->st.texter)) {
+    if(!GetCharCfgValue(line, &cfg->st.texter, *lineCnt)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "BREV") || isMatchingConfigLine(line, "MANAGEMAIL")) {
-    if(!GetCharCfgValue(line, &cfg->st.brev)) {
+    if(!GetCharCfgValue(line, &cfg->st.brev, *lineCnt)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "MEDMÖTEN") || isMatchingConfigLine(line, "JOINFORUMS")) {
-    if(!GetCharCfgValue(line, &cfg->st.medmoten)) {
+    if(!GetCharCfgValue(line, &cfg->st.medmoten, *lineCnt)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "RADMÖTEN") || isMatchingConfigLine(line, "MANAGEFORUMS")) {
-    if(!GetCharCfgValue(line, &cfg->st.radmoten)) {
+    if(!GetCharCfgValue(line, &cfg->st.radmoten, *lineCnt)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "SESTATUS") || isMatchingConfigLine(line, "VIEWUSERINFO")) {
-    if(!GetCharCfgValue(line, &cfg->st.sestatus)) {
+    if(!GetCharCfgValue(line, &cfg->st.sestatus, *lineCnt)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "ANVÄNDARE") || isMatchingConfigLine(line, "MANAGEUSERS")) {
-    if(!GetCharCfgValue(line, &cfg->st.anv)) {
+    if(!GetCharCfgValue(line, &cfg->st.anv, *lineCnt)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "ÄNDSTATUS") || isMatchingConfigLine(line, "MANAGESTATUS")) {
-    if(!GetCharCfgValue(line, &cfg->st.chgstatus)) {
+    if(!GetCharCfgValue(line, &cfg->st.chgstatus, *lineCnt)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "BYTAREA") || isMatchingConfigLine(line, "JOINAREAS")) {
-    if(!GetCharCfgValue(line, &cfg->st.bytarea)) {
+    if(!GetCharCfgValue(line, &cfg->st.bytarea, *lineCnt)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "RADAREA") || isMatchingConfigLine(line, "MANAGEAREAS")) {
-    if(!GetCharCfgValue(line, &cfg->st.radarea)) {
+    if(!GetCharCfgValue(line, &cfg->st.radarea, *lineCnt)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "FILER") || isMatchingConfigLine(line, "MANAGEFILES")) {
-    if(!GetCharCfgValue(line, &cfg->st.filer)) {
+    if(!GetCharCfgValue(line, &cfg->st.filer, *lineCnt)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "LADDANER") || isMatchingConfigLine(line, "DOWNLOAD")) {
-    if(!GetCharCfgValue(line, &cfg->st.laddaner)) {
+    if(!GetCharCfgValue(line, &cfg->st.laddaner, *lineCnt)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "GRUPPER") || isMatchingConfigLine(line, "MANAGEGROUPS")) {
-    if(!GetCharCfgValue(line, &cfg->st.grupper)) {
+    if(!GetCharCfgValue(line, &cfg->st.grupper, *lineCnt)) {
       return 0;
     }
   } else {
-    printf("Invalid config line: %s\n", line);
+    printf("Invalid config line %d: %s\n", *lineCnt, line);
     return 0;
   }
   return 1;
@@ -696,7 +699,7 @@ int readFidoConfig(struct Config *cfg) {
   return readConfigFile("NiKom:DatoCfg/NiKomFido.cfg", cfg, handleFidoConfigLine);
 }
 
-int handleFidoConfigLine(char *line, BPTR fh, struct Config *cfg) {
+int handleFidoConfigLine(char *line, BPTR fh, struct Config *cfg, int *lineCnt) {
   int i, address[4], group;
   char *tmp1, *tmp2, tmpbuf[50];
 
@@ -713,7 +716,7 @@ int handleFidoConfigLine(char *line, BPTR fh, struct Config *cfg) {
     tmp1 = FindNextWord(line);
     cfg->fidoConfig.fd[i].nummer = atoi(tmp1);
     if(cfg->fidoConfig.fd[i].nummer <= 0) {
-      printf("The domain number must be a positive integer: %s\n", line);
+      printf("Line %d, the domain number must be a positive integer: %s\n", *lineCnt, line);
       return 0;
     }
     tmp1 = FindNextWord(tmp1);
@@ -721,7 +724,7 @@ int handleFidoConfigLine(char *line, BPTR fh, struct Config *cfg) {
     tmp2[-1] = '\0';
     strncpy(cfg->fidoConfig.fd[i].domain, tmp1, 19);
     if(!ParseFidoAddress(tmp2, address)) {
-      printf("Invalid FidoNet address '%s'\n", tmp2);
+      printf("Line %d, invalid FidoNet address '%s'\n", *lineCnt, tmp2);
       return 0;
     }
     cfg->fidoConfig.fd[i].zone = address[0];
@@ -775,13 +778,13 @@ int handleFidoConfigLine(char *line, BPTR fh, struct Config *cfg) {
     }
     group = parsegrupp(tmpbuf);
     if(group == -1) {
-      printf("Unknown user group '%s'\n", tmpbuf);
+      printf("Line %d, unknown user group '%s'\n", *lineCnt, tmpbuf);
       return 0;
     }
     BAMSET((char *)&cfg->fidoConfig.mailgroups, group);
   }
   else if(isMatchingConfigLine(line, "MAILSTATUS")) {
-    if(!GetCharCfgValue(line, &cfg->fidoConfig.mailstatus)) {
+    if(!GetCharCfgValue(line, &cfg->fidoConfig.mailstatus, *lineCnt)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "DEFAULTORIGIN")) {
@@ -789,7 +792,7 @@ int handleFidoConfigLine(char *line, BPTR fh, struct Config *cfg) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "CRASHSTATUS")) {
-    if(!GetCharCfgValue(line, &cfg->fidoConfig.crashstatus)) {
+    if(!GetCharCfgValue(line, &cfg->fidoConfig.crashstatus, *lineCnt)) {
       return 0;
     }
   } else if(isMatchingConfigLine(line, "MESSAGE_BYTE_ORDER")) {
@@ -801,10 +804,10 @@ int handleFidoConfigLine(char *line, BPTR fh, struct Config *cfg) {
     } else if(strcmp(tmpbuf, "LITTLE_ENDIAN") == 0) {
       cfg->fidoConfig.littleEndianByteOrder = 1;
     } else {
-      printf("Invalid byte order '%s'\n", tmpbuf);
+      printf("Line %d, invalid byte order '%s'\n", *lineCnt, tmpbuf);
     }
   } else {
-    printf("Invalid config line: %s\n", line);
+    printf("Invalid config line %d: %s\n", *lineCnt, line);
     return 0;
   }
   return 1;
@@ -815,23 +818,23 @@ int readStyleSheetConfig(struct Config *cfg) {
   return readConfigFile("NiKom:DatoCfg/StyleSheets.cfg", cfg, handleStyleSheetsConfigLine);
 }
 
-int handleStyleSheetsConfigLine(char *line, BPTR fh, struct Config *cfg) {
+int handleStyleSheetsConfigLine(char *line, BPTR fh, struct Config *cfg, int *lineCnt) {
   struct StyleCode *styleCode;
   char *word, codeKey[20];
   if(isMatchingConfigLine(line, "STYLE")) {
     word = FindNextWord(line);
     if(word[0] == '\0') {
-      printf("No number given for stylesheet: '%s'\n", line);
+      printf("Line %d, no number given for stylesheet: '%s'\n", *lineCnt, line);
       return 0;
     }
     currentStyleSheet = atoi(word);
     if(currentStyleSheet < 0 || currentStyleSheet >= MAXSTYLESHEET) {
-      printf("Invalid style sheet number: %d\n", currentStyleSheet);
+      printf("Line %d, invalid style sheet number: %d\n", *lineCnt, currentStyleSheet);
       return 0;
     }
     word = FindNextWord(word);
     if(word[0] == '\0') {
-      printf("No name given for stylesheet %d\n", currentStyleSheet);
+      printf("Line %d, no name given for stylesheet %d\n", *lineCnt, currentStyleSheet);
       return 0;
     }
     strcpy(cfg->styleSheets[currentStyleSheet].name, word);
@@ -839,18 +842,18 @@ int handleStyleSheetsConfigLine(char *line, BPTR fh, struct Config *cfg) {
   }
   if(isMatchingConfigLine(line, "CODE")) {
     if(currentStyleSheet == -1) {
-      printf("CODE line without any preceeding STYLE line found.\n");
+      printf("Line %d, CODE line without any preceeding STYLE line found.\n", *lineCnt);
       return 0;
     }
    word = FindNextWord(line);
     if(word[0] == '\0') {
-      printf("No name given for code: '%s'\n", line);
+      printf("Line %d, no name given for code: '%s'\n", *lineCnt, line);
       return 0;
     }
     CopyOneWord(codeKey, word);
     word = FindNextWord(word);
     if(word[0] == '\0') {
-      printf("No ANSI sequence for code '%s' defined.\n", codeKey);
+      printf("Line %d, no ANSI sequence for code '%s' defined.\n", *lineCnt, codeKey);
       return 0;
     }
     if(!(styleCode = AllocMem(sizeof(struct StyleCode), MEMF_PUBLIC | MEMF_CLEAR))) {
@@ -864,7 +867,7 @@ int handleStyleSheetsConfigLine(char *line, BPTR fh, struct Config *cfg) {
     }
     return 1;
   }
-  printf("Invalid config line: %s\n", line);
+  printf("Invalid config line %d: %s\n", *lineCnt, line);
   return 0;
 }
 

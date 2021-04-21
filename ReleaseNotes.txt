@@ -19,6 +19,7 @@ Small fixes:
 - When reading a Fido text that is originally in the same character
   set as the terminal uses it will be displayed without any character
   set conversion. (Especially useful for UTF-8)
+- NiKServer will now print which line number a config error is at.
 
 ---------------------------------------------------------------------------
                          NiKom v2.5.0, 2019-01-20

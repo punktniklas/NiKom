@@ -42,7 +42,7 @@ int GetStringCfgValue(char *str, char *dest, int len) {
   return 1;
 }
 
-int GetLongCfgValue(char *str, long *value) {
+int GetLongCfgValue(char *str, long *value, int lineCnt) {
   char *valstr, *tmp;
 
   if((valstr = FindStringCfgValue(str)) == NULL) {
@@ -50,7 +50,7 @@ int GetLongCfgValue(char *str, long *value) {
   }
   for(tmp = valstr; *tmp != '\0'; tmp++) {
     if(!IzDigit(*tmp) && *tmp != '-') {
-      printf("Invalid config line, value must be only digits: %s\n", str);
+      printf("Invalid config line %d, value must be only digits: %s\n", lineCnt, str);
       return 0;
     }
   }
@@ -58,34 +58,34 @@ int GetLongCfgValue(char *str, long *value) {
   return 1;
 }
 
-int GetCharCfgValue(char *str, char *value) {
+int GetCharCfgValue(char *str, char *value, int lineCnt) {
   long longval;
-  if(!GetLongCfgValue(str, &longval)) {
+  if(!GetLongCfgValue(str, &longval, lineCnt)) {
     return 0;
   }
   if(longval < -128 || longval > 127) {
-    printf("Invalid config line, value must be between -128 and 127: %s\n", str);
+    printf("Invalid config line %d, value must be between -128 and 127: %s\n", lineCnt, str);
     return 0;
   }
   *value = longval;
   return 1;
 }
 
-int GetShortCfgValue(char *str, short *value) {
+int GetShortCfgValue(char *str, short *value, int lineCnt) {
   long longval;
-  if(!GetLongCfgValue(str, &longval)) {
+  if(!GetLongCfgValue(str, &longval, lineCnt)) {
     return 0;
   }
   if(longval < SHRT_MIN || longval > SHRT_MAX) {
-    printf("Invalid config line, value must be between %d and %d: %s\n",
-           SHRT_MIN, SHRT_MAX, str);
+    printf("Invalid config line %d, value must be between %d and %d: %s\n",
+           lineCnt, SHRT_MIN, SHRT_MAX, str);
     return 0;
   }
   *value = longval;
   return 1;
 }
 
-int GetBoolCfgFlag(char *str, long *flagfield, long flag) {
+int GetBoolCfgFlag(char *str, long *flagfield, long flag, int lineCnt) {
   char *valstr;
   int boolvalue;
 
@@ -97,7 +97,7 @@ int GetBoolCfgFlag(char *str, long *flagfield, long flag) {
   } else if(stricmp(valstr, "NO") == 0 || stricmp(valstr, "NEJ") == 0) {
     boolvalue = 0;
   } else {
-    printf("Invalid config line, invalid boolean value: %s\n", str);
+    printf("Invalid config line %d, invalid boolean value: %s\n", lineCnt, str);
     return 0;
   }
   if(boolvalue) {
