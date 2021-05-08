@@ -16,9 +16,13 @@ Small fixes:
 - Fix so you can change the subject when writing a Fido text/mail.
 - Quoting the corrext text when replying with a text number.
 - Quoting a Fido text will now skip from the tear line and down.
+- When someone likes/dislikes a text it is now logged to Usage.log.
 - When reading a Fido text that is originally in the same character
   set as the terminal uses it will be displayed without any character
   set conversion. (Especially useful for UTF-8)
+- "Skip Subject" now also works for Fido forums.
+- NiKom no longer adds a "Re:" to the subject line when replying to
+  a Fido text.
 - NiKServer will now print which line number a config error is at.
 
 ---------------------------------------------------------------------------
