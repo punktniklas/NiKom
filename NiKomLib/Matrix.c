@@ -59,24 +59,32 @@ void __saveds AASM LIBMatrix2NiKom(register __a6 struct NiKomBase *NiKomBase ARE
                fidotext->topoint);
       userId = fidoparsenamn(fidotext->touser, NiKomBase->Servermem);
       if(userId == -1) {
-        LogEvent(NiKomBase->Servermem, FIDO_LOG, WARN,
-                 "User '%s' not found, skipping netmail %d.msg", fidotext->touser, currentMsgNum);
+        LogEvent(NiKomBase->Servermem, SYSTEM_LOG, WARN,
+                 "Can't import netmail %d.msg (in '%s'). Unknown user '%s'",
+                 currentMsgNum,
+                 NiKomBase->Servermem->cfg->fidoConfig.matrixDirs[i].path,
+                 fidotext->touser);
         continue;
       }
       LogEvent(NiKomBase->Servermem, FIDO_LOG, DEBUG,
                "User '%s' is NiKom user #%d.", fidotext->touser, userId);
       mailId = updatenextletter(userId);
       if(mailId == -1) {
-        LogEvent(NiKomBase->Servermem, FIDO_LOG, WARN,
-                 "Can't update .nextletter, skipping netmail %d.msg", currentMsgNum);
+        LogEvent(NiKomBase->Servermem, SYSTEM_LOG, WARN,
+                 "Can't update .nextletter for user %d, skipping netmail %d.msg", userId, currentMsgNum);
         continue;
       }
       sprintf(buffer, "NiKom:Users/%d/%d/%d.letter", userId / 100, userId, mailId);
       if(!(fh = Open(buffer, MODE_NEWFILE))) {
-        LogEvent(NiKomBase->Servermem, FIDO_LOG, WARN,
+        LogEvent(NiKomBase->Servermem, SYSTEM_LOG, WARN,
                  "Can't write to file %s, skipping netmail %d.msg.", buffer, currentMsgNum);
         continue;
       }
+      LogEvent(NiKomBase->Servermem, USAGE_LOG, INFO,
+               "Importing netmail %d.msg for user %d (To: '%s').",
+               currentMsgNum,
+               userId,
+               fidotext->touser);
       FPuts(fh, "System-ID: Fido\n");
       sprintf(buffer, "From: %s (%d:%d/%d.%d)\n", 
               fidotext->fromuser, fidotext->fromzone, fidotext->fromnet,

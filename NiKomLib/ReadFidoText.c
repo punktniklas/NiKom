@@ -187,6 +187,21 @@ int getpoint(char *adr) {
 	else return(0);
 }
 
+// Handle the weird MSGID strings that SynchroNet produces. It produces
+// MSGIDs on the format <something>@zone:net/node.point. If we find an
+// '@' before a ':', then return the string that starts after the '@'.
+// Otherwise return the original string.
+// We can not rely on just finding the '@' since some systems (including
+// NiKom..) produces MSGIDs like zone:net/node.point@FidoNet.
+static UBYTE *findMsgIdStart(UBYTE *str) {
+  UBYTE *tmpStr;
+  for(tmpStr = str; *tmpStr != '\0'; tmpStr++) {
+    if(*tmpStr == '@') return tmpStr+1;
+    if(*tmpStr == ':') return str;
+  }
+  return str;
+}
+
 static USHORT getTwoByteField(UBYTE *bytes, char littleEndian) {
   if(littleEndian) {
     return (USHORT) (bytes[1] * 0x100 + bytes[0]);
@@ -214,7 +229,7 @@ struct FidoText * __saveds AASM LIBReadFidoText(register __a0 char *filename ARE
   struct FidoLine *fltmp;
   BPTR fh;
   UBYTE intl[30], replyto[20], origin[20], topt[5], fmpt[5], ftshead[190],
-    fidoline[81],flbuffer[81],*foo,prequote[10];
+    fidoline[81],flbuffer[81],*foo,prequote[10], *msgId;
   int bytes;
   
   if(!NiKomBase->Servermem) return(NULL);
@@ -333,10 +348,11 @@ struct FidoText * __saveds AASM LIBReadFidoText(register __a0 char *filename ARE
   fidotext->charset = chrset;
   if(fidotext->attribut & FIDOT_PRIVATE) {
     if(fidotext->msgid[0]) {
-      if((x=getzone(fidotext->msgid))) fidotext->fromzone=x;
-      if((x=getnet(fidotext->msgid))) fidotext->fromnet=x;
-      if((x=getnode(fidotext->msgid))) fidotext->fromnode=x;
-      if((x=getpoint(fidotext->msgid))) fidotext->frompoint=x;
+      msgId = findMsgIdStart(fidotext->msgid);
+      if((x=getzone(msgId))) fidotext->fromzone=x;
+      if((x=getnet(msgId))) fidotext->fromnet=x;
+      if((x=getnode(msgId))) fidotext->fromnode=x;
+      if((x=getpoint(msgId))) fidotext->frompoint=x;
     }
     if(replyto[0]) {
       if((x=getzone(replyto))) fidotext->tozone=x;
@@ -357,10 +373,11 @@ struct FidoText * __saveds AASM LIBReadFidoText(register __a0 char *filename ARE
     if(fmpt[0]) fidotext->frompoint = atoi(fmpt);
   } else {
     if(fidotext->msgid[0]) {
-      if((x=getzone(fidotext->msgid))) fidotext->fromzone=x;
-      if((x=getnet(fidotext->msgid))) fidotext->fromnet=x;
-      if((x=getnode(fidotext->msgid))) fidotext->fromnode=x;
-      if((x=getpoint(fidotext->msgid))) fidotext->frompoint=x;
+      msgId = findMsgIdStart(fidotext->msgid);
+      if((x=getzone(msgId))) fidotext->fromzone=x;
+      if((x=getnet(msgId))) fidotext->fromnet=x;
+      if((x=getnode(msgId))) fidotext->fromnode=x;
+      if((x=getpoint(msgId))) fidotext->frompoint=x;
     }
     if(replyto[0]) {
       if((x=getzone(replyto))) fidotext->tozone=x;
