@@ -40,8 +40,8 @@ nikom.library : Debug/$(CPU) NoDebug/$(CPU) $(OBJS) nikom.fd
         LIB lib:sc.lib lib:amiga.lib /UtilLib/Debug/$(CPU)/nikomutils_nlib.lib \
         BATCH SMALLCODE SMALLDATA \
         LIBVERSION 27 \
-        LIBREVISION 1 \
-        LIBID "nikom.library 27.1"
+        LIBREVISION 2 \
+        LIBID "nikom.library 27.2"
   slink Debug/$(CPU)/nikom.library TO NoDebug/$(CPU)/nikom.library NODEBUG NOICONS
 
 LibInit.o:      LibInit.c       nikom.fd
