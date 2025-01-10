@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # The motivation for this script is to be able to read a line of text with
 # a timeout, while handling both CR and LF as line ending. 
@@ -31,7 +31,7 @@ while len(chars) < numChars:
     readable, writeable, exceptions = select.select([unbufferedStdin], [], [], 1)
     if unbufferedStdin in readable:
         timeoutCount = 0
-        c = unbufferedStdin.read(1)
+        c = unbufferedStdin.read(1).decode()
         if 0 == len(c) or c in ("\r", "\n"):
             break
         else:
@@ -41,5 +41,5 @@ while len(chars) < numChars:
         returnValue = 128 # Same as bash read when it times out
         break
 
-print "".join(chars) # Send the read string back on stdout
+print("".join(chars)) # Send the read string back on stdout
 sys.exit(returnValue)
