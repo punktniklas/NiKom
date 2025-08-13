@@ -31,7 +31,7 @@ while len(chars) < numChars:
     readable, writeable, exceptions = select.select([unbufferedStdin], [], [], 1)
     if unbufferedStdin in readable:
         timeoutCount = 0
-        c = unbufferedStdin.read(1).decode()
+        c = unbufferedStdin.read(1).decode('latin-1')
         if 0 == len(c) or c in ("\r", "\n"):
             break
         else:
